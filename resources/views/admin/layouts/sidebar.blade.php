@@ -33,21 +33,19 @@
 
                 <li class="menu-title"><span >Users managment</span></li>
 
-                @canany(['admin.roles.index'])
+                @haspermission('admin.roles.index')
                 <li class="nav-item">
                     <a class="nav-link menu-link {{
                         (
-                            request()->routeIs('admin.roles.index') || 
-                            request()->routeIs('admin.roles.create') ||
-                            request()->routeIs('admin.roles.edit') ||
+                            request()->routeIs('admin.roles.index') ||
                             request()->routeIs('admin.roles.show')
                         ) ? 'active' : ''}}" href="{{route('admin.roles.index')}}">
                         <i class="ri-forbid-2-fill"></i> <span >Roles</span>
                     </a>
                 </li> <!-- end Dashboard Menu -->
-                @endcanany
+                @endhaspermission
 
-                @canany(['admin.permissions.index'])
+                @haspermission('admin.permissions.index')
                 <li class="nav-item">
                     <a class="nav-link menu-link {{
                         (
@@ -59,7 +57,7 @@
                         <i class="ri-forbid-fill"></i> <span >Permissions</span>
                     </a>
                 </li> <!-- end Dashboard Menu -->
-                @endcanany
+                @endhaspermission
             </ul>
         </div>
         <!-- Sidebar -->

@@ -30,7 +30,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Role name</label>
+                                    <label class="form-label" for="">Role name <span class="text-danger">*</span></label>
                                     <input name="name" value="{{old('name')}}" type="text" class="form-control">
                                     @error('name')
                                         <p class="mx-2 my-2 text-danger">
@@ -42,7 +42,7 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="form-label" for="is_default">Make default</label>
+                                    <label class="form-label" for="is_default">Make default <span class="text-danger">*</span></label>
                                     <select class="form-control" name="is_default">
                                         <option value="1">yes</option>
                                         <option value="0">no</option>
@@ -68,7 +68,6 @@
                                             <tr>
                                                 <th scope="col" width="1%">Assign</th>
                                                 <th scope="col" width="20%">Name</th>
-                                                <th scope="col">Guard Name</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -82,7 +81,6 @@
                                                                @if(isset($role) && $role->permissions->contains($permission->id)) checked @endif>
                                                     </td>
                                                     <td>{{ $permission->name }}</td>
-                                                    <td>{{ $permission->guard_name }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -92,7 +90,6 @@
                         </div>
                         <!-- end card -->
                         
-
                         <div class="text-end mb-3">
                             <a href="{{ route('admin.roles.index') }}" class="btn btn-primary w-sm">Back</a>
                             <button type="submit" class="btn btn-success w-sm">Submit</button>

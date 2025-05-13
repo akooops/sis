@@ -30,8 +30,7 @@ class UsersController extends Controller
                       ->orWhere('firstname', 'like', '%' . $search . '%')
                       ->orWhere('lastname', 'like', '%' . $search . '%')
                       ->orWhere('username', 'like', '%' . $search . '%')
-                      ->orWhere('email', 'like', '%' . $search . '%')
-                      ->orWhere('phone', 'like', '%' . $search . '%');
+                      ->orWhere('email', 'like', '%' . $search . '%');
             });
         }
 
@@ -66,7 +65,7 @@ class UsersController extends Controller
         $user->roles()->syncWithoutDetaching($request->input('roles'));
     
         if($request->has('file')){
-            $file = $this->fileService->upload($request->file('file'), 'App\\Models\\User', $user);
+            $file = $this->fileService->upload($request->file('file'), 'App\\Models\\User', $user->id);
         }
 
         return redirect()->route('users.index')
@@ -124,10 +123,10 @@ class UsersController extends Controller
         if($request->has('file')){
             if($user->avatar) $user->avatar->detach();
 
-            $file = $this->fileService->upload($request->file('file'), 'App\\Models\\User', $user);
+            $file = $this->fileService->upload($request->file('file'), 'App\\Models\\User', $user->id);
         }
     
-        return redirect()->route('users.index')
+        return redirect()->route('admin.users.index')
                         ->with('success','User updated successfully');
     }
 
@@ -141,7 +140,7 @@ class UsersController extends Controller
     {
         $user->delete();
 
-        return redirect()->route('users.index')
+        return redirect()->route('admin.users.index')
                         ->with('success','User deleted successfully');
     }
 }

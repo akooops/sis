@@ -86,7 +86,7 @@ class AuthController extends Controller
                             );
                             
                             // Upload and attach the new avatar
-                            $this->fileService->upload($uploadedFile, 'App\\Models\\User',$user);
+                            $this->fileService->upload($uploadedFile, 'App\\Models\\User', $user->id);
                         }
                     } catch (\Exception $e) {
                         Log::channel('auth')->error('Error downloading avatar: ' . $e->getMessage());
@@ -119,6 +119,6 @@ class AuthController extends Controller
             return redirect($azureLogoutUrl);
         }
         
-        return redirect()->route('admin.login');
+        return redirect()->route('admin.auth.login');
     }
 }

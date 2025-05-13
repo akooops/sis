@@ -27,12 +27,12 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title mb-0">User Information</h4>
+                            <h4 class="card-title mb-0">User information</h4>
                         </div>
                         <div class="card-body">
                             <div>
                                 <figure class="figure">
-                                    <img src="{{$user->image->fullpath}}" alt="" class="rounded avatar-xl" style="object-fit: cover">
+                                    <img src="{{$user->avatarUrl}}" alt="" class="rounded avatar-xl" style="object-fit: cover">
                                 </figure>
                             </div>
                         
@@ -50,35 +50,58 @@
                                 <h4 class="fs-15">User Username</h4>
                                 {{$user->username}}
                             </div>
-
-
+ 
                             <div class="mb-3">
                                 <h4 class="fs-15">User Email</h4>
                                 {{$user->email}}
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">User Role</h4>
-                                @foreach($user->roles as $role)
-                                    <span class="badge bg-primary">{{ $role->name }}</span>
-                                @endforeach
+                                <h4 class="fs-15">Azure user?</h4>
+                                @if($user->azure_ad_id)
+                                    <span class="badge bg-success">yes</span>                                                    
+                                @else
+                                    <span class="badge bg-danger">no</span>
+                                @endif
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">User Description</h4>
-                                @if(is_null($user->description))
-                                    <span class="badge bg-danger">No Description</span>
-                                @else
-                                    {{$user->description}}
-                                @endif 
+                                <h4 class="fs-15">User created at</h4>
+                                {{$user->created_at}}
+                            </div>
+
+                            <div class="mb-3">
+                                <h4 class="fs-15">User updated at</h4>
+                                {{$user->updated_at}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">User roles</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <table class="table table-striped">
+                
+                                    @foreach($user->roles  as $role)
+                                        <tr>
+                                            <td>{{ $role->name }}</td>
+                                        </tr>
+                                    @endforeach
+                                </table>
                             </div>
                         </div>
                     </div>
                     <!-- end card -->
 
                     <div class="text-end mb-3">
-                        <a href="{{ route('users.index') }}" class="btn btn-primary w-sm">Back</a>
-                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-success w-sm">Edit</a>
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-primary w-sm">Back</a>
+                
+                        @haspermission('admin.users.update')
+                            <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-success w-sm">Edit</a>
+                        @endhaspermission
                     </div>
                 </div>
                 <!-- end col -->

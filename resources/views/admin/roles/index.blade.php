@@ -101,11 +101,11 @@
                                                         @endhaspermission
 
                                                         @haspermission('admin.roles.delete')
-                                                            <form action="{{route('admin.roles.destroy', $role->id)}}" method="DELETE">
+                                                            <form action="{{route('admin.roles.destroy', $role->id)}}" method="POST">
                                                                 @csrf
-                                                                @method('DELETE')
+                                                                @method('delete')
 
-                                                                <li><a class="dropdown-item" type="submit"><i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Destroy</a></li>
+                                                                <li><button class="dropdown-item" type="submit"><i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Destroy</button></li>
                                                             </form>
                                                         @endhaspermission
                                                     </ul>

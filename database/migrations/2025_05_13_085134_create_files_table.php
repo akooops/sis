@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('size');
             $table->string('type');
             $table->boolean('is_main')->default(true);
-            $table->morphs('model');
+            $table->nullableMorphs('model');
             $table->timestamps();
         });
     }

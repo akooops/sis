@@ -27,16 +27,46 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title mb-0">{{ ucfirst($role->name) }} Role</h4>
+                            <h4 class="card-title mb-0">Role information</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h4 class="fs-15">Role name</h4>
+                                {{$role->name}}
+                            </div>
+
+                            <div class="mb-3">
+                                <h4 class="fs-15">Role is default?</h4>
+                                @if($role->is_default)
+                                    <span class="badge bg-success">yes</span>                                                    
+                                @else
+                                    <span class="badge bg-danger">no</span>
+                                @endif
+                            </div>
+
+                            <div class="mb-3">
+                                <h4 class="fs-15">Role created at</h4>
+                                {{$role->created_at}}
+                            </div>
+
+                            <div class="mb-3">
+                                <h4 class="fs-15">Role updated at</h4>
+                                {{$role->updated_at}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">Role permissionss</h4>
                         </div>
                         <div class="card-body">
                             <div class="mb-4">
                                 <table class="table table-striped">
                 
-                                    @foreach($rolePermissions  as $permission)
+                                    @foreach($role->permissions  as $permission)
                                         <tr>
                                             <td>{{ $permission->name }}</td>
-                                            <td>{{ $permission->guard_name }}</td>
                                         </tr>
                                     @endforeach
                                 </table>
@@ -46,8 +76,10 @@
                     <!-- end card -->
 
                     <div class="text-end mb-3">
-                        <a href="{{ route('roles.index') }}" class="btn btn-primary w-sm">Back</a>
-                        <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-success w-sm">Edit</a>
+                        <a href="{{ route('admin.roles.index') }}" class="btn btn-primary w-sm">Back</a>
+                        @haspermission('admin.roles.update')
+                            <a href="{{ route('admin.roles.edit', $role->id) }}" class="btn btn-success w-sm">Edit</a>
+                        @endhaspermission
                     </div>
                 </div>
                 <!-- end col -->

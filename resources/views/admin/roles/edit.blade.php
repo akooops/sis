@@ -23,16 +23,16 @@
             </div>
             <!--end row-->
 
-            <form method="POST" action="{{ route('roles.update', $role->id) }}">
-                @method('patch')
+            <form method="POST" action="{{ route('admin.roles.update', $role->id) }}">
                 @csrf
+                @method('patch')
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Role Name</label>
-                                    <input name="name" value="{{ $role->name }}" type="text" class="form-control" placeholder="Enter role name">
+                                    <label class="form-label" for="">Role name <span class="text-danger">*</span></label>
+                                    <input name="name" value="{{ $role->name }}" type="text" class="form-control">
                                     @error('name')
                                         <p class="mx-2 my-2 text-danger">
                                             <strong>
@@ -43,38 +43,57 @@
                                 </div>
 
                                 <div class="mb-4">
+                                    <label class="form-label" for="is_default">Make default <span class="text-danger">*</span></label>
+                                    <select class="form-control" name="is_default">
+                                        <option value="1" {{$role->is_default}} ? "checked" : "">yes</option>
+                                        <option value="0" {{!$role->is_default}} ? "checked" : "">no</option>
+                                    </select>
+
+                                    @error('is_default')
+                                        <p class="mx-2 my-2 text-danger">
+                                            <strong>
+                                                {{$message}}
+                                            </strong>
+                                        </p>
+                                    @enderror
+                                </div>                                
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="mb-4">
                                     <label class="form-label" for="">Assign Permissions</label>
                                     <table class="table table-striped">
                                         <thead>
-                                            <th scope="col" width="1%">
-                                                <input id="checkAll" type="checkbox">
-                                            </th>
-                                            <th scope="col" width="20%">Name</th>
-                                            <th scope="col" width="1%">Guard</th> 
-                                        </thead>
-                                        @foreach($permissions as $permission)
                                             <tr>
-                                                <td>
-                                                    <input type="checkbox" 
-                                                    name="permission[{{ $permission->name }}]"
-                                                    value="{{ $permission->name }}"
-                                                    class='permission'
-                                                    {{ in_array($permission->name, $rolePermissions) 
-                                                        ? 'checked'
-                                                        : '' }}>
-                                                </td>
-                                                <td>{{ $permission->name }}</td>
-                                                <td>{{ $permission->guard_name }}</td>
+                                                <th scope="col" width="1%">Assign</th>
+                                                <th scope="col" width="20%">Name</th>
                                             </tr>
-                                        @endforeach
+                                        </thead>
+                                        <tbody>
+                                            @foreach($permissions as $permission)
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" 
+                                                               name="permissions[]"
+                                                               value="{{ $permission->id }}"
+                                                               class='permission'
+                                                               @if(isset($role) && $role->permissions->contains($permission->id)) checked @endif>
+                                                    </td>
+                                                    <td>{{ $permission->name }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
                         <!-- end card -->
+                        
 
                         <div class="text-end mb-3">
-                            <a href="{{ route('roles.index') }}" class="btn btn-primary w-sm">Back</a>
+                            <a href="{{ route('admin.roles.index') }}" class="btn btn-primary w-sm">Back</a>
                             <button type="submit" class="btn btn-success w-sm">Submit</button>
                         </div>
                     </div>
@@ -91,27 +110,4 @@
 @endsection
 @section('script')
 <script src="{{ URL::asset('/assets/admin/js/app.min.js') }}"></script>
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('[name="all_permission"]').on('click', function() {
-
-            if($(this).is(':checked')) {
-                $.each($('.permission'), function() {
-                    $(this).prop('checked',true);
-                });
-            } else {
-                $.each($('.permission'), function() {
-                    $(this).prop('checked',false);
-                });
-            }
-            
-        });
-    });
-
-    
-    $("#checkAll").click(function(){
-        $('input:checkbox').not(this).prop('checked', this.checked);
-    });
-</script>
 @endsection

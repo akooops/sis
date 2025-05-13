@@ -98,7 +98,7 @@ class RolesController extends Controller
      */
     public function update(Role $role, UpdateRoleRequest $request)
     {
-        $role->udpate($request->validated());
+        $role->update($request->validated());
         
         if($request->has('permissions'))
             $role->permissions()->sync($request->input('permissions'));
