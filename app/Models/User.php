@@ -40,7 +40,7 @@ class User extends Authenticatable
     //Relationships
     public function avatar()
     {
-        return $this->morphOne(File::class, 'model')->where('is_main', true);
+        return $this->morphOne(File::class, 'model');
     }
 
     public function roles()
@@ -61,7 +61,7 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute()
     {
         // If user has a profile image, return it
-        return ($this->avatar) ? $this->avatar->url : URL::to('assets/images/default-avatar.jpg');
+        return ($this->avatar) ? $this->avatar->url : URL::to('assets/admin/images/default-avatar.jpg');
     }
 
     //Custom Methods

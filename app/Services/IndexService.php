@@ -13,6 +13,8 @@ class IndexService
         return [
             'perPage' => $data->perPage(),
             'currentPage' => $data->currentPage(),
+            "nextPage" => ($data->currentPage() >= $data->lastPage() ? null : $data->currentPage() + 1),
+            "prevPage" => ($data->currentPage() <= 1 ? null : $data->currentPage() - 1),
             'lastPage' => $data->lastPage(),
             'from' => ($data->firstItem() === null) ? 0 : $data->firstItem(),
             'to' => ($data->lastItem() === null) ? 0 : $data->lastItem(),
@@ -49,6 +51,7 @@ class IndexService
 
         return $visiblePages;
     }
+
 
     public function limitPerPage($value)
     {

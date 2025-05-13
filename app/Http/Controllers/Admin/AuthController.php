@@ -53,7 +53,6 @@ class AuthController extends Controller
                     'lastname' => $azureUser->user['surname'] ?? '',
                     'username' => $azureUser->getNickname() ?? strstr($azureUser->getEmail(), '@', true),
                     'email' => $azureUser->getEmail(),
-                    'phone' => $azureUser->user['mobilePhone'] ?? null,
                     'email_verified_at' => now(),
                     'password' => Str::random(16)
                 ]);

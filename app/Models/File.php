@@ -32,6 +32,24 @@ class File extends Model
         return $this->name ? Storage::disk('public')->url($this->path) : URL::to($this->path);
     }
 
+    public function attach(Model $model)
+    {
+        if($this->model) return;
+
+        $this->update([
+            'model_type' => $model->getMorphClass(),
+            'model_id' => $model->id
+        ]);
+    }
+
+    public function detach()
+    {
+        $this->update([
+            'model_type' => null,
+            'model_id' => null
+        ]);
+    }
+
     //Boot Method
     public static function boot()
     {

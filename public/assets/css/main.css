@@ -1,0 +1,150 @@
+:root{
+    --bs-primary: #FFCD38;
+    --bs-heading-color: #fff;
+}
+
+body{
+    background-color: #122130;
+    color: #fff;
+    font-weight: 400;
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6{
+    color: #fff;
+}
+
+.btn-primary{
+    color: #122130;
+    padding-right: 48px;
+    padding-left: 48px;
+    font-weight: 500;
+}
+
+.btn-primary:hover{
+    color: #122130;
+}
+
+.btn-outline-primary:hover{
+    color: #122130;
+}
+
+.form-primary{
+    background-color: #122130;
+}
+
+.secondary-cta{
+    border: 1px solid #FFCD38;
+}
+
+.navbar .container{
+    height: 64px;
+}
+
+.navbar.navbar-bg-dark{
+    background-color: #122130;
+}
+
+.navbar-stick{
+    border-bottom: 1px solid #1c3043;
+}
+
+.navbar .navbar-brand{
+    padding: 0px;
+    width: 64px;
+    height: 100%;   
+}
+
+.navbar-brand img{
+    height: 64px;
+}
+
+.nav-item .nav-link{
+    margin-right: 24px;
+    font-size: 0.85rem;
+    font-weight: 400;
+}
+
+.nav-item .nav-link.active{
+    color: #FFCD38; 
+    font-weight: 700;
+}
+
+.text-line.text-primary:before{
+    background-color: #FFCD38;
+}
+
+.accordion-wrapper .card-header button.collapsed{
+    color: #fff
+}
+
+.text-gray{
+    color: #adadad !important;
+}
+
+.collpase-content{
+    font-weight: 300;
+    line-height: 28px;
+}
+
+.bg-map{
+    position: absolute;
+    height: 90vh;
+    width: 100%;
+    opacity: 0.02;
+    left: 0;
+}
+
+.bg-secondary{
+    background-color: #192939 !important;
+}
+
+.post-title a{
+    color: #fff !important;
+}
+
+.post-content img{
+    width: 100%;
+    margin: 16px 0px;
+}
+
+.pagination .page-link{
+    background-color: #192939 !important;
+    color: #fff;
+}
+
+.pagination .page-link.active{
+    color: #FFCD38;
+}
+
+/* File: styles.css */
+.clamp-text-2 {
+    display: -webkit-box;      
+    -webkit-line-clamp: 2;          
+    -webkit-box-orient: vertical;  
+    overflow: hidden;               
+    text-overflow: ellipsis;        
+}
+
+.clamp-text-3 {
+    display: -webkit-box;      
+    -webkit-line-clamp: 3;          
+    -webkit-box-orient: vertical;  
+    overflow: hidden;               
+    text-overflow: ellipsis;        
+}
+
+@media (min-width: 992px) {
+    .navbar .container{
+        height: 92px;
+    }
+
+    .navbar .navbar-brand{
+        padding: 0px;
+        width: 92px;
+        height: 100%;   
+    }
+    
+    .navbar-brand img{
+        height: 92px;
+    }
+}
