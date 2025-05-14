@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Admin\Roles\StoreRoleRequest;
-use App\Http\Requests\Admin\Roles\UpdateRoleRequest;
+use App\Http\Requests\Admin\LanguageKeys\StoreLanguageKeyRequest;
+use App\Http\Requests\Admin\LanguageKeys\UpdateLanguageKeyRequest;
+use App\Http\Requests\Admin\LanguageKeys\UpdateLanguageKeyTranslationRequest;
+use App\Models\Language;
 use App\Models\Permission;
 use Illuminate\Http\Request;
-use App\Models\Role;
+use App\Models\LanguageKey;
 use Illuminate\Support\Facades\Route;
 
 class LanguagesKeysController extends Controller
@@ -22,20 +24,20 @@ class LanguagesKeysController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $roles = Role::latest();
+        $languageKeys = LanguageKey::latest();
 
         if ($search) {
-            $roles->where(function($query) use ($search) {
+            $languageKeys->where(function($query) use ($search) {
                 $query->where('id', $search)
-                      ->orWhere('name', 'like', '%' . $search . '%');
+                      ->orWhere('key', 'like', '%' . $search . '%');
             });
         }
 
-        $roles = $roles->paginate($perPage, ['*'], 'page', $page);
+        $languageKeys = $languageKeys->paginate($perPage, ['*'], 'page', $page);
 
-        return view('admin.roles.index', [
-            'roles' => $roles,
-            'pagination' => $this->indexService->handlePagination($roles)
+        return view('admin.language-keys.index', [
+            'languageKeys' => $languageKeys,
+            'pagination' => $this->indexService->handlePagination($languageKeys)
         ]);
     }
     
@@ -46,8 +48,11 @@ class LanguagesKeysController extends Controller
      */
     public function create()
     {
-        $permissions = Permission::get();
-        return view('admin.roles.create', compact('permissions'));
+        $defaultLanguage = Language::where([
+            'is_default' => true,
+        ])->first();
+
+        return view('admin.language-keys.create', compact('defaultLanguage'));
     }
     
     /**
@@ -56,13 +61,20 @@ class LanguagesKeysController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreRoleRequest $request)
+    public function store(StoreLanguageKeyRequest $request)
     {
-        $role = Role::create($request->validated());
-        $role->permissions()->syncWithoutDetaching($request->input('permissions'));
+        $languageKey = LanguageKey::create($request->validated());
+        
+        $defaultLanguage = Language::where([
+            'is_default' => true,
+        ])->first();
+
+        foreach($languageKey->getTranslatableFields() as $field){
+            $languageKey->setTranslation($field, $defaultLanguage->code, $request->input($field));    
+        }
     
-        return redirect()->route('admin.roles.index')
-                        ->with('success','Role created successfully');
+        return redirect()->route('admin.language-keys.index')
+                        ->with('success','Language Key created successfully');
     }
 
     /**
@@ -71,9 +83,11 @@ class LanguagesKeysController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Role $role)
+    public function show(LanguageKey $languageKey)
     {    
-        return view('admin.roles.show', compact('role'));
+        $languages = Language::orderBy('is_default', 'DESC')->get();
+
+        return view('admin.language-keys.show', compact('languageKey', 'languages'));
     }
     
     /**
@@ -82,11 +96,11 @@ class LanguagesKeysController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Role $role)
+    public function edit(LanguageKey $languageKey)
     {
-        $permissions = Permission::get();
+        $languages = Language::orderBy('is_default', 'DESC')->get();
 
-        return view('admin.roles.edit', compact('role', 'permissions'));
+        return view('admin.language-keys.edit', compact('languageKey', 'languages'));
     }
     
     /**
@@ -96,15 +110,25 @@ class LanguagesKeysController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Role $role, UpdateRoleRequest $request)
+    public function update(LanguageKey $languageKey, UpdateLanguageKeyRequest $request)
     {
-        $role->update($request->validated());
-        
-        if($request->has('permissions'))
-            $role->permissions()->sync($request->input('permissions'));
+        $languageKey->update($request->validated());
     
-        return redirect()->route('admin.roles.index')
-                        ->with('success','Role updated successfully');
+        return redirect()->route('admin.language-keys.index')
+                        ->with('success','Language Key updated successfully');
+    }
+
+    public function updateTranslation(LanguageKey $languageKey, UpdateLanguageKeyTranslationRequest $request){
+        $language = Language::find($request->language_id);
+
+        foreach($languageKey->getTranslatableFields() as $field){
+            $languageKey->setTranslation($field, $language->code, $request->input($field));    
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Language Key updated successfully',
+        ]);
     }
 
     /**
@@ -113,11 +137,11 @@ class LanguagesKeysController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Role $role)
+    public function destroy(LanguageKey $languageKey)
     {
-        $role->delete();
+        $languageKey->delete();
 
-        return redirect()->route('admin.roles.index')
-                        ->with('success','Role deleted successfully');
+        return redirect()->route('admin.language-keys.index')
+                        ->with('success','Language Key deleted successfully');
     }
 }

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('language_keys', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('key')->unique();
             
             $table->timestamps();
         });

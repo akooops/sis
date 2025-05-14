@@ -23,7 +23,7 @@ class LanguagesController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $languages = Language::orderBy('is_default', 'DESC');;
+        $languages = Language::orderBy('is_default', 'DESC');
 
         if ($search) {
             $languages->where(function($query) use ($search) {

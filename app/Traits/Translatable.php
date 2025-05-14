@@ -36,13 +36,6 @@ trait Translatable
             return $translation;
         }
 
-        if ($fallbackToDefault) {
-            $defaultLanguage = Language::where('is_default', true)->first();
-            if ($defaultLanguage && $defaultLanguage->id !== $language->id) {
-                return $this->getTranslation($field, $defaultLanguage->code, false);
-            }
-        }
-
         return "{$field}.{$languageCode}";
     }
 
