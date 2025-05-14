@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\LanguagesController;
 use App\Http\Controllers\Admin\LanguagesKeysController;
+use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\UsersController;
@@ -82,4 +83,14 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('language-keys/{languageKey}/update-translation', [LanguagesKeysController::class, 'updateTranslation'])->middleware('check.permission:admin.language-keys.update')->name('admin.language-keys.update-translation');
     Route::patch('language-keys/{languageKey}', [LanguagesKeysController::class, 'update'])->middleware('check.permission:admin.language-keys.update')->name('admin.language-keys.update');
     Route::delete('language-keys/{languageKey}', [LanguagesKeysController::class, 'destroy'])->middleware('check.permission:admin.language-keys.destroy')->name('admin.language-keys.destroy');
+
+    // Language keys
+    Route::get('media', [MediaController::class, 'index'])->middleware('check.permission:admin.media.index')->name('admin.media.index');
+    Route::get('media/create', [MediaController::class, 'create'])->middleware('check.permission:admin.media.store')->name('admin.media.create');
+    Route::post('media', [MediaController::class, 'store'])->middleware('check.permission:admin.media.store')->name('admin.media.store');
+    Route::get('media/{media}', [MediaController::class, 'show'])->middleware('check.permission:admin.media.show')->name('admin.media.show');
+    Route::get('media/{media}/edit', [MediaController::class, 'edit'])->middleware('check.permission:admin.media.update')->name('admin.media.edit');
+    Route::patch('media/{media}/update-translation', [MediaController::class, 'updateTranslation'])->middleware('check.permission:admin.media.update')->name('admin.media.update-translation');
+    Route::patch('media/{media}', [MediaController::class, 'update'])->middleware('check.permission:admin.media.update')->name('admin.media.update');
+    Route::delete('media/{media}', [MediaController::class, 'destroy'])->middleware('check.permission:admin.media.destroy')->name('admin.media.destroy');
 });

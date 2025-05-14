@@ -7,6 +7,7 @@ use App\Models\File;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\UserRole;
+use App\Traits\HasFiles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -15,7 +16,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasFiles;
     
     //Properties
     protected $guarded = ['id'];
@@ -38,7 +39,7 @@ class User extends Authenticatable
     protected $appends = ['fullname', 'avatarUrl'];
 
     //Relationships
-    public function avatar()
+    public function file()
     {
         return $this->morphOne(File::class, 'model');
     }
@@ -61,7 +62,7 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute()
     {
         // If user has a profile image, return it
-        return ($this->avatar) ? $this->avatar->url : URL::to('assets/admin/images/default-avatar.jpg');
+        return ($this->file) ? $this->file->url : URL::to('assets/admin/images/default-avatar.jpg');
     }
 
     //Custom Methods

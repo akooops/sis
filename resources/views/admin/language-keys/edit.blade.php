@@ -89,7 +89,7 @@
                                 @endforeach
                             </ul>
 
-                            <div class="tab-content text-muted">
+                            <div class="tab-content">
                                 @foreach ($languages as $key => $language)
                                     <div class="tab-pane {{$key == 0 ? "active" : ""}}" id="{{$language->code}}" role="tabpanel">
                                         <form class="translation-form" data-language="{{$language->code}}" data-language-id="{{$language->id}}">

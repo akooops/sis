@@ -106,14 +106,12 @@
                                         </p>
                                     @enderror
 
-                                    @if($user->avatar)
                                     <div class="mt-4">
                                         <figure class="figure">
                                             <img src="{{ $user->avatarUrl }}" class="rounded avatar-xl" style="object-fit: cover">
                                             <figcaption class="figure-caption">Last uploaded image</figcaption>
                                         </figure>
                                     </div>
-                                    @endif
                                 </div>
                             </div>
                         </div>
