@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\LanguagesController;
+use App\Http\Controllers\Admin\LanguagesKeysController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\UsersController;
@@ -61,4 +63,23 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('users/{user}/edit', [UsersController::class, 'edit'])->middleware('check.permission:admin.users.update')->name('admin.users.edit');
     Route::patch('users/{user}', [UsersController::class, 'update'])->middleware('check.permission:admin.users.update')->name('admin.users.update');
     Route::delete('users/{user}', [UsersController::class, 'destroy'])->middleware('check.permission:admin.users.destroy')->name('admin.users.destroy');
+
+    // Languages
+    Route::get('languages', [LanguagesController::class, 'index'])->middleware('check.permission:admin.languages.index')->name('admin.languages.index');
+    Route::get('languages/create', [LanguagesController::class, 'create'])->middleware('check.permission:admin.languages.store')->name('admin.languages.create');
+    Route::post('languages', [LanguagesController::class, 'store'])->middleware('check.permission:admin.languages.store')->name('admin.languages.store');
+    Route::get('languages/{language}', [LanguagesController::class, 'show'])->middleware('check.permission:admin.languages.show')->name('admin.languages.show');
+    Route::get('languages/{language}/edit', [LanguagesController::class, 'edit'])->middleware('check.permission:admin.languages.update')->name('admin.languages.edit');
+    Route::patch('languages/{language}', [LanguagesController::class, 'update'])->middleware('check.permission:admin.languages.update')->name('admin.languages.update');
+    Route::delete('languages/{language}', [LanguagesController::class, 'destroy'])->middleware('check.permission:admin.languages.destroy')->name('admin.languages.destroy');
+
+    // Language keys
+    Route::get('language-keys', [LanguagesKeysController::class, 'index'])->middleware('check.permission:admin.language-keys.index')->name('admin.language-keys.index');
+    Route::get('language-keys/create', [LanguagesKeysController::class, 'create'])->middleware('check.permission:admin.language-keys.store')->name('admin.language-keys.create');
+    Route::post('language-keys', [LanguagesKeysController::class, 'store'])->middleware('check.permission:admin.language-keys.store')->name('admin.language-keys.store');
+    Route::get('language-keys/{languageKey}', [LanguagesKeysController::class, 'show'])->middleware('check.permission:admin.language-keys.show')->name('admin.language-keys.show');
+    Route::get('language-keys/{languageKey}/edit', [LanguagesKeysController::class, 'edit'])->middleware('check.permission:admin.language-keys.update')->name('admin.language-keys.edit');
+    Route::patch('language-keys/{languageKey}/update-translation', [LanguagesKeysController::class, 'updateTranslation'])->middleware('check.permission:admin.language-keys.update')->name('admin.language-keys.update');
+    Route::patch('language-keys/{languageKey}', [LanguagesKeysController::class, 'update'])->middleware('check.permission:admin.language-keys.update')->name('admin.language-keys.update');
+    Route::delete('language-keys/{languageKey}', [LanguagesKeysController::class, 'destroy'])->middleware('check.permission:admin.language-keys.destroy')->name('admin.language-keys.destroy');
 });
