@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Admin\Media;
+namespace App\Http\Requests\Admin\Pages;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DeleteMediaRequest extends FormRequest
+class DeletePageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,11 +28,11 @@ class DeleteMediaRequest extends FormRequest
 
     public function withValidator($validator)
     {
-        $media = $this->route('media');
+        $page = $this->route('page');
 
-        $validator->after(function ($validator) use ($media){
-            if ($media->mediable) {
-                $validator->errors()->add('media', 'This media cannot be deleted as it is in use.');
+        $validator->after(function ($validator) use ($page){
+            if ($page->is_system_page) {
+                $validator->errors()->add('page', 'This page cannot be deleted as it is a system page.');
 
                 return;
             }

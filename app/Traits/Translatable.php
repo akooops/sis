@@ -41,10 +41,7 @@ trait Translatable
 
     public function setTranslation(string $field, string $languageCode, string $value)
     {
-        if (is_null($value)) {
-            $this->removeTranslation($field, $languageCode);
-            return;
-        }
+        if(is_null($value)) return;
 
         $language = Language::where('code', $languageCode)->first();
         if(!$language) return;

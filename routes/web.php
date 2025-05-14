@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\FilesController;
 use App\Http\Controllers\Admin\LanguagesController;
 use App\Http\Controllers\Admin\LanguagesKeysController;
 use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\PagesController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\UsersController;
@@ -84,7 +86,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('language-keys/{languageKey}', [LanguagesKeysController::class, 'update'])->middleware('check.permission:admin.language-keys.update')->name('admin.language-keys.update');
     Route::delete('language-keys/{languageKey}', [LanguagesKeysController::class, 'destroy'])->middleware('check.permission:admin.language-keys.destroy')->name('admin.language-keys.destroy');
 
-    // Language keys
+    // Media
     Route::get('media', [MediaController::class, 'index'])->middleware('check.permission:admin.media.index')->name('admin.media.index');
     Route::get('media/create', [MediaController::class, 'create'])->middleware('check.permission:admin.media.store')->name('admin.media.create');
     Route::post('media', [MediaController::class, 'store'])->middleware('check.permission:admin.media.store')->name('admin.media.store');
@@ -93,4 +95,17 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('media/{media}/update-translation', [MediaController::class, 'updateTranslation'])->middleware('check.permission:admin.media.update')->name('admin.media.update-translation');
     Route::patch('media/{media}', [MediaController::class, 'update'])->middleware('check.permission:admin.media.update')->name('admin.media.update');
     Route::delete('media/{media}', [MediaController::class, 'destroy'])->middleware('check.permission:admin.media.destroy')->name('admin.media.destroy');
+
+    // Page
+    Route::get('pages', [PagesController::class, 'index'])->middleware('check.permission:admin.pages.index')->name('admin.pages.index');
+    Route::get('pages/create', [PagesController::class, 'create'])->middleware('check.permission:admin.pages.store')->name('admin.pages.create');
+    Route::post('pages', [PagesController::class, 'store'])->middleware('check.permission:admin.pages.store')->name('admin.pages.store');
+    Route::get('pages/{page}', [PagesController::class, 'show'])->middleware('check.permission:admin.pages.show')->name('admin.pages.show');
+    Route::get('pages/{page}/edit', [PagesController::class, 'edit'])->middleware('check.permission:admin.pages.update')->name('admin.pages.edit');
+    Route::patch('pages/{page}/update-translation', [PagesController::class, 'updateTranslation'])->middleware('check.permission:admin.pages.update')->name('admin.pages.update-translation');
+    Route::patch('pages/{page}', [PagesController::class, 'update'])->middleware('check.permission:admin.pages.update')->name('admin.pages.update');
+    Route::delete('pages/{page}', [PagesController::class, 'destroy'])->middleware('check.permission:admin.pages.destroy')->name('admin.pages.destroy');
+
+    // Files
+    Route::post('files/upload', [FilesController::class, 'upload'])->name('admin.files.upload');
 });

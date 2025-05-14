@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Admin\Media;
+namespace App\Http\Requests\Admin\Files;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DeleteMediaRequest extends FormRequest
+class FileUploadRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,20 +22,7 @@ class DeleteMediaRequest extends FormRequest
     public function rules(): array
     {
         return [
-
+            'file' => 'required|file',
         ];
-    }
-
-    public function withValidator($validator)
-    {
-        $media = $this->route('media');
-
-        $validator->after(function ($validator) use ($media){
-            if ($media->mediable) {
-                $validator->errors()->add('media', 'This media cannot be deleted as it is in use.');
-
-                return;
-            }
-        });
     }
 }
