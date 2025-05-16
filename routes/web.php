@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ArticlesController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\FilesController;
 use App\Http\Controllers\Admin\LanguagesController;
@@ -108,4 +109,14 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
     // Files
     Route::post('files/upload', [FilesController::class, 'upload'])->name('admin.files.upload');
+
+    // Article
+    Route::get('articles', [ArticlesController::class, 'index'])->middleware('check.permission:admin.articles.index')->name('admin.articles.index');
+    Route::get('articles/create', [ArticlesController::class, 'create'])->middleware('check.permission:admin.articles.store')->name('admin.articles.create');
+    Route::post('articles', [ArticlesController::class, 'store'])->middleware('check.permission:admin.articles.store')->name('admin.articles.store');
+    Route::get('articles/{article}', [ArticlesController::class, 'show'])->middleware('check.permission:admin.articles.show')->name('admin.articles.show');
+    Route::get('articles/{article}/edit', [ArticlesController::class, 'edit'])->middleware('check.permission:admin.articles.update')->name('admin.articles.edit');
+    Route::patch('articles/{article}/update-translation', [ArticlesController::class, 'updateTranslation'])->middleware('check.permission:admin.articles.update')->name('admin.articles.update-translation');
+    Route::patch('articles/{article}', [ArticlesController::class, 'update'])->middleware('check.permission:admin.articles.update')->name('admin.articles.update');
+    Route::delete('articles/{article}', [ArticlesController::class, 'destroy'])->middleware('check.permission:admin.articles.destroy')->name('admin.articles.destroy');
 });

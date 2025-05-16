@@ -1,5 +1,5 @@
 @extends('admin.layouts.master')
-@section('title') Pages @endsection
+@section('title') Articles @endsection
 @section('css')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -20,8 +20,8 @@
 @endsection
 @section('content')
 @component('admin.components.breadcrumb')
-@slot('li_1') Pages @endslot
-@slot('title') Create Page @endslot
+@slot('li_1') Articles @endslot
+@slot('title') Create Article @endslot
 @endcomponent
 <div class="row">
     <div class="col">
@@ -39,14 +39,14 @@
             </div>
             <!--end row-->
 
-            <form method="POST" action="{{ route('admin.pages.store') }}">
+            <form method="POST" enctype="multipart/form-data" action="{{ route('admin.articles.store') }}">
                 @csrf
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Page name<span class="text-danger">*</span></label>
+                                    <label class="form-label" for="">Article name<span class="text-danger">*</span></label>
                                     <input name="name" value="{{old('name')}}" type="text" class="form-control">
                                     @error('name')
                                         <p class="mx-2 my-2 text-danger">
@@ -58,7 +58,7 @@
                                 </div>  
                                 
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Page slug<span class="text-danger">*</span></label>
+                                    <label class="form-label" for="">Article slug<span class="text-danger">*</span></label>
                                     <input name="slug" value="{{old('slug')}}" type="text" class="form-control">
                                     @error('slug')
                                         <p class="mx-2 my-2 text-danger">
@@ -70,7 +70,7 @@
                                 </div>  
 
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Page status<span class="text-danger">*</span></label>
+                                    <label class="form-label" for="">Article status<span class="text-danger">*</span></label>
                                     <select class="form-control" name="status">
                                         <option value="draft">Draft</option>
                                         <option value="hidden">Hidden</option>
@@ -86,6 +86,45 @@
                                     @enderror
                                 </div>  
 
+                                <div class="mb-4">
+                                    <label class="form-label" for="">Article thumbnail <span class="text-danger">*</span></label>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="form-check me-3">
+                                            <input class="form-check-input" type="radio" name="media_option" id="media_option_upload" value="upload" checked>
+                                            <label class="form-check-label" for="media_option_upload">Upload Image</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="media_option" id="media_option_select" value="select">
+                                            <label class="form-check-label" for="media_option_select">Select from Media</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- File upload input -->
+                                    <div id="upload_section">
+                                        <input type="file" name="file" id="file_input" class="form-control mb-2" accept="image/*">
+                                        <div id="file_preview"></div>
+                                        @error('file')
+                                            <p class="mx-2 my-2 text-danger"><strong>{{ $message }}</strong></p>
+                                        @enderror
+                                    </div>
+                                    
+                                    <!-- Media select input -->
+                                    <div id="media_section" style="display:none;">
+                                        <div class="row">
+                                            @foreach($medias as $media)
+                                                <div class="col-auto mb-2">
+                                                    <label class="d-block">
+                                                        <input type="radio" name="media_id" value="{{ $media->id }}" class="d-none media-radio">
+                                                        <img src="{{ $media->file->url }}" alt="media" class="img-thumbnail media-thumb" style="width:90px; height:70px; object-fit:cover; cursor:pointer; border:2px solid transparent;">
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        @error('media_id')
+                                            <p class="mx-2 my-2 text-danger"><strong>{{ $message }}</strong></p>
+                                        @enderror
+                                    </div>
+                                </div>
 
                             </div>
                         </div>
@@ -93,7 +132,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Page {{$defaultLanguage->name}} title <span class="text-danger">*</span></label>
+                                    <label class="form-label" for="">Article {{$defaultLanguage->name}} title <span class="text-danger">*</span></label>
                                     <input name="title" value="{{old('title')}}" type="text" class="form-control">
                                     @error('title')
                                         <p class="mx-2 my-2 text-danger">
@@ -105,7 +144,7 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Page {{$defaultLanguage->name}} description <span class="text-danger">*</span></label>
+                                    <label class="form-label" for="">Article {{$defaultLanguage->name}} description <span class="text-danger">*</span></label>
                                     <textarea name="description" type="text" class="form-control">{{old('description')}}</textarea>
                                     @error('description')
                                         <p class="mx-2 my-2 text-danger">
@@ -119,7 +158,7 @@
                                 <div class="mb-4">
                                     <input type="file" id="image-upload" accept="image/*" style="display: none;">
 
-                                    <label class="form-label" for="">Page {{$defaultLanguage->name}} content <span class="text-danger">*</span></label>
+                                    <label class="form-label" for="">Article {{$defaultLanguage->name}} content <span class="text-danger">*</span></label>
                                     <textarea id="markdown-editor" name="content" type="text" class="form-control">{{old('content')}}</textarea>
                                     @error('content')
                                         <p class="mx-2 my-2 text-danger">
@@ -134,7 +173,7 @@
                         <!-- end card -->
                         
                         <div class="text-end mb-3">
-                            <a href="{{ route('admin.pages.index') }}" class="btn btn-primary w-sm">Back</a>
+                            <a href="{{ route('admin.articles.index') }}" class="btn btn-primary w-sm">Back</a>
                             <button type="submit" class="btn btn-success w-sm">Submit</button>
                         </div>
                     </div>
@@ -154,6 +193,39 @@
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Toggle between upload and select
+    document.getElementById('media_option_upload').addEventListener('change', function() {
+        document.getElementById('upload_section').style.display = '';
+        document.getElementById('media_section').style.display = 'none';
+    });
+    document.getElementById('media_option_select').addEventListener('change', function() {
+        document.getElementById('upload_section').style.display = 'none';
+        document.getElementById('media_section').style.display = '';
+    });
+
+    // Image preview for upload
+    document.getElementById('file_input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('file_preview');
+        preview.innerHTML = '';
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" class="img-thumbnail" style="width:120px;height:90px;object-fit:cover;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Highlight selected media image
+    document.querySelectorAll('.media-thumb').forEach(function(img) {
+        img.addEventListener('click', function() {
+            document.querySelectorAll('.media-thumb').forEach(i => i.style.border = '2px solid transparent');
+            this.style.border = '2px solid #0d6efd';
+            this.previousElementSibling.checked = true;
+        });
+    });
+
     const simplemde = new SimpleMDE({ 
         element: document.getElementById("markdown-editor"),
         spellChecker: false,

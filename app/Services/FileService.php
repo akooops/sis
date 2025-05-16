@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\File;
+use App\Models\Media;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -27,6 +28,37 @@ class FileService
             'model_type' => $model_type,
             'model_id' => $model_id,
         ]);
+    }
+
+    public function duplicateMediaFile(Media $media, $model_type = null, $model_id = null, $is_main = false)
+    {
+        $originalFile = $media->file;
+        if (!$originalFile) {
+            return null;
+        }
+
+        $extension = pathinfo($originalFile->name, PATHINFO_EXTENSION);
+        $newFileName = uniqid() . '.' . $extension;
+        $newFilePath = dirname($originalFile->path) . '/' . $newFileName;
+
+        // Copy the file in storage
+        if (!Storage::disk('public')->copy($originalFile->path, $newFilePath)) {
+            return null;
+        }
+
+        // Create a new File record
+        $newFile = File::create([
+            'original_name' => $originalFile->original_name,
+            'name' => $newFileName,
+            'path' => $newFilePath,
+            'size' => $originalFile->size,
+            'type' => $originalFile->type,
+            'is_main' => $is_main,
+            'model_type' => $model_type,
+            'model_id' => $model_id,
+        ]);
+
+        return $newFile;
     }
 
     public function cleanupUnusedFiles($olderThan = '-30 days')
