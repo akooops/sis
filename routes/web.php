@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ArticlesController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\FilesController;
+use App\Http\Controllers\Admin\GradesController;
 use App\Http\Controllers\Admin\LanguagesController;
 use App\Http\Controllers\Admin\LanguagesKeysController;
 use App\Http\Controllers\Admin\MediaController;
@@ -130,4 +131,14 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('programs/{program}/update-translation', [ProgramsController::class, 'updateTranslation'])->middleware('check.permission:admin.programs.update')->name('admin.programs.update-translation');
     Route::patch('programs/{program}', [ProgramsController::class, 'update'])->middleware('check.permission:admin.programs.update')->name('admin.programs.update');
     Route::delete('programs/{program}', [ProgramsController::class, 'destroy'])->middleware('check.permission:admin.programs.destroy')->name('admin.programs.destroy');
+
+    // Program
+    Route::get('grades', [GradesController::class, 'index'])->middleware('check.permission:admin.grades.index')->name('admin.grades.index');
+    Route::get('grades/create', [GradesController::class, 'create'])->middleware('check.permission:admin.grades.store')->name('admin.grades.create');
+    Route::post('grades', [GradesController::class, 'store'])->middleware('check.permission:admin.grades.store')->name('admin.grades.store');
+    Route::get('grades/{grade}', [GradesController::class, 'show'])->middleware('check.permission:admin.grades.show')->name('admin.grades.show');
+    Route::get('grades/{grade}/edit', [GradesController::class, 'edit'])->middleware('check.permission:admin.grades.update')->name('admin.grades.edit');
+    Route::patch('grades/{grade}/update-translation', [GradesController::class, 'updateTranslation'])->middleware('check.permission:admin.grades.update')->name('admin.grades.update-translation');
+    Route::patch('grades/{grade}', [GradesController::class, 'update'])->middleware('check.permission:admin.grades.update')->name('admin.grades.update');
+    Route::delete('grades/{grade}', [GradesController::class, 'destroy'])->middleware('check.permission:admin.grades.destroy')->name('admin.grades.destroy');
 });

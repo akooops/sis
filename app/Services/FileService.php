@@ -25,7 +25,7 @@ class FileService
             'path' => $filePath,
             'size' => $file->getSize(),
             'type' => $file->getMimeType(),
-            '$is_main' => $is_main,
+            'is_main' => $is_main,
             'model_type' => $model_type,
             'model_id' => $model_id,
         ]);
