@@ -1,5 +1,5 @@
 @extends('admin.layouts.master')
-@section('title') Pages @endsection
+@section('title') Programs @endsection
 @section('css')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -20,8 +20,8 @@
 @endsection
 @section('content')
 @component('admin.components.breadcrumb')
-@slot('li_1') Pages @endslot
-@slot('title') Create Page @endslot
+@slot('li_1') Programs @endslot
+@slot('title') Create Program @endslot
 @endcomponent
 <div class="row">
     <div class="col">
@@ -39,14 +39,14 @@
             </div>
             <!--end row-->
 
-            <form method="POST" action="{{ route('admin.pages.store') }}">
+            <form method="POST" enctype="multipart/form-data" action="{{ route('admin.programs.store') }}">
                 @csrf
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Page name<span class="text-danger">*</span></label>
+                                    <label class="form-label" for="">Program name<span class="text-danger">*</span></label>
                                     <input name="name" value="{{old('name')}}" type="text" class="form-control">
                                     @error('name')
                                         <p class="mx-2 my-2 text-danger">
@@ -58,7 +58,7 @@
                                 </div>  
                                 
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Page slug<span class="text-danger">*</span></label>
+                                    <label class="form-label" for="">Program slug<span class="text-danger">*</span></label>
                                     <input name="slug" value="{{old('slug')}}" type="text" class="form-control">
                                     @error('slug')
                                         <p class="mx-2 my-2 text-danger">
@@ -70,24 +70,7 @@
                                 </div>  
 
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Page status<span class="text-danger">*</span></label>
-                                    <select class="form-control" name="status">
-                                        <option value="draft">Draft</option>
-                                        <option value="hidden">Hidden</option>
-                                        <option value="published">Published</option>
-                                    </select>
-
-                                    @error('status')
-                                        <p class="mx-2 my-2 text-danger">
-                                            <strong>
-                                                {{$message}}
-                                            </strong>
-                                        </p>
-                                    @enderror
-                                </div>  
-
-                                <div class="mb-4">
-                                    <label class="form-label" for="">Article thumbnail <span class="text-danger">*</span></label>
+                                    <label class="form-label" for="">Program thumbnail <span class="text-danger">*</span></label>
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="form-check me-3">
                                             <input class="form-check-input" type="radio" name="media_option" id="media_option_upload" value="upload" checked>
@@ -125,13 +108,14 @@
                                         @enderror
                                     </div>
                                 </div>
+
                             </div>
                         </div>
 
                         <div class="card">
                             <div class="card-body">
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Page {{$defaultLanguage->name}} title <span class="text-danger">*</span></label>
+                                    <label class="form-label" for="">Program {{$defaultLanguage->name}} title <span class="text-danger">*</span></label>
                                     <input name="title" value="{{old('title')}}" type="text" class="form-control">
                                     @error('title')
                                         <p class="mx-2 my-2 text-danger">
@@ -143,7 +127,7 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Page {{$defaultLanguage->name}} description <span class="text-danger">*</span></label>
+                                    <label class="form-label" for="">Program {{$defaultLanguage->name}} description <span class="text-danger">*</span></label>
                                     <textarea name="description" type="text" class="form-control">{{old('description')}}</textarea>
                                     @error('description')
                                         <p class="mx-2 my-2 text-danger">
@@ -157,7 +141,7 @@
                                 <div class="mb-4">
                                     <input type="file" id="image-upload" accept="image/*" style="display: none;">
 
-                                    <label class="form-label" for="">Page {{$defaultLanguage->name}} content <span class="text-danger">*</span></label>
+                                    <label class="form-label" for="">Program {{$defaultLanguage->name}} content <span class="text-danger">*</span></label>
                                     <textarea id="markdown-editor" name="content" type="text" class="form-control">{{old('content')}}</textarea>
                                     @error('content')
                                         <p class="mx-2 my-2 text-danger">
@@ -172,7 +156,7 @@
                         <!-- end card -->
                         
                         <div class="text-end mb-3">
-                            <a href="{{ route('admin.pages.index') }}" class="btn btn-primary w-sm">Back</a>
+                            <a href="{{ route('admin.programs.index') }}" class="btn btn-primary w-sm">Back</a>
                             <button type="submit" class="btn btn-success w-sm">Submit</button>
                         </div>
                     </div>
@@ -192,7 +176,7 @@
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-        // Toggle between upload and select
+    // Toggle between upload and select
     document.getElementById('media_option_upload').addEventListener('change', function() {
         document.getElementById('upload_section').style.display = '';
         document.getElementById('media_section').style.display = 'none';

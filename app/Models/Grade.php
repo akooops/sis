@@ -8,23 +8,29 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 
-class Page extends Model
+class Grade extends Model
 {
     use HasFactory, Translatable, HasFiles;
 
     //Properties
     protected $guarded = ['id'];
 
-    protected $casts = [
-        'is_system_page' => 'boolean',
-    ];
-
     protected $appends = ['thumbnailUrl'];
 
     //Relationships
     public function file()
     {
-        return $this->morphOne(File::class, 'model');
+        return $this->morphOne(File::class, 'model')->where('is_main', 1);
+    }
+
+    public function files()
+    {
+        return $this->morphMany(File::class, 'model')->where('is_main', 0);
+    }
+
+    public function program()
+    {
+        return $this->belongsTo(Program::class);
     }
 
     //Accessors & Mutators

@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 class FileService
 {
-    public function upload(UploadedFile $file, $model_type = null, $model_id = null)
+    public function upload(UploadedFile $file, $model_type = null, $model_id = null, $is_main = 0)
     {
         $originalName = $file->getClientOriginalName();
         $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
@@ -25,6 +25,7 @@ class FileService
             'path' => $filePath,
             'size' => $file->getSize(),
             'type' => $file->getMimeType(),
+            '$is_main' => $is_main,
             'model_type' => $model_type,
             'model_id' => $model_id,
         ]);

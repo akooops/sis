@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Admin\Pages;
+namespace App\Http\Requests\Admin\Programs;
 
 use App\Models\Media;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StorePageRequest extends FormRequest
+class StoreProgramRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,11 +24,10 @@ class StorePageRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:500|unique:pages,slug',
+            'slug' => 'required|string|max:500|unique:programs,slug',
             'title' => 'required|string|max:1000',
             'description' => 'required|string|max:3000',
             'content' => 'required|string',
-            'status' => 'required|string|in:draft,hidden,published',
             'file' => 'nullable|file|image', 
             'media_id' => 'nullable|exists:media,id',
         ];

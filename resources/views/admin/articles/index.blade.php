@@ -80,7 +80,7 @@
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div class="flex-shrink-0 me-2">
-                                                        <img src="{{ $article->thumbnailUrl }}" class="avatar-xs rounded-circle material-shadow">
+                                                        <img src="{{ $article->thumbnailUrl }}" class="avatar-xs material-shadow">
                                                     </div>
                                                     <div class="flex-grow-1">{{ $article->name }}</div>
                                                 </div>

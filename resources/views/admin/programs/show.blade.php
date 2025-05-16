@@ -1,11 +1,11 @@
 @extends('admin.layouts.master')
-@section('title') Pages @endsection
+@section('title') Programs @endsection
 @section('css')
 @endsection
 @section('content')
 @component('admin.components.breadcrumb')
-@slot('li_1') Pages @endslot
-@slot('title') Show Page @endslot
+@slot('li_1') Programs @endslot
+@slot('title') Show Program @endslot
 @endcomponent
 <div class="row">
     <div class="col">
@@ -27,53 +27,33 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title mb-0">Page information</h4>
+                            <h4 class="card-title mb-0">Program information</h4>
                         </div>
                         <div class="card-body">
                             <div>
                                 <figure class="figure">
-                                    <img src="{{$page->thumbnailUrl}}" alt="" class="rounded avatar-xl" style="object-fit: cover">
+                                    <img src="{{$program->thumbnailUrl}}" alt="" class="rounded avatar-xl" style="object-fit: cover">
                                 </figure>
                             </div>
-                            
+
                             <div class="mb-3">
-                                <h4 class="fs-15">Page name</h4>
-                                {{$page->name}}
+                                <h4 class="fs-15">Program name</h4>
+                                {{$program->name}}
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">Page slug</h4>
-                                <span class="badge bg-primary"> {{$page->slug }} </span>
+                                <h4 class="fs-15">Program slug</h4>
+                                <span class="badge bg-primary"> {{$program->slug }} </span>
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">is system created page?</h4>
-                                @if($page->is_system_page)
-                                    <span class="badge bg-success">yes</span>                                                    
-                                @else
-                                    <span class="badge bg-danger">no</span>
-                                @endif
+                                <h4 class="fs-15">Program created at</h4>
+                                {{$program->created_at}}
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">Page status</h4>
-                                @if($page->status == 'draft')
-                                    <span class="badge bg-info">Draft</span>   
-                                @elseif($page->status == 'hidden')   
-                                    <span class="badge bg-primary">Hidden</span>                                                 
-                                @else
-                                    <span class="badge bg-success">Published</span>
-                                @endif
-                            </div>
-
-                            <div class="mb-3">
-                                <h4 class="fs-15">Page created at</h4>
-                                {{$page->created_at}}
-                            </div>
-
-                            <div class="mb-3">
-                                <h4 class="fs-15">Page updated at</h4>
-                                {{$page->updated_at}}
+                                <h4 class="fs-15">Program updated at</h4>
+                                {{$program->updated_at}}
                             </div>
                         </div>
                     </div>
@@ -96,19 +76,19 @@
                                 @foreach ($languages as $key => $language)
                                     <div class="tab-pane {{$key == 0 ? "active" : ""}}" id="{{$language->code}}" role="tabpanel">
                                         <div class="mb-3">
-                                            <h4 class="fs-15">Page {{$language->name}} title</h4>
-                                            {{$page->getTranslation('title', $language->code)}}
+                                            <h4 class="fs-15">Program {{$language->name}} title</h4>
+                                            {{$program->getTranslation('title', $language->code)}}
                                         </div>
 
                                         <div class="mb-3">
-                                            <h4 class="fs-15">Page {{$language->name}} description</h4>
-                                            {{$page->getTranslation('description', $language->code)}}
+                                            <h4 class="fs-15">Program {{$language->name}} description</h4>
+                                            {{$program->getTranslation('description', $language->code)}}
                                         </div>
 
                                         <div class="mb-3">
-                                            <h4 class="fs-15">Page {{$language->name}} content</h4>
+                                            <h4 class="fs-15">Program {{$language->name}} content</h4>
                                             <x-markdown>
-                                                {{ $page->getTranslation('content', $language->code) }}
+                                                {{ $program->getTranslation('content', $language->code) }}
                                             </x-markdown>
                                         </div>
                                     </div>
@@ -118,10 +98,10 @@
                     </div>
 
                     <div class="text-end mb-3">
-                        <a href="{{ route('admin.pages.index') }}" class="btn btn-primary w-sm">Back</a>
+                        <a href="{{ route('admin.programs.index') }}" class="btn btn-primary w-sm">Back</a>
                         
-                        @haspermission('admin.pages.update')
-                            <a href="{{ route('admin.pages.edit', $page->id) }}" class="btn btn-success w-sm">Edit</a>
+                        @haspermission('admin.programs.update')
+                            <a href="{{ route('admin.programs.edit', $program->id) }}" class="btn btn-success w-sm">Edit</a>
                         @endhaspermission
                     </div>
                 </div>

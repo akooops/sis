@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Admin\Pages\DeletePageRequest;
-use App\Http\Requests\Admin\Pages\StorePageRequest;
-use App\Http\Requests\Admin\Pages\UpdatePageRequest;
-use App\Http\Requests\Admin\Pages\UpdatePageTranslationRequest;
+use App\Http\Requests\Admin\Programs\DeleteProgramRequest;
+use App\Http\Requests\Admin\Programs\StoreProgramRequest;
+use App\Http\Requests\Admin\Programs\UpdateProgramRequest;
+use App\Http\Requests\Admin\Programs\UpdateProgramTranslationRequest;
 use App\Models\Language;
-use App\Models\Media;
 use App\Models\Permission;
 use Illuminate\Http\Request;
-use App\Models\Page;
+use App\Models\Program;
+use App\Models\Media;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
-class PagesController extends Controller
+class ProgramsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,20 +27,20 @@ class PagesController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $pages = Page::latest();
+        $programs = Program::latest();
 
         if ($search) {
-            $pages->where(function($query) use ($search) {
+            $programs->where(function($query) use ($search) {
                 $query->where('id', $search)
                       ->orWhere('name', 'like', '%' . $search . '%');
             });
         }
 
-        $pages = $pages->paginate($perPage, ['*'], 'page', $page);
+        $programs = $programs->paginate($perPage, ['*'], 'program', $page);
 
-        return view('admin.pages.index', [
-            'pages' => $pages,
-            'pagination' => $this->indexService->handlePagination($pages)
+        return view('admin.programs.index', [
+            'programs' => $programs,
+            'pagination' => $this->indexService->handlePagination($programs)
         ]);
     }
     
@@ -56,8 +56,7 @@ class PagesController extends Controller
         ])->first();
 
         $medias = Media::where('type', 'image')->get();
-
-        return view('admin.pages.create', compact('defaultLanguage', 'medias'));
+        return view('admin.programs.create', compact('defaultLanguage', 'medias'));
     }
     
     /**
@@ -66,9 +65,9 @@ class PagesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StorePageRequest $request)
+    public function store(StoreProgramRequest $request)
     {
-        $page = Page::create(array_merge(
+        $program = Program::create(array_merge(
             $request->validated(),
             [
                 'slug' => Str::slug($request->slug)
@@ -79,9 +78,8 @@ class PagesController extends Controller
             'is_default' => true,
         ])->first();
 
-
-        foreach($page->getTranslatableFields() as $field){
-            $page->setTranslation($field, $defaultLanguage->code, $request->input($field));    
+        foreach($program->getTranslatableFields() as $field){
+            $program->setTranslation($field, $defaultLanguage->code, $request->input($field));    
         }
 
         $media = null;
@@ -118,10 +116,10 @@ class PagesController extends Controller
             $media = Media::find($request->input('media_id'));
         }
     
-        $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Page', $page->id, true);
-    
-        return redirect()->route('admin.pages.index')
-                        ->with('success','Page created successfully');
+        $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Program', $program->id, true);
+
+        return redirect()->route('admin.programs.index')
+                        ->with('success','Program created successfully');
     }
 
     /**
@@ -130,13 +128,11 @@ class PagesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Page $page)
+    public function show(Program $program)
     {    
         $languages = Language::orderBy('is_default', 'DESC')->get();
 
-        $medias = Media::where('type', 'image')->get();
-
-        return view('admin.pages.show', compact('page', 'languages', 'medias'));
+        return view('admin.programs.show', compact('program', 'languages'));
     }
     
     /**
@@ -145,11 +141,12 @@ class PagesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Page $page)
+    public function edit(Program $program)
     {
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $medias = Media::where('type', 'image')->get();
 
-        return view('admin.pages.edit', compact('page', 'languages'));
+        return view('admin.programs.edit', compact('program', 'languages', 'medias'));
     }
     
     /**
@@ -159,17 +156,16 @@ class PagesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Page $page, UpdatePageRequest $request)
+    public function update(Program $program, UpdateProgramRequest $request)
     {
-        $page->update(array_merge(
+        $program->update(array_merge(
             $request->validated(),
             [
                 'slug' => Str::slug($request->slug)
             ]
         ));
-
-            
-        $media = null;
+    
+                $media = null;
 
         if ($request->hasFile('file')) {
             // Get MIME type
@@ -196,24 +192,24 @@ class PagesController extends Controller
         }
     
         if($media){
-            $page->file->detach();
-            $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Page', $page->id, true);
+            $program->file->detach();
+            $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Program', $program->id, true);
         }
-    
-        return redirect()->route('admin.pages.index')
-                        ->with('success','Page updated successfully');
+
+        return redirect()->route('admin.programs.index')
+                        ->with('success','Program updated successfully');
     }
 
-    public function updateTranslation(Page $page, UpdatePageTranslationRequest $request){
+    public function updateTranslation(Program $program, UpdateProgramTranslationRequest $request){
         $language = Language::find($request->language_id);
 
-        foreach($page->getTranslatableFields() as $field){
-            $page->setTranslation($field, $language->code, $request->input($field));    
+        foreach($program->getTranslatableFields() as $field){
+            $program->setTranslation($field, $language->code, $request->input($field));    
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Page updated successfully',
+            'message' => 'Program updated successfully',
         ]);
     }
 
@@ -223,11 +219,11 @@ class PagesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Page $page, DeletePageRequest $request)
+    public function destroy(Program $program)
     {
-        $page->delete();
+        $program->delete();
 
-        return redirect()->route('admin.pages.index')
-                        ->with('success','Page deleted successfully');
+        return redirect()->route('admin.programs.index')
+                        ->with('success','Program deleted successfully');
     }
 }

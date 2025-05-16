@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Admin\Pages;
+namespace App\Http\Requests\Admin\Programs;
 
-use App\Models\Media;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Media;
 
-class UpdatePageRequest extends FormRequest
+class UpdateProgramRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,40 +17,29 @@ class UpdatePageRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {        
-        $page = request()->route('page');
+        $program = $this->route('program');
 
-        $data = [
+        return [
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:500|unique:pages,slug,'.$page->id,
-            'status' => 'required|string|in:draft,hidden,published',
+            'slug' => 'required|string|max:500|unique:programs,slug,'.$program->id,
             'file' => 'nullable|file|image',
             'media_id' => 'nullable|exists:media,id',
         ];
-
-        if($page->is_system_page){
-            unset($data['name']);
-            unset($data['slug']);
-        }
-
-        return $data;
     }
 
-        /**
+    /**
      * Configure the validator instance.
      */
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
             $mediaId = $this->input('media_id');
-            $page = request()->route('page');
 
             // Validate media type if media_id is provided
-            if ($mediaId && !$page->is_system_page) {
+            if ($mediaId) {
                 $media = Media::find($mediaId);
                 
                 if (!$media) {

@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\LanguagesKeysController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\PagesController;
 use App\Http\Controllers\Admin\PermissionsController;
+use App\Http\Controllers\Admin\ProgramsController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\UsersController;
 use Illuminate\Support\Facades\Route;
@@ -119,4 +120,14 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('articles/{article}/update-translation', [ArticlesController::class, 'updateTranslation'])->middleware('check.permission:admin.articles.update')->name('admin.articles.update-translation');
     Route::patch('articles/{article}', [ArticlesController::class, 'update'])->middleware('check.permission:admin.articles.update')->name('admin.articles.update');
     Route::delete('articles/{article}', [ArticlesController::class, 'destroy'])->middleware('check.permission:admin.articles.destroy')->name('admin.articles.destroy');
+
+    // Program
+    Route::get('programs', [ProgramsController::class, 'index'])->middleware('check.permission:admin.programs.index')->name('admin.programs.index');
+    Route::get('programs/create', [ProgramsController::class, 'create'])->middleware('check.permission:admin.programs.store')->name('admin.programs.create');
+    Route::post('programs', [ProgramsController::class, 'store'])->middleware('check.permission:admin.programs.store')->name('admin.programs.store');
+    Route::get('programs/{program}', [ProgramsController::class, 'show'])->middleware('check.permission:admin.programs.show')->name('admin.programs.show');
+    Route::get('programs/{program}/edit', [ProgramsController::class, 'edit'])->middleware('check.permission:admin.programs.update')->name('admin.programs.edit');
+    Route::patch('programs/{program}/update-translation', [ProgramsController::class, 'updateTranslation'])->middleware('check.permission:admin.programs.update')->name('admin.programs.update-translation');
+    Route::patch('programs/{program}', [ProgramsController::class, 'update'])->middleware('check.permission:admin.programs.update')->name('admin.programs.update');
+    Route::delete('programs/{program}', [ProgramsController::class, 'destroy'])->middleware('check.permission:admin.programs.destroy')->name('admin.programs.destroy');
 });

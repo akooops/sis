@@ -1,5 +1,5 @@
 @extends('admin.layouts.master')
-@section('title') Pages @endsection
+@section('title') Programs @endsection
 @section('css')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <style>
@@ -22,8 +22,8 @@
 @endsection
 @section('content')
 @component('admin.components.breadcrumb')
-@slot('li_1') Pages @endslot
-@slot('title') Edit Page @endslot
+@slot('li_1') Programs @endslot
+@slot('title') Edit Program @endslot
 @endcomponent
 <div class="row">
     <div class="col">
@@ -53,14 +53,14 @@
 
             <div class="row">
                 <div class="col-12">
-                    <form method="POST" action="{{ route('admin.pages.update', $page->id) }}">
+                    <form method="POST" enctype="multipart/form-data" action="{{ route('admin.programs.update', $program->id) }}">
                         @csrf
                         @method('patch')
                         <div class="card">
                             <div class="card-body">
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Page name<span class="text-danger">*</span></label>
-                                    <input name="name" value="{{old('name', $page->name)}}" type="text" class="form-control">
+                                    <label class="form-label" for="">Program name<span class="text-danger">*</span></label>
+                                    <input name="name" value="{{old('name', $program->name)}}" type="text" class="form-control">
                                     @error('name')
                                         <p class="mx-2 my-2 text-danger">
                                             <strong>
@@ -71,8 +71,8 @@
                                 </div>  
                                 
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Page slug<span class="text-danger">*</span></label>
-                                    <input name="slug" value="{{old('slug', $page->slug)}}" type="text" class="form-control">
+                                    <label class="form-label" for="">Program slug<span class="text-danger">*</span></label>
+                                    <input name="slug" value="{{old('slug', $program->slug)}}" type="text" class="form-control">
                                     @error('slug')
                                         <p class="mx-2 my-2 text-danger">
                                             <strong>
@@ -83,22 +83,7 @@
                                 </div>  
 
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Page status<span class="text-danger">*</span></label>
-                                    <select class="form-control" name="status">
-                                        <option value="draft" {{ $page->status == 'draft' ? 'selected' : '' }}>Draft</option>
-                                        <option value="hidden" {{ $page->status == 'hidden' ? 'selected' : '' }}>Hidden</option>
-                                        <option value="published" {{ $page->status == 'published' ? 'selected' : '' }}>Published</option>
-                                    </select>
-                                    @error('status')
-                                        <p class="mx-2 my-2 text-danger">
-                                            <strong>
-                                                {{$message}}
-                                            </strong>
-                                        </p>
-                                    @enderror
-                                </div>
-                                                                <div class="mb-4">
-                                    <label class="form-label" for="">Article thumbnail <span class="text-danger">(Keep it empty if you don't want to change it)</span></label>
+                                    <label class="form-label" for="">Program thumbnail <span class="text-danger">(Keep it empty if you don't want to change it)</span></label>
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="form-check me-3">
                                             <input class="form-check-input" type="radio" name="media_option" id="media_option_upload" value="upload" checked>
@@ -139,7 +124,7 @@
                                 
                                 <div class="mt-4">
                                     <figure class="figure">
-                                        <img src="{{ $page->thumbnailUrl }}" class="rounded avatar-xl" style="object-fit: cover">
+                                        <img src="{{ $program->thumbnailUrl }}" class="rounded avatar-xl" style="object-fit: cover">
                                         <figcaption class="figure-caption">Last uploaded image</figcaption>
                                     </figure>
                                 </div>
@@ -177,19 +162,19 @@
 
                                             <div class="mb-4">
                                                 <label class="form-label" for="title-{{$language->id}}">Title <span class="text-danger">*</span></label>
-                                                <input type="text" id="title-{{$language->id}}" name="title" class="form-control translation-title" value="{{$page->getTranslation('title', $language->code)}}">
+                                                <input type="text" id="title-{{$language->id}}" name="title" class="form-control translation-title" value="{{$program->getTranslation('title', $language->code)}}">
                                                 <div class="translation-error" id="error-title-{{$language->id}}"></div>
                                             </div>
 
                                             <div class="mb-4">
                                                 <label class="form-label" for="description-{{$language->id}}">Description <span class="text-danger">*</span></label>
-                                                <textarea id="description-{{$language->id}}" name="description" class="form-control translation-description" rows="3">{{$page->getTranslation('description', $language->code)}}</textarea>
+                                                <textarea id="description-{{$language->id}}" name="description" class="form-control translation-description" rows="3">{{$program->getTranslation('description', $language->code)}}</textarea>
                                                 <div class="translation-error" id="error-description-{{$language->id}}"></div>
                                             </div>
 
                                             <div class="mb-4">
                                                 <label class="form-label" for="content-{{$language->id}}">Content <span class="text-danger">*</span></label>
-                                                <textarea id="content-{{$language->id}}" name="content" class="form-control translation-content markdown-editor">{{$page->getTranslation('content', $language->code)}}</textarea>
+                                                <textarea id="content-{{$language->id}}" name="content" class="form-control translation-content markdown-editor">{{$program->getTranslation('content', $language->code)}}</textarea>
                                                 <div class="translation-error" id="error-content-{{$language->id}}"></div>
                                             </div>
 
@@ -204,7 +189,7 @@
                     </div>
                     
                     <div class="text-end mb-3">
-                        <a href="{{ route('admin.pages.index') }}" class="btn btn-primary w-sm">Back</a>
+                        <a href="{{ route('admin.programs.index') }}" class="btn btn-primary w-sm">Back</a>
                     </div>
                 </div>
                 <!-- end col -->
@@ -435,7 +420,7 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('content', editors[contentId].value());
             
             // Send AJAX request
-            fetch('{{ route('admin.pages.update-translation', $page->id) }}', {
+            fetch('{{ route('admin.programs.update-translation', $program->id) }}', {
                 method: 'POST',
                 body: formData,
                 headers: {

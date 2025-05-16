@@ -222,7 +222,7 @@
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-        // Toggle between upload and select
+    // Toggle between upload and select
     document.getElementById('media_option_upload').addEventListener('change', function() {
         document.getElementById('upload_section').style.display = '';
         document.getElementById('media_section').style.display = 'none';

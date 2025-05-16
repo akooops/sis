@@ -8,16 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 
-class Page extends Model
+class Program extends Model
 {
     use HasFactory, Translatable, HasFiles;
 
     //Properties
     protected $guarded = ['id'];
-
-    protected $casts = [
-        'is_system_page' => 'boolean',
-    ];
 
     protected $appends = ['thumbnailUrl'];
 
