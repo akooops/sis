@@ -2,6 +2,8 @@
 @section('title') Grades @endsection
 @section('css')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<link href="{{ URL::asset('assets/admin/libs/dropzone/dropzone.min.css')}}" rel="stylesheet" type="text/css" />
+
 <style>
     .is-invalid {
         border-color: #dc3545 !important;
@@ -53,7 +55,7 @@
 
             <div class="row">
                 <div class="col-12">
-                    <form method="POST" enctype="multipart/form-data" action="{{ route('admin.grades.update', $grade->id) }}">
+                    <form id="main-form" method="POST" enctype="multipart/form-data" action="{{ route('admin.grades.update', $grade->id) }}">
                         @csrf
                         @method('patch')
                         <div class="card">
@@ -126,11 +128,11 @@
                                     <!-- Media select input -->
                                     <div id="media_section" style="display:none;">
                                         <div class="row">
-                                            @foreach($imageMedias as $imageMedia)
+                                            @foreach($medias as $media)
                                                 <div class="col-auto mb-2">
                                                     <label class="d-block">
-                                                        <input type="radio" name="media_id" value="{{ $imageMedia->id }}" class="d-none media-radio">
-                                                        <img src="{{ $imageMedia->file->url }}" alt="media" class="img-thumbnail media-thumb" style="width:90px; height:70px; object-fit:cover; cursor:pointer; border:2px solid transparent;">
+                                                        <input type="radio" name="media_id" value="{{ $media->id }}" class="d-none media-radio">
+                                                        <img src="{{ $media->file->url }}" alt="media" class="img-thumbnail media-thumb" style="width:90px; height:70px; object-fit:cover; cursor:pointer; border:2px solid transparent;">
                                                     </label>
                                                 </div>
                                             @endforeach
@@ -148,11 +150,89 @@
                                     </figure>
                                 </div>
 
+                                <div class="mb-4">
+                                    <label class="form-label" for="">Grade files</label>
+
+                                    <div class="dropzone">
+                                        <div class="fallback">
+                                            <input name="images" type="file" multiple="multiple">
+                                        </div>
+                                        <div class="dz-message needsclick">
+                                            <div class="mb-3">
+                                                <i class="display-4 text-muted ri-upload-cloud-2-fill"></i>
+                                            </div>
+
+                                            <h4>Drop files here or click to upload.</h4>
+                                        </div>
+                                    </div>
+
+                                    <ul class="list-unstyled mb-0" id="dropzone-preview">
+                                        <li class="mt-2" id="dropzone-preview-list">
+                                            <!-- This is used as the file preview template -->
+                                            <div class="border rounded">
+                                                <div class="d-flex p-2">
+                                                    <div class="flex-shrink-0 me-3">
+                                                        <div class="avatar-sm bg-light rounded">
+                                                            <img data-dz-thumbnail class="img-fluid rounded d-block" src="#" alt="Dropzone-Image" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <div class="pt-1">
+                                                            <h5 class="fs-14 mb-1" data-dz-name>&nbsp;</h5>
+                                                            <p class="fs-13 text-muted mb-0" data-dz-size></p>
+                                                            <div class="progress animated-progress custom-progress mb-4">
+                                                                <div class="progress-bar bg-primary" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100" data-dz-uploadprogress></div>
+                                                            </div>
+                                                            <strong class="error text-danger" data-dz-errormessage></strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-shrink-0 ms-3">
+                                                        <button data-dz-remove class="btn btn-sm btn-danger">Delete</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <!-- end dropzon-preview -->
+                                </div>
+
+                                <div class="row mb-3">
+                                    <label class="form-label" for="">Last uploaded grade files</label>
+
+                                    <ul class="list-unstyled mb-0">
+                                        @foreach ($grade->files as $key => $file)
+                                            <li id="file-{{$key}}" class="mt-2">
+                                                <div class="border rounded">
+                                                    <div class="d-flex p-2">
+                                                        <div class="flex-grow-1">
+                                                            <div class="pt-1">
+                                                                <h5 class="fs-14 mb-1">
+                                                                    <a href="{{$file->url}}" target="_blank"> {{$file->original_name}} </a>
+                                                                </h5>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-shrink-0 ms-3">
+                                                            <button onclick="confirmDelete('{{ $file->id }}', {{ $key }})" 
+                                                                    class="btn btn-sm btn-danger">
+                                                                Remove
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+
                                 <div class="text-end mb-3">
                                     <button type="submit" class="btn btn-success w-sm">Submit</button>
                                 </div>
                             </div>
                         </div>
+
+                        @foreach ($grade->files as $file)
+                            <input type="hidden" name="files[]" value="{{$file->id}}">
+                        @endforeach
                     </form>
 
                     <div class="card">
@@ -221,10 +301,82 @@
 
 @endsection
 @section('script')
+<script src="{{ URL::asset('assets/admin/libs/dropzone/dropzone.min.js') }}"></script>
+<script src="{{ URL::asset('assets/admin/libs/filepond/filepond.min.js') }}"></script>
+<script src="{{ URL::asset('assets/admin/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js') }}"></script>
+<script src="{{ URL::asset('assets/admin/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js') }}"></script>
+<script src="{{ URL::asset('assets/admin/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js') }}"></script>
+<script src="{{ URL::asset('assets/admin/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
+
 <script src="{{ URL::asset('/assets/admin/js/app.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
+    
+function confirmDelete(fileId, key) {
+    if (confirm('Are you sure you want to remove this file?')) {
+        // Remove the hidden input
+        const inputs = document.querySelectorAll('input[name="files[]"]');
+        inputs.forEach(input => {
+            if (input.value === fileId.toString()) {
+                input.remove();
+            }
+        });
+        
+        // Remove the visual element
+        const listItem = document.getElementById(`file-${key}`);
+        if (listItem) {
+            listItem.remove();
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    var previewTemplate,
+        dropzone,
+        dropzonePreviewNode = document.querySelector("#dropzone-preview-list");
+    (dropzonePreviewNode.id = ""),
+        dropzonePreviewNode &&
+            ((previewTemplate = dropzonePreviewNode.parentNode.innerHTML),
+            dropzonePreviewNode.parentNode.removeChild(dropzonePreviewNode),
+            (dropzone = new Dropzone(".dropzone", { url: '{{ route('admin.files.upload') }}', method: "post", headers: {'x-csrf-token': '{{csrf_token()}}'}, previewTemplate: previewTemplate, previewsContainer: "#dropzone-preview" }))),
+        FilePond.registerPlugin(FilePondPluginFileEncode, FilePondPluginFileValidateSize, FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
+    var inputMultipleElements = document.querySelectorAll("input.filepond-input-multiple");
+    inputMultipleElements &&
+        (Array.from(inputMultipleElements).forEach(function (e) {
+            FilePond.create(e);
+        }),
+        FilePond.create(document.querySelector(".filepond-input-circle"), {
+            labelIdle: 'Drag & Drop your picture or <span class="filepond--label-action">Browse</span>',
+            imagePreviewHeight: 170,
+            imageCropAspectRatio: "1:1",
+            imageResizeTargetWidth: 200,
+            imageResizeTargetHeight: 200,
+            stylePanelLayout: "compact circle",
+            styleLoadIndicatorPosition: "center bottom",
+            styleProgressIndicatorPosition: "right bottom",
+            styleButtonRemoveItemPosition: "left bottom",
+            styleButtonProcessItemPosition: "right bottom",
+        }));
+
+    dropzone.on('uploadprogress', function(file, progress, bytesSent){
+        if (file.previewElement) 
+            file.previewElement.querySelector("[data-dz-uploadprogress]").setAttribute('area-valuenow', Math.round(progress) + "%");
+    });
+
+    dropzone.on("success", function(file, response) {
+        // Example: extract the file ID and do something with it
+        if (response.status === "success" && response.data && response.data.file) {
+            console.log(response.data.file.id);
+            var fileId = response.data.file.id;
+
+            var hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'files[]';
+            hiddenInput.value = fileId;
+            document.querySelector('#main-form').appendChild(hiddenInput);
+        }
+    });
+
     // Toggle between upload and select
     document.getElementById('media_option_upload').addEventListener('change', function() {
         document.getElementById('upload_section').style.display = '';

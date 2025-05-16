@@ -29,7 +29,7 @@ class UpdateGradeRequest extends FormRequest
             'file' => 'nullable|file|image',
             'media_id' => 'nullable|exists:media,id',
             'files' => 'nullable|array',
-            'files.*' => 'file'
+            'files.*' => 'exists:files,id'
         ];
     }
 

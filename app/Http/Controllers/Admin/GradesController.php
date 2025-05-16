@@ -219,36 +219,17 @@ class GradesController extends Controller
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Grade', $grade->id, true);
         }
 
-                if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $file) {
-                // Get MIME type
-                $mimeType = $request->file('file')->getMimeType();
-                
-                // Determine file category using match expression
-                $type = match (true) {
-                    str_starts_with($mimeType, 'image/') => 'image',
-                    str_starts_with($mimeType, 'video/') => 'video',
-                    str_starts_with($mimeType, 'audio/') => 'audio',
-                    default => 'document',
-                };
+        $grade->files()->where('is_main', false)->update([
+            'model_type' => null,
+            'model_id' => null
+        ]);
 
-                $media = Media::create(array_merge(
-                    $request->validated(),
-                    [
-                        'type' => $type
-                    ]
-                ));
-
-                $defaultLanguage = Language::where([
-                    'is_default' => true,
-                ])->first();
-
-                foreach($media->getTranslatableFields() as $field){
-                    $media->setTranslation($field, $defaultLanguage->code, $request->input($field));    
+        if ($request->has('files')) {
+            foreach ($request->input('files') as $file) {
+                foreach ($request->input('files') as $fileId) {
+                    $file = File::findOrFail($fileId);
+                    $file->attach($grade);
                 }
-                
-                $file = $this->fileService->upload($request->file('file'), 'App\\Models\\Media', $media->id);
-                $this->fileService->duplicateMediaFile($media, 'App\\Models\\Grade', $grade->id);
             }
         }
 

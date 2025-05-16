@@ -47,6 +47,11 @@
                             </div>
 
                             <div class="mb-3">
+                                <h4 class="fs-15">Grade program</h4>
+                                {{$grade->program->name }}
+                            </div>
+
+                            <div class="mb-3">
                                 <h4 class="fs-15">Grade created at</h4>
                                 {{$grade->created_at}}
                             </div>
@@ -58,6 +63,36 @@
                         </div>
                     </div>
 
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">Grade files</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <ul class="list-unstyled mb-0">
+                                    @foreach ($grade->files as $key => $file)
+                                        <li id="file-{{$key}}" class="mt-2">
+                                            <div class="border rounded">
+                                                <div class="d-flex p-2">
+                                                    <div class="flex-grow-1">
+                                                        <div class="pt-1">
+                                                            <h5 class="fs-14 mb-1">
+                                                                <a href="{{$file->url}}" target="_blank"> {{$file->original_name}} </a>
+                                                            </h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-shrink-0 ms-3">
+                                                        <a href="{{$file->url}}" class="btn btn-sm btn-info show-item-btn" target="_blank"> Download </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end card -->
 
                     <div class="card">
                         <div class="card-body">
