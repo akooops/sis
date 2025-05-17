@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AlbumsController;
 use App\Http\Controllers\Admin\ArticlesController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\Admin\FilesController;
 use App\Http\Controllers\Admin\GradesController;
 use App\Http\Controllers\Admin\LanguagesController;
@@ -152,4 +153,14 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('albums/{album}/update-translation', [AlbumsController::class, 'updateTranslation'])->middleware('check.permission:admin.albums.update')->name('admin.albums.update-translation');
     Route::patch('albums/{album}', [AlbumsController::class, 'update'])->middleware('check.permission:admin.albums.update')->name('admin.albums.update');
     Route::delete('albums/{album}', [AlbumsController::class, 'destroy'])->middleware('check.permission:admin.albums.destroy')->name('admin.albums.destroy');
+
+    // Events
+    Route::get('events', [EventsController::class, 'index'])->middleware('check.permission:admin.events.index')->name('admin.events.index');
+    Route::get('events/create', [EventsController::class, 'create'])->middleware('check.permission:admin.events.store')->name('admin.events.create');
+    Route::post('events', [EventsController::class, 'store'])->middleware('check.permission:admin.events.store')->name('admin.events.store');
+    Route::get('events/{event}', [EventsController::class, 'show'])->middleware('check.permission:admin.events.show')->name('admin.events.show');
+    Route::get('events/{event}/edit', [EventsController::class, 'edit'])->middleware('check.permission:admin.events.update')->name('admin.events.edit');
+    Route::patch('events/{event}/update-translation', [EventsController::class, 'updateTranslation'])->middleware('check.permission:admin.events.update')->name('admin.events.update-translation');
+    Route::patch('events/{event}', [EventsController::class, 'update'])->middleware('check.permission:admin.events.update')->name('admin.events.update');
+    Route::delete('events/{event}', [EventsController::class, 'destroy'])->middleware('check.permission:admin.events.destroy')->name('admin.events.destroy');
 });

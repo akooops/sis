@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Admin\Albums\DeleteAlbumRequest;
-use App\Http\Requests\Admin\Albums\StoreAlbumRequest;
-use App\Http\Requests\Admin\Albums\UpdateAlbumRequest;
-use App\Http\Requests\Admin\Albums\UpdateAlbumTranslationRequest;
+use App\Http\Requests\Admin\Events\DeleteEventRequest;
+use App\Http\Requests\Admin\Events\StoreEventRequest;
+use App\Http\Requests\Admin\Events\UpdateEventRequest;
+use App\Http\Requests\Admin\Events\UpdateEventTranslationRequest;
 use App\Models\File;
 use App\Models\Language;
 use App\Models\Permission;
 use Illuminate\Http\Request;
-use App\Models\Album;
+use App\Models\Event;
 use App\Models\Media;
 use App\Models\Program;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
-class AlbumsController extends Controller
+class EventsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -29,20 +29,20 @@ class AlbumsController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $albums = Album::latest();
+        $events = Event::latest();
 
         if ($search) {
-            $albums->where(function($query) use ($search) {
+            $events->where(function($query) use ($search) {
                 $query->where('id', $search)
                       ->orWhere('name', 'like', '%' . $search . '%');
             });
         }
 
-        $albums = $albums->paginate($perPage, ['*'], 'album', $page);
+        $events = $events->paginate($perPage, ['*'], 'event', $page);
 
-        return view('admin.albums.index', [
-            'albums' => $albums,
-            'pagination' => $this->indexService->handlePagination($albums)
+        return view('admin.events.index', [
+            'events' => $events,
+            'pagination' => $this->indexService->handlePagination($events)
         ]);
     }
     
@@ -59,7 +59,7 @@ class AlbumsController extends Controller
 
         $medias = Media::where('type', 'image')->get();
 
-        return view('admin.albums.create', compact('defaultLanguage', 'medias'));
+        return view('admin.events.create', compact('defaultLanguage', 'medias'));
     }
     
     /**
@@ -68,9 +68,9 @@ class AlbumsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreAlbumRequest $request)
+    public function store(StoreEventRequest $request)
     {
-        $album = Album::create(array_merge(
+        $event = Event::create(array_merge(
             $request->validated(),
             [
                 'slug' => Str::slug($request->slug)
@@ -81,8 +81,8 @@ class AlbumsController extends Controller
             'is_default' => true,
         ])->first();
 
-        foreach($album->getTranslatableFields() as $field){
-            $album->setTranslation($field, $defaultLanguage->code, $request->input($field));    
+        foreach($event->getTranslatableFields() as $field){
+            $event->setTranslation($field, $defaultLanguage->code, $request->input($field));    
         }
 
         $media = null;
@@ -119,7 +119,7 @@ class AlbumsController extends Controller
             $media = Media::find($request->input('media_id'));
         }
     
-        $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Album', $album->id, true);
+        $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Event', $event->id, true);
 
         if ($request->has('files')) {
             foreach ($request->input('files') as $file) {
@@ -133,13 +133,13 @@ class AlbumsController extends Controller
                         default => 'document',
                     };
 
-                    if($type == 'image') $file->attach($album);
+                    if($type == 'image' || $type == 'video') $file->attach($event);
                 }
             }
         }
 
-        return redirect()->route('admin.albums.index')
-                        ->with('success','Album created successfully');
+        return redirect()->route('admin.events.index')
+                        ->with('success','Event created successfully');
     }
 
     /**
@@ -148,11 +148,11 @@ class AlbumsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Album $album)
+    public function show(Event $event)
     {    
         $languages = Language::orderBy('is_default', 'DESC')->get();
 
-        return view('admin.albums.show', compact('album', 'languages'));
+        return view('admin.events.show', compact('event', 'languages'));
     }
     
     /**
@@ -161,12 +161,12 @@ class AlbumsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Album $album)
+    public function edit(Event $event)
     {
         $languages = Language::orderBy('is_default', 'DESC')->get();
         $medias = Media::where('type', 'image')->get();
 
-        return view('admin.albums.edit', compact('album', 'languages', 'medias'));
+        return view('admin.events.edit', compact('event', 'languages', 'medias'));
     }
     
     /**
@@ -176,9 +176,9 @@ class AlbumsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Album $album, UpdateAlbumRequest $request)
+    public function update(Event $event, UpdateEventRequest $request)
     {
-        $album->update(array_merge(
+        $event->update(array_merge(
             $request->validated(),
             [
                 'slug' => Str::slug($request->slug)
@@ -212,11 +212,11 @@ class AlbumsController extends Controller
         }
     
         if($media){
-            $album->file->detach();
-            $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Album', $album->id, true);
+            $event->file->detach();
+            $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Event', $event->id, true);
         }
 
-        $album->files()->where('is_main', false)->update([
+        $event->files()->where('is_main', false)->update([
             'model_type' => null,
             'model_id' => null
         ]);
@@ -225,7 +225,7 @@ class AlbumsController extends Controller
             foreach ($request->input('files') as $file) {
                 foreach ($request->input('files') as $fileId) {
                     $file = File::findOrFail($fileId);
-                    $file->attach($album);
+                    $file->attach($event);
 
                     $type = match (true) {
                         str_starts_with($file->type, 'image/') => 'image',
@@ -234,25 +234,25 @@ class AlbumsController extends Controller
                         default => 'document',
                     };
 
-                    if($type == 'image') $file->attach($album);
+                    if($type == 'image' || $type == 'video') $file->attach($event);
                 }
             }
         }
 
-        return redirect()->route('admin.albums.index')
-                        ->with('success','Album updated successfully');
+        return redirect()->route('admin.events.index')
+                        ->with('success','Event updated successfully');
     }
 
-    public function updateTranslation(Album $album, UpdateAlbumTranslationRequest $request){
+    public function updateTranslation(Event $event, UpdateEventTranslationRequest $request){
         $language = Language::find($request->language_id);
 
-        foreach($album->getTranslatableFields() as $field){
-            $album->setTranslation($field, $language->code, $request->input($field));    
+        foreach($event->getTranslatableFields() as $field){
+            $event->setTranslation($field, $language->code, $request->input($field));    
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Album updated successfully',
+            'message' => 'Event updated successfully',
         ]);
     }
 
@@ -262,11 +262,11 @@ class AlbumsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Album $album)
+    public function destroy(Event $event)
     {
-        $album->delete();
+        $event->delete();
 
-        return redirect()->route('admin.albums.index')
-                        ->with('success','Album deleted successfully');
+        return redirect()->route('admin.events.index')
+                        ->with('success','Event deleted successfully');
     }
 }
