@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AlbumsController;
 use App\Http\Controllers\Admin\ArticlesController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\FilesController;
@@ -132,7 +133,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('programs/{program}', [ProgramsController::class, 'update'])->middleware('check.permission:admin.programs.update')->name('admin.programs.update');
     Route::delete('programs/{program}', [ProgramsController::class, 'destroy'])->middleware('check.permission:admin.programs.destroy')->name('admin.programs.destroy');
 
-    // Program
+    // Grades
     Route::get('grades', [GradesController::class, 'index'])->middleware('check.permission:admin.grades.index')->name('admin.grades.index');
     Route::get('grades/create', [GradesController::class, 'create'])->middleware('check.permission:admin.grades.store')->name('admin.grades.create');
     Route::post('grades', [GradesController::class, 'store'])->middleware('check.permission:admin.grades.store')->name('admin.grades.store');
@@ -141,4 +142,14 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('grades/{grade}/update-translation', [GradesController::class, 'updateTranslation'])->middleware('check.permission:admin.grades.update')->name('admin.grades.update-translation');
     Route::patch('grades/{grade}', [GradesController::class, 'update'])->middleware('check.permission:admin.grades.update')->name('admin.grades.update');
     Route::delete('grades/{grade}', [GradesController::class, 'destroy'])->middleware('check.permission:admin.grades.destroy')->name('admin.grades.destroy');
+
+    // Albums
+    Route::get('albums', [AlbumsController::class, 'index'])->middleware('check.permission:admin.albums.index')->name('admin.albums.index');
+    Route::get('albums/create', [AlbumsController::class, 'create'])->middleware('check.permission:admin.albums.store')->name('admin.albums.create');
+    Route::post('albums', [AlbumsController::class, 'store'])->middleware('check.permission:admin.albums.store')->name('admin.albums.store');
+    Route::get('albums/{album}', [AlbumsController::class, 'show'])->middleware('check.permission:admin.albums.show')->name('admin.albums.show');
+    Route::get('albums/{album}/edit', [AlbumsController::class, 'edit'])->middleware('check.permission:admin.albums.update')->name('admin.albums.edit');
+    Route::patch('albums/{album}/update-translation', [AlbumsController::class, 'updateTranslation'])->middleware('check.permission:admin.albums.update')->name('admin.albums.update-translation');
+    Route::patch('albums/{album}', [AlbumsController::class, 'update'])->middleware('check.permission:admin.albums.update')->name('admin.albums.update');
+    Route::delete('albums/{album}', [AlbumsController::class, 'destroy'])->middleware('check.permission:admin.albums.destroy')->name('admin.albums.destroy');
 });
