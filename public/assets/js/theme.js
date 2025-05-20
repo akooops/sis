@@ -12,6 +12,7 @@ var theme = {
     theme.offCanvas();
     theme.isotope();
     theme.onepageHeaderOffset();
+    theme.spyScroll();
     theme.anchorSmoothScroll();
     theme.svgInject();
     theme.backgroundImage();
@@ -96,6 +97,8 @@ var theme = {
    * Enables offcanvas-nav, closes offcanvas on anchor clicks, focuses on input in search offcanvas
    */
   offCanvas: () => {
+    var navbar = document.querySelector(".navbar");
+    if (navbar == null) return;
     const navOffCanvasBtn = document.querySelectorAll(".offcanvas-nav-btn");
     const navOffCanvas = document.querySelector('.navbar:not(.navbar-clone) .offcanvas-nav');
     const bsOffCanvas = new bootstrap.Offcanvas(navOffCanvas, {scroll: true});
@@ -133,7 +136,6 @@ var theme = {
         var iso = new Isotope(grid, {
           itemSelector: '.item',
           layoutMode: 'masonry',
-          isOriginLeft: false,
           masonry: {
             columnWidth: grid.offsetWidth / 12
           },
@@ -183,6 +185,8 @@ var theme = {
    * Adds an offset value to anchor point equal to sticky header height on a onepage
    */
   onepageHeaderOffset: () => {
+    var navbar = document.querySelector(".navbar");
+    if (navbar == null) return;
     const header_height = document.querySelector(".navbar").offsetHeight;
     const shrinked_header_height = 75;
     const sections = document.querySelectorAll(".onepage section");
@@ -194,6 +198,29 @@ var theme = {
     if(first_section != null) {
       first_section.style.paddingTop = header_height + 'px';
       first_section.style.marginTop = '-' + header_height + 'px';
+    }
+  },
+  /**
+   * Spy Scroll
+   * Highlights the active nav link while scrolling through sections
+   */
+  spyScroll: () => {
+    let section = document.querySelectorAll('section[id]');
+    let navLinks = document.querySelectorAll('.nav-link.scroll');
+    window.onscroll = () => {
+      section.forEach(sec => {
+        let top = window.scrollY; //returns the number of pixels that the document is currently scrolled vertically.
+        let offset = sec.offsetTop - 0; //returns the distance of the outer border of the current element relative to the inner border of the top of the offsetParent, the closest positioned ancestor element
+        let height = sec.offsetHeight; //returns the height of an element, including vertical padding and borders, as an integer
+        let id = sec.getAttribute('id'); //gets the value of an attribute of an element
+        if (top >= offset && top < offset + height) {
+          navLinks.forEach(links => {
+            links.classList.remove('active');
+            document.querySelector(`.nav-link.scroll[href*=${id}]`).classList.add('active');
+            //[att*=val] Represents an element with the att attribute whose value contains at least one instance of the substring "val". If "val" is the empty string then the selector does not represent anything.
+          });
+        }
+      });
     }
   },
   /**
@@ -328,20 +355,50 @@ var theme = {
       navi.appendChild(next);
       controls.appendChild(pagi);
       var sliderEffect = slider1.getAttribute('data-effect') ? slider1.getAttribute('data-effect') : 'slide';
-      var sliderItems = slider1.getAttribute('data-items') ? slider1.getAttribute('data-items') : 3; // items in all devices
-      var sliderItemsXs = slider1.getAttribute('data-items-xs') ? slider1.getAttribute('data-items-xs') : 1; // start - 575
-      var sliderItemsSm = slider1.getAttribute('data-items-sm') ? slider1.getAttribute('data-items-sm') : Number(sliderItemsXs); // 576 - 767
-      var sliderItemsMd = slider1.getAttribute('data-items-md') ? slider1.getAttribute('data-items-md') : Number(sliderItemsSm); // 768 - 991
-      var sliderItemsLg = slider1.getAttribute('data-items-lg') ? slider1.getAttribute('data-items-lg') : Number(sliderItemsMd); // 992 - 1199
-      var sliderItemsXl = slider1.getAttribute('data-items-xl') ? slider1.getAttribute('data-items-xl') : Number(sliderItemsLg); // 1200 - end
-      var sliderItemsXxl = slider1.getAttribute('data-items-xxl') ? slider1.getAttribute('data-items-xxl') : Number(sliderItemsXl); // 1500 - end
+      if (slider1.getAttribute('data-items-auto') === 'true') {
+        var slidesPerViewInit = "auto";
+        var breakpointsInit = null;
+      } else {
+        var sliderItems = slider1.getAttribute('data-items') ? slider1.getAttribute('data-items') : 3; // items in all devices
+        var sliderItemsXs = slider1.getAttribute('data-items-xs') ? slider1.getAttribute('data-items-xs') : 1; // start - 575
+        var sliderItemsSm = slider1.getAttribute('data-items-sm') ? slider1.getAttribute('data-items-sm') : Number(sliderItemsXs); // 576 - 767
+        var sliderItemsMd = slider1.getAttribute('data-items-md') ? slider1.getAttribute('data-items-md') : Number(sliderItemsSm); // 768 - 991
+        var sliderItemsLg = slider1.getAttribute('data-items-lg') ? slider1.getAttribute('data-items-lg') : Number(sliderItemsMd); // 992 - 1199
+        var sliderItemsXl = slider1.getAttribute('data-items-xl') ? slider1.getAttribute('data-items-xl') : Number(sliderItemsLg); // 1200 - end
+        var sliderItemsXxl = slider1.getAttribute('data-items-xxl') ? slider1.getAttribute('data-items-xxl') : Number(sliderItemsXl); // 1500 - end
+        var slidesPerViewInit = sliderItems;
+        var breakpointsInit = {
+          0: {
+            slidesPerView: Number(sliderItemsXs)
+          },
+          576: {
+            slidesPerView: Number(sliderItemsSm)
+          },
+          768: {
+            slidesPerView: Number(sliderItemsMd)
+          },
+          992: {
+            slidesPerView: Number(sliderItemsLg)
+          },
+          1200: {
+            slidesPerView: Number(sliderItemsXl)
+          },
+          1400: {
+            slidesPerView: Number(sliderItemsXxl)
+          }
+        }
+      }
       var sliderSpeed = slider1.getAttribute('data-speed') ? slider1.getAttribute('data-speed') : 500;
       var sliderAutoPlay = slider1.getAttribute('data-autoplay') !== 'false';
       var sliderAutoPlayTime = slider1.getAttribute('data-autoplaytime') ? slider1.getAttribute('data-autoplaytime') : 5000;
       var sliderAutoHeight = slider1.getAttribute('data-autoheight') === 'true';
+      var sliderResizeUpdate = slider1.getAttribute('data-resizeupdate') !== 'false';
+      var sliderAllowTouchMove = slider1.getAttribute('data-drag') !== 'false';
+      var sliderReverseDirection = slider1.getAttribute('data-reverse') === 'true';
       var sliderMargin = slider1.getAttribute('data-margin') ? slider1.getAttribute('data-margin') : 30;
       var sliderLoop = slider1.getAttribute('data-loop') === 'true';
       var sliderCentered = slider1.getAttribute('data-centered') === 'true';
+      var sliderWatchOverflow = slider1.getAttribute('data-watchoverflow') !== 'false';
       var swiper = slider1.querySelector('.swiper:not(.swiper-thumbs)');
       var swiperTh = slider1.querySelector('.swiper-thumbs');
       var sliderTh = new Swiper(swiperTh, {
@@ -384,37 +441,23 @@ var theme = {
         },
         autoplay: {
           delay: sliderAutoPlayTime,
-          disableOnInteraction: false
+          disableOnInteraction: false,
+          reverseDirection: sliderReverseDirection,
+          pauseOnMouseEnter: false
         },
-        speed: sliderSpeed,
-        slidesPerView: sliderItems,
+        allowTouchMove: sliderAllowTouchMove,
+        speed: parseInt(sliderSpeed),
+        slidesPerView: slidesPerViewInit,
         loop: sliderLoop,
         centeredSlides: sliderCentered,
         spaceBetween: Number(sliderMargin),
         effect: sliderEffect,
         autoHeight: sliderAutoHeight,
+        watchOverflow: sliderWatchOverflow,
         grabCursor: true,
         resizeObserver: false,
-        breakpoints: {
-          0: {
-            slidesPerView: Number(sliderItemsXs)
-          },
-          576: {
-            slidesPerView: Number(sliderItemsSm)
-          },
-          768: {
-            slidesPerView: Number(sliderItemsMd)
-          },
-          992: {
-            slidesPerView: Number(sliderItemsLg)
-          },
-          1200: {
-            slidesPerView: Number(sliderItemsXl)
-          },
-          1400: {
-            slidesPerView: Number(sliderItemsXxl)
-          }
-        },
+        updateOnWindowResize: sliderResizeUpdate,
+        breakpoints: breakpointsInit,
         pagination: {
           el: carousel[i].querySelector('.swiper-pagination'),
           clickable: true
@@ -478,6 +521,8 @@ var theme = {
   plyr: () => {
     var players = Plyr.setup('.player', {
       loadSprite: true,
+      fullscreen: { enabled: true, iosNative: true },
+      muted: false
     });
   },
   /**
@@ -563,10 +608,10 @@ var theme = {
    */
   pageProgress: () => {
     var progressWrap = document.querySelector('.progress-wrap');
-    var progressPath = document.querySelector('.progress-wrap path');
-    var pathLength = progressPath.getTotalLength();
-    var offset = 50;
     if(progressWrap != null) {
+      var progressPath = document.querySelector('.progress-wrap path');
+      var pathLength = progressPath.getTotalLength();
+      var offset = 50;
       progressPath.style.transition = progressPath.style.WebkitTransition = 'none';
       progressPath.style.strokeDasharray = pathLength + ' ' + pathLength;
       progressPath.style.strokeDashoffset = pathLength;

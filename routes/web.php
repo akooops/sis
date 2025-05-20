@@ -9,11 +9,14 @@ use App\Http\Controllers\Admin\GradesController;
 use App\Http\Controllers\Admin\LanguagesController;
 use App\Http\Controllers\Admin\LanguagesKeysController;
 use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\MenuItemsController;
+use App\Http\Controllers\Admin\MenusController;
 use App\Http\Controllers\Admin\PagesController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\ProgramsController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\PagesController as ControllersPagesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -163,4 +166,26 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('events/{event}/update-translation', [EventsController::class, 'updateTranslation'])->middleware('check.permission:admin.events.update')->name('admin.events.update-translation');
     Route::patch('events/{event}', [EventsController::class, 'update'])->middleware('check.permission:admin.events.update')->name('admin.events.update');
     Route::delete('events/{event}', [EventsController::class, 'destroy'])->middleware('check.permission:admin.events.destroy')->name('admin.events.destroy');
+
+    // Menus
+    Route::get('menus', [MenusController::class, 'index'])->middleware('check.permission:admin.menus.index')->name('admin.menus.index');
+    Route::get('menus/create', [MenusController::class, 'create'])->middleware('check.permission:admin.menus.store')->name('admin.menus.create');
+    Route::post('menus', [MenusController::class, 'store'])->middleware('check.permission:admin.menus.store')->name('admin.menus.store');
+    Route::get('menus/{menu}', [MenusController::class, 'show'])->middleware('check.permission:admin.menus.show')->name('admin.menus.show');
+    Route::get('menus/{menu}/edit', [MenusController::class, 'edit'])->middleware('check.permission:admin.menus.update')->name('admin.menus.edit');
+    Route::patch('menus/{menu}', [MenusController::class, 'update'])->middleware('check.permission:admin.menus.update')->name('admin.menus.update');
+    Route::delete('menus/{menu}', [MenusController::class, 'destroy'])->middleware('check.permission:admin.menus.destroy')->name('admin.menus.destroy');
+
+    // Menu Items
+    Route::get('menus/{menu}/menu-items', [MenuItemsController::class, 'index'])->middleware('check.permission:admin.menu-items.index')->name('admin.menu-items.index');
+    Route::get('menus/{menu}/menu-items/create', [MenuItemsController::class, 'create'])->middleware('check.permission:admin.menu-items.store')->name('admin.menu-items.create');
+    Route::post('menus/{menu}/menu-items', [MenuItemsController::class, 'store'])->middleware('check.permission:admin.menu-items.store')->name('admin.menu-items.store');
+    Route::get('menu-items/{menuItem}', [MenuItemsController::class, 'show'])->middleware('check.permission:admin.menu-items.show')->name('admin.menu-items.show');
+    Route::get('menu-items/{menuItem}/edit', [MenuItemsController::class, 'edit'])->middleware('check.permission:admin.menu-items.update')->name('admin.menu-items.edit');
+    Route::patch('menu-items/{menuItem}/update-translation', [MenuItemsController::class, 'updateTranslation'])->middleware('check.permission:admin.menu-items.update')->name('admin.menu-items.update-translation');
+    Route::patch('menu-items/{menuItem}', [MenuItemsController::class, 'update'])->middleware('check.permission:admin.menu-items.update')->name('admin.menu-items.update');
+    Route::delete('menu-items/{menuItem}', [MenuItemsController::class, 'destroy'])->middleware('check.permission:admin.menu-items.destroy')->name('admin.menu-items.destroy');
 });
+
+Route::get('', [ControllersPagesController::class, 'index'])->name('index');
+
