@@ -41,6 +41,11 @@
     border-bottom: 4px solid #E0B65D;
 }
 
+.swiper-hero, .swiper-hero .swiper-slide{
+    height: calc(100vh - 96px) !important;
+    border-bottom: 4px solid #E0B65D;
+}
+
 .shape-welcome-image{
     width: 85%;
 }
@@ -53,6 +58,11 @@
     top: 25px;
 }
 
+.grades-section{
+    border-top: 4px solid #E0B65D;
+    border-bottom: 4px solid #E0B65D;
+}
+
 .grades figure{
     height: 400px;
 }
@@ -63,6 +73,60 @@
 
 .grades figure a img{
     height: 100% !important;
+}
+
+.facts-section {
+    position: relative;
+    background-image: url('../img/photos/bg7.jpg');
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+.facts-section::before {
+    content: "";
+    position: absolute;
+    inset: 0; /* shorthand for top:0; right:0; bottom:0; left:0; */
+    background: rgba(0, 0, 0, 0.5); /* black with 50% opacity */
+    z-index: 1;
+}
+
+.facts-section > * {
+    position: relative;
+    z-index: 2;
+}
+
+.uil-angle-right{
+    font-size: 18px;
+}
+
+.bg-light-primary{
+    background-color: #f8fcff;
+}
+
+.page-main-section{
+    border-bottom: 4px solid #E0B65D;
+}
+
+.page-main-container{
+    height: calc(100vh - 96px) !important;
+}
+
+.page-main-container::before {
+    content: "";
+    position: absolute;
+    inset: 0; /* shorthand for top:0; right:0; bottom:0; left:0; */
+    background: rgba(0, 0, 0, 0.5); /* black with 50% opacity */
+    z-index: 1;
+}
+
+.page-main-container > * {
+    position: relative;
+    z-index: 2;
+}
+
+.active{
+    color: #2A5D91;
 }
 
 @media (min-width: 1024px) {

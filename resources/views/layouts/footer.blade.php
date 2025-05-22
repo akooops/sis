@@ -1,51 +1,68 @@
-<footer class="bg-secondary">
-  <div class="container pt-12">
-  <div class="container pb-6 text-center">
-      <div class="row mt-n10 mt-lg-0">
-          <div class="col-xl-10 mx-auto">
-              <div class="row mb-3">
-                  <div class="col-md-4">
-                      <div class="widget">
-                          <h4 class="widget-title">Address</h4>
-                          <address>ENP, 10 Rue des Frères OUDEK, El Harrach 16200</address>
-                      </div>
-                      <!-- /.widget -->
-                  </div>
-                  <!--/column -->
-                  <div class="col-md-4">
-                      <div class="widget">
-                          <h4 class="widget-title">Phone</h4>
-                          <p>00 (123) 456 78 90 <br />00 (987) 654 32 10</p>
-                      </div>
-                      <!-- /.widget -->
-                  </div>
-                  <!--/column -->
-                  <div class="col-md-4">
-                      <div class="widget">
-                          <h4 class="widget-title">E-mail</h4>
-                          <p><a href="mailto:iec@g.enp.edu.dz" class="text-white">iec@g.enp.edu.dz</a></p>
-                      </div>
-                      <!-- /.widget -->
-                  </div>
-                  <!--/column -->
-              </div>
-              <!--/.row -->
-              <p>© 2024 IEC. Tous les droits sont réservés.</p>
-              <nav class="nav social social-white justify-content-center">
-                  <a href="https://www.facebook.com/IEC.ENP"><i class="uil uil-facebook-f"></i></a>
-                  <a href="https://www.instagram.com/iec.enp/"><i class="uil uil-instagram"></i></a>
-                  <a href="https://www.linkedin.com/company/industrial-engineers-club-iec/mycompany/"><i class="uil uil-linkedin"></i></a>
-              </nav>
-              <!-- /.social -->
-
-              <h5 class="mt-8">Avec l'aide de notre partenaire</h5>
-              <a class="mt-4" href="https://www.dzsecurity.com" target="_blank" rel="noopener">
-                <img src="{{ URL::asset('assets/img/dzsecurity.png')}}" alt="dzsecurity" height="64px"/>
-              </a>
-          </div>
-          <!-- /column -->
-      </div>
-      <!-- /.row -->
-  </div>
-  <!-- /.container -->
+<footer class="bg-primary text-inverse">
+    <div class="container pt-13 pt-md-15 pb-7">
+        <div class="row gy-6 gy-lg-0">
+            <div class="col-lg-4">
+                <div class="widget">
+                    <a href="./index.html">
+                        <img class="logo-canvas" src="{{ URL::asset('assets/img/logo-2.png')}}" alt="" />
+                    </a>
+                    <h3 class="h2 my-3 text-white">Join the Community</h3>
+                    <p class="lead mb-5">Let's make something great together. We are trusted by over 5000+ clients. Join them by using our services and grow your business.</p>
+                </div>
+                <!-- /.widget -->
+            </div>
+            <!-- /column -->
+            <div class="col-md-4 col-lg-2 offset-lg-2">
+                <div class="widget">
+                    <h4 class="widget-title text-white mb-3">Need Help?</h4>
+                    <ul class="list-unstyled text-reset mb-0">
+                        <li><a href="#">Support</a></li>
+                        <li><a href="#">Get Started</a></li>
+                        <li><a href="#">Terms of Use</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <!-- /.widget -->
+            </div>
+            <!-- /column -->
+            <div class="col-md-4 col-lg-2">
+                <div class="widget">
+                    <h4 class="widget-title text-white mb-3">Learn More</h4>
+                    <ul class="list-unstyled  mb-0">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Our Story</a></li>
+                        <li><a href="#">Projects</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Features</a></li>
+                    </ul>
+                </div>
+                <!-- /.widget -->
+            </div>
+            <!-- /column -->
+            <div class="col-md-4 col-lg-2">
+                <div class="widget">
+                    <h4 class="widget-title text-white mb-3">Get in Touch</h4>
+                    <address>Moonshine St. 14/05 Light City, London, United Kingdom</address>
+                    <a href="mailto:first.last@email.com">info@email.com</a><br /> 00 (123) 456 78 90
+                </div>
+                <!-- /.widget -->
+            </div>
+            <!-- /column -->
+        </div>
+        <!--/.row -->
+        <hr class="mt-13 mt-md-15 mb-7" />
+        <div class="d-md-flex align-items-center justify-content-between">
+            <p class="mb-2 mb-lg-0">© 2024 Sandbox. All rights reserved.</p>
+            <nav class="nav social social-white text-md-end">
+                <a href="#"><i class="uil uil-twitter"></i></a>
+                <a href="#"><i class="uil uil-facebook-f"></i></a>
+                <a href="#"><i class="uil uil-dribbble"></i></a>
+                <a href="#"><i class="uil uil-instagram"></i></a>
+                <a href="#"><i class="uil uil-youtube"></i></a>
+            </nav>
+            <!-- /.social -->
+        </div>
+        <!-- /div -->
+    </div>
+    <!-- /.container -->
 </footer>

@@ -17,4 +17,29 @@ class PagesController extends Controller
     {
         return view('index');
     }
+
+    public function page(Request $request)
+    {
+        return view('page');
+    }
+
+    public function articles(Request $request)
+    {
+        return view('articles');
+    }
+
+    public function article(Request $request)
+    {
+        return view('article');
+    }
+
+    public function albums(Request $request)
+    {
+        return view('albums');
+    }
+
+    public function album(Request $request)
+    {
+        return view('album');
+    }
 }
