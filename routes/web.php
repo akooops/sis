@@ -193,3 +193,7 @@ Route::get('/articles', [ControllersPagesController::class, 'articles'])->name('
 Route::get('/article', [ControllersPagesController::class, 'article'])->name('page');
 Route::get('/albums', [ControllersPagesController::class, 'albums'])->name('page');
 Route::get('/album', [ControllersPagesController::class, 'album'])->name('page');
+Route::get('/events', [ControllersPagesController::class, 'events'])->name('page');
+Route::get('/event', [ControllersPagesController::class, 'event'])->name('page');
+Route::get('/grades', [ControllersPagesController::class, 'grades'])->name('page');
+Route::get('/grade', [ControllersPagesController::class, 'grade'])->name('page');

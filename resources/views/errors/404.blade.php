@@ -4,21 +4,23 @@
 @section('css')
 @endsection
 @section('content')
-<section class="wrapper bg-secondary">
-    <div class="container py-12 text-center">
-        <div class="row">
-            <div class="col-8 mx-auto">
-                <h1 class="display-1 mb-3">
-                    Page non trouvée
-                </h1>
+<section class="wrapper bg-dark page-main-section" style="background-image: url('{{ URL::asset('assets/img/photos/banner-1.jpg')}}')">
+    <div class="container page-main-container">
+        <div class="row h-100">
+            <div class="col-md-10 offset-md-1 col-lg-7 offset-lg-0 col-xl-6 col-xxl-5 text-center text-lg-start justify-content-center align-self-center align-items-start">
+                <h2 class="display-1 fs-48 mb-4 text-white animate__animated animate__slideInDown animate__delay-1s">
+                    Welcome to saud international schools
+                </h2>
+                <p class="lead fs-18 lh-sm mb-0 text-white animate__animated animate__slideInRight animate__delay-2s">                   
+                    Learning Today . . . Leading Tomorrow.                                         
+                </p>
             </div>
-            <!-- /column -->
+            <!--/column -->
         </div>
-        <!-- /.row -->
+        <!--/.row -->
     </div>
-    <!-- /.container -->
+    <!--/.container -->
 </section>
-<!-- /section -->
 
 <section class="wrapper">
     <div class="container py-12 text-center">

@@ -42,4 +42,24 @@ class PagesController extends Controller
     {
         return view('album');
     }
+
+    public function events(Request $request)
+    {
+        return view('events');
+    }
+
+    public function event(Request $request)
+    {
+        return view('event');
+    }
+
+    public function grades(Request $request)
+    {
+        return view('grades');
+    }
+
+    public function grade(Request $request)
+    {
+        return view('grade');
+    }
 }
