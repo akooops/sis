@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AlbumsController;
 use App\Http\Controllers\Admin\ArticlesController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\BannersController;
 use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\Admin\FilesController;
 use App\Http\Controllers\Admin\GradesController;
@@ -188,6 +189,19 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('menu-items/{menuItem}/update-translation', [MenuItemsController::class, 'updateTranslation'])->middleware('check.permission:admin.menu-items.update')->name('admin.menu-items.update-translation');
     Route::patch('menu-items/{menuItem}', [MenuItemsController::class, 'update'])->middleware('check.permission:admin.menu-items.update')->name('admin.menu-items.update');
     Route::delete('menu-items/{menuItem}', [MenuItemsController::class, 'destroy'])->middleware('check.permission:admin.menu-items.destroy')->name('admin.menu-items.destroy');
+
+    // Menu Items
+    Route::get('banners/order', [BannersController::class, 'orderPage'])->middleware('check.permission:admin.banners.order')->name('admin.banners.order-page');
+    Route::post('banners/order', [BannersController::class, 'order'])->middleware('check.permission:admin.banners.order')->name('admin.banners.order');
+
+    Route::get('banners', [BannersController::class, 'index'])->middleware('check.permission:admin.banners.index')->name('admin.banners.index');
+    Route::get('banners/create', [BannersController::class, 'create'])->middleware('check.permission:admin.banners.store')->name('admin.banners.create');
+    Route::post('banners', [BannersController::class, 'store'])->middleware('check.permission:admin.banners.store')->name('admin.banners.store');
+    Route::get('banners/{banner}', [BannersController::class, 'show'])->middleware('check.permission:admin.banners.show')->name('admin.banners.show');
+    Route::get('banners/{banner}/edit', [BannersController::class, 'edit'])->middleware('check.permission:admin.banners.update')->name('admin.banners.edit');
+    Route::patch('banners/{banner}/update-translation', [BannersController::class, 'updateTranslation'])->middleware('check.permission:admin.banners.update')->name('admin.banners.update-translation');
+    Route::patch('banners/{banner}', [BannersController::class, 'update'])->middleware('check.permission:admin.banners.update')->name('admin.banners.update');
+    Route::delete('banners/{banner}', [BannersController::class, 'destroy'])->middleware('check.permission:admin.banners.destroy')->name('admin.banners.destroy');
 });
 
 Route::get('', [ControllersPagesController::class, 'index'])->name('index');

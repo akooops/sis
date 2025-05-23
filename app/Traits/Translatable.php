@@ -39,7 +39,7 @@ trait Translatable
         return "{$field}.{$languageCode}";
     }
 
-    public function setTranslation(string $field, string $languageCode, string $value)
+    public function setTranslation(string $field, string $languageCode, $value)
     {
         if(is_null($value)) return;
 

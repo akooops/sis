@@ -1,5 +1,5 @@
 @extends('admin.layouts.master')
-@section('title') Menu Items @endsection
+@section('title') Banners @endsection
 @section('css')
 <style>
     .is-invalid {
@@ -21,8 +21,8 @@
 @endsection
 @section('content')
 @component('admin.components.breadcrumb')
-@slot('li_1') Menu Items @endslot
-@slot('title') Edit Menu Item @endslot
+@slot('li_1') Banners @endslot
+@slot('title') Edit Banner @endslot
 @endcomponent
 <div class="row">
     <div class="col">
@@ -44,16 +44,22 @@
                 @include('admin.layouts.messages')
             </div>
 
+            <!-- Success alert for AJAX responses -->
+            <div class="alert alert-success alert-dismissible fade translation-success" role="alert" id="translationSuccess">
+                <strong>Success!</strong> <span id="successMessage">Translation updated successfully.</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
             <div class="row">
                 <div class="col-12">
-                    <form method="POST" enctype="multipart/form-data" action="{{ route('admin.menu-items.update', $menuItem->id) }}">
+                    <form method="POST" enctype="multipart/form-data" action="{{ route('admin.banners.update', $banner->id) }}">
                         @csrf
                         @method('patch')
                         <div class="card">
                             <div class="card-body">
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Menu Item name<span class="text-danger">*</span></label>
-                                    <input name="name" value="{{$menuItem->name}}" type="text" class="form-control">
+                                    <label class="form-label" for="">Banner name<span class="text-danger">*</span></label>
+                                    <input name="name" value="{{old('name', $banner->name)}}" type="text" class="form-control">
                                     @error('name')
                                         <p class="mx-2 my-2 text-danger">
                                             <strong>
@@ -63,17 +69,17 @@
                                     @enderror
                                 </div>  
 
-                                <div class="mb-3">
+                                                                <div class="mb-3">
                                     <label class="form-label" for="">Where should this menu item link?</label>
                                     <div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="external" id="external_no" value="0" {{ $menuItem->page_id ? 'checked' : '' }}>
+                                            <input class="form-check-input" type="radio" name="external" id="external_no" value="0" {{ $banner->page_id ? 'checked' : '' }}>
                                             <label class="form-check-label" for="external_no">
                                                 Link to a page
                                             </label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="external" id="external_yes" value="1" {{ !$menuItem->page_id ? 'checked' : '' }}>
+                                            <input class="form-check-input" type="radio" name="external" id="external_yes" value="1" {{ !$banner->page_id ? 'checked' : '' }}>
                                             <label class="form-check-label" for="external_yes">
                                                 Redirect to a URL
                                             </label>
@@ -82,7 +88,7 @@
                                 </div>
 
                                 <div id="is-external" class="mb-3" style="display:none;">
-                                    <input name="url" value="{{$menuItem->url}}" type="text" class="form-control">
+                                    <input name="url" value="{{$banner->url}}" type="text" class="form-control">
                                     @error('url')
                                         <p class="mx-2 my-2 text-danger">
                                             <strong>
@@ -95,7 +101,7 @@
                                 <div id="isnot-external" class="mb-3" style="display:none;">
                                     <select name="page_id" class="form-select mb-3">
                                         @foreach($pages as $page)
-                                            <option value="{{ $page->id }}" {{ $menuItem->page_id == $page->id 
+                                            <option value="{{ $page->id }}" {{ $banner->page_id == $page->id 
                                                 ? 'selected'
                                                 : '' }}>{{ $page->name }}</option>
                                         @endforeach
@@ -110,6 +116,53 @@
                                     @enderror
                                 </div>
 
+                                <div class="mb-4">
+                                    <label class="form-label" for="">Banner thumbnail <span class="text-danger">(Keep it empty if you don't want to change it)</span></label>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="form-check me-3">
+                                            <input class="form-check-input" type="radio" name="media_option" id="media_option_upload" value="upload" checked>
+                                            <label class="form-check-label" for="media_option_upload">Upload Image</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="media_option" id="media_option_select" value="select">
+                                            <label class="form-check-label" for="media_option_select">Select from Media</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- File upload input -->
+                                    <div id="upload_section">
+                                        <input type="file" name="file" id="file_input" class="form-control mb-2" accept="image/*">
+                                        <div id="file_preview"></div>
+                                        @error('file')
+                                            <p class="mx-2 my-2 text-danger"><strong>{{ $message }}</strong></p>
+                                        @enderror
+                                    </div>
+                                    
+                                    <!-- Media select input -->
+                                    <div id="media_section" style="display:none;">
+                                        <div class="row">
+                                            @foreach($medias as $media)
+                                                <div class="col-auto mb-2">
+                                                    <label class="d-block">
+                                                        <input type="radio" name="media_id" value="{{ $media->id }}" class="d-none media-radio">
+                                                        <img src="{{ $media->file->url }}" alt="media" class="img-thumbnail media-thumb" style="width:90px; height:70px; object-fit:cover; cursor:pointer; border:2px solid transparent;">
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        @error('media_id')
+                                            <p class="mx-2 my-2 text-danger"><strong>{{ $message }}</strong></p>
+                                        @enderror
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <figure class="figure">
+                                        <img src="{{ $banner->thumbnailUrl }}" class="rounded avatar-xl" style="object-fit: cover">
+                                        <figcaption class="figure-caption">Last uploaded image</figcaption>
+                                    </figure>
+                                </div>
+
                                 <div class="text-end mb-3">
                                     <button type="submit" class="btn btn-success w-sm">Submit</button>
                                 </div>
@@ -117,14 +170,16 @@
                         </div>
                     </form>
 
+                    
                     <!-- Success alert for AJAX responses -->
                     <div class="alert alert-success alert-dismissible fade translation-success" role="alert" id="translationSuccess">
                         <strong>Success!</strong> <span id="successMessage">Translation updated successfully.</span>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-
+                    
                     <div class="card">
                         <div class="card-body">
+
                             <!-- Nav tabs -->
                             <ul class="nav nav-tabs nav-justified nav-border-top nav-border-top-success mb-3" role="tablist">
                                 @foreach ($languages as $key => $language)
@@ -145,8 +200,21 @@
 
                                             <div class="mb-4">
                                                 <label class="form-label" for="title-{{$language->id}}">Title <span class="text-danger">*</span></label>
-                                                <input type="text" id="title-{{$language->id}}" name="title" class="form-control translation-title" value="{{$menuItem->getTranslation('title', $language->code)}}">
+                                                <input type="text" id="title-{{$language->id}}" name="title" class="form-control translation-title" value="{{$banner->getTranslation('title', $language->code)}}">
                                                 <div class="translation-error" id="error-title-{{$language->id}}"></div>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label class="form-label" for="subtitle-{{$language->id}}">Subtitle <span class="text-danger">*</span></label>
+                                                <input type="text" id="subtitle-{{$language->id}}" name="subtitle" class="form-control translation-subtitle" value="{{$banner->getTranslation('subtitle', $language->code)}}">
+                                                <div class="translation-error" id="error-subtitle-{{$language->id}}"></div>
+                                            </div>
+
+
+                                            <div class="mb-4">
+                                                <label class="form-label" for="cta-{{$language->id}}">Cta <span class="text-danger">*</span></label>
+                                                <input type="text" id="cta-{{$language->id}}" name="cta" class="form-control translation-cta" value="{{$banner->getTranslation('cta', $language->code)}}">
+                                                <div class="translation-error" id="error-cta-{{$language->id}}"></div>
                                             </div>
 
                                             <div class="text-end mt-3">
@@ -160,7 +228,7 @@
                     </div>
                     
                     <div class="text-end mb-3">
-                        <a href="{{ route('admin.menu-items.index', ['menu' => $menuItem->menu_id]) }}" class="btn btn-primary w-sm">Back</a>
+                        <a href="{{ route('admin.banners.index') }}" class="btn btn-primary w-sm">Back</a>
                     </div>
                 </div>
                 <!-- end col -->
@@ -174,9 +242,10 @@
 @endsection
 @section('script')
 <script src="{{ URL::asset('/assets/admin/js/app.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    function toggleExternal() {
+        function toggleExternal() {
         let isExternal = document.querySelector('input[name="external"]:checked').value;
         if (isExternal === "1") {
             document.getElementById('is-external').style.display = '';
@@ -194,6 +263,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial state
     toggleExternal();
+    
+    // Toggle between upload and select
+    document.getElementById('media_option_upload').addEventListener('change', function() {
+        document.getElementById('upload_section').style.display = '';
+        document.getElementById('media_section').style.display = 'none';
+    });
+    document.getElementById('media_option_select').addEventListener('change', function() {
+        document.getElementById('upload_section').style.display = 'none';
+        document.getElementById('media_section').style.display = '';
+    });
+
+    // Image preview for upload
+    document.getElementById('file_input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('file_preview');
+        preview.innerHTML = '';
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" class="img-thumbnail" style="width:120px;height:90px;object-fit:cover;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Highlight selected media image
+    document.querySelectorAll('.media-thumb').forEach(function(img) {
+        img.addEventListener('click', function() {
+            document.querySelectorAll('.media-thumb').forEach(i => i.style.border = '2px solid transparent');
+            this.style.border = '2px solid #0d6efd';
+            this.previousElementSibling.checked = true;
+        });
+    });
 
     // Handle translation form submissions
     const forms = document.querySelectorAll('.translation-form');
@@ -205,12 +307,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const languageId = this.dataset.languageId;
             const languageCode = this.dataset.language;
             const titleInput = document.getElementById(`title-${languageId}`);
+            const subtitleInput = document.getElementById(`subtitle-${languageId}`);
+            const ctaInput = document.getElementById(`cta-${languageId}`);
             const submitButton = this.querySelector('.translation-submit');
             
             // Reset validation state
             titleInput.classList.remove('is-invalid');
-            document.getElementById(`error-title-${languageId}`).textContent = '';
+            subtitleInput.classList.remove('is-invalid');
+            ctaInput.classList.remove('is-invalid');
 
+            document.getElementById(`error-title-${languageId}`).textContent = '';
+            document.getElementById(`error-subtitle-${languageId}`).textContent = '';
+            document.getElementById(`error-cta-${languageId}`).textContent = '';
+            
             // Show loading spinner on button
             const originalButtonText = submitButton.innerHTML;
             submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
@@ -222,9 +331,11 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('_method', 'PATCH');
             formData.append('language_id', languageId);
             formData.append('title', titleInput.value);
-            
+            formData.append('subtitle', subtitleInput.value);
+            formData.append('cta', ctaInput.value);
+
             // Send AJAX request
-            fetch('{{ route('admin.menu-items.update-translation', $menuItem->id) }}', {
+            fetch('{{ route('admin.banners.update-translation', $banner->id) }}', {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -256,6 +367,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (error.errors.title) {
                         titleInput.classList.add('is-invalid');
                         document.getElementById(`error-title-${languageId}`).textContent = error.errors.title[0];
+                    }
+                    
+                    if (error.errors.subtitle) {
+                        subtitleInput.classList.add('is-invalid');
+                        document.getElementById(`error-subtitle-${languageId}`).textContent = error.errors.subtitle[0];
+                    }
+                    
+                    if (error.errors.cta) {
+                        ctaInput.classList.add('is-invalid');
+                        document.getElementById(`error-cta-${languageId}`).textContent = error.errors.cta[0];
                     }
                 } else {
                     // General error
