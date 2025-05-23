@@ -6,13 +6,6 @@
     list-style: none;
     padding: 0;
     margin: 0;
-    min-height: 20px; /* Important for empty lists */
-}
-.sortable-list ul {
-    margin-left: 30px;
-    list-style: none;
-    padding: 0;
-    min-height: 20px; /* Important for nesting */
 }
 .sortable-list .list-group-item {
     cursor: move;
@@ -43,7 +36,6 @@
 @section('content')
 <div class="row">
     <div class="col">
-
         <div class="h-100">
             <div class="row mb-3 pb-1">
                 <div class="col-12">
@@ -51,11 +43,9 @@
                         <div class="flex-grow-1">
                             <h4 class="fs-16 mb-1">Good Morning, {{Auth::user()->fullname}}</h4>
                         </div>
-                    </div><!-- end card header -->
+                    </div>
                 </div>
-                <!--end col-->
             </div>
-            <!--end row-->
 
             <div class="mt-2">
                 @include('admin.layouts.messages')
@@ -74,7 +64,13 @@
                             
                             <ul id="sortable" class="sortable-list">
                                 @foreach($banners as $banner)
-                                    @include('admin.banners.partials.sortable-item', ['item' => $banner])
+                                    <li class="list-group-item" data-id="{{ $banner->id }}">
+                                        <div class="d-flex align-items-center">
+                                            <i class="ri-drag-move-2-line handle"></i>
+                                            {{ $banner->name }}
+                                            <small class="text-muted ms-2">(ID: {{ $banner->id }})</small>
+                                        </div>
+                                    </li>
                                 @endforeach
                             </ul>
                         </div>
@@ -94,56 +90,32 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    function initSortable() {
-        // Get all nested sortable elements
-        var nestedSortables = document.querySelectorAll('.sortable-list');
-        
-        // Loop through each nested sortable element
-        for (var i = 0; i < nestedSortables.length; i++) {
-            new Sortable(nestedSortables[i], {
-                group: 'nested',
-                animation: 150,
-                fallbackOnBody: true,
-                swapThreshold: 0.65,
-                handle: '.handle',
-                ghostClass: 'sortable-ghost',
-                chosenClass: 'sortable-chosen',
-                dragClass: 'sortable-drag',
-                emptyInsertThreshold: 5,
-                onEnd: function(evt) {
-                    // Re-initialize sortables for any new nested lists
-                    setTimeout(initSortable, 100);
-                    updateOrder();
-                }
-            });
+    // Initialize single sortable list (no nesting)
+    const sortableList = document.getElementById('sortable');
+    
+    new Sortable(sortableList, {
+        animation: 150,
+        handle: '.handle',
+        ghostClass: 'sortable-ghost',
+        chosenClass: 'sortable-chosen',
+        dragClass: 'sortable-drag',
+        onEnd: function(evt) {
+            updateOrder();
         }
-    }
+    });
 
     function updateOrder() {
         const items = [];
+        const children = Array.from(sortableList.children);
         
-        function processList(list, parentId = null) {
-            const children = Array.from(list.children);
-            children.forEach((el, index) => {
-                if (el.dataset.id) {
-                    const itemData = {
-                        id: el.dataset.id,
-                        order: index + 1,
-                    };
-                    
-                    items.push(itemData);
-
-                    // Process child lists
-                    const childList = el.querySelector('.sortable-list');
-                    if (childList) {
-                        processList(childList, itemData.id);
-                    }
-                }
-            });
-        }
-
-        const rootList = document.getElementById('sortable');
-        processList(rootList);
+        children.forEach((el, index) => {
+            if (el.dataset.id) {
+                items.push({
+                    id: el.dataset.id,
+                    order: index + 1
+                });
+            }
+        });
         
         console.log('Items to update:', items);
         
@@ -165,9 +137,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
         });
     }
-
-    // Initialize sortable
-    initSortable();
 });
 </script>
 @endsection
