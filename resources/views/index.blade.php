@@ -1,50 +1,46 @@
 @extends('layouts.master')
-@section('title', '')
-@section('description', '')
+@section('title', $page->getLocalTranslation('title'))
+@section('description', $page->getLocalTranslation('description'))
 @section('canonical', route('index'))
 @section('css')
 @endsection
 @section('content')
 <section class="wrapper bg-dark">
-    <div class="swiper-container swiper-hero dots-over swiper-container-0" data-margin="0" data-autoplay="true" data-autoplaytime="7000" data-nav="true" data-dots="true" data-items="1">
+    <div class="swiper-container swiper-hero dots-over swiper-container-0" data-margin="0" data-autoplay="true" data-autoplaytime="7000" data-nav="false" data-dots="true" data-items="1">
         <div class="swiper swiper-initialized swiper-horizontal swiper-backface-hidden">
             <div class="swiper-wrapper" id="swiper-wrapper-f9c21ed344bd05ba" aria-live="off">
-                <div class="swiper-slide bg-overlay bg-overlay-400 bg-dark bg-image swiper-slide-prev" data-image-src="{{ URL::asset('assets/img/photos/banner-1.jpg')}}" role="group" >
-                    <div class="container h-100">
-                        <div class="row h-100">
-                            <div class="col-md-10 offset-md-1 col-lg-7 offset-lg-0 col-xl-6 col-xxl-5 text-center text-lg-start justify-content-center align-self-center align-items-start">
-                                <h2 class="display-1 fs-48 mb-4 text-white animate__animated animate__slideInDown animate__delay-1s">
-                                  Welcome to saud international schools
-                                </h2>
-                                <p class="lead fs-18 lh-sm mb-7 text-white animate__animated animate__slideInRight animate__delay-2s">                   
-                                  Learning Today . . . Leading Tomorrow.                                         
-                                </p>
-                                <div class="animate__animated animate__slideInUp animate__delay-3s">
-                                  <a href="#" class="btn btn-md btn-outline-white rounded">
-                                    <i class="uil uil-angle-right"></i>
-                                    Learn More
-                                  </a>
+
+                @foreach ($banners as $banner)
+                    <div class="swiper-slide bg-overlay bg-overlay-400 bg-dark bg-image swiper-slide-prev" data-image-src="{{ $banner->thumbnailUrl  }}" role="group" >
+                        <div class="container h-100">
+                            <div class="row h-100">
+                                <div class="banner-container col-md-8 offset-md-1 col-lg-7 offset-lg-0 col-xl-6 col-xxl-5 text-center text-lg-start justify-content-center align-self-center align-items-start">
+                                    <h2 class="display-1 fs-36 fw-semibold mb-4 text-white animate__animated animate__slideInDown animate__delay-1s">
+                                        {{$banner->getLocalTranslation('title')}}
+                                    </h2>
+                                    <p class="lead fs-16 fw-semibold lh-sm mb-7 text-white animate__animated animate__slideInRight animate__delay-2s">                   
+                                        {{$banner->getLocalTranslation('subtitle')}}                                         
+                                    </p>
+                                    <div class="animate__animated animate__slideInUp animate__delay-3s">
+                                    <a href="{{$banner->page ? route('page', ['slug' => $banner->page->slug]) : $banner->url}}" 
+                                        class="btn btn-sm bg-primary rounded text-white">
+                                        {{$banner->getLocalTranslation('cta')}}
+                                    </a>
+                                    </div>
                                 </div>
+                                <!--/column -->
                             </div>
-                            <!--/column -->
+                            <!--/.row -->
                         </div>
-                        <!--/.row -->
+                        <!--/.container -->
                     </div>
-                    <!--/.container -->
-                </div>
-                <!--/.swiper-slide -->
+                    <!--/.swiper-slide -->
+                @endforeach
+            
             </div>
             <!--/.swiper-wrapper -->
-            <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
         </div>
         <!-- /.swiper -->
-        <div class="swiper-controls">
-            <div class="swiper-navigation">
-                <div class="swiper-button swiper-button-prev" tabindex="0" role="button" aria-label="Previous slide" aria-controls="swiper-wrapper-f9c21ed344bd05ba" aria-disabled="false"></div>
-                <div class="swiper-button swiper-button-next" tabindex="0" role="button" aria-label="Next slide" aria-controls="swiper-wrapper-f9c21ed344bd05ba" aria-disabled="false"></div>
-            </div>
-            <div class="swiper-pagination swiper-pagination-clickable swiper-pagination-bullets swiper-pagination-horizontal"><span class="swiper-pagination-bullet" tabindex="0" role="button" aria-label="Go to slide 1"></span><span class="swiper-pagination-bullet swiper-pagination-bullet-active" tabindex="0" role="button" aria-label="Go to slide 2" aria-current="true"></span><span class="swiper-pagination-bullet" tabindex="0" role="button" aria-label="Go to slide 3"></span></div>
-        </div>
     </div>
     <!-- /.swiper-container -->
 </section>
@@ -62,7 +58,7 @@
             <!--/column -->
 
             <div class="col-lg-6 mt-8 mt-md-0 text-center text-md-start">
-                <h3 class="display-4 mb-2 text-primary">
+                <h3 class="display-4 mb-2 text-gold">
                     Welcome to Saud international schools
                 </h3>
                 
@@ -81,97 +77,31 @@
 </section>
 
 <section class="wrapper bg-light grades-section">
-        <div class="row align-items-center">
-            <div class="col-lg-3 grades p-0">
+        <div class="row row-cols-1 row-cols-md-5 align-items-center">
+            @foreach ($programs as $program)    
+            <div class="col grades p-0">
                 <figure class="overlay caption caption-overlay mb-0">
-                    <a href="#"> 
-                      <img src="{{ URL::asset('assets/img/photos/grade-1.jpg')}}" style="object-fit: cover" alt="">
+                    <a href="{{route('program', ['slug' => $program->slug])}}"> 
+                      <img src="{{$program->thumbnailUrl}}" style="object-fit: cover" alt="">
                       <span class="bg"></span>
                     </a>
 
                     <figcaption>
-                        <span class="badge badge-lg bg-white text-uppercase mb-3">Kindergarden</span>
-                        <h2 class="post-title h3 mt-1 mb-3 text-uppercase">
-                          <a href="./blog-post.html">
-                            Prek to KG
+
+                        <h2 class="post-title h3 mb-2 fw-normal">
+                          <a href="{{route('program', ['slug' => $program->slug])}}">
+                            {{$program->getLocalTranslation('title')}}
                           </a>
                         </h2>
-
-                        <ul class="post-meta text-white mb-0">
-                          <a href="#" class="btn btn-sm btn-outline-white rounded">Learn More</a>
-                        </ul>
-                        <!-- /.post-meta -->
+                       
+                        <span class="badge badge-lg bg-primary my-2 fw-semibold" style="color: white !important">
+                            {{$program->getLocalTranslation('subtitle')}}
+                        </span>
                     </figcaption>
                     <!-- /figcaption -->
                 </figure>
             </div>
-
-            <div class="col-lg-3 grades p-0">
-                <figure class="overlay caption caption-overlay mb-0">
-                    <a href="#"> 
-                      <img src="{{ URL::asset('assets/img/photos/grade-2.jpg')}}" style="object-fit: cover" alt="">
-                      <span class="bg"></span>
-                    </a>
-                    <figcaption>
-                        <span class="badge badge-lg bg-white text-uppercase mb-3">Primary School</span>
-                        <h2 class="post-title h3 mt-1 mb-3 text-uppercase">
-                          <a href="./blog-post.html">
-                            Grades 1-5
-                          </a>
-                        </h2>
-                        <ul class="post-meta text-white mb-0">
-                          <a href="#" class="btn btn-sm btn-outline-white rounded">Learn More</a>
-                        </ul>
-                        <!-- /.post-meta -->
-                    </figcaption>
-                    <!-- /figcaption -->
-                </figure>
-            </div>
-
-            <div class="col-lg-3 grades p-0">
-                <figure class="overlay caption caption-overlay mb-0">
-                    <a href="#"> 
-                      <img src="{{ URL::asset('assets/img/photos/grade-3.jpg')}}" style="object-fit: cover" alt="">
-                      <span class="bg"></span>
-                    </a>
-
-                    <figcaption>
-                        <span class="badge badge-lg bg-white text-uppercase mb-3">Middle School</span>
-                        <h2 class="post-title h3 mt-1 mb-3 text-uppercase">
-                          <a href="./blog-post.html">
-                            Grades 6 - 10
-                          </a>
-                        </h2>
-                        <ul class="post-meta text-white mb-0">
-                          <a href="#" class="btn btn-sm btn-outline-white rounded">Learn More</a>
-                        </ul>
-                        <!-- /.post-meta -->
-                    </figcaption>
-                    <!-- /figcaption -->
-                </figure>
-            </div>
-
-            <div class="col-lg-3 grades p-0">
-                <figure class="overlay caption caption-overlay mb-0">
-                    <a href="#"> 
-                      <img src="{{ URL::asset('assets/img/photos/grade-4.jpg')}}" style="object-fit: cover" alt="">
-                      <span class="bg"></span>
-                    </a>
-                    <figcaption>
-                        <span class="badge badge-lg bg-white text-uppercase mb-3">Secondary School</span>
-                        <h2 class="post-title h3 mt-1 mb-3 text-uppercase">
-                          <a href="./blog-post.html">
-                            Grades 11-12
-                          </a>
-                        </h2>
-                        <ul class="post-meta text-white mb-0">
-                          <a href="#" class="btn btn-sm btn-outline-white rounded">Learn More</a>
-                        </ul>
-                        <!-- /.post-meta -->
-                    </figcaption>
-                    <!-- /figcaption -->
-                </figure>
-            </div>
+            @endforeach
         </div>
 </section>
 
@@ -188,8 +118,8 @@
                                         <div class="icon btn btn-circle btn-lg btn-soft-purple pe-none mx-auto me-4 mb-lg-3 mb-xl-0"> <i class="uil uil-presentation-check"></i> </div>
                                     </div>
                                     <div>
-                                        <h3 class="counter mb-1 text-gold">7518</h3>
-                                        <p class="mb-0 text-light">Projects Done</p>
+                                        <h3 class="counter mb-1 text-gold">4</h3>
+                                        <p class="mb-0 text-light">Schools</p>
                                     </div>
                                 </div>
                             </div>
@@ -207,7 +137,7 @@
                                     </div>
                                     <div>
                                         <h3 class="counter mb-1 text-gold">7518</h3>
-                                        <p class="mb-0 text-light">Projects Done</p>
+                                        <p class="mb-0 text-light">Students</p>
                                     </div>
                                 </div>
                             </div>
@@ -224,8 +154,8 @@
                                         <div class="icon btn btn-circle btn-lg btn-soft-yellow pe-none mx-auto me-4 mb-lg-3 mb-xl-0"> <i class="uil uil-user-check"></i> </div>
                                     </div>
                                     <div>
-                                        <h3 class="counter mb-1 text-gold">7518</h3>
-                                        <p class="mb-0 text-light">Projects Done</p>
+                                        <h3 class="counter mb-1 text-gold">10000</h3>
+                                        <p class="mb-0 text-light">Alumni</p>
                                     </div>
                                 </div>
                             </div>
@@ -242,8 +172,8 @@
                                         <div class="icon btn btn-circle btn-lg btn-soft-aqua pe-none mx-auto me-4 mb-lg-3 mb-xl-0"> <i class="uil uil-trophy"></i> </div>
                                     </div>
                                     <div>
-                                        <h3 class="counter mb-1 text-gold">7518</h3>
-                                        <p class="mb-0 text-light">Projects Done</p>
+                                        <h3 class="counter mb-1 text-gold">1st</h3>
+                                        <p class="mb-0 text-light">School in saudi</p>
                                     </div>
                                 </div>
                             </div>
@@ -264,7 +194,6 @@
                   The vision of Saud International School is to create a supportive environment enabling us to equip our students with skills and abilities which will allow them to develop intellectually, physically, socially, emotionally and morally as they become successful and productive lifelong learners in the 21st Century.
                 </p>
                 <a href="#" class="btn btn-sm btn-primary rounded">
-                  <i class="uil uil-angle-right"></i>
                   Learn More
                 </a>
             </div>
@@ -289,14 +218,13 @@
             <!--/column -->
 
             <div class="col-lg-6 mt-8 mt-md-0 text-center text-md-start">
-                <h3 class="display-4 mb-2 text-primary">
-                  Welcome to Saud international schools
+                <h3 class="display-4 mb-2 text-gold">
+                  Message From The Head of School
                 </h3>
                 
                 <p class="mb-4">The mission of Saud International School is to provide a challenging educational environment that meets the needs of the diverse community by offering a worldwide known curriculum implemented with state of the art technology along with  extra-curricular activities.</p>
 
                 <a href="#" class="btn btn-sm btn-primary rounded">
-                    <i class="uil uil-angle-right"></i>
                     Learn More
                 </a>
             </div>
@@ -309,10 +237,10 @@
 
 <section class="wrapper bg-light-primary">
     <div class="container py-12">
-        <h3 class="display-5 mb-4 text-center text-primary">
+        <h3 class="display-5 mb-4 text-center text-gold">
           Saud international schools 
           <br>
-          Upcoming events
+          Latest articles
         </h3>
 
         <div class="swiper-container blog grid-view mb-6" data-margin="30" data-dots="true" data-items-xl="3" data-items-md="2" data-items-xs="1">
@@ -402,7 +330,7 @@
         <div class="container py-12">
             <div class="row">
                 <div class="col-xl-7 col-xxl-6 mx-auto text-center">
-                  <h3 class="display-5 mb-4 text-center text-primary">
+                  <h3 class="display-5 mb-4 text-center text-gold">
                     Saud international schools 
                     <br>
                     Albums
@@ -418,7 +346,7 @@
                         <div class="swiper-slide">
                             <div class="card shadow-lg">
                                 <figure class="card-img-top overlay overlay-1">
-                                    <a href="#"> <img src="./assets/img/photos/b12.jpg" alt="" /></a>
+                                    <a href="#"> <img src="./assets/img/photos/b5.jpg" alt="" /></a>
                                     <figcaption>
                                         <h5 class="from-top mb-0">Read More</h5>
                                     </figcaption>
@@ -431,7 +359,7 @@
                         <div class="swiper-slide">
                             <div class="card shadow-lg">
                                 <figure class="card-img-top overlay overlay-1">
-                                    <a href="#"> <img src="./assets/img/photos/b12.jpg" alt="" /></a>
+                                    <a href="#"> <img src="./assets/img/photos/b1.jpg" alt="" /></a>
                                     <figcaption>
                                         <h5 class="from-top mb-0">Read More</h5>
                                     </figcaption>
@@ -444,7 +372,7 @@
                         <div class="swiper-slide">
                             <div class="card shadow-lg">
                                 <figure class="card-img-top overlay overlay-1">
-                                    <a href="#"> <img src="./assets/img/photos/b12.jpg" alt="" /></a>
+                                    <a href="#"> <img src="./assets/img/photos/b2.jpg" alt="" /></a>
                                     <figcaption>
                                         <h5 class="from-top mb-0">Read More</h5>
                                     </figcaption>
@@ -457,7 +385,7 @@
                         <div class="swiper-slide">
                             <div class="card shadow-lg">
                                 <figure class="card-img-top overlay overlay-1">
-                                    <a href="#"> <img src="./assets/img/photos/b12.jpg" alt="" /></a>
+                                    <a href="#"> <img src="./assets/img/photos/b4.jpg" alt="" /></a>
                                     <figcaption>
                                         <h5 class="from-top mb-0">Read More</h5>
                                     </figcaption>

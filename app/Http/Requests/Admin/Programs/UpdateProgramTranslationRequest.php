@@ -23,6 +23,7 @@ class UpdateProgramTranslationRequest extends FormRequest
     {
         $data = [
             'title' => 'required|string|max:255',
+            'subtitle' => 'required|string|max:3000',
             'description' => 'required|string',
             'content' => 'required|string',
             'language_id' => 'required|exists:languages,id',

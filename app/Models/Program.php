@@ -31,6 +31,6 @@ class Program extends Model
 
     public function getTranslatableFields(): array
     {
-        return ['title', 'description', 'content'];
+        return ['title', 'subtitle', 'description', 'content'];
     }
 }

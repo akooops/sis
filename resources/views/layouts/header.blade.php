@@ -3,7 +3,7 @@
         <div class="container flex-lg-row flex-nowrap align-items-center">
             <div class="navbar-brand w-100">
                 <a href="./index.html">
-                <img class="logo logo-light" src="{{ URL::asset('assets/img/logo.png')}}" alt="">
+                    <img class="logo" src="{{ URL::asset('assets/img/logo.png')}}" alt="">                
                 </a>
             </div>
             <div class="offcanvas offcanvas-nav offcanvas-end">
@@ -181,11 +181,11 @@
         <div class="offcanvas-body d-flex flex-column h-100">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
+                    <a class="nav-link" href="#">Link example</a>
                 </li>
 
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Dropdown</a>
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Link example dropdown</a>
                     <ul class="dropdown-menu"> 
                         <li class="nav-item"><a class="dropdown-item" href="#">Action</a></li>
                         <li class="dropdown">

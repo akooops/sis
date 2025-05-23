@@ -7,6 +7,10 @@
     color: #E0B65D;
 }
 
+.bg-gold{
+    background-color: #E0B65D;
+}
+
 .nav-link{
     font-weight: 500;
 }
@@ -59,12 +63,11 @@
 }
 
 .grades-section{
-    border-top: 4px solid #E0B65D;
     border-bottom: 4px solid #E0B65D;
 }
 
 .grades figure{
-    height: 400px;
+    height: 425px;
 }
 
 .grades figure a{
@@ -127,6 +130,10 @@
 
 .active{
     color: #2A5D91;
+}
+
+.overlay span.bg {
+    background: rgba(0, 0, 0, 0.4);
 }
 
 @media (min-width: 1024px) {

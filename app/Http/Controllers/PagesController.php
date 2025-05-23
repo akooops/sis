@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Banner;
+use App\Models\Page;
+use App\Models\Program;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -15,7 +18,13 @@ class PagesController extends Controller
      */
     public function index(Request $request)
     {
-        return view('index');
+        $page = Page::where('slug', 'home')->first();
+        if(!$page) abort(404);
+
+        $banners = Banner::orderBy('order')->get();
+        $programs = Program::latest()->get();
+
+        return view('index', compact('page', 'banners', 'programs'));
     }
 
     public function page(Request $request)
@@ -53,9 +62,9 @@ class PagesController extends Controller
         return view('event');
     }
 
-    public function grades(Request $request)
+    public function program(Request $request)
     {
-        return view('grades');
+        return view('program');
     }
 
     public function grade(Request $request)

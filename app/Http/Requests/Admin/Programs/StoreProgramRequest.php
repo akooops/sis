@@ -26,6 +26,7 @@ class StoreProgramRequest extends FormRequest
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:500|unique:programs,slug',
             'title' => 'required|string|max:1000',
+            'subtitle' => 'required|string|max:3000',
             'description' => 'required|string|max:3000',
             'content' => 'required|string',
             'file' => 'nullable|file|image', 

@@ -205,12 +205,15 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 });
 
 Route::get('', [ControllersPagesController::class, 'index'])->name('index');
-Route::get('/page', [ControllersPagesController::class, 'page'])->name('page');
-Route::get('/articles', [ControllersPagesController::class, 'articles'])->name('page');
-Route::get('/article', [ControllersPagesController::class, 'article'])->name('page');
-Route::get('/albums', [ControllersPagesController::class, 'albums'])->name('page');
-Route::get('/album', [ControllersPagesController::class, 'album'])->name('page');
-Route::get('/events', [ControllersPagesController::class, 'events'])->name('page');
-Route::get('/event', [ControllersPagesController::class, 'event'])->name('page');
-Route::get('/grades', [ControllersPagesController::class, 'grades'])->name('page');
-Route::get('/grade', [ControllersPagesController::class, 'grade'])->name('page');
+
+Route::get('/articles', [ControllersPagesController::class, 'articles']);
+Route::get('/article', [ControllersPagesController::class, 'article']);
+Route::get('/albums', [ControllersPagesController::class, 'albums']);
+Route::get('/album', [ControllersPagesController::class, 'album']);
+Route::get('/events', [ControllersPagesController::class, 'events']);
+Route::get('/event', [ControllersPagesController::class, 'event']);
+Route::get('/grades', [ControllersPagesController::class, 'grades']);
+Route::get('/grade', [ControllersPagesController::class, 'grade']);
+
+Route::get('/{slug}', [ControllersPagesController::class, 'page'])->name('page');
+Route::get('/program/{slug}', [ControllersPagesController::class, 'program'])->name('program');

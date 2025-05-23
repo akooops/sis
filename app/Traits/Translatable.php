@@ -39,6 +39,29 @@ trait Translatable
         return "{$field}.{$languageCode}";
     }
 
+    public function getLocalTranslation(string $field)
+    {
+        $languageCode = app()->getLocale();
+
+        $language = Language::where('code', $languageCode)->first();
+
+        if (!$language) {
+            return "{$field}.{$languageCode}";
+        }
+
+        $translation = $this->translations()
+            ->where('field', $field)
+            ->where('language_id', $language->id)
+            ->value('value');
+
+        if ($translation) {
+            return $translation;
+        }
+
+        return "{$field}.{$languageCode}";
+    }
+
+
     public function setTranslation(string $field, string $languageCode, $value)
     {
         if(is_null($value)) return;

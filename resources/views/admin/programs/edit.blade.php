@@ -173,6 +173,12 @@
                                             </div>
 
                                             <div class="mb-4">
+                                                <label class="form-label" for="subtitle-{{$language->id}}">Subtitle <span class="text-danger">*</span></label>
+                                                <input type="text" id="subtitle-{{$language->id}}" name="subtitle" class="form-control translation-subtitle" value="{{$program->getTranslation('subtitle', $language->code)}}">
+                                                <div class="translation-error" id="error-subtitle-{{$language->id}}"></div>
+                                            </div>
+
+                                            <div class="mb-4">
                                                 <label class="form-label" for="description-{{$language->id}}">Description <span class="text-danger">*</span></label>
                                                 <textarea id="description-{{$language->id}}" name="description" class="form-control translation-description" rows="3">{{$program->getTranslation('description', $language->code)}}</textarea>
                                                 <div class="translation-error" id="error-description-{{$language->id}}"></div>
@@ -400,6 +406,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const languageId = this.dataset.languageId;
             const languageCode = this.dataset.language;
             const titleInput = document.getElementById(`title-${languageId}`);
+            const subtitleInput = document.getElementById(`subtitle-${languageId}`);
             const descriptionTextarea = document.getElementById(`description-${languageId}`);
             const contentId = `content-${languageId}`;
             const submitButton = this.querySelector('.translation-submit');
@@ -408,6 +415,7 @@ document.addEventListener('DOMContentLoaded', function() {
             titleInput.classList.remove('is-invalid');
             descriptionTextarea.classList.remove('is-invalid');
             document.getElementById(`error-title-${languageId}`).textContent = '';
+            document.getElementById(`error-subtitle-${languageId}`).textContent = '';
             document.getElementById(`error-description-${languageId}`).textContent = '';
             document.getElementById(`error-content-${languageId}`).textContent = '';
             
@@ -422,6 +430,7 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('_method', 'PATCH');
             formData.append('language_id', languageId);
             formData.append('title', titleInput.value);
+            formData.append('subtitle', subtitleInput.value);
             formData.append('description', descriptionTextarea.value);
             formData.append('content', editors[contentId].value());
             
@@ -458,6 +467,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (error.errors.title) {
                         titleInput.classList.add('is-invalid');
                         document.getElementById(`error-title-${languageId}`).textContent = error.errors.title[0];
+                    }
+
+                    if (error.errors.subtitle) {
+                        titleInput.classList.add('is-invalid');
+                        document.getElementById(`error-subtitle-${languageId}`).textContent = error.errors.subtitle[0];
                     }
                     
                     if (error.errors.description) {
