@@ -84,6 +84,10 @@
                                                     </a>
 
                                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink1" style="">
+                                                        @haspermission('admin.menu-items.index')
+                                                            <li><a class="dropdown-item" href="{{route('admin.menu-items.index', ['menu' => $menu->id])}}"><i class="ri-node-tree align-bottom me-2 text-muted"></i> Items</a></li>
+                                                        @endhaspermission
+
                                                         @haspermission('admin.menus.show')
                                                             <li><a class="dropdown-item" href="{{route('admin.menus.show', $menu->id)}}"><i class="ri-eye-fill align-bottom me-2 text-muted"></i> View</a></li>
                                                         @endhaspermission

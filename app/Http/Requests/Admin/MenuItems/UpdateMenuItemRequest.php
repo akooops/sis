@@ -22,9 +22,9 @@ class UpdateMenuItemRequest extends FormRequest
     {        
         return [
             'name' => 'required|string|max:255',
-            'title' => 'required|string|max:255',
-            'url' => 'required_without:page_id|url',
-            'page_id' => 'required_without:url|exists:pages,id',
+            'external' => 'required|integer',
+            'url' => 'nullable|required_without:page_id|url',
+            'page_id' => 'nullable|required_without:url|exists:pages,id',
         ];
     }
 }

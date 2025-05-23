@@ -96,7 +96,7 @@
                                                     </a>
 
                                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink1" style="">
-                                                        @haspermission('admin.grades.show')
+                                                        @haspermission('admin.grades.index')
                                                             <li><a class="dropdown-item" href="{{route('admin.grades.index', ['program_id' => $program->id])}}"><i class="ri-node-tree align-bottom me-2 text-muted"></i> Grades</a></li>
                                                         @endhaspermission
 

@@ -47,7 +47,7 @@
                             <div class="mb-3">
                                 <h4 class="fs-15">Menu Item url</h4>
                                 @if(!$menuItem->page)
-                                    <a href="{{$media->url}}" target="_blank" rel="noopener noreferrer" class="me-2">
+                                    <a href="{{$menuItem->url}}" target="_blank" rel="noopener noreferrer" class="me-2">
                                         <span class="badge bg-primary">
                                             <i class="ri-link"></i> Open
                                         </span>
@@ -106,7 +106,7 @@
                     </div>
 
                     <div class="text-end mb-3">
-                        <a href="{{ route('admin.menu-items.index') }}" class="btn btn-primary w-sm">Back</a>
+                        <a href="{{ route('admin.menu-items.index', $menuItem->menu_id) }}" class="btn btn-primary w-sm">Back</a>
                         
                         @haspermission('admin.menu-items.update')
                             <a href="{{ route('admin.menu-items.edit', $menuItem->id) }}" class="btn btn-success w-sm">Edit</a>

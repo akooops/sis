@@ -5,7 +5,7 @@ namespace App\Http\Requests\Admin\MenuItems;
 use App\Models\Media;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreMenuItemRequest extends FormRequest
+class OrderMenuItemsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,11 +23,10 @@ class StoreMenuItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'title' => 'required|string|max:255',
-            'external' => 'required|integer',
-            'url' => 'nullable|required_without:page_id|url',
-            'page_id' => 'nullable|required_without:url|exists:pages,id',
+            'order' => 'required|array',
+            'order.*.id' => 'required|exists:menu_items,id',
+            'order.*.order' => 'required|integer',
+            'order.*.menu_item_id' => 'nullable|exists:menu_items,id'
         ];
     }
 }

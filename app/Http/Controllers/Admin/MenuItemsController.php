@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\MenuItems\OrderMenuItemsRequest;
 use App\Http\Requests\Admin\MenuItems\StoreMenuItemRequest;
 use App\Http\Requests\Admin\MenuItems\UpdateMenuItemRequest;
 use App\Http\Requests\Admin\MenuItems\UpdateMenuItemTranslationRequest;
@@ -73,6 +74,12 @@ class MenuItemsController extends Controller
 
         $validatedData['order'] = $menu->items()->max('order') + 1;
 
+        if($request->input('external')){
+            $validatedData['page_id'] = null;
+        }else{
+            $validatedData['url'] = null;
+        }
+
         $menuItem = MenuItem::create(array_merge(
             $validatedData,
             [
@@ -90,7 +97,7 @@ class MenuItemsController extends Controller
             $menuItem->setTranslation($field, $defaultLanguage->code, $request->input($field));    
         }
 
-        return redirect()->route('admin.menu-items.index')
+        return redirect()->route('admin.menu-items.index', ['menu' => $menu->id])
                         ->with('success','MenuItem created successfully');
     }
 
@@ -116,11 +123,10 @@ class MenuItemsController extends Controller
     public function edit(MenuItem $menuItem)
     {
         $languages = Language::orderBy('is_default', 'DESC')->get();
-        $medias = Media::where('type', 'image')->get();
 
         $pages = Page::get();
 
-        return view('admin.menu-items.edit', compact('menuItem', 'languages', 'medias', 'pages'));
+        return view('admin.menu-items.edit', compact('menuItem', 'languages', 'pages'));
     }
     
     /**
@@ -134,15 +140,15 @@ class MenuItemsController extends Controller
     {
         $validatedData = $request->validated();
 
-        if($request->has('page_id')){
-            $validatedData['url'] = null;
-        }else{
+        if($request->input('external')){
             $validatedData['page_id'] = null;
+        }else{
+            $validatedData['url'] = null;
         }
 
         $menuItem->update($validatedData);
 
-        return redirect()->route('admin.menu-items.index')
+        return redirect()->route('admin.menu-items.index', ['menu' => $menuItem->menu_id])
                         ->with('success','MenuItem updated successfully');
     }
 
@@ -169,7 +175,29 @@ class MenuItemsController extends Controller
     {
         $menuItem->delete();
 
-        return redirect()->route('admin.menu-items.index')
+        return redirect()->route('admin.menu-items.index', ['menu' => $menuItem->menu_id])
                         ->with('success','MenuItem deleted successfully');
+    }
+
+    public function orderPage(Menu $menu)
+    {
+        $menuItems = $menu->items;
+
+        return view('admin.menu-items.order', compact('menu', 'menuItems'));
+    }
+
+    public function order(OrderMenuItemsRequest $request, Menu $menu)
+    {
+        foreach ($request->order as $item) {
+            MenuItem::where('id', $item['id'])
+                ->update([
+                    'order' => $item['order'],
+                    'menu_item_id' => $item['menu_item_id']
+            ]);
+        }
+            
+        return response()->json([
+            'status' => 'success',
+        ]);
     }
 }

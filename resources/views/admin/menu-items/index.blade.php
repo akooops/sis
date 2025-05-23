@@ -17,21 +17,30 @@
                         <div class="flex-grow-1">
                             <h4 class="fs-16 mb-1">Good Morning, {{Auth::user()->fullname}}</h4>
                         </div>
-                        @haspermission('admin.menu-items.store')
                         <div class="mt-3 mt-lg-0">
                             <form action="javascript:void(0);">
                                 <div class="row g-3 mb-0 align-items-center">
+                                    @haspermission('admin.menu-items.order')
+                                    <div class="col-auto">
+                                        <a href="{{ route('admin.menu-items.order-page', ['menu' => $menu->id]) }}" class="btn btn-soft-primary"><i
+                                                class="ri-add-circle-line align-middle me-1"></i>
+                                            Order Menu Items</a>
+                                    </div>
+                                    <!--end col-->
+                                    @endhaspermission
+
+                                    @haspermission('admin.menu-items.store')
                                     <div class="col-auto">
                                         <a href="{{ route('admin.menu-items.create', ['menu' => $menu->id]) }}" class="btn btn-soft-success"><i
                                                 class="ri-add-circle-line align-middle me-1"></i>
                                             Add Menu Item</a>
                                     </div>
                                     <!--end col-->
+                                    @endhaspermission
                                 </div>
                                 <!--end row-->
                             </form>
                         </div>
-                        @endhaspermission
                     </div><!-- end card header -->
                 </div>
                 <!--end col-->
@@ -90,7 +99,7 @@
 
                                             <td>
                                                 @if(!$menuItem->page)
-                                                    <a href="{{$media->url}}" target="_blank" rel="noopener noreferrer" class="me-2">
+                                                    <a href="{{$menuItem->url}}" target="_blank" rel="noopener noreferrer" class="me-2">
                                                         <span class="badge bg-primary">
                                                             <i class="ri-link"></i> Open
                                                         </span>

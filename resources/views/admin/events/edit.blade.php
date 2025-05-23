@@ -181,6 +181,12 @@
                             <input type="hidden" name="files[]" value="{{$file->id}}">
                         @endforeach
                     </form>
+                    
+                    <!-- Success alert for AJAX responses -->
+                    <div class="alert alert-success alert-dismissible fade translation-success" role="alert" id="translationSuccess">
+                        <strong>Success!</strong> <span id="successMessage">Translation updated successfully.</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
 
                     <div class="card">
                         <div class="card-body">

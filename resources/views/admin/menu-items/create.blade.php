@@ -42,24 +42,24 @@
                                 </div>  
 
                                 <div class="mb-3">
-                                    <label class="form-label" for="">Does this page redirect to a url?</label>
-
-                                    <select id="external" onchange="change()" name="external" class="form-select mb-3">
-                                        <option value="0" selected>No - It's linked with a page</option>
-                                        <option value="1">Yes - It will redirect to a url</option>
-                                    </select>         
-                                    
-                                    @error('external')
-                                        <p class="mx-2 my-2 text-danger">
-                                            <strong>
-                                                {{$message}}
-                                            </strong>
-                                        </p>
-                                    @enderror
+                                    <label class="form-label" for="">Where should this menu item link?</label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="external" id="external_no" value="0" checked>
+                                            <label class="form-check-label" for="external_no">
+                                                Link to a page
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="external" id="external_yes" value="1">
+                                            <label class="form-check-label" for="external_yes">
+                                                Redirect to a URL
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div id="is-external" class="mb-3">
-                                    <label class="form-label" for="">External url</label>
                                     <input name="url" value="{{old('url')}}" type="text" class="form-control">
                                     @error('url')
                                         <p class="mx-2 my-2 text-danger">
@@ -71,12 +71,9 @@
                                 </div>
 
                                 <div id="isnot-external" class="mb-3">
-                                    <label class="form-label" for="">Menu Item Linked Page -Choose a page-</label>
-
                                     <select name="page_id" class="form-select mb-3">
-                                        <option value="" selected>This section has no page</option>
                                         @foreach($pages as $page)
-                                            <option value="{{ $page->id }}">#{{ $page->id }} - {{ $page->title }}</option>
+                                            <option value="{{ $page->id }}">{{ $page->name }}</option>
                                         @endforeach
                                     </select>         
                                     
@@ -129,19 +126,25 @@
 <script src="{{ URL::asset('/assets/admin/js/app.min.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    function change(){
-        let isExternal = $('#external').find(":selected").val();
-
-        if(isExternal == true){
-            $('#is-external').show();
-            $('#isnot-external').hide();
-        }else{
-            $('#is-external').hide();
-            $('#isnot-external').show();
+    function toggleExternal() {
+        let isExternal = document.querySelector('input[name="external"]:checked').value;
+        if(isExternal === "1") {
+            document.getElementById('is-external').style.display = '';
+            document.getElementById('isnot-external').style.display = 'none';
+        } else {
+            document.getElementById('is-external').style.display = 'none';
+            document.getElementById('isnot-external').style.display = '';
         }
     }
 
-    change();
+    // Bind change event to both radios
+    document.querySelectorAll('input[name="external"]').forEach(function(radio) {
+        radio.addEventListener('change', toggleExternal);
+    });
+
+    // Initial state
+    toggleExternal();
 });
+
 </script>
 @endsection

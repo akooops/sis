@@ -177,6 +177,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::delete('menus/{menu}', [MenusController::class, 'destroy'])->middleware('check.permission:admin.menus.destroy')->name('admin.menus.destroy');
 
     // Menu Items
+    Route::get('menus/{menu}/menu-items/order', [MenuItemsController::class, 'orderPage'])->middleware('check.permission:admin.menu-items.order')->name('admin.menu-items.order-page');
+    Route::post('menus/{menu}/menu-items/order', [MenuItemsController::class, 'order'])->middleware('check.permission:admin.menu-items.order')->name('admin.menu-items.order');
+
     Route::get('menus/{menu}/menu-items', [MenuItemsController::class, 'index'])->middleware('check.permission:admin.menu-items.index')->name('admin.menu-items.index');
     Route::get('menus/{menu}/menu-items/create', [MenuItemsController::class, 'create'])->middleware('check.permission:admin.menu-items.store')->name('admin.menu-items.create');
     Route::post('menus/{menu}/menu-items', [MenuItemsController::class, 'store'])->middleware('check.permission:admin.menu-items.store')->name('admin.menu-items.store');
