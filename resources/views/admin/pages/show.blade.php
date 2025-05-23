@@ -54,7 +54,7 @@
                                     <span class="badge bg-danger">no</span>
                                 @endif
                             </div>
-
+                            
                             <div class="mb-3">
                                 <h4 class="fs-15">Page status</h4>
                                 @if($page->status == 'draft')
@@ -63,6 +63,15 @@
                                     <span class="badge bg-primary">Hidden</span>                                                 
                                 @else
                                     <span class="badge bg-success">Published</span>
+                                @endif
+                            </div>
+
+                            <div class="mb-3">
+                                <h4 class="fs-15">Linked menu?</h4>
+                                @if($page->menu_id)
+                                    <span class="badge bg-success">{{$page->menu->name}}</span>                                                    
+                                @else
+                                    <span class="badge bg-danger">Not added</span>
                                 @endif
                             </div>
 

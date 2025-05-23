@@ -29,6 +29,9 @@ class StorePageRequest extends FormRequest
             'description' => 'required|string|max:3000',
             'content' => 'required|string',
             'status' => 'required|string|in:draft,hidden,published',
+
+            'menu_id' => 'nullable|exists:menus,id',
+
             'file' => 'nullable|file|image', 
             'media_id' => 'nullable|exists:media,id',
         ];

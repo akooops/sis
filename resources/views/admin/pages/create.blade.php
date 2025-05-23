@@ -39,7 +39,7 @@
             </div>
             <!--end row-->
 
-            <form method="POST" action="{{ route('admin.pages.store') }}">
+            <form method="POST" enctype="multipart/form-data" action="{{ route('admin.pages.store') }}">
                 @csrf
                 <div class="row">
                     <div class="col-12">
@@ -86,8 +86,27 @@
                                     @enderror
                                 </div>  
 
+                                
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Article thumbnail <span class="text-danger">*</span></label>
+                                    <label class="form-label" for="">Add menu to page</label>
+                                    <select class="form-control" name="menu_id">
+                                        <option value="" selected>Don't add any menu</option>
+                                        @foreach ($menus as $menu)
+                                            <option value="{{$menu->id}}">{{$menu->name}}</option>
+                                        @endforeach
+                                    </select>
+
+                                    @error('menu_id')
+                                        <p class="mx-2 my-2 text-danger">
+                                            <strong>
+                                                {{$message}}
+                                            </strong>
+                                        </p>
+                                    @enderror
+                                </div>  
+
+                                <div class="mb-4">
+                                    <label class="form-label" for="">Page thumbnail <span class="text-danger">*</span></label>
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="form-check me-3">
                                             <input class="form-check-input" type="radio" name="media_option" id="media_option_upload" value="upload" checked>

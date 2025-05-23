@@ -28,12 +28,12 @@ class UpdatePageRequest extends FormRequest
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:500|unique:pages,slug,'.$page->id,
             'status' => 'required|string|in:draft,hidden,published',
+            'menu_id' => 'nullable|exists:menus,id',
             'file' => 'nullable|file|image',
             'media_id' => 'nullable|exists:media,id',
         ];
 
         if($page->is_system_page){
-            unset($data['name']);
             unset($data['slug']);
         }
 

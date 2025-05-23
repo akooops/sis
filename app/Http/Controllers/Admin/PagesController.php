@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\Pages\UpdatePageRequest;
 use App\Http\Requests\Admin\Pages\UpdatePageTranslationRequest;
 use App\Models\Language;
 use App\Models\Media;
+use App\Models\Menu;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 use App\Models\Page;
@@ -56,8 +57,9 @@ class PagesController extends Controller
         ])->first();
 
         $medias = Media::where('type', 'image')->get();
+        $menus = Menu::get();
 
-        return view('admin.pages.create', compact('defaultLanguage', 'medias'));
+        return view('admin.pages.create', compact('defaultLanguage', 'medias', 'menus'));
     }
     
     /**
@@ -134,9 +136,7 @@ class PagesController extends Controller
     {    
         $languages = Language::orderBy('is_default', 'DESC')->get();
 
-        $medias = Media::where('type', 'image')->get();
-
-        return view('admin.pages.show', compact('page', 'languages', 'medias'));
+        return view('admin.pages.show', compact('page', 'languages'));
     }
     
     /**
@@ -148,8 +148,10 @@ class PagesController extends Controller
     public function edit(Page $page)
     {
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $medias = Media::where('type', 'image')->get();
+        $menus = Menu::get();
 
-        return view('admin.pages.edit', compact('page', 'languages'));
+        return view('admin.pages.edit', compact('page', 'languages', 'medias', 'menus'));
     }
     
     /**
@@ -164,7 +166,7 @@ class PagesController extends Controller
         $page->update(array_merge(
             $request->validated(),
             [
-                'slug' => Str::slug($request->slug)
+                'slug' => ($page->is_system_page) ? $page->slug : Str::slug($request->slug)
             ]
         ));
 

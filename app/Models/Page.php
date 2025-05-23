@@ -27,6 +27,11 @@ class Page extends Model
         return $this->morphOne(File::class, 'model');
     }
 
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class, 'menu_id');
+    }
+    
     //Accessors & Mutators
     public function getThumbnailUrlAttribute()
     {

@@ -53,7 +53,7 @@
 
             <div class="row">
                 <div class="col-12">
-                    <form method="POST" action="{{ route('admin.pages.update', $page->id) }}">
+                    <form method="POST" enctype="multipart/form-data" action="{{ route('admin.pages.update', $page->id) }}">
                         @csrf
                         @method('patch')
                         <div class="card">
@@ -81,7 +81,7 @@
                                         </p>
                                     @enderror
                                 </div>  
-
+                                
                                 <div class="mb-4">
                                     <label class="form-label" for="">Page status<span class="text-danger">*</span></label>
                                     <select class="form-control" name="status">
@@ -97,8 +97,27 @@
                                         </p>
                                     @enderror
                                 </div>
-                                                                <div class="mb-4">
-                                    <label class="form-label" for="">Article thumbnail <span class="text-danger">(Keep it empty if you don't want to change it)</span></label>
+
+                                <div class="mb-4">
+                                    <label class="form-label" for="">Add menu to page</label>
+                                    <select class="form-control" name="menu_id">
+                                        <option value="" {{ !$page->menu_id ? 'selected' : '' }}>Don't add any menu</option>
+                                        @foreach ($menus as $menu)
+                                            <option {{ $page->menu_id == $menu->id ? 'selected' : '' }} value="{{$menu->id}}">{{$menu->name}}</option>
+                                        @endforeach
+                                    </select>
+
+                                    @error('menu_id')
+                                        <p class="mx-2 my-2 text-danger">
+                                            <strong>
+                                                {{$message}}
+                                            </strong>
+                                        </p>
+                                    @enderror
+                                </div>  
+
+                                <div class="mb-4">
+                                    <label class="form-label" for="">Page thumbnail <span class="text-danger">(Keep it empty if you don't want to change it)</span></label>
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="form-check me-3">
                                             <input class="form-check-input" type="radio" name="media_option" id="media_option_upload" value="upload" checked>
@@ -150,13 +169,14 @@
                             </div>
                         </div>
                     </form>
+
                     
                     <!-- Success alert for AJAX responses -->
                     <div class="alert alert-success alert-dismissible fade translation-success" role="alert" id="translationSuccess">
                         <strong>Success!</strong> <span id="successMessage">Translation updated successfully.</span>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-
+                    
                     <div class="card">
                         <div class="card-body">
                             @foreach ($languages as $language)
