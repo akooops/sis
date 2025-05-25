@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Album;
+use App\Models\Article;
 use App\Models\Banner;
 use App\Models\Page;
 use App\Models\Program;
@@ -18,18 +20,31 @@ class PagesController extends Controller
      */
     public function index(Request $request)
     {
-        $page = Page::where('slug', 'home')->first();
+        $page = Page::where([
+            'slug' => 'home',
+            'status' => 'published'
+        ])->first();
+
         if(!$page) abort(404);
 
         $banners = Banner::orderBy('order')->get();
         $programs = Program::latest()->get();
+        $articles = Article::latest()->where('status', 'published')->limit(6)->get();
+        $albums = Album::latest()->where('status', 'published')->limit(6)->get();
 
-        return view('index', compact('page', 'banners', 'programs'));
+        return view('index', compact('page', 'banners', 'programs', 'articles', 'albums'));
     }
 
-    public function page(Request $request)
+    public function page(Request $request, $slug = null)
     {
-        return view('page');
+        $page = Page::where([
+            'slug' => $slug,
+            'status' => 'published'
+        ])->first();
+        
+        if(!$page) abort(404);
+
+        return view('page', compact('page'));
     }
 
     public function articles(Request $request)

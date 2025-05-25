@@ -14,7 +14,7 @@
                     <div class="swiper-slide bg-overlay bg-overlay-400 bg-dark bg-image swiper-slide-prev" data-image-src="{{ $banner->thumbnailUrl  }}" role="group" >
                         <div class="container h-100">
                             <div class="row h-100">
-                                <div class="banner-container col-md-8 offset-md-1 col-lg-7 offset-lg-0 col-xl-6 col-xxl-5 text-center text-lg-start justify-content-center align-self-center align-items-start">
+                                <div class="banner-container col-lg-6 text-center text-lg-start justify-content-center align-self-center align-items-start">
                                     <h2 class="display-1 fs-36 fw-semibold mb-4 text-white animate__animated animate__slideInDown animate__delay-1s">
                                         {{$banner->getLocalTranslation('title')}}
                                     </h2>
@@ -29,6 +29,13 @@
                                     </div>
                                 </div>
                                 <!--/column -->
+
+                                <div class="d-flex col-lg-5 justify-content-center justify-content-md-end align-items-start" data-cues="slideInDown" data-disabled="true">
+                                    <div class="position-relative h-100" data-cue="slideInDown" data-show="true" style="animation-name: slideInDown; animation-duration: 700ms; animation-timing-function: ease; animation-delay: 0ms; animation-direction: normal; animation-fill-mode: both;">
+                                        <a href="./assets/media/movie.mp4" class="btn btn-circle btn-primary btn-play ripple position-absolute" style="top:50%; left: 50%; transform: translate(-50%,-50%); z-index:3;" data-glightbox=""><i class="icn-caret-right"></i></a>
+                                    </div>
+                                    <!-- /div -->
+                                </div>
                             </div>
                             <!--/.row -->
                         </div>
@@ -57,7 +64,7 @@
             </div>
             <!--/column -->
 
-            <div class="col-lg-6 mt-8 mt-md-0 text-center text-md-start">
+            <div class="col-lg-6 mt-12 mt-lg-0 text-center text-lg-start">
                 <h3 class="display-4 mb-2 text-gold">
                     Welcome to Saud international schools
                 </h3>
@@ -217,7 +224,7 @@
             </div>
             <!--/column -->
 
-            <div class="col-lg-6 mt-8 mt-md-0 text-center text-md-start">
+            <div class="col-lg-6 mt-12 mt-lg-0 text-center text-lg-start">
                 <h3 class="display-4 mb-2 text-gold">
                   Message From The Head of School
                 </h3>
@@ -246,21 +253,35 @@
         <div class="swiper-container blog grid-view mb-6" data-margin="30" data-dots="true" data-items-xl="3" data-items-md="2" data-items-xs="1">
             <div class="swiper">
                 <div class="swiper-wrapper">
+                    @foreach ($articles as $article)   
                     <div class="swiper-slide">
                         <article>
-                            <figure class="overlay overlay-1 hover-scale rounded mb-5">
-                                <a href="#"> <img src="./assets/img/photos/b4.jpg" alt="" /></a>
+                            <figure class="article-figure overlay overlay-1 hover-scale rounded mb-5">
+                                <a href="{{route('article', ['slug' => $article->slug])}}">
+                                    <img src="{{$article->thumbnailUrl}}" alt="" />
+                                </a>
                                 <figcaption>
                                     <h5 class="from-top mb-0">Read More</h5>
                                 </figcaption>
                             </figure>
                             <div class="post-header">
-                                <h2 class="post-title h3 mt-1 mb-3"><a class="link-dark" href="./blog-post.html">Ligula tristique quis risus</a></h2>
+                                <h2 class="post-title h3 mt-1 mb-3">
+                                    <a class="link-dark" href="{{route('article', ['slug' => $article->slug])}}">
+                                        {{$article->getLocalTranslation('title')}}
+                                    </a>
+                                </h2>
+                            </div>
+                            <div class="post-content">
+                                <p class="truncate-3-lines">{{$article->getLocalTranslation('description')}}</p>
                             </div>
                             <!-- /.post-header -->
                             <div class="post-footer">
                                 <ul class="post-meta">
-                                    <li class="post-date"><i class="uil uil-calendar-alt"></i><span>14 Apr 2022</span></li>
+                                    <li class="post-date">
+                                        <i class="uil uil-calendar-alt"></i><span>
+                                            {{$article->created_at->format('Y-m-d')}}
+                                        </span>
+                                    </li>
                                 </ul>
                                 <!-- /.post-meta -->
                             </div>
@@ -268,58 +289,19 @@
                         </article>
                         <!-- /article -->
                     </div>
-                    <!--/.swiper-slide -->
-                    <div class="swiper-slide">
-                        <article>
-                            <figure class="overlay overlay-1 hover-scale rounded mb-5">
-                                <a href="#"> <img src="./assets/img/photos/b4.jpg" alt="" /></a>
-                                <figcaption>
-                                    <h5 class="from-top mb-0">Read More</h5>
-                                </figcaption>
-                            </figure>
-                            <div class="post-header">
-                                <h2 class="post-title h3 mt-1 mb-3"><a class="link-dark" href="./blog-post.html">Ligula tristique quis risus</a></h2>
-                            </div>
-                            <!-- /.post-header -->
-                            <div class="post-footer">
-                                <ul class="post-meta">
-                                    <li class="post-date"><i class="uil uil-calendar-alt"></i><span>14 Apr 2022</span></li>
-                                </ul>
-                                <!-- /.post-meta -->
-                            </div>
-                            <!-- /.post-footer -->
-                        </article>
-                        <!-- /article -->
-                    </div>
-
-                                        <div class="swiper-slide">
-                        <article>
-                            <figure class="overlay overlay-1 hover-scale rounded mb-5">
-                                <a href="#"> <img src="./assets/img/photos/b4.jpg" alt="" /></a>
-                                <figcaption>
-                                    <h5 class="from-top mb-0">Read More</h5>
-                                </figcaption>
-                            </figure>
-                            <div class="post-header">
-                                <h2 class="post-title h3 mt-1 mb-3"><a class="link-dark" href="./blog-post.html">Ligula tristique quis risus</a></h2>
-                            </div>
-                            <!-- /.post-header -->
-                            <div class="post-footer">
-                                <ul class="post-meta">
-                                    <li class="post-date"><i class="uil uil-calendar-alt"></i><span>14 Apr 2022</span></li>
-                                </ul>
-                                <!-- /.post-meta -->
-                            </div>
-                            <!-- /.post-footer -->
-                        </article>
-                        <!-- /article -->
-                    </div>
+                    @endforeach
                 </div>
                 <!--/.swiper-wrapper -->
             </div>
             <!-- /.swiper -->
         </div>
         <!-- /.swiper-container -->
+
+        <div class="d-flex justify-content-center mt-4">
+              <a href="#" class="btn btn-sm btn-primary rounded text-center">
+                  View more articles
+              </a>
+        </div>
     </div>
     <!-- /.container -->
 </section>
@@ -343,57 +325,22 @@
             <div class="swiper-container nav-bottom nav-color mb-14" data-margin="30" data-dots="false" data-nav="true" data-items-lg="3" data-items-md="2" data-items-xs="1">
                 <div class="swiper overflow-visible pb-2">
                     <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <div class="card shadow-lg">
-                                <figure class="card-img-top overlay overlay-1">
-                                    <a href="#"> <img src="./assets/img/photos/b5.jpg" alt="" /></a>
-                                    <figcaption>
-                                        <h5 class="from-top mb-0">Read More</h5>
-                                    </figcaption>
-                                </figure>
+                        @foreach ($albums as $album)   
+                            <div class="swiper-slide">
+                                <div class="card shadow-lg">
+                                    <figure class="album-figure card-img-top overlay overlay-1">
+                                        <a href="{{route('album', ['slug' => $album->slug])}}"> 
+                                            <img src="{{$album->thumbnailUrl}}" alt="" />
+                                        </a>
+                                        <figcaption>
+                                            <h5 class="from-top mb-0">Read More</h5>
+                                        </figcaption>
+                                    </figure>
+                                </div>
+                                <!-- /.card -->
                             </div>
-                            <!-- /.card -->
-                        </div>
-                        <!--/.swiper-slide -->
-                        
-                        <div class="swiper-slide">
-                            <div class="card shadow-lg">
-                                <figure class="card-img-top overlay overlay-1">
-                                    <a href="#"> <img src="./assets/img/photos/b1.jpg" alt="" /></a>
-                                    <figcaption>
-                                        <h5 class="from-top mb-0">Read More</h5>
-                                    </figcaption>
-                                </figure>
-                            </div>
-                            <!-- /.card -->
-                        </div>
-                        <!--/.swiper-slide -->
-
-                        <div class="swiper-slide">
-                            <div class="card shadow-lg">
-                                <figure class="card-img-top overlay overlay-1">
-                                    <a href="#"> <img src="./assets/img/photos/b2.jpg" alt="" /></a>
-                                    <figcaption>
-                                        <h5 class="from-top mb-0">Read More</h5>
-                                    </figcaption>
-                                </figure>
-                            </div>
-                            <!-- /.card -->
-                        </div>
-                        <!--/.swiper-slide -->
-
-                        <div class="swiper-slide">
-                            <div class="card shadow-lg">
-                                <figure class="card-img-top overlay overlay-1">
-                                    <a href="#"> <img src="./assets/img/photos/b4.jpg" alt="" /></a>
-                                    <figcaption>
-                                        <h5 class="from-top mb-0">Read More</h5>
-                                    </figcaption>
-                                </figure>
-                            </div>
-                            <!-- /.card -->
-                        </div>
-                        <!--/.swiper-slide -->
+                            <!--/.swiper-slide -->
+                        @endforeach
                     </div>
                     <!--/.swiper-wrapper -->
                 </div>
@@ -401,9 +348,8 @@
             </div>
             <!-- /.swiper-container -->
 
-            <div class="d-flex justify-content-center mt-4">
+            <div class="d-flex justify-content-center mt-2">
               <a href="#" class="btn btn-sm btn-primary rounded text-center">
-                <i class="uil uil-angle-right"></i>
                   View more albums
               </a>
             </div>

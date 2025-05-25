@@ -1,9 +1,9 @@
-<header class="wrapper bg-soft-primary">
-    <nav class="navbar navbar-expand-lg classic navbar-light navbar-bg-light py-md-2 py-0">
+<header class="wrapper bg-soft-primary ">
+    <nav class="navbar navbar-expand-lg classic position-absolute py-0">
         <div class="container flex-lg-row flex-nowrap align-items-center">
             <div class="navbar-brand w-100">
                 <a href="./index.html">
-                    <img class="logo" src="{{ URL::asset('assets/img/logo.png')}}" alt="">                
+                    <img class="logo" src="{{ URL::asset('assets/img/logo-2.png')}}" alt="">                
                 </a>
             </div>
             <div class="offcanvas offcanvas-nav offcanvas-end">
@@ -134,7 +134,7 @@
             </div>
             <!-- /.navbar-collapse -->
             <div class="navbar-other ms-lg-4">
-                <ul class="navbar-nav flex-row align-items-center ms-auto">
+                <ul class="navbar-nav flex-row align-items-center ms-auto bg-white rounded ps-0 mx-0 ps-md-6">
                     <li class="nav-item d-none d-md-block me-6">
                         <a class="nav-link" href="#">Visit</a>
                     </li>
@@ -147,7 +147,7 @@
                         <a class="nav-link" href="#">Apply</a>
                     </li>
 
-                    <div class="d-flex bg-primary p-1 rounded ms-3">
+                    <div class="d-flex bg-primary py-1 rounded">
                         <li class="nav-item mx-2">
                             <a class="nav-link text-light px-0" data-bs-toggle="offcanvas" data-bs-target="#offcanvas-search">
                                 <i class="uil uil-search"></i>
