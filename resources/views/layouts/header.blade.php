@@ -2,13 +2,15 @@
     <nav class="navbar navbar-expand-lg classic position-absolute py-0">
         <div class="container flex-lg-row flex-nowrap align-items-center">
             <div class="navbar-brand w-100">
-                <a href="./index.html">
-                    <img class="logo" src="{{ URL::asset('assets/img/logo-2.png')}}" alt="">                
+                <a href="{{route('index')}}">
+                    <img class="logo" src="{{ URL::asset('assets/img/logo.png')}}" alt="">                
                 </a>
             </div>
             <div class="offcanvas offcanvas-nav offcanvas-end">
                 <div class="offcanvas-header d-lg-none">
-                    <a href="./index.html"><img src="./assets/img/logo-light.png" srcset="./assets/img/logo-light@2x.png 2x" alt="" /></a>
+                    <a href="{{route('index')}}">
+                        <img src="{{ URL::asset('assets/img/logo.png')}}" alt="" />
+                    </a>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body ms-lg-auto d-flex flex-column h-100 d-lg-none">
@@ -115,36 +117,22 @@
                             </div>
                         </li>
                     </ul>
-                    <!-- /.navbar-nav -->
-                    <div class="d-lg-none mt-auto pt-6 pb-6 order-4">
-                        <a href="mailto:first.last@email.com" class="link-inverse">info@email.com</a>
-                        <br /> 00 (123) 456 78 90 <br />
-                        <nav class="nav social social-white mt-4">
-                            <a href="#"><i class="uil uil-twitter"></i></a>
-                            <a href="#"><i class="uil uil-facebook-f"></i></a>
-                            <a href="#"><i class="uil uil-dribbble"></i></a>
-                            <a href="#"><i class="uil uil-instagram"></i></a>
-                            <a href="#"><i class="uil uil-youtube"></i></a>
-                        </nav>
-                        <!-- /.social -->
-                    </div>
-                    <!-- /offcanvas-nav-other -->
                 </div>
                 <!-- /.offcanvas-body -->
             </div>
             <!-- /.navbar-collapse -->
             <div class="navbar-other ms-lg-4">
-                <ul class="navbar-nav flex-row align-items-center ms-auto bg-white rounded ps-0 mx-0 ps-md-6">
+                <ul class="navbar-nav flex-row align-items-center ms-auto rounded ps-0 mx-0 ps-md-6">
                     <li class="nav-item d-none d-md-block me-6">
-                        <a class="nav-link" href="#">Visit</a>
+                        <a class="nav-link text-white main-nav-link" href="#">Visit</a>
                     </li>
 
                     <li class="nav-item d-none d-md-block me-6">
-                        <a class="nav-link" href="#">Inquire</a>
+                        <a class="nav-link text-white main-nav-link" href="#">Inquire</a>
                     </li>
 
                     <li class="nav-item d-none d-md-block me-6">
-                        <a class="nav-link" href="#">Apply</a>
+                        <a class="nav-link text-white main-nav-link" href="#">Apply</a>
                     </li>
 
                     <div class="d-flex bg-primary py-1 rounded">
@@ -172,8 +160,8 @@
 
     <div class="offcanvas-nav offcanvas offcanvas-end bg-light" id="offcanvas-nav" data-bs-scroll="true">
         <div class="offcanvas-header">
-            <a href="./index.html">
-                <img class="logo-canvas" src="{{ URL::asset('assets/img/logo-2.png')}}" alt="" />
+            <a href="{{route('index')}}">
+                <img class="logo-canvas" src="{{ URL::asset('assets/img/logo.png')}}" alt="" />
             </a>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>

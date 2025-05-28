@@ -186,6 +186,10 @@
     width: 100%;
 }
 
+.navbar-clone .main-nav-link{
+    color: #2A5D91 !important;
+}
+
 @media (min-width: 1024px) {
     .logo{
         height: 72px;

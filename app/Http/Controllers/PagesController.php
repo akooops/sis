@@ -67,7 +67,7 @@ class PagesController extends Controller
         $pageNumber = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $articles = Article::latest();
+        $articles = Article::latest()->where('status', 'published');;
 
         if ($search) {
             $articles->where(function($query) use ($search) {
@@ -78,7 +78,7 @@ class PagesController extends Controller
 
         $articles = $articles->paginate('10', ['*'], 'page', $pageNumber);
 
-        $popularArticles = Article::inRandomOrder()->whereNotIn('id', $articles->pluck('id'))->get();
+        $popularArticles = Article::inRandomOrder()->where('status', 'published')->whereNotIn('id', $articles->pluck('id'))->get();
 
         return view('articles', [
             'page' => $page,
@@ -95,7 +95,32 @@ class PagesController extends Controller
 
     public function albums(Request $request)
     {
-        return view('albums');
+        $page = Page::where([
+            'slug' => 'albums',
+            'status' => 'published'
+        ])->first();
+
+        if(!$page) abort(404);
+
+        $pageNumber = $this->indexService->checkPageIfNull($request->query('page', 1));
+        $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
+
+        $albums = Album::latest()->where('status', 'published');
+
+        if ($search) {
+            $albums->where(function($query) use ($search) {
+                $query->where('id', $search)
+                      ->orWhere('name', 'like', '%' . $search . '%');
+            });
+        }
+
+        $albums = $albums->paginate('10', ['*'], 'page', $pageNumber);
+
+        return view('albums', [
+            'page' => $page,
+            'albums' => $albums,
+            'pagination' => $this->indexService->handlePagination($albums)
+        ]);
     }
 
     public function album(Request $request)

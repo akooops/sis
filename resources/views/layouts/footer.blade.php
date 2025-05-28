@@ -3,8 +3,8 @@
         <div class="row gy-6 gy-lg-0">
             <div class="col-lg-4">
                 <div class="widget">
-                    <a href="./index.html">
-                        <img class="logo-canvas" src="{{ URL::asset('assets/img/logo-2.png')}}" alt="" />
+                    <a href="{{route('index')}}">
+                        <img class="logo-canvas" src="{{ URL::asset('assets/img/logo.png')}}" alt="" />
                     </a>
                     <h3 class="h2 my-3 text-white">Join the Community</h3>
                     <p class="lead mb-5">Let's make something great together. We are trusted by over 5000+ clients. Join them by using our services and grow your business.</p>

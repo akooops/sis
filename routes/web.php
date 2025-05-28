@@ -207,14 +207,13 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 Route::get('', [ControllersPagesController::class, 'index'])->name('index');
 
 Route::get('/articles', [ControllersPagesController::class, 'articles']);
-Route::get('/albums', [ControllersPagesController::class, 'albums']);
-Route::get('/album', [ControllersPagesController::class, 'album']);
 Route::get('/events', [ControllersPagesController::class, 'events']);
 Route::get('/event', [ControllersPagesController::class, 'event']);
 Route::get('/grades', [ControllersPagesController::class, 'grades']);
 Route::get('/grade', [ControllersPagesController::class, 'grade']);
 
 Route::get('/articles', [ControllersPagesController::class, 'articles'])->name('articles');
+Route::get('/albums', [ControllersPagesController::class, 'albums'])->name('albums');
 
 Route::get('/{slug}', [ControllersPagesController::class, 'page'])->name('page');
 Route::get('/program/{slug}', [ControllersPagesController::class, 'program'])->name('program');
