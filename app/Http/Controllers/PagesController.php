@@ -78,7 +78,7 @@ class PagesController extends Controller
 
         $articles = $articles->paginate('10', ['*'], 'page', $pageNumber);
 
-        $popularArticles = Article::inRandomOrder()->where('status', 'published')->whereNotIn('id', $articles->pluck('id'))->get();
+        $popularArticles = Article::inRandomOrder()->limit(6)->where('status', 'published')->whereNotIn('id', $articles->pluck('id'))->get();
 
         return view('articles', [
             'page' => $page,
@@ -88,9 +88,18 @@ class PagesController extends Controller
         ]);
     }
 
-    public function article(Request $request)
+    public function article(Request $request, $slug = null)
     {
-        return view('article');
+        $article = Article::where([
+            'slug' => $slug,
+            'status' => 'published'
+        ])->first();
+        
+        if(!$article) abort(404);
+
+        $popularArticles = Article::inRandomOrder()->limit(6)->where('status', 'published')->whereNotIn('id', [$article->id])->get();
+
+        return view('article', compact('article', 'popularArticles'));
     }
 
     public function albums(Request $request)
@@ -123,9 +132,16 @@ class PagesController extends Controller
         ]);
     }
 
-    public function album(Request $request)
+    public function album(Request $request, $slug)
     {
-        return view('album');
+        $album = Album::where([
+            'slug' => $slug,
+            'status' => 'published'
+        ])->first();
+        
+        if(!$album) abort(404);
+
+        return view('album', compact('album'));
     }
 
     public function events(Request $request)
