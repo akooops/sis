@@ -9,7 +9,7 @@
     <div class="container page-main-container">
         <div class="row h-100">
             <div class="col-md-10 offset-md-1 col-lg-7 offset-lg-0 col-xl-6 col-xxl-5 text-center text-lg-start justify-content-center align-self-center align-items-start">
-                <h1 class="display-1 fs-48 mb-4 text-white animate__animated animate__slideInDown animate__delay-1s">
+                <h1 class="display-1 fs-48 mt-12 text-white animate__animated animate__slideInDown animate__delay-1s">
                     {{$page->getLocalTranslation('title')}}
                 </h1>
 

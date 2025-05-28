@@ -1,20 +1,18 @@
 @extends('layouts.master')
-@section('title', '')
-@section('description', '')
-@section('canonical', route('index'))
+@section('title', $page->getLocalTranslation('title'))
+@section('description', $page->getLocalTranslation('description'))
+@section('canonical', route('articles'))
 @section('css')
 @endsection
 @section('content')
-<section class="wrapper bg-dark page-main-section" style="background-image: url('{{ URL::asset('assets/img/photos/banner-1.jpg')}}')">
+<section class="wrapper bg-dark page-main-section" style="background-image: url('{{ $page->thumbnailUrl  }}'); background-size: cover">
     <div class="container page-main-container">
         <div class="row h-100">
             <div class="col-md-10 offset-md-1 col-lg-7 offset-lg-0 col-xl-6 col-xxl-5 text-center text-lg-start justify-content-center align-self-center align-items-start">
-                <h2 class="display-1 fs-48 mb-4 text-white animate__animated animate__slideInDown animate__delay-1s">
-                    Welcome to saud international schools
-                </h2>
-                <p class="lead fs-18 lh-sm mb-0 text-white animate__animated animate__slideInRight animate__delay-2s">                   
-                    Learning Today . . . Leading Tomorrow.                                         
-                </p>
+                <h1 class="display-1 fs-48 mt-12 text-white animate__animated animate__slideInDown animate__delay-1s">
+                    {{$page->getLocalTranslation('title')}}
+                </h1>
+
             </div>
             <!--/column -->
         </div>
@@ -23,34 +21,38 @@
     <!--/.container -->
 </section>
 
+@if($page->menu)
 <section class="wrapper bg-light-primary">
     <div class="container py-8 d-flex justify-content-center">
         <ul class="nav justify-content-center">
-            <li class="nav-item text-nowrap">
-                <a class="nav-link py-2 text-uppercase fs-14 text-center active fw-semibold" href="">ACADEMICS OVERVIEW</a>
-            </li>
-            <li class="nav-item text-nowrap">
-                <a class="nav-link py-2 text-uppercase fs-14 text-center fw-semibold" href="">IB FRAMEWORK</a>
-            </li>
-            <li class="nav-item text-nowrap">
-                <a class="nav-link py-2 text-uppercase fs-14 text-center fw-semibold" href="">Early Years Programme Pre-k To KG2</a>
-            </li>
-            <li class="nav-item text-nowrap">
-                <a class="nav-link py-2 text-uppercase fs-14 text-center fw-semibold" href="">PRIMARY GRADES 1 – 5</a>
-            </li>
-            <li class="nav-item text-nowrap">
-                <a class="nav-link py-2 text-uppercase fs-14 text-center fw-semibold" href="">fdsfds</a>
-            </li>
+            @foreach ($page->menu->items as $menuItem)
+                @php
+                    $menuUrl = $menuItem->page
+                        ? route('page', ['slug' => $menuItem->page->slug])
+                        : $menuItem->url;
+                    $currentUrl = url()->current();
+                @endphp
+
+                <li class="nav-item text-nowrap">
+                    <a class="nav-link py-2 text-uppercase fs-14 text-center fw-semibold {{ $currentUrl === $menuUrl ? 'active' : '' }}"
+                    href="{{ $menuUrl }}">
+                        {{$menuItem->getLocalTranslation('title')}}
+                    </a>
+                </li>
+            @endforeach
         </ul>
     </div>
 </section>
+@endif
 
 <section class="wrapper bg-light">
    <div class="container py-3 py-md-5">
       <nav class="d-inline-block" aria-label="breadcrumb">
          <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a class="text-uppercase" href="#">Home</a></li>
-            <li class="breadcrumb-item text-uppercase active" aria-current="page">Shop</li>
+            <li class="breadcrumb-item text-uppercase active" aria-current="page">
+                {{$page->getLocalTranslation('title')}}
+            </li>
          </ol>
       </nav>
       <!-- /nav -->
@@ -58,56 +60,76 @@
    <!-- /.container -->
 </section>
 
+
 <section class="wrapper bg-light">
     <div class="container pt-6 pb-12">
         <div class="row gx-lg-8 gx-xl-12">
             <div class="col-lg-8">
-                <div class="blog classic-view">
-                    <article class="post">
-                        <div class="card">
-                            <figure class="card-img-top overlay overlay-1 hover-scale">
-                                <a href="./blog-post.html"><img src="./assets/img/photos/b1.jpg" alt=""><span class="bg"></span></a>
-                                <figcaption>
-                                    <h5 class="from-top mb-0">Read More</h5>
-                                </figcaption>
-                            </figure>
-                            <div class="card-body">
-                                <div class="post-header">
-                                    <h2 class="post-title mt-1 mb-0"><a class="link-dark" href="./blog-post.html">Amet Dolor Bibendum Parturient Cursus</a></h2>
+                <div class="blog grid grid-view">
+                    <div class="row isotope gx-md-8 gy-8 mb-8">
+                        @foreach ($articles as $article)
+                            <article class="item post col-md-6">
+                                <div class="card">
+                                    <figure class="article-figure card-img-top overlay overlay-1 hover-scale">
+                                        <a href="{{route('article', ['slug' => $article->slug])}}">
+                                            <img src="{{$article->thumbnailUrl}}" alt="" />
+                                        </a>
+                                        <figcaption>
+                                            <h5 class="from-top mb-0">Read More</h5>
+                                        </figcaption>
+                                    </figure>
+                                    <div class="card-body">
+                                        <div class="post-header">
+                                            <h2 class="post-title h3 mt-1 mb-3">
+                                                <a class="link-dark" href="{{route('article', ['slug' => $article->slug])}}">
+                                                    {{$article->getLocalTranslation('title')}}
+                                                </a>
+                                            </h2>
+                                        </div>
+                                        <!-- /.post-header -->
+                                        <div class="post-content">
+                                            <p class="truncate-3-lines">{{$article->getLocalTranslation('description')}}</p>
+                                        </div>
+                                        <!-- /.post-content -->
+                                    </div>
+                                    <!--/.card-body -->
+                                    <div class="card-footer">
+                                        <ul class="post-meta d-flex mb-0">
+                                            <li class="post-date">
+                                                <i class="uil uil-calendar-alt"></i>
+                                                <span>{{$article->created_at->format('Y-m-d')}}</span>
+                                            </li>
+                                        </ul>
+                                        <!-- /.post-meta -->
+                                    </div>
+                                    <!-- /.card-footer -->
                                 </div>
-                                <!-- /.post-header -->
-                                <div class="post-content">
-                                    <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel. Nulla vitae elit libero, a pharetra augue. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh. Cras mattis consectetur purus.</p>
-                                </div>
-                                <!-- /.post-content -->
-                            </div>
-                            <!--/.card-body -->
-                            <div class="card-footer">
-                                <ul class="post-meta d-flex mb-0">
-                                    <li class="post-date"><i class="uil uil-calendar-alt"></i><span>5 Jul 2022</span></li>
-                                </ul>
-                                <!-- /.post-meta -->
-                            </div>
-                            <!-- /.card-footer -->
-                        </div>
-                        <!-- /.card -->
-                    </article>
-                    <!-- /.post -->
+                                <!-- /.card -->
+                            </article>
+                            <!-- /.post -->
+                        @endforeach
+                    </div>
+                    <!-- /.row -->
                 </div>
-                <!-- /.blog -->
-                
+                                
                 <nav class="d-flex" aria-label="pagination">
                     <ul class="pagination">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" aria-label="Previous">
+                        <li class="page-item {{is_null($pagination["prevPage"]) ? 'disabled' : ''}}">
+                            <a class="page-link" href="{{ route('articles', array_merge(['page' => $pagination["prevPage"]], request()->only('search'))) }}" aria-label="Previous">
                             <span aria-hidden="true"><i class="uil uil-arrow-left"></i></span>
                             </a>
                         </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Next">
+
+                        @foreach($pagination["pages"] as $page)
+                            <li class="page-item">
+                                <a class="page-link {{($page == $pagination['currentPage']) ? 'active' : ''}}" href="{{ route('articles', array_merge(['page' => $page], request()->only('search'))) }}">
+                                    {{$page}}
+                                </a>
+                            </li>
+                        @endforeach
+
+                        <li class="page-item {{is_null($pagination["nextPage"]) ? 'disabled' : ''}}">
+                            <a class="page-link" href="{{ route('articles', array_merge(['page' => $pagination["nextPage"]], request()->only('search'))) }}" aria-label="Next">
                             <span aria-hidden="true"><i class="uil uil-arrow-right"></i></span>
                             </a>
                         </li>
@@ -117,12 +139,15 @@
                 <!-- /nav -->
             </div>
             <!-- /column -->
+
             <aside class="col-lg-4 sidebar">
                 <div class="widget">
                     <form class="search-form">
                         <div class="form-floating mb-0">
-                            <input id="search-form" type="text" class="form-control" placeholder="Search">
-                            <label for="search-form">Search</label>
+                            <form action="{{route('articles')}}">
+                                <input name="search" value="{{request()->get('search')}}" id="search-form" type="text" class="form-control" placeholder="Search">
+                                <label for="search-form">Search</label>
+                            </form>  
                         </div>
                     </form>
                     <!-- /.search-form -->
@@ -132,39 +157,29 @@
                 <div class="widget">
                     <h4 class="widget-title mb-3">Popular Posts</h4>
                     <ul class="image-list">
-                        <li>
-                            <figure class="rounded"><a href="./blog-post.html"><img src="./assets/img/photos/a1.jpg" alt=""></a></figure>
-                            <div class="post-content">
-                                <h6 class="mb-2"> <a class="link-dark" href="./blog-post.html">Magna Mollis Ultricies</a> </h6>
-                                <ul class="post-meta">
-                                    <li class="post-date"><i class="uil uil-calendar-alt"></i><span>26 Mar 2022</span></li>
-                                    <li class="post-comments"><a href="#"><i class="uil uil-comment"></i>3</a></li>
-                                </ul>
-                                <!-- /.post-meta -->
-                            </div>
-                        </li>
-                        <li>
-                            <figure class="rounded"> <a href="./blog-post.html"><img src="./assets/img/photos/a2.jpg" alt=""></a></figure>
-                            <div class="post-content">
-                                <h6 class="mb-2"> <a class="link-dark" href="./blog-post.html">Ornare Nullam Risus</a> </h6>
-                                <ul class="post-meta">
-                                    <li class="post-date"><i class="uil uil-calendar-alt"></i><span>16 Feb 2022</span></li>
-                                    <li class="post-comments"><a href="#"><i class="uil uil-comment"></i>6</a></li>
-                                </ul>
-                                <!-- /.post-meta -->
-                            </div>
-                        </li>
-                        <li>
-                            <figure class="rounded"><a href="./blog-post.html"><img src="./assets/img/photos/a3.jpg" alt=""></a></figure>
-                            <div class="post-content">
-                                <h6 class="mb-2"> <a class="link-dark" href="./blog-post.html">Euismod Nullam Fusce</a> </h6>
-                                <ul class="post-meta">
-                                    <li class="post-date"><i class="uil uil-calendar-alt"></i><span>8 Jan 2022</span></li>
-                                    <li class="post-comments"><a href="#"><i class="uil uil-comment"></i>5</a></li>
-                                </ul>
-                                <!-- /.post-meta -->
-                            </div>
-                        </li>
+                        @foreach ($popularArticles as $popularArticle)
+                            <li>
+                                <figure class="popular-article-figure rounded">
+                                    <a href="{{route('article', ['slug' => $popularArticle->slug])}}">
+                                        <img src="{{$popularArticle->thumbnailUrl}}" alt="" />
+                                    </a>
+                                </figure>
+                                <div class="post-content">
+                                    <h6 class="mb-2"> 
+                                        <a class="link-dark" href="{{route('article', ['slug' => $popularArticle->slug])}}">
+                                            {{$popularArticle->getLocalTranslation('title')}}
+                                        </a>
+                                    </h6>
+                                    <ul class="post-meta">
+                                        <li class="post-date">
+                                            <i class="uil uil-calendar-alt"></i>
+                                            <span>{{$popularArticle->created_at->format('Y-m-d')}}</span>
+                                        </li>
+                                    </ul>
+                                    <!-- /.post-meta -->
+                                </div>
+                            </li>
+                        @endforeach
                     </ul>
                     <!-- /.image-list -->
                 </div>

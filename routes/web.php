@@ -214,6 +214,8 @@ Route::get('/event', [ControllersPagesController::class, 'event']);
 Route::get('/grades', [ControllersPagesController::class, 'grades']);
 Route::get('/grade', [ControllersPagesController::class, 'grade']);
 
+Route::get('/articles', [ControllersPagesController::class, 'articles'])->name('articles');
+
 Route::get('/{slug}', [ControllersPagesController::class, 'page'])->name('page');
 Route::get('/program/{slug}', [ControllersPagesController::class, 'program'])->name('program');
 Route::get('/articles/{slug}', [ControllersPagesController::class, 'article'])->name('article');

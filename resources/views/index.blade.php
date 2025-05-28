@@ -15,7 +15,7 @@
                         <div class="container h-100">
                             <div class="row h-100">
                                 <div class="banner-container col-lg-6 text-center text-lg-start justify-content-center align-self-center align-items-start">
-                                    <h2 class="display-1 fs-36 fw-semibold mb-4 text-white animate__animated animate__slideInDown animate__delay-1s">
+                                    <h2 class="display-1 fs-36 mt-12 fw-semibold mb-4 text-white animate__animated animate__slideInDown animate__delay-1s">
                                         {{$banner->getLocalTranslation('title')}}
                                     </h2>
                                     <p class="lead fs-16 fw-semibold lh-sm mb-7 text-white animate__animated animate__slideInRight animate__delay-2s">                   

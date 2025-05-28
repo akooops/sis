@@ -7,12 +7,20 @@ use App\Models\Article;
 use App\Models\Banner;
 use App\Models\Page;
 use App\Models\Program;
+use App\Services\IndexService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 class PagesController extends Controller
 {
+    protected $indexService;
+
+    public function __construct(IndexService $indexService)
+    {
+        $this->indexService = $indexService;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -49,7 +57,35 @@ class PagesController extends Controller
 
     public function articles(Request $request)
     {
-        return view('articles');
+        $page = Page::where([
+            'slug' => 'articles',
+            'status' => 'published'
+        ])->first();
+
+        if(!$page) abort(404);
+
+        $pageNumber = $this->indexService->checkPageIfNull($request->query('page', 1));
+        $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
+
+        $articles = Article::latest();
+
+        if ($search) {
+            $articles->where(function($query) use ($search) {
+                $query->where('id', $search)
+                      ->orWhere('name', 'like', '%' . $search . '%');
+            });
+        }
+
+        $articles = $articles->paginate('10', ['*'], 'page', $pageNumber);
+
+        $popularArticles = Article::inRandomOrder()->whereNotIn('id', $articles->pluck('id'))->get();
+
+        return view('articles', [
+            'page' => $page,
+            'articles' => $articles,
+            'popularArticles' => $popularArticles,
+            'pagination' => $this->indexService->handlePagination($articles)
+        ]);
     }
 
     public function article(Request $request)

@@ -147,6 +147,20 @@
     object-fit: cover;
 }
 
+.popular-article-figure{
+    height: 70px !important;
+}
+
+.popular-article-figure a{
+    height: 100% !important;
+}
+
+.popular-article-figure a img{
+    height: 100% !important;
+    object-fit: cover;
+}
+
+
 .album-figure{
     height: 250px;
 }
