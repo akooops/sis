@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Album;
 use App\Models\Article;
 use App\Models\Banner;
+use App\Models\Event;
 use App\Models\Page;
 use App\Models\Program;
 use App\Services\IndexService;
@@ -146,12 +147,31 @@ class PagesController extends Controller
 
     public function events(Request $request)
     {
-        return view('events');
+        $page = Page::where([
+            'slug' => 'events',
+            'status' => 'published'
+        ])->first();
+
+        if(!$page) abort(404);
+
+        $events = Event::latest()->where('status', 'published')->get();
+
+        return view('events', [
+            'page' => $page,
+            'events' => $events,
+        ]);
     }
 
-    public function event(Request $request)
+    public function event(Request $request, $slug)
     {
-        return view('event');
+        $event = Event::where([
+            'slug' => $slug,
+            'status' => 'published'
+        ])->first();
+        
+        if(!$event) abort(404);
+
+        return view('event', compact('event'));
     }
 
     public function program(Request $request)
