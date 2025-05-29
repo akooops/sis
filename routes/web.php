@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\PagesController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\ProgramsController;
 use App\Http\Controllers\Admin\RolesController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\PagesController as ControllersPagesController;
 use Illuminate\Support\Facades\Route;
@@ -202,6 +203,12 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('banners/{banner}/update-translation', [BannersController::class, 'updateTranslation'])->middleware('check.permission:admin.banners.update')->name('admin.banners.update-translation');
     Route::patch('banners/{banner}', [BannersController::class, 'update'])->middleware('check.permission:admin.banners.update')->name('admin.banners.update');
     Route::delete('banners/{banner}', [BannersController::class, 'destroy'])->middleware('check.permission:admin.banners.destroy')->name('admin.banners.destroy');
+
+    //Settings
+    Route::get('settings', [SettingsController::class, 'index'])->middleware('check.permission:admin.settings.index')->name('admin.settings.index');
+    Route::get('settings/{setting}', [SettingsController::class, 'show'])->middleware('check.permission:admin.settings.show')->name('admin.settings.show');
+    Route::get('settings/{setting}/edit', [SettingsController::class, 'edit'])->middleware('check.permission:admin.settings.edit')->name('admin.settings.edit');
+    Route::patch('settings/{setting}', [SettingsController::class, 'update'])->middleware('check.permission:admin.settings.update')->name('admin.settings.update');
 });
 
 Route::get('', [ControllersPagesController::class, 'index'])->name('index');
