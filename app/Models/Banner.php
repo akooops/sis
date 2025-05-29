@@ -15,12 +15,17 @@ class Banner extends Model
     //Properties
     protected $guarded = ['id'];
 
-    protected $appends = ['thumbnailUrl'];
+    protected $appends = ['thumbnailUrl', 'videoUrl'];
 
     //Relationships
     public function file()
     {
         return $this->morphOne(File::class, 'model')->where('is_main', 1);
+    }
+
+    public function video()
+    {
+        return $this->morphOne(File::class, 'model')->where('is_main', 0);
     }
 
     public function page()
@@ -29,10 +34,14 @@ class Banner extends Model
     }
 
     //Accessors & Mutators
-    //Accessors & Mutators
     public function getThumbnailUrlAttribute()
     {
         return ($this->file) ? $this->file->url : URL::to('assets/admin/images/default-banner.jpg');
+    }
+
+    public function getVideoUrlAttribute()
+    {
+        return ($this->video) ? $this->video->url : '';
     }
 
     public function getTranslatableFields(): array

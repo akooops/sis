@@ -189,6 +189,10 @@
     color: #2A5D91 !important;
 }
 
+.footer-menu a:hover{
+    color: white !important;
+}
+
 @media (min-width: 1024px) {
     .logo{
         height: 72px;

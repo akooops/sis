@@ -42,7 +42,7 @@
                                     @enderror
                                 </div>     
                                 
-                                                                <div class="mb-3">
+                                <div class="mb-3">
                                     <label class="form-label" for="">Where should this menu item link?</label>
                                     <div>
                                         <div class="form-check form-check-inline">
@@ -127,6 +127,17 @@
                                     </div>
                                 </div>
 
+                                <div class="mb-3">
+                                    <label class="form-label" for="">Attach a video</label>
+                                    <input name="video" type="file" class="form-control" accept="video/*">
+                                    @error('video')
+                                        <p class="mx-2 my-2 text-danger">
+                                            <strong>
+                                                {{$message}}
+                                            </strong>
+                                        </p>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 

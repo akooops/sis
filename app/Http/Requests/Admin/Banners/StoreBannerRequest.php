@@ -35,6 +35,8 @@ class StoreBannerRequest extends FormRequest
 
             'file' => 'nullable|file|image', 
             'media_id' => 'nullable|exists:media,id',
+
+            'video' => 'nullable|file|mimes:mp4,mov,avi,wmv,webm'
         ];
     }
 

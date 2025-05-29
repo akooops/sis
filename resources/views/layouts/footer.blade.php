@@ -1,3 +1,19 @@
+@php
+    $primaryMenuSetting = getSetting('footer_primary_menu');
+    $primaryMenu = null;
+
+    if($primaryMenuSetting && $primaryMenuSetting->type == "menu"){
+        $primaryMenu = getMenu($primaryMenuSetting->value);
+    }
+
+    $secondaryMenuSetting = getSetting('footer_secondary_menu');
+    $secondaryMenu = null;
+
+    if($secondaryMenuSetting && $secondaryMenuSetting->type == "menu"){
+        $secondaryMenu = getMenu($secondaryMenuSetting->value);
+    }
+@endphp
+
 <footer class="bg-primary text-inverse">
     <div class="container pt-13 pt-md-15 pb-7">
         <div class="row gy-6 gy-lg-0">
@@ -12,14 +28,25 @@
                 <!-- /.widget -->
             </div>
             <!-- /column -->
+
             <div class="col-md-4 col-lg-2 offset-lg-2">
                 <div class="widget">
                     <h4 class="widget-title text-white mb-3">Need Help?</h4>
-                    <ul class="list-unstyled text-reset mb-0">
-                        <li><a href="#">Support</a></li>
-                        <li><a href="#">Get Started</a></li>
-                        <li><a href="#">Terms of Use</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
+                    <ul class="footer-menu list-unstyled mb-0">
+                        @if($primaryMenu)
+                            @foreach ($primaryMenu->items as $primaryMenuItem)
+                                <li>
+                                    <a
+                                        href="{{
+                                            $primaryMenuItem->page 
+                                                ? route('page', ['slug' => $primaryMenuItem->page->slug]) 
+                                                : $primaryMenuItem->url
+                                            }}">
+                                        {{$primaryMenuItem->getLocalTranslation('title')}}
+                                    </a>
+                                </li>
+                            @endforeach
+                        @endif
                     </ul>
                 </div>
                 <!-- /.widget -->
@@ -28,12 +55,21 @@
             <div class="col-md-4 col-lg-2">
                 <div class="widget">
                     <h4 class="widget-title text-white mb-3">Learn More</h4>
-                    <ul class="list-unstyled  mb-0">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Our Story</a></li>
-                        <li><a href="#">Projects</a></li>
-                        <li><a href="#">Pricing</a></li>
-                        <li><a href="#">Features</a></li>
+                    <ul class="footer-menu list-unstyled mb-0">
+                        @if($secondaryMenu)
+                            @foreach ($secondaryMenu->items as $secondaryMenuItem)
+                                <li>
+                                    <a
+                                        href="{{
+                                            $secondaryMenuItem->page 
+                                                ? route('page', ['slug' => $secondaryMenuItem->page->slug]) 
+                                                : $secondaryMenuItem->url
+                                            }}">
+                                        {{$secondaryMenuItem->getLocalTranslation('title')}}
+                                    </a>
+                                </li>
+                            @endforeach
+                        @endif
                     </ul>
                 </div>
                 <!-- /.widget -->

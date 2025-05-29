@@ -41,8 +41,8 @@
                                 {{$banner->name}}
                             </div>
 
-                                                    <div class="mb-3">
-                                <h4 class="fs-15">Menu Item page</h4>
+                            <div class="mb-3">
+                                <h4 class="fs-15">Banner page</h4>
                                 @if($banner->page)
                                     <span class="badge bg-primary"> {{$banner->page->name }} </span>
                                 @else
@@ -51,7 +51,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">Menu Item url</h4>
+                                <h4 class="fs-15">Banner url</h4>
                                 @if(!$banner->page)
                                     <a href="{{$banner->url}}" target="_blank" rel="noopener noreferrer" class="me-2">
                                         <span class="badge bg-primary">
@@ -63,14 +63,19 @@
                                 @endif
                             </div>
 
-                            <div class="mb-3">
-                                <h4 class="fs-15">Menu Item parent</h4>
-                                @if($banner->parent)
-                                    <span class="badge bg-primary"> {{$banner->parent->name }} </span>
-                                @else
-                                    <span class="badge bg-danger"> no parent</span>
-                                @endif
-                            </div>
+                            @if($banner->video)
+                                <div class="mb-3">
+                                    <h4 class="fs-15">Attached video</h4>
+                                    <video 
+                                        preload="none" 
+                                        controls
+                                        width="300" 
+                                        height="200">
+                                        <source src="{{$banner->videoUrl}}">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            @endif
 
                             <div class="mb-3">
                                 <h4 class="fs-15">Banner created at</h4>

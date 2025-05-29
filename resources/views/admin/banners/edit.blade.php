@@ -163,6 +163,33 @@
                                     </figure>
                                 </div>
 
+                                <div class="mb-4">
+                                    <label class="form-label" for="">Attach a video <span class="text-danger">(Keep it empty if you don't want to change it)</span></label>
+                                    <input name="video" type="file" class="form-control" accept="video/*">
+                                    @error('video')
+                                        <p class="mx-2 my-2 text-danger">
+                                            <strong>
+                                                {{$message}}
+                                            </strong>
+                                        </p>
+                                    @enderror
+
+                                    @if($banner->video)
+                                        <div class="mt-2">
+                                            <video 
+                                                preload="none" 
+                                                controls
+                                                width="300" 
+                                                height="200">
+                                                <source src="{{$banner->videoUrl}}">
+                                                Your browser does not support the video tag.
+                                            </video>
+
+                                            <p>Last uploaded video</p>
+                                        </div>
+                                    @endif
+                                </div>
+
                                 <div class="text-end mb-3">
                                     <button type="submit" class="btn btn-success w-sm">Submit</button>
                                 </div>

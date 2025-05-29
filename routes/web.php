@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\PagesController as ControllersPagesController;
+use App\Models\Language;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -42,7 +43,7 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware(['force.admin.english'])->group(function () {
     Route::get('auth/login', [AuthController::class, 'showLoginForm'])->name('admin.auth.login');
     Route::post('auth/login', [AuthController::class, 'login'])->name('admin.auth.login');
     
@@ -51,7 +52,7 @@ Route::prefix('admin')->group(function () {
     Route::get('auth/azure/callback', [AuthController::class, 'handleAzureCallback'])->name('admin.auth.azure.callback');
 });
 
-Route::middleware(['auth'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'force.admin.english'])->prefix('admin')->group(function () {
     //Auth
     Route::post('auth/logout', [AuthController::class, 'logout'])->name('admin.auth.logout');
 
@@ -211,17 +212,29 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('settings/{setting}', [SettingsController::class, 'update'])->middleware('check.permission:admin.settings.update')->name('admin.settings.update');
 });
 
-Route::get('', [ControllersPagesController::class, 'index'])->name('index');
+Route::middleware(['set.locale'])->group(function () {
+    Route::get('', [ControllersPagesController::class, 'index'])->name('index');
 
+    Route::get('/articles', [ControllersPagesController::class, 'articles'])->name('articles');
+    Route::get('/albums', [ControllersPagesController::class, 'albums'])->name('albums');
+    Route::get('/events', [ControllersPagesController::class, 'events'])->name('events');
+    Route::get('/programs/{program}', [ControllersPagesController::class, 'program'])->name('program');
 
-Route::get('/articles', [ControllersPagesController::class, 'articles'])->name('articles');
-Route::get('/albums', [ControllersPagesController::class, 'albums'])->name('albums');
-Route::get('/events', [ControllersPagesController::class, 'events'])->name('events');
-Route::get('/programs/{program}', [ControllersPagesController::class, 'program'])->name('program');
+    Route::get('/{slug}', [ControllersPagesController::class, 'page'])->name('page');
+    Route::get('/program/{slug}', [ControllersPagesController::class, 'program'])->name('program');
+    Route::get('/articles/{slug}', [ControllersPagesController::class, 'article'])->name('article');
+    Route::get('/albums/{slug}', [ControllersPagesController::class, 'album'])->name('album');
+    Route::get('/events/{slug}', [ControllersPagesController::class, 'event'])->name('event');
+    Route::get('/grades/{slug}', [ControllersPagesController::class, 'grade'])->name('grade');
+});
 
-Route::get('/{slug}', [ControllersPagesController::class, 'page'])->name('page');
-Route::get('/program/{slug}', [ControllersPagesController::class, 'program'])->name('program');
-Route::get('/articles/{slug}', [ControllersPagesController::class, 'article'])->name('article');
-Route::get('/albums/{slug}', [ControllersPagesController::class, 'album'])->name('album');
-Route::get('/events/{slug}', [ControllersPagesController::class, 'event'])->name('event');
-Route::get('/grades/{slug}', [ControllersPagesController::class, 'grade'])->name('grade');
+Route::get('language/{locale}', function ($locale) {
+    $languageCodes = Language::pluck('code')->toArray();
+    
+    if (in_array($locale, $languageCodes)) {
+        app()->setLocale($locale);
+        session()->put('locale', $locale);
+    }
+    
+    return redirect()->back();
+})->name('locale.switch');

@@ -92,21 +92,10 @@ class BannersController extends Controller
         $media = null;
 
         if ($request->hasFile('file')) {
-            // Get MIME type
-            $mimeType = $request->file('file')->getMimeType();
-            
-            // Determine file category using match expression
-            $type = match (true) {
-                str_starts_with($mimeType, 'image/') => 'image',
-                str_starts_with($mimeType, 'video/') => 'video',
-                str_starts_with($mimeType, 'audio/') => 'audio',
-                default => 'document',
-            };
-
             $media = Media::create(array_merge(
                 $request->validated(),
                 [
-                    'type' => $type
+                    'type' => 'image'
                 ]
             ));
 
@@ -124,6 +113,10 @@ class BannersController extends Controller
         }
     
         $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Banner', $banner->id, true);
+
+        if ($request->hasFile('video')) {
+            $video = $this->fileService->upload($request->file('video'), 'App\\Models\\Banner', $banner->id, false);
+        }
 
         return redirect()->route('admin.banners.index')
                         ->with('success','Banner created successfully');
@@ -179,21 +172,10 @@ class BannersController extends Controller
         $media = null;
 
         if ($request->hasFile('file')) {
-            // Get MIME type
-            $mimeType = $request->file('file')->getMimeType();
-            
-            // Determine file category using match expression
-            $type = match (true) {
-                str_starts_with($mimeType, 'image/') => 'image',
-                str_starts_with($mimeType, 'video/') => 'video',
-                str_starts_with($mimeType, 'audio/') => 'audio',
-                default => 'document',
-            };
-
             $media = Media::create(array_merge(
                 $request->validated(),
                 [
-                    'type' => $type
+                    'type' => 'image'
                 ]
             ));
             
@@ -205,6 +187,12 @@ class BannersController extends Controller
         if($media){
             $banner->file->detach();
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Banner', $banner->id, true);
+        }
+
+        if ($request->hasFile('video')) {
+            if($banner->video) $banner->video->detach();
+
+            $video = $this->fileService->upload($request->file('video'), 'App\\Models\\Banner', $banner->id, false);
         }
 
         return redirect()->route('admin.banners.index')

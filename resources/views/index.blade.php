@@ -30,12 +30,14 @@
                                 </div>
                                 <!--/column -->
 
-                                <div class="d-flex col-lg-5 justify-content-center justify-content-md-end align-items-start" data-cues="slideInDown" data-disabled="true">
-                                    <div class="position-relative h-100" data-cue="slideInDown" data-show="true" style="animation-name: slideInDown; animation-duration: 700ms; animation-timing-function: ease; animation-delay: 0ms; animation-direction: normal; animation-fill-mode: both;">
-                                        <a href="./assets/media/movie.mp4" class="btn btn-circle btn-primary btn-play ripple position-absolute" style="top:50%; left: 50%; transform: translate(-50%,-50%); z-index:3;" data-glightbox=""><i class="icn-caret-right"></i></a>
+                                @if($banner->video)
+                                    <div class="col-lg-6 pe-lg-8" data-cues="slideInDown" data-disabled="true">
+                                        <div class="d-flex w-100 h-100 justify-content-center justify-content-lg-end align-items-start align-items-lg-center" data-cue="slideInDown">
+                                            <a href="{{$banner->videoUrl}}" class="btn btn-circle btn-primary btn-play ripple" data-glightbox><i class="icn-caret-right"></i></a>
+                                        </div>
+                                        <!-- /div -->
                                     </div>
-                                    <!-- /div -->
-                                </div>
+                                @endif
                             </div>
                             <!--/.row -->
                         </div>
