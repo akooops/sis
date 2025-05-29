@@ -6,6 +6,7 @@ use App\Models\Album;
 use App\Models\Article;
 use App\Models\Banner;
 use App\Models\Event;
+use App\Models\Grade;
 use App\Models\Page;
 use App\Models\Program;
 use App\Services\IndexService;
@@ -174,13 +175,28 @@ class PagesController extends Controller
         return view('event', compact('event'));
     }
 
-    public function program(Request $request)
+    public function program(Request $request, $slug)
     {
-        return view('program');
+        $program = Program::where([
+            'slug' => $slug        
+        ])->first();
+        
+        if(!$program) abort(404);
+
+        $programs = Program::get();
+        return view('program', compact('program', 'programs'));
     }
 
-    public function grade(Request $request)
+    public function grade(Request $request, $slug)
     {
-        return view('grade');
+        $grade = Grade::where([
+            'slug' => $slug        
+        ])->first();
+        
+        if(!$grade) abort(404);
+
+        $grades = Grade::where('program_id', $grade->program_id)->get();
+
+        return view('grade', compact('grade', 'grades'));
     }
 }

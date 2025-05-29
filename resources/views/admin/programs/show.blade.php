@@ -81,6 +81,11 @@
                                         </div>
 
                                         <div class="mb-3">
+                                            <h4 class="fs-15">Program {{$language->name}} subtitle</h4>
+                                            {{$program->getTranslation('subtitle', $language->code)}}
+                                        </div>
+
+                                        <div class="mb-3">
                                             <h4 class="fs-15">Program {{$language->name}} description</h4>
                                             {{$program->getTranslation('description', $language->code)}}
                                         </div>

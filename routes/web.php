@@ -206,15 +206,15 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
 Route::get('', [ControllersPagesController::class, 'index'])->name('index');
 
-Route::get('/grades', [ControllersPagesController::class, 'grades']);
-Route::get('/grade', [ControllersPagesController::class, 'grade']);
 
 Route::get('/articles', [ControllersPagesController::class, 'articles'])->name('articles');
 Route::get('/albums', [ControllersPagesController::class, 'albums'])->name('albums');
 Route::get('/events', [ControllersPagesController::class, 'events'])->name('events');
+Route::get('/programs/{program}', [ControllersPagesController::class, 'program'])->name('program');
 
 Route::get('/{slug}', [ControllersPagesController::class, 'page'])->name('page');
 Route::get('/program/{slug}', [ControllersPagesController::class, 'program'])->name('program');
 Route::get('/articles/{slug}', [ControllersPagesController::class, 'article'])->name('article');
 Route::get('/albums/{slug}', [ControllersPagesController::class, 'album'])->name('album');
 Route::get('/events/{slug}', [ControllersPagesController::class, 'event'])->name('event');
+Route::get('/grades/{slug}', [ControllersPagesController::class, 'grade'])->name('grade');

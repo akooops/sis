@@ -23,6 +23,10 @@ class Program extends Model
         return $this->morphOne(File::class, 'model');
     }
 
+    public function grades(){
+        return $this->hasMany(Grade::class, 'program_id', 'id');
+    }
+
     //Accessors & Mutators
     public function getThumbnailUrlAttribute()
     {
