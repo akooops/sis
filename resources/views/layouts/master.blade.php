@@ -1,3 +1,7 @@
+@php
+    $currentLanguage = getCurrentLanguage();
+@endphp
+
 <!DOCTYPE html>
 <html lang="ar">
 
@@ -28,7 +32,7 @@
     @include('layouts.head-css')
 </head>
 
-<body>
+<body dir="{{($currentLanguage && $currentLanguage->is_rtl) ? 'rtl' : 'ltr'}}">
     <div class="content">
         <!-- Begin page -->
         <div class="content-wrapper">
