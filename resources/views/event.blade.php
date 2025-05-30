@@ -50,7 +50,12 @@
    <div class="container py-3 py-md-5">
       <nav class="d-inline-block" aria-label="breadcrumb">
          <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a class="text-uppercase" href="#">Home</a></li>
+            <li class="breadcrumb-item">
+                <a class="text-uppercase" href="{{route('events')}}">
+                    {{getLanguageKeyLocalTranslation('breadcrumbs_events_page_title')}}
+                </a>
+            </li>
+
             <li class="breadcrumb-item text-uppercase active" aria-current="page">
                 {{$event->getLocalTranslation('title')}}
             </li>

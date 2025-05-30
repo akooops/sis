@@ -44,7 +44,11 @@
    <div class="container py-3 py-md-5">
       <nav class="d-inline-block" aria-label="breadcrumb">
          <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a class="text-uppercase" href="#">Grades</a></li>
+            <li class="breadcrumb-item">
+                <a class="text-uppercase" href="{{route('index')}}">
+                    {{getLanguageKeyLocalTranslation('breadcrumbs_index_page_title')}}
+                </a>
+            </li>            
             <li class="breadcrumb-item text-uppercase active" aria-current="page">
                 {{$grade->getLocalTranslation('title')}}
             </li>
@@ -82,7 +86,7 @@
             <div class="card accordion-item">
                 <div class="card-header" id="accordion-heading-3-1">
                     <button class="collapsed" data-bs-toggle="collapse" data-bs-target="#grades-collapse" aria-expanded="false" aria-controls="grades-collapse">
-                        Files
+                        {{getLanguageKeyLocalTranslation('grade_page_collapse_title')}}
                     </button>
                 </div>
                 <!-- /.card-header -->
@@ -92,8 +96,12 @@
                             <thead>
                                 <tr>
                                     <th scope="col" width="25px">#</th>
-                                    <th scope="col" width="90%">File name</th>
-                                    <th scope="col">Options</th>
+                                    <th scope="col" width="90%">
+                                        {{getLanguageKeyLocalTranslation('grade_page_table_header_file')}}
+                                    </th>
+                                    <th scope="col">
+                                        {{getLanguageKeyLocalTranslation('grade_page_table_header_option')}}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -107,7 +115,7 @@
                                         </td>
                                         <td>
                                             <a href="{{$file->url}}" target="_blank" class="btn btn-sm btn-primary rounded">
-                                                Download
+                                                {{getLanguageKeyLocalTranslation('grade_page_table_cta')}}
                                             </a>
                                         </td>
                                     </tr>

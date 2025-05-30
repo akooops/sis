@@ -196,6 +196,42 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Albums',
                 'ar' => 'الألبومات'
             ],
+            'program_page_collapse_title' => [
+                'en' => 'Grades',
+                'ar' => 'الدرجات'
+            ],
+            'program_page_table_header_grade' => [
+                'en' => 'Grade',
+                'ar' => 'الدرجة'
+            ],
+            'program_page_table_header_option' => [
+                'en' => 'Options',
+                'ar' => 'الإطلاع'
+            ],
+            'program_page_table_cta' => [
+                'en' => 'Check it out',
+                'ar' => 'الإطلاع'
+            ],
+            'grade_page_collapse_title' => [
+                'en' => 'Files',
+                'ar' => 'الملفات'
+            ],
+            'grade_page_table_header_file' => [
+                'en' => 'File',
+                'ar' => 'الملف'
+            ],
+            'grade_page_table_header_option' => [
+                'en' => 'Options',
+                'ar' => 'الإطلاع'
+            ],
+            'grade_page_table_cta' => [
+                'en' => 'Download',
+                'ar' => 'التحميل'
+            ],
+            'breadcrumbs_events_page_title' => [
+                'en' => 'Events',
+                'ar' => 'الفعاليات'
+            ],
         ];
 
         // Seed language keys and translations

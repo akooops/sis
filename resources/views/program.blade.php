@@ -45,7 +45,11 @@
    <div class="container py-3 py-md-5">
       <nav class="d-inline-block" aria-label="breadcrumb">
          <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a class="text-uppercase" href="#">Programs</a></li>
+            <li class="breadcrumb-item">
+                <a class="text-uppercase" href="{{route('index')}}">
+                    {{getLanguageKeyLocalTranslation('breadcrumbs_index_page_title')}}
+                </a>
+            </li>
             <li class="breadcrumb-item text-uppercase active" aria-current="page">
                 {{$program->getLocalTranslation('title')}}
             </li>
@@ -83,7 +87,7 @@
             <div class="card accordion-item">
                 <div class="card-header" id="accordion-heading-3-1">
                     <button class="collapsed" data-bs-toggle="collapse" data-bs-target="#grades-collapse" aria-expanded="false" aria-controls="grades-collapse">
-                        Grades
+                        {{getLanguageKeyLocalTranslation('program_page_collapse_title')}}
                     </button>
                 </div>
                 <!-- /.card-header -->
@@ -93,8 +97,12 @@
                             <thead>
                                 <tr>
                                     <th scope="col" width="25px">#</th>
-                                    <th scope="col" width="90%">Grade</th>
-                                    <th scope="col">Options</th>
+                                    <th scope="col" width="90%">
+                                        {{getLanguageKeyLocalTranslation('program_page_table_header_grade')}}
+                                    </th>
+                                    <th scope="col">
+                                        {{getLanguageKeyLocalTranslation('program_page_table_header_option')}}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -108,7 +116,7 @@
                                         </td>
                                         <td>
                                             <a href="{{route('grade', ['slug' => $grade->slug])}}" class="btn btn-sm btn-primary rounded">
-                                                Learn more
+                                                {{getLanguageKeyLocalTranslation('program_page_table_cta')}}
                                             </a>
                                         </td>
                                     </tr>
