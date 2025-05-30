@@ -71,6 +71,42 @@
     <!-- /.swiper-container -->
 </section>
 
+<section class="wrapper bg-light">
+    <div class="container py-12">
+        <div class="row align-items-center">
+            <div class="col-lg-6 position-relative">
+                <div class="shape shape-welcome bg-primary rellax d-md-block" data-rellax-speed="0"></div>
+                
+                <figure>
+                  <img class="shape-welcome-image ms-6" src="{{ URL::asset('assets/img/home-1-welcome.png')}}" alt="">
+                </figure>
+            </div>
+            <!--/column -->
+
+            <div class="col-lg-6 mt-12 mt-lg-0 text-center text-lg-start">
+                <h3 class="display-4 mb-2 text-gold">
+                    {{getLanguageKeyLocalTranslation('index_page_first_section_title')}}
+                </h3>
+                
+                <p class="mb-4">
+                    {{getLanguageKeyLocalTranslation('index_page_first_section_subtitle')}}
+                </p>
+
+                @if($firstSectionCtaPage)
+                    <a href="{{route('page', ['slug' => $firstSectionCtaPage->slug])}}" class="btn btn-sm btn-primary rounded">
+                        <i class="uil uil-angle-right"></i>
+                        {{getLanguageKeyLocalTranslation('index_page_first_section_cta')}}
+                    </a>
+                @endif
+            </div>
+            <!--/column -->
+        </div>
+        <!--/.row -->
+    </div>
+    <!-- /.container -->
+</section>
+<!-- /section -->
+
 <section class="wrapper bg-light grades-section">
         <div class="row row-cols-1 row-cols-md-5 align-items-center">
             @foreach ($programs as $program)    

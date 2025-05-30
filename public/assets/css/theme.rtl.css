@@ -189,7 +189,7 @@ Author:		elemis
     --bs-border-subtle-dark: #bebfc2;
     --bs-white-rgb: 255, 255, 255;
     --bs-black-rgb: 0, 0, 0;
-    --bs-font-sans-serif: "Poppins", sans-serif;
+    --bs-font-sans-serif: "Changa", sans-serif;
     --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
     --bs-root-font-size: 20px;
@@ -26042,7 +26042,7 @@ article .post-meta li.ms-auto:before {
     position: relative;
 }
 .code-wrapper .btn-clipboard {
-    font-family: Poppins, sans-serif;
+    font-family: Changa, sans-serif;
     position: absolute;
     top: 0.5rem;
     left: 0.5rem;
