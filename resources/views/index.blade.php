@@ -1,3 +1,20 @@
+@php
+    $firstSectionCtaPageSetting = getSetting('index_page_first_section_cta_page');
+    $firstSectionCtaPage = null;
+
+    if($firstSectionCtaPageSetting) $firstSectionCtaPage = getPage($firstSectionCtaPageSetting->value);
+
+    $secondSectionCtaPageSetting = getSetting('index_page_second_section_cta_page');
+    $secondSectionCtaPage = null;
+
+    if($secondSectionCtaPageSetting) $secondSectionCtaPage = getPage($secondSectionCtaPageSetting->value);
+
+    $thirdSectionCtaPageSetting = getSetting('index_page_third_section_cta_page');
+    $thirdSectionCtaPage = null;
+
+    if($thirdSectionCtaPageSetting) $thirdSectionCtaPage = getPage($thirdSectionCtaPageSetting->value);
+@endphp
+
 @extends('layouts.master')
 @section('title', $page->getLocalTranslation('title'))
 @section('description', $page->getLocalTranslation('description'))
@@ -54,37 +71,6 @@
     <!-- /.swiper-container -->
 </section>
 
-<section class="wrapper bg-light">
-    <div class="container py-12">
-        <div class="row align-items-center">
-            <div class="col-lg-6 position-relative">
-                <div class="shape shape-welcome bg-primary rellax d-md-block" data-rellax-speed="0"></div>
-                
-                <figure>
-                  <img class="shape-welcome-image ms-6" src="{{ URL::asset('assets/img/home-1-welcome.png')}}" alt="">
-                </figure>
-            </div>
-            <!--/column -->
-
-            <div class="col-lg-6 mt-12 mt-lg-0 text-center text-lg-start">
-                <h3 class="display-4 mb-2 text-gold">
-                    Welcome to Saud international schools
-                </h3>
-                
-                <p class="mb-4">The mission of Saud International School is to provide a challenging educational environment that meets the needs of the diverse community by offering a worldwide known curriculum implemented with state of the art technology along with  extra-curricular activities.</p>
-
-                <a href="#" class="btn btn-sm btn-primary rounded">
-                  <i class="uil uil-angle-right"></i>
-                  Learn More
-                </a>
-            </div>
-            <!--/column -->
-        </div>
-        <!--/.row -->
-    </div>
-    <!-- /.container -->
-</section>
-
 <section class="wrapper bg-light grades-section">
         <div class="row row-cols-1 row-cols-md-5 align-items-center">
             @foreach ($programs as $program)    
@@ -127,8 +113,12 @@
                                         <div class="icon btn btn-circle btn-lg btn-soft-purple pe-none mx-auto me-4 mb-lg-3 mb-xl-0"> <i class="uil uil-presentation-check"></i> </div>
                                     </div>
                                     <div>
-                                        <h3 class="counter mb-1 text-gold">4</h3>
-                                        <p class="mb-0 text-light">Schools</p>
+                                        <h3 class="counter mb-1 text-gold">
+                                            {{getLanguageKeyLocalTranslation('index_page_first_number_value')}}
+                                        </h3>
+                                        <p class="mb-0 text-light">
+                                            {{getLanguageKeyLocalTranslation('index_page_first_number_title')}}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -145,8 +135,12 @@
                                         <div class="icon btn btn-circle btn-lg btn-soft-red pe-none mx-auto me-4 mb-lg-3 mb-xl-0"> <i class="uil uil-users-alt"></i> </div>
                                     </div>
                                     <div>
-                                        <h3 class="counter mb-1 text-gold">7518</h3>
-                                        <p class="mb-0 text-light">Students</p>
+                                        <h3 class="counter mb-1 text-gold">
+                                            {{getLanguageKeyLocalTranslation('index_page_second_number_value')}}
+                                        </h3>
+                                        <p class="mb-0 text-light">
+                                            {{getLanguageKeyLocalTranslation('index_page_second_number_title')}}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -163,8 +157,12 @@
                                         <div class="icon btn btn-circle btn-lg btn-soft-yellow pe-none mx-auto me-4 mb-lg-3 mb-xl-0"> <i class="uil uil-user-check"></i> </div>
                                     </div>
                                     <div>
-                                        <h3 class="counter mb-1 text-gold">10000</h3>
-                                        <p class="mb-0 text-light">Alumni</p>
+                                        <h3 class="counter mb-1 text-gold">
+                                            {{getLanguageKeyLocalTranslation('index_page_third_number_value')}}
+                                        </h3>
+                                        <p class="mb-0 text-light">
+                                            {{getLanguageKeyLocalTranslation('index_page_third_number_title')}}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -181,8 +179,12 @@
                                         <div class="icon btn btn-circle btn-lg btn-soft-aqua pe-none mx-auto me-4 mb-lg-3 mb-xl-0"> <i class="uil uil-trophy"></i> </div>
                                     </div>
                                     <div>
-                                        <h3 class="counter mb-1 text-gold">1st</h3>
-                                        <p class="mb-0 text-light">School in saudi</p>
+                                        <h3 class="counter mb-1 text-gold">
+                                            {{getLanguageKeyLocalTranslation('index_page_forth_number_value')}}
+                                        </h3>
+                                        <p class="mb-0 text-light">
+                                            {{getLanguageKeyLocalTranslation('index_page_forth_number_title')}}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -197,14 +199,17 @@
             <!--/column -->
             <div class="col-lg-5">
                  <h3 class="display-5 mb-2 text-gold">
-                    Saud international schools In number
+                    {{getLanguageKeyLocalTranslation('index_page_second_section_title')}}
                 </h3>
                 <p class="mb-4 text-light">
-                  The vision of Saud International School is to create a supportive environment enabling us to equip our students with skills and abilities which will allow them to develop intellectually, physically, socially, emotionally and morally as they become successful and productive lifelong learners in the 21st Century.
+                   {{getLanguageKeyLocalTranslation('index_page_second_section_subtitle')}}
                 </p>
-                <a href="#" class="btn btn-sm btn-primary rounded">
-                  Learn More
-                </a>
+
+                @if($secondSectionCtaPage)
+                    <a href="{{route('page', ['slug' => $secondSectionCtaPage->slug])}}" class="btn btn-sm btn-primary rounded">
+                        {{getLanguageKeyLocalTranslation('index_page_second_section_cta')}}
+                    </a>
+                @endif
             </div>
             <!--/column -->
         </div>
@@ -214,7 +219,8 @@
 </section>
 <!-- /section -->
 
-<section class="wrapper bg-light-primary">
+
+<section class="wrapper bg-light">
     <div class="container py-12">
         <div class="row align-items-center">
             <div class="col-lg-6 position-relative">
@@ -228,14 +234,19 @@
 
             <div class="col-lg-6 mt-12 mt-lg-0 text-center text-lg-start">
                 <h3 class="display-4 mb-2 text-gold">
-                  Message From The Head of School
+                    {{getLanguageKeyLocalTranslation('index_page_third_section_title')}}
                 </h3>
                 
-                <p class="mb-4">The mission of Saud International School is to provide a challenging educational environment that meets the needs of the diverse community by offering a worldwide known curriculum implemented with state of the art technology along with  extra-curricular activities.</p>
+                <p class="mb-4">
+                    {{getLanguageKeyLocalTranslation('index_page_third_section_subtitle')}}
+                </p>
 
-                <a href="#" class="btn btn-sm btn-primary rounded">
-                    Learn More
-                </a>
+                @if($thirdSectionCtaPage)
+                    <a href="{{route('page', ['slug' => $thirdSectionCtaPage->slug])}}" class="btn btn-sm btn-primary rounded">
+                        <i class="uil uil-angle-right"></i>
+                        {{getLanguageKeyLocalTranslation('index_page_third_section_cta')}}
+                    </a>
+                @endif
             </div>
             <!--/column -->
         </div>
@@ -243,13 +254,14 @@
     </div>
     <!-- /.container -->
 </section>
+<!-- /section -->
 
 <section class="wrapper bg-light-primary">
     <div class="container py-12">
         <h3 class="display-5 mb-4 text-center text-gold">
-          Saud international schools 
-          <br>
-          Latest articles
+            {{getLanguageKeyLocalTranslation('index_page_forth_section_title')}}
+            <br>
+            {{getLanguageKeyLocalTranslation('index_page_forth_section_subtitle')}}
         </h3>
 
         <div class="swiper-container blog grid-view mb-6" data-margin="30" data-dots="true" data-items-xl="3" data-items-md="2" data-items-xs="1">
@@ -263,7 +275,7 @@
                                     <img src="{{$article->thumbnailUrl}}" alt="" />
                                 </a>
                                 <figcaption>
-                                    <h5 class="from-top mb-0">Read More</h5>
+                                    <h5 class="from-top mb-0"></h5>
                                 </figcaption>
                             </figure>
                             <div class="post-header">
@@ -300,8 +312,8 @@
         <!-- /.swiper-container -->
 
         <div class="d-flex justify-content-center mt-4">
-              <a href="#" class="btn btn-sm btn-primary rounded text-center">
-                  View more articles
+              <a href="{{route('articles')}}" class="btn btn-sm btn-primary rounded text-center">
+                    {{getLanguageKeyLocalTranslation('index_page_forth_section_cta')}}
               </a>
         </div>
     </div>
@@ -314,11 +326,11 @@
         <div class="container py-12">
             <div class="row">
                 <div class="col-xl-7 col-xxl-6 mx-auto text-center">
-                  <h3 class="display-5 mb-4 text-center text-gold">
-                    Saud international schools 
-                    <br>
-                    Albums
-                  </h3>
+                    <h3 class="display-5 mb-4 text-center text-gold">
+                        {{getLanguageKeyLocalTranslation('index_page_fifth_section_title')}}
+                        <br>
+                        {{getLanguageKeyLocalTranslation('index_page_fifth_section_subtitle')}}
+                    </h3>
                 </div>
                 <!--/column -->
             </div>
@@ -335,7 +347,7 @@
                                             <img src="{{$album->thumbnailUrl}}" alt="" />
                                         </a>
                                         <figcaption>
-                                            <h5 class="from-top mb-0">Read More</h5>
+                                            <h5 class="from-top mb-0"></h5>
                                         </figcaption>
                                     </figure>
                                 </div>
@@ -351,8 +363,8 @@
             <!-- /.swiper-container -->
 
             <div class="d-flex justify-content-center mt-2">
-              <a href="#" class="btn btn-sm btn-primary rounded text-center">
-                  View more albums
+              <a href="{{route('albums')}}" class="btn btn-sm btn-primary rounded text-center">
+                    {{getLanguageKeyLocalTranslation('index_page_fifth_section_cta')}}
               </a>
             </div>
         </div>

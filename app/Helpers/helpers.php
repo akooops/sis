@@ -3,6 +3,7 @@
 use App\Models\Language;
 use App\Models\LanguageKey;
 use App\Models\Menu;
+use App\Models\Page;
 use App\Models\Setting;
 
 function getCurrentLanguage(){
@@ -26,6 +27,10 @@ function getSetting($key) {
 
 function getMenu($id){
     return Menu::find($id);
+}
+
+function getPage($id){
+    return Page::find($id);
 }
 
 function getLanguageKeyLocalTranslation($key){
