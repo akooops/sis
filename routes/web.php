@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\BannersController;
 use App\Http\Controllers\Admin\DashboardContoller;
 use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\Admin\FilesController;
+use App\Http\Controllers\Admin\FormsController;
 use App\Http\Controllers\Admin\GradesController;
 use App\Http\Controllers\Admin\LanguagesController;
 use App\Http\Controllers\Admin\LanguagesKeysController;
@@ -213,6 +214,16 @@ Route::middleware(['auth', 'force.admin.english'])->prefix('admin')->group(funct
     Route::get('settings/{setting}', [SettingsController::class, 'show'])->middleware('check.permission:admin.settings.show')->name('admin.settings.show');
     Route::get('settings/{setting}/edit', [SettingsController::class, 'edit'])->middleware('check.permission:admin.settings.edit')->name('admin.settings.edit');
     Route::patch('settings/{setting}', [SettingsController::class, 'update'])->middleware('check.permission:admin.settings.update')->name('admin.settings.update');
+
+    // Forms
+    Route::get('forms', [FormsController::class, 'index'])->middleware('check.permission:admin.forms.index')->name('admin.forms.index');
+    Route::get('forms/create', [FormsController::class, 'create'])->middleware('check.permission:admin.forms.store')->name('admin.forms.create');
+    Route::post('forms', [FormsController::class, 'store'])->middleware('check.permission:admin.forms.store')->name('admin.forms.store');
+    Route::get('forms/{form}', [FormsController::class, 'show'])->middleware('check.permission:admin.forms.show')->name('admin.forms.show');
+    Route::get('forms/{form}/edit', [FormsController::class, 'edit'])->middleware('check.permission:admin.forms.update')->name('admin.forms.edit');
+    Route::patch('forms/{form}/update-translation', [FormsController::class, 'updateTranslation'])->middleware('check.permission:admin.forms.update')->name('admin.forms.update-translation');
+    Route::patch('forms/{form}', [FormsController::class, 'update'])->middleware('check.permission:admin.forms.update')->name('admin.forms.update');
+    Route::delete('forms/{form}', [FormsController::class, 'destroy'])->middleware('check.permission:admin.forms.destroy')->name('admin.forms.destroy');
 });
 
 Route::middleware(['set.locale'])->group(function () {

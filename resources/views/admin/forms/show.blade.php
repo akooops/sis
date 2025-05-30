@@ -1,11 +1,11 @@
 @extends('admin.layouts.master')
-@section('title') Albums @endsection
+@section('title') Forms @endsection
 @section('css')
 @endsection
 @section('content')
 @component('admin.components.breadcrumb')
-@slot('li_1') Albums @endslot
-@slot('title') Show Album @endslot
+@slot('li_1') Forms @endslot
+@slot('title') Show Form @endslot
 @endcomponent
 <div class="row">
     <div class="col">
@@ -27,30 +27,24 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title mb-0">Album information</h4>
+                            <h4 class="card-title mb-0">Form information</h4>
                         </div>
                         <div class="card-body">
-                            <div>
-                                <figure class="figure">
-                                    <img src="{{$album->thumbnailUrl}}" alt="" class="rounded avatar-xl" style="object-fit: cover">
-                                </figure>
+                            <div class="mb-3">
+                                <h4 class="fs-15">Form name</h4>
+                                {{$form->name}}
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">Album name</h4>
-                                {{$album->name}}
+                                <h4 class="fs-15">Form slug</h4>
+                                <span class="badge bg-primary"> {{$form->slug }} </span>
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">Album slug</h4>
-                                <span class="badge bg-primary"> {{$album->slug }} </span>
-                            </div>
-
-                            <div class="mb-3">
-                                <h4 class="fs-15">Album status</h4>
-                                @if($album->status == 'draft')
+                                <h4 class="fs-15">Form status</h4>
+                                @if($form->status == 'draft')
                                     <span class="badge bg-info">Draft</span>   
-                                @elseif($album->status == 'hidden')   
+                                @elseif($form->status == 'hidden')   
                                     <span class="badge bg-primary">Hidden</span>                                                 
                                 @else
                                     <span class="badge bg-success">Published</span>
@@ -58,34 +52,25 @@
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">Album created at</h4>
-                                {{$album->created_at}}
+                                <h4 class="fs-15">Form has captcha?</h4>
+                                @if($form->has_captcha)
+                                    <span class="badge bg-danger">Yes</span>                                                  
+                                @else
+                                    <span class="badge bg-success">No</span>
+                                @endif
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">Album updated at</h4>
-                                {{$album->updated_at}}
+                                <h4 class="fs-15">Form created at</h4>
+                                {{$form->created_at}}
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title mb-0">Album files</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row mb-3">
-                                @foreach ($album->files as $key => $file)
-                                    <div class="col-6 col-md-4">
-                                        <figure class="figure" style="width: 100%">
-                                            <img src="{{ $file->url }}" class="figure-img img-fluid rounded border" style="width:100%; height: 200px; object-fit:cover">
-                                        </figure>
-                                    </div>
-                                @endforeach
+                            <div class="mb-3">
+                                <h4 class="fs-15">Form updated at</h4>
+                                {{$form->updated_at}}
                             </div>
                         </div>
                     </div>
-                    <!-- end card -->
 
                     <div class="card">
                         <div class="card-body">
@@ -104,13 +89,13 @@
                                 @foreach ($languages as $key => $language)
                                     <div class="tab-pane {{$key == 0 ? "active" : ""}}" id="{{$language->code}}" role="tabpanel">
                                         <div class="mb-3">
-                                            <h4 class="fs-15">Album {{$language->name}} title</h4>
-                                            {{$album->getTranslation('title', $language->code)}}
+                                            <h4 class="fs-15">Form {{$language->name}} title</h4>
+                                            {{$form->getTranslation('title', $language->code)}}
                                         </div>
 
                                         <div class="mb-3">
-                                            <h4 class="fs-15">Album {{$language->name}} description</h4>
-                                            {{$album->getTranslation('description', $language->code)}}
+                                            <h4 class="fs-15">Form {{$language->name}} description</h4>
+                                            {{$form->getTranslation('description', $language->code)}}
                                         </div>
                                     </div>
                                 @endforeach
@@ -119,10 +104,10 @@
                     </div>
 
                     <div class="text-end mb-3">
-                        <a href="{{ route('admin.albums.index') }}" class="btn btn-primary w-sm">Back</a>
+                        <a href="{{ route('admin.forms.index') }}" class="btn btn-primary w-sm">Back</a>
                         
-                        @haspermission('admin.albums.update')
-                            <a href="{{ route('admin.albums.edit', $album->id) }}" class="btn btn-success w-sm">Edit</a>
+                        @haspermission('admin.forms.update')
+                            <a href="{{ route('admin.forms.edit', $form->id) }}" class="btn btn-success w-sm">Edit</a>
                         @endhaspermission
                     </div>
                 </div>
