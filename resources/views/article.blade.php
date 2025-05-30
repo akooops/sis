@@ -26,7 +26,11 @@
    <div class="container py-3 py-md-5">
       <nav class="d-inline-block" aria-label="breadcrumb">
          <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a class="text-uppercase" href="#">Articles</a></li>
+            <li class="breadcrumb-item">
+                <a class="text-uppercase" href="{{route('articles')}}">
+                    {{getLanguageKeyLocalTranslation('breadcrumbs_articles_page_title')}}
+                </a>
+            </li>
             <li class="breadcrumb-item text-uppercase active" aria-current="page">
                 {{$article->getLocalTranslation('title')}}
             </li>
@@ -94,7 +98,9 @@
 
             <aside class="col-lg-4 sidebar">
                 <div class="widget">
-                    <h4 class="widget-title mb-3">Popular Posts</h4>
+                    <h4 class="widget-title mb-3">
+                        {{getLanguageKeyLocalTranslation('sidebar_popular_article_title')}}
+                    </h4>
                     <ul class="image-list">
                         @foreach ($popularArticles as $popularArticle)
                             <li>

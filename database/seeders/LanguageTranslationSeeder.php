@@ -176,6 +176,26 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => '1st',
                 'ar' => 'أول'
             ],
+            'breadcrumbs_index_page_title' => [
+                'en' => 'Home',
+                'ar' => 'الرئيسية'
+            ],
+            'sidebar_search_form_placeholder' => [
+                'en' => 'Search...',
+                'ar' => 'قم بالبحث'
+            ],
+            'sidebar_popular_article_title' => [
+                'en' => 'Popular articles',
+                'ar' => 'أشهر المقالات'
+            ],
+            'breadcrumbs_articles_page_title' => [
+                'en' => 'Articles',
+                'ar' => 'المقالات'
+            ],
+            'breadcrumbs_albums_page_title' => [
+                'en' => 'Albums',
+                'ar' => 'الألبومات'
+            ],
         ];
 
         // Seed language keys and translations

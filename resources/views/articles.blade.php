@@ -49,7 +49,11 @@
    <div class="container py-3 py-md-5">
       <nav class="d-inline-block" aria-label="breadcrumb">
          <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a class="text-uppercase" href="#">Home</a></li>
+            <li class="breadcrumb-item">
+                <a class="text-uppercase" href="{{route('index')}}">
+                    {{getLanguageKeyLocalTranslation('breadcrumbs_index_page_title')}}
+                </a>
+            </li>
             <li class="breadcrumb-item text-uppercase active" aria-current="page">
                 {{$page->getLocalTranslation('title')}}
             </li>
@@ -75,7 +79,7 @@
                                             <img src="{{$article->thumbnailUrl}}" alt="" />
                                         </a>
                                         <figcaption>
-                                            <h5 class="from-top mb-0">Read More</h5>
+                                            <h5 class="from-top mb-0"></h5>
                                         </figcaption>
                                     </figure>
                                     <div class="card-body">
@@ -146,7 +150,9 @@
                         <div class="form-floating mb-0">
                             <form action="{{route('articles')}}">
                                 <input name="search" value="{{request()->get('search')}}" id="search-form" type="text" class="form-control" placeholder="Search">
-                                <label for="search-form">Search</label>
+                                <label for="search-form">
+                                    {{getLanguageKeyLocalTranslation('sidebar_search_form_placeholder')}}
+                                </label>
                             </form>  
                         </div>
                     </form>
@@ -155,7 +161,9 @@
                 <!-- /.widget -->
 
                 <div class="widget">
-                    <h4 class="widget-title mb-3">Popular Posts</h4>
+                    <h4 class="widget-title mb-3">
+                        {{getLanguageKeyLocalTranslation('sidebar_popular_article_title')}}
+                    </h4>
                     <ul class="image-list">
                         @foreach ($popularArticles as $popularArticle)
                             <li>
