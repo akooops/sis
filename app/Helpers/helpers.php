@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Language;
+use App\Models\LanguageKey;
 use App\Models\Menu;
 use App\Models\Setting;
 
@@ -25,4 +26,10 @@ function getSetting($key) {
 
 function getMenu($id){
     return Menu::find($id);
+}
+
+function getLanguageKeyLocalTranslation($key){
+    $languageKey = LanguageKey::where('key', $key)->first();
+
+    return $languageKey ? $languageKey->getLocalTranslation('content') : '';
 }

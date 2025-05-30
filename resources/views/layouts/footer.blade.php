@@ -12,6 +12,11 @@
     if($secondaryMenuSetting && $secondaryMenuSetting->type == "menu"){
         $secondaryMenu = getMenu($secondaryMenuSetting->value);
     }
+
+    $facebookUrl = getSetting('social_facebook_url');
+    $instagramUrl = getSetting('social_instagram_url');
+    $twitterUrl = getSetting('social_twitter_url');
+    $youtubeUrl = getSetting('social_youtube_url');
 @endphp
 
 <footer class="bg-primary text-inverse">
@@ -22,8 +27,12 @@
                     <a href="{{route('index')}}">
                         <img class="logo-canvas" src="{{ URL::asset('assets/img/logo.png')}}" alt="" />
                     </a>
-                    <h3 class="h2 my-3 text-white">Join the Community</h3>
-                    <p class="lead mb-5">Let's make something great together. We are trusted by over 5000+ clients. Join them by using our services and grow your business.</p>
+                    <h3 class="h2 my-3 text-white">
+                        {{getLanguageKeyLocalTranslation('footer_main_title')}}
+                    </h3>
+                    <p class="lead mb-5">
+                        {{getLanguageKeyLocalTranslation('footer_main_subtitle')}}
+                    </p>
                 </div>
                 <!-- /.widget -->
             </div>
@@ -31,7 +40,9 @@
 
             <div class="col-md-4 col-lg-2 offset-lg-2">
                 <div class="widget">
-                    <h4 class="widget-title text-white mb-3">Need Help?</h4>
+                    <h4 class="widget-title text-white mb-3">
+                        {{getLanguageKeyLocalTranslation('footer_first_menu_title')}}
+                    </h4>
                     <ul class="footer-menu list-unstyled mb-0">
                         @if($primaryMenu)
                             @foreach ($primaryMenu->items as $primaryMenuItem)
@@ -54,7 +65,9 @@
             <!-- /column -->
             <div class="col-md-4 col-lg-2">
                 <div class="widget">
-                    <h4 class="widget-title text-white mb-3">Learn More</h4>
+                    <h4 class="widget-title text-white mb-3">
+                        {{getLanguageKeyLocalTranslation('footer_second_menu_title')}}
+                    </h4>
                     <ul class="footer-menu list-unstyled mb-0">
                         @if($secondaryMenu)
                             @foreach ($secondaryMenu->items as $secondaryMenuItem)
@@ -77,9 +90,16 @@
             <!-- /column -->
             <div class="col-md-4 col-lg-2">
                 <div class="widget">
-                    <h4 class="widget-title text-white mb-3">Get in Touch</h4>
-                    <address>Moonshine St. 14/05 Light City, London, United Kingdom</address>
-                    <a href="mailto:first.last@email.com">info@email.com</a><br /> 00 (123) 456 78 90
+                    <h4 class="widget-title text-white mb-3">
+                        {{getLanguageKeyLocalTranslation('footer_get_in_touch_title')}}
+                    </h4>
+                    <address>
+                        {{getLanguageKeyLocalTranslation('footer_get_in_touch_address')}}
+                    </address>
+                    <a href="mailto:{{getLanguageKeyLocalTranslation('footer_get_in_touch_email')}}">
+                        {{getLanguageKeyLocalTranslation('footer_get_in_touch_email')}}
+                    </a>
+                    <br /> {{getLanguageKeyLocalTranslation('footer_get_in_touch_phone')}}
                 </div>
                 <!-- /.widget -->
             </div>
@@ -88,13 +108,34 @@
         <!--/.row -->
         <hr class="mt-13 mt-md-15 mb-7" />
         <div class="d-md-flex align-items-center justify-content-between">
-            <p class="mb-2 mb-lg-0">© 2025 Saudi international schools. All rights reserved.</p>
+            <p class="mb-2 mb-lg-0">
+                {{getLanguageKeyLocalTranslation('footer_all_rights_reserved')}}
+            </p>
+
             <nav class="nav social social-white text-md-end">
-                <a href="#"><i class="uil uil-twitter"></i></a>
-                <a href="#"><i class="uil uil-facebook-f"></i></a>
-                <a href="#"><i class="uil uil-dribbble"></i></a>
-                <a href="#"><i class="uil uil-instagram"></i></a>
-                <a href="#"><i class="uil uil-youtube"></i></a>
+                @if($facebookUrl)
+                    <a href="{{$facebookUrl->value}}">
+                        <i class="uil uil-facebook-f"></i>
+                    </a>
+                @endif
+
+                @if($instagramUrl)
+                    <a href="{{$instagramUrl->value}}">
+                        <i class="uil uil-instagram"></i>
+                    </a>
+                @endif
+
+                @if($twitterUrl)
+                    <a href="{{$twitterUrl->value}}">
+                        <i class="uil uil-twitter"></i>
+                    </a>
+                @endif
+
+                @if($youtubeUrl)
+                    <a href="{{$youtubeUrl->value}}">
+                        <i class="uil uil-youtube"></i>
+                    </a>
+                @endif
             </nav>
             <!-- /.social -->
         </div>

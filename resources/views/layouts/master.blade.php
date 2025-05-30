@@ -7,15 +7,15 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Saud International Schools - @yield('title')</title>
+    <title>{{getLanguageKeyLocalTranslation('website_title')}} - @yield('title')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="@yield('description')">
 
-    <meta property="og:title" content="Saud International Schools - @yield('title')" />
+    <meta property="og:title" content="{{getLanguageKeyLocalTranslation('website_title')}} - @yield('title')" />
     <meta property="og:description" content="@yield('description')" />
     <meta property="og:image" content="@hasSection('image')@yield('image')@else{{ URL::asset('assets/img/logo.png')}}@endif" />
 
-    <meta name="twitter:title" content="Saud International Schools - @yield('title')" />
+    <meta name="twitter:title" content="{{getLanguageKeyLocalTranslation('website_title')}} - @yield('title')" />
     <meta name="twitter:description" content="@yield('description')" />
     <meta property="twitter:image" content="@hasSection('image')@yield('image')@else{{ URL::asset('assets/img/logo.png')}}@endif" />
 

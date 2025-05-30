@@ -33,15 +33,21 @@
             <div class="navbar-other ms-lg-4">
                 <ul class="navbar-nav flex-row align-items-center ms-auto rounded ps-0 mx-0 ps-md-6">
                     <li class="nav-item d-none d-md-block me-6">
-                        <a class="nav-link text-white main-nav-link" href="#">Visit</a>
+                        <a class="nav-link text-white main-nav-link" href="#">
+                            {{getLanguageKeyLocalTranslation('navbar_visits_nav_link')}}
+                        </a>
                     </li>
 
                     <li class="nav-item d-none d-md-block me-6">
-                        <a class="nav-link text-white main-nav-link" href="#">Inquire</a>
+                        <a class="nav-link text-white main-nav-link" href="#">
+                            {{getLanguageKeyLocalTranslation('navbar_inquiries_nav_link')}}
+                        </a>
                     </li>
 
                     <li class="nav-item d-none d-md-block me-6">
-                        <a class="nav-link text-white main-nav-link" href="#">Apply</a>
+                        <a class="nav-link text-white main-nav-link" href="#">
+                            {{getLanguageKeyLocalTranslation('navbar_applications_nav_link')}}
+                        </a>
                     </li>
 
                     <div class="d-flex bg-primary py-1 rounded">
@@ -120,7 +126,9 @@
 
                 @if(count($languages) >= 0)
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="" data-bs-toggle="dropdown">Change Language</a>
+                        <a class="nav-link dropdown-toggle" href="" data-bs-toggle="dropdown">               
+                            {{getLanguageKeyLocalTranslation('navbar_change_language_nav_link')}}
+                        </a>
 
                         <ul class="dropdown-menu">
                             @foreach ($languages as $language)
@@ -143,7 +151,7 @@
     <div class="offcanvas offcanvas-top bg-light" id="offcanvas-search" data-bs-scroll="true" aria-modal="true" role="dialog">
         <div class="container d-flex flex-row py-6">
           <form class="search-form w-100" action="{{route('articles')}}">
-            <input id="search-form" name="search" type="text" class="form-control" placeholder="Type keyword and hit enter">
+            <input id="search-form" name="search" type="text" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('navbar_search_form_placeholder')}}">
           </form>
           <!-- /.search-form -->
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
