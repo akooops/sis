@@ -68,6 +68,27 @@
                                         @enderror
                                     </div>  
                                 @endif
+
+                                @if ($setting->type == 'page')
+                                    <div class="mb-4">
+                                        <label class="form-label" for="">Value<span class="text-danger">*</span></label>
+                                        <select class="form-control" name="value">
+                                            @foreach($pages as $page)
+                                                <option value="{{ $page->id }}" {{ $setting->value == $page->id ? 'selected' : '' }}>
+                                                    {{ $page->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+
+                                        @error('value')
+                                            <p class="mx-2 my-2 text-danger">
+                                                <strong>
+                                                    {{$message}}
+                                                </strong>
+                                            </p>
+                                        @enderror
+                                    </div>  
+                                @endif
                             </div>
                         </div>
 

@@ -59,6 +59,11 @@
                                         $menuValue = \App\Models\Menu::find($setting->value);
                                     @endphp
                                     {{$menuValue->name}}
+                                @elseif($setting->type == 'page')
+                                    @php
+                                        $pageValue = \App\Models\Page::find($setting->value);
+                                    @endphp
+                                    {{$pageValue->name}}
                                 @endif
                             </div>
 

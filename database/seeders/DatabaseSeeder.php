@@ -12,7 +12,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(PermissionsSeeder::class);
         $this->call(InitAdminAccountSeeder::class);
         $this->call(LanguageTranslationSeeder::class);
+        $this->call(SettingsSeeder::class);
+        $this->call(PagesSeeder::class);
     }
 }

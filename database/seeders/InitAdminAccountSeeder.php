@@ -26,7 +26,7 @@ class InitAdminAccountSeeder extends Seeder
             ]);
         }
 
-        $ownerRole = Role::where('name', 'owner')->first();
+        $ownerRole = Role::where('name', 'Super Admin')->first();
         $user = User::where('email', 'ilyes24.azzi@gmail.com')->first();
 
         if($ownerRole && $user){

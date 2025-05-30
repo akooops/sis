@@ -6,6 +6,7 @@ use App\Http\Requests\Admin\Roles\StoreRoleRequest;
 use App\Http\Requests\Admin\Roles\UpdateRoleRequest;
 use App\Http\Requests\Admin\Settings\UpdateSettingRequest;
 use App\Models\Menu;
+use App\Models\Page;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 use App\Models\Role;
@@ -65,6 +66,10 @@ class SettingsController extends Controller
             $menus = Menu::get();            
             
             return view('admin.settings.edit', compact('setting', 'menus'));
+        }else if($setting->type == "page"){
+            $pages = Page::get();            
+
+            return view('admin.settings.edit', compact('setting', 'pages'));
         }
 
         return view('admin.settings.edit', compact('setting'));

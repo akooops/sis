@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AlbumsController;
 use App\Http\Controllers\Admin\ArticlesController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BannersController;
+use App\Http\Controllers\Admin\DashboardContoller;
 use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\Admin\FilesController;
 use App\Http\Controllers\Admin\GradesController;
@@ -53,6 +54,8 @@ Route::prefix('admin')->middleware(['force.admin.english'])->group(function () {
 });
 
 Route::middleware(['auth', 'force.admin.english'])->prefix('admin')->group(function () {
+    Route::get('/', [DashboardContoller::class, 'index'])->middleware('check.permission:admin.dashboard.index')->name('admin.dashboard');
+
     //Auth
     Route::post('auth/logout', [AuthController::class, 'logout'])->name('admin.auth.logout');
 
