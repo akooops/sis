@@ -28,7 +28,20 @@
             <div class="swiper-wrapper" id="swiper-wrapper-f9c21ed344bd05ba" aria-live="off">
 
                 @foreach ($banners as $banner)
-                    <div class="swiper-slide bg-overlay bg-overlay-400 bg-dark bg-image swiper-slide-prev" data-image-src="{{ $banner->thumbnailUrl  }}" role="group" >
+                    <div class="swiper-slide bg-overlay bg-overlay-400 bg-dark swiper-slide-prev" role="group">
+                        
+                        @if($banner->video)
+                            <!-- Video Background -->
+                            <video class="banner-video" autoplay muted loop playsinline>
+                                <source src="{{ $banner->videoUrl }}">
+                                <!-- Fallback to image if video fails -->
+                                <img src="{{ $banner->thumbnailUrl }}" alt="">
+                            </video>
+                        @else
+                            <!-- Image Background -->
+                            <div class="banner-image" style="background-image: url('{{ $banner->thumbnailUrl }}')"></div>
+                        @endif
+
                         <div class="container h-100">
                             <div class="row h-100">
                                 <div class="banner-container col-lg-6 text-center text-lg-start justify-content-center align-self-center align-items-start">
@@ -39,22 +52,13 @@
                                         {{$banner->getLocalTranslation('subtitle')}}                                         
                                     </p>
                                     <div class="animate__animated animate__slideInUp animate__delay-3s">
-                                    <a href="{{$banner->page ? route('page', ['slug' => $banner->page->slug]) : $banner->url}}" 
-                                        class="btn btn-sm bg-primary rounded text-white">
-                                        {{$banner->getLocalTranslation('cta')}}
-                                    </a>
+                                        <a href="{{$banner->page ? route('page', ['slug' => $banner->page->slug]) : $banner->url}}" 
+                                            class="btn btn-sm bg-primary rounded text-white">
+                                            {{$banner->getLocalTranslation('cta')}}
+                                        </a>
                                     </div>
                                 </div>
                                 <!--/column -->
-
-                                @if($banner->video)
-                                    <div class="col-lg-6 pe-lg-8" data-cues="slideInDown" data-disabled="true">
-                                        <div class="d-flex w-100 h-100 justify-content-center justify-content-lg-end align-items-start align-items-lg-center" data-cue="slideInDown">
-                                            <a href="{{$banner->videoUrl}}" class="btn btn-circle btn-primary btn-play ripple" data-glightbox><i class="icn-caret-right"></i></a>
-                                        </div>
-                                        <!-- /div -->
-                                    </div>
-                                @endif
                             </div>
                             <!--/.row -->
                         </div>
@@ -70,6 +74,7 @@
     </div>
     <!-- /.swiper-container -->
 </section>
+
 
 <section class="wrapper bg-light">
     <div class="container py-12">
