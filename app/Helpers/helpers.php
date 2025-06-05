@@ -21,10 +21,6 @@ function getLanguages(){
     return Language::orderBy('is_default', 'DESC')->get();
 }
 
-function getSetting($key) {
-    return Setting::where('key', $key)->first();
-}
-
 function getMenu($id){
     return Menu::find($id);
 }
@@ -33,8 +29,19 @@ function getPage($id){
     return Page::find($id);
 }
 
-function getLanguageKeyLocalTranslation($key){
-    $languageKey = LanguageKey::where('key', $key)->first();
-
-    return $languageKey ? $languageKey->getLocalTranslation('content') : '';
+function getSetting($key) {
+    return cache()->remember("setting-{$key}", 3600, function() use ($key) {
+        return Setting::where('key', $key)->first();
+    });
 }
+
+function getLanguageKeyLocalTranslation($key){
+    $locale = app()->getLocale();
+    $cacheKey = "language-key-{$key}-{$locale}";
+
+    return cache()->remember($cacheKey, 3600, function() use ($key) {
+        $languageKey = LanguageKey::where('key', $key)->first();
+        return $languageKey ? $languageKey->getLocalTranslation('content') : '';
+    });
+}
+

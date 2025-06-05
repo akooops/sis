@@ -85,6 +85,8 @@ class SettingsController extends Controller
     public function update(Setting $setting, UpdateSettingRequest $request){
         $setting->update($request->validated());
 
+        cache()->forget("setting-{$setting->key}");
+
         return redirect()->route('admin.settings.index')
             ->with('success','Setting updated successfully');
     }

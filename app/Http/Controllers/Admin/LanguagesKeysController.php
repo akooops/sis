@@ -125,6 +125,8 @@ class LanguagesKeysController extends Controller
             $languageKey->setTranslation($field, $language->code, $request->input($field));    
         }
 
+        cache()->forget("language-key-{$languageKey->key}-{$language->code}");
+
         return response()->json([
             'status' => 'success',
             'message' => 'Language Key updated successfully',
