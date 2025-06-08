@@ -1,5 +1,5 @@
 @extends('admin.layouts.master')
-@section('title') Articles @endsection
+@section('title') Visit Services @endsection
 @section('css')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <style>
@@ -22,8 +22,8 @@
 @endsection
 @section('content')
 @component('admin.components.breadcrumb')
-@slot('li_1') Articles @endslot
-@slot('title') Edit Article @endslot
+@slot('li_1') Visit Services @endslot
+@slot('title') Edit Visit Service @endslot
 @endcomponent
 <div class="row">
     <div class="col">
@@ -53,14 +53,14 @@
 
             <div class="row">
                 <div class="col-12">
-                    <form method="POST" enctype="multipart/form-data" action="{{ route('admin.articles.update', $article->id) }}">
+                    <form method="POST" enctype="multipart/form-data" action="{{ route('admin.visit-services.update', $visitService->id) }}">
                         @csrf
                         @method('patch')
                         <div class="card">
                             <div class="card-body">
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Article name<span class="text-danger">*</span></label>
-                                    <input name="name" value="{{$article->name}}" type="text" class="form-control">
+                                    <label class="form-label" for="">Visit Service name<span class="text-danger">*</span></label>
+                                    <input name="name" value="{{$visitService->name}}" type="text" class="form-control">
                                     @error('name')
                                         <p class="mx-2 my-2 text-danger">
                                             <strong>
@@ -71,9 +71,9 @@
                                 </div>  
                                 
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Article slug<span class="text-danger">*</span></label>
-                                    <input name="slug" value="{{$article->slug}}" type="text" class="form-control">
-                                    @error('slug')
+                                    <label class="form-label" for="">Visit Service duration in minutes<span class="text-danger">*</span></label>
+                                    <input name="duration" value="{{$visitService->duration}}" type="number" min="0" class="form-control">
+                                    @error('duration')
                                         <p class="mx-2 my-2 text-danger">
                                             <strong>
                                                 {{$message}}
@@ -83,23 +83,19 @@
                                 </div>  
 
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Article status<span class="text-danger">*</span></label>
-                                    <select class="form-control" name="status">
-                                        <option value="draft" {{ $article->status == 'draft' ? 'selected' : '' }}>Draft</option>
-                                        <option value="hidden" {{ $article->status == 'hidden' ? 'selected' : '' }}>Hidden</option>
-                                        <option value="published" {{ $article->status == 'published' ? 'selected' : '' }}>Published</option>
-                                    </select>
-                                    @error('status')
+                                    <label class="form-label" for="">Visit Service capacity<span class="text-danger">*</span></label>
+                                    <input name="capacity" value="{{$visitService->capacity}}" type="number" min="0" class="form-control">
+                                    @error('capacity')
                                         <p class="mx-2 my-2 text-danger">
                                             <strong>
                                                 {{$message}}
                                             </strong>
                                         </p>
                                     @enderror
-                                </div>
+                                </div>  
 
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Article thumbnail <span class="text-danger">(Keep it empty if you don't want to change it)</span></label>
+                                    <label class="form-label" for="">Visit Service thumbnail <span class="text-danger">(Keep it empty if you don't want to change it)</span></label>
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="form-check me-3">
                                             <input class="form-check-input" type="radio" name="media_option" id="media_option_upload" value="upload" checked>
@@ -140,7 +136,7 @@
                                 
                                 <div class="mt-4">
                                     <figure class="figure">
-                                        <img src="{{ $article->thumbnailUrl }}" class="rounded avatar-xl" style="object-fit: cover">
+                                        <img src="{{ $visitService->thumbnailUrl }}" class="rounded avatar-xl" style="object-fit: cover">
                                         <figcaption class="figure-caption">Last uploaded image</figcaption>
                                     </figure>
                                 </div>
@@ -185,19 +181,19 @@
 
                                             <div class="mb-4">
                                                 <label class="form-label" for="title-{{$language->id}}">Title <span class="text-danger">*</span></label>
-                                                <input type="text" id="title-{{$language->id}}" name="title" class="form-control translation-title" value="{{$article->getTranslation('title', $language->code)}}">
+                                                <input type="text" id="title-{{$language->id}}" name="title" class="form-control translation-title" value="{{$visitService->getTranslation('title', $language->code)}}">
                                                 <div class="translation-error" id="error-title-{{$language->id}}"></div>
                                             </div>
 
                                             <div class="mb-4">
                                                 <label class="form-label" for="description-{{$language->id}}">Description <span class="text-danger">*</span></label>
-                                                <textarea id="description-{{$language->id}}" name="description" class="form-control translation-description" rows="3">{{$article->getTranslation('description', $language->code)}}</textarea>
+                                                <textarea id="description-{{$language->id}}" name="description" class="form-control translation-description" rows="3">{{$visitService->getTranslation('description', $language->code)}}</textarea>
                                                 <div class="translation-error" id="error-description-{{$language->id}}"></div>
                                             </div>
 
                                             <div class="mb-4">
                                                 <label class="form-label" for="content-{{$language->id}}">Content <span class="text-danger">*</span></label>
-                                                <textarea id="content-{{$language->id}}" name="content" class="form-control translation-content markdown-editor">{{$article->getTranslation('content', $language->code)}}</textarea>
+                                                <textarea id="content-{{$language->id}}" name="content" class="form-control translation-content markdown-editor">{{$visitService->getTranslation('content', $language->code)}}</textarea>
                                                 <div class="translation-error" id="error-content-{{$language->id}}"></div>
                                             </div>
 
@@ -212,7 +208,7 @@
                     </div>
                     
                     <div class="text-end mb-3">
-                        <a href="{{ route('admin.articles.index') }}" class="btn btn-primary w-sm">Back</a>
+                        <a href="{{ route('admin.visit-services.index') }}" class="btn btn-primary w-sm">Back</a>
                     </div>
                 </div>
                 <!-- end col -->
@@ -377,35 +373,6 @@ document.addEventListener('DOMContentLoaded', function() {
             this.value = '';
         });
     }
-
-    // Auto slug generation
-    const nameInput = document.querySelector('input[name="name"]');
-    const slugInput = document.querySelector('input[name="slug"]');
-    
-    // Flag to track if slug has been manually edited
-    let slugManuallyEdited = false;
-    
-    // Function to convert string to slug
-    function stringToSlug(str) {
-        return str
-            .toLowerCase()
-            .replace(/[^\w\s-]/g, '') // Remove special characters
-            .replace(/\s+/g, '-')     // Replace spaces with hyphens
-            .replace(/-+/g, '-')      // Replace multiple hyphens with single hyphen
-            .trim();                  // Trim leading/trailing spaces
-    }
-    
-    // Update slug when name changes (if not manually edited)
-    nameInput.addEventListener('input', function() {
-        if (!slugManuallyEdited) {
-            slugInput.value = stringToSlug(this.value);
-        }
-    });
-    
-    // Set flag when slug is manually edited
-    slugInput.addEventListener('input', function() {
-        slugManuallyEdited = true;
-    });
     
     // Handle translation form submissions
     const forms = document.querySelectorAll('.translation-form');
@@ -443,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('content', editors[contentId].value());
             
             // Send AJAX request
-            fetch('{{ route('admin.articles.update-translation', $article->id) }}', {
+            fetch('{{ route('admin.visit-services.update-translation', $visitService->id) }}', {
                 method: 'POST',
                 body: formData,
                 headers: {

@@ -11,16 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('form_items', function (Blueprint $table) {
+        Schema::create('visit_services', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('type');
-            $table->json('options')->nullable();
-            $table->boolean('is_required')->default(false);
+            $table->float('duration')->default(1);
+            $table->integer('capacity')->default(1);
             $table->integer('order')->default(0);
-            
-            $table->unsignedBigInteger('form_id')->nullable();
-            $table->foreign('form_id')->references('id')->on('forms')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -30,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('form_items');
+        Schema::dropIfExists('visit_services');
     }
 };

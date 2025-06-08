@@ -1,11 +1,11 @@
 @extends('admin.layouts.master')
-@section('title') Forms @endsection
+@section('title') Visit Services @endsection
 @section('css')
 @endsection
 @section('content')
 @component('admin.components.breadcrumb')
-@slot('li_1') Forms @endslot
-@slot('title') Show Form @endslot
+@slot('li_1') Visit Services @endslot
+@slot('title') Show Visit Service @endslot
 @endcomponent
 <div class="row">
     <div class="col">
@@ -27,50 +27,43 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title mb-0">Form information</h4>
+                            <h4 class="card-title mb-0">Visit Service information</h4>
                         </div>
                         <div class="card-body">
-                            <div class="mb-3">
-                                <h4 class="fs-15">Form name</h4>
-                                {{$form->name}}
+                            <div>
+                                <figure class="figure">
+                                    <img src="{{$visitService->thumbnailUrl}}" alt="" class="rounded avatar-xl" style="object-fit: cover">
+                                </figure>
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">Form slug</h4>
-                                <span class="badge bg-primary"> {{$form->slug }} </span>
+                                <h4 class="fs-15">Visit Service name</h4>
+                                {{$visitService->name}}
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">Form status</h4>
-                                @if($form->status == 'draft')
-                                    <span class="badge bg-info">Draft</span>   
-                                @elseif($form->status == 'hidden')   
-                                    <span class="badge bg-primary">Hidden</span>                                                 
-                                @else
-                                    <span class="badge bg-success">Published</span>
-                                @endif
+                                <h4 class="fs-15">Visit Service duration</h4>
+                                <span class="badge bg-primary"> {{$visitService->formattedDuration }} </span>
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">Form has captcha?</h4>
-                                @if($form->has_captcha)
-                                    <span class="badge bg-danger">Yes</span>                                                  
-                                @else
-                                    <span class="badge bg-success">No</span>
-                                @endif
+                                <h4 class="fs-15">Visit Service capacity</h4>
+                                <span class="badge bg-primary"> {{$visitService->capacity }} </span>
+                            </div>
+
+
+                            <div class="mb-3">
+                                <h4 class="fs-15">VisitService created at</h4>
+                                {{$visitService->created_at}}
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">Form created at</h4>
-                                {{$form->created_at}}
-                            </div>
-
-                            <div class="mb-3">
-                                <h4 class="fs-15">Form updated at</h4>
-                                {{$form->updated_at}}
+                                <h4 class="fs-15">VisitService updated at</h4>
+                                {{$visitService->updated_at}}
                             </div>
                         </div>
                     </div>
+
 
                     <div class="card">
                         <div class="card-body">
@@ -89,13 +82,20 @@
                                 @foreach ($languages as $key => $language)
                                     <div class="tab-pane {{$key == 0 ? "active" : ""}}" id="{{$language->code}}" role="tabpanel">
                                         <div class="mb-3">
-                                            <h4 class="fs-15">Form {{$language->name}} title</h4>
-                                            {{$form->getTranslation('title', $language->code)}}
+                                            <h4 class="fs-15">VisitService {{$language->name}} title</h4>
+                                            {{$visitService->getTranslation('title', $language->code)}}
                                         </div>
 
                                         <div class="mb-3">
-                                            <h4 class="fs-15">Form {{$language->name}} description</h4>
-                                            {{$form->getTranslation('description', $language->code)}}
+                                            <h4 class="fs-15">VisitService {{$language->name}} description</h4>
+                                            {{$visitService->getTranslation('description', $language->code)}}
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <h4 class="fs-15">VisitService {{$language->name}} content</h4>
+                                            <x-markdown>
+                                                {{ $visitService->getTranslation('content', $language->code) }}
+                                            </x-markdown>
                                         </div>
                                     </div>
                                 @endforeach
@@ -104,10 +104,10 @@
                     </div>
 
                     <div class="text-end mb-3">
-                        <a href="{{ route('admin.forms.index') }}" class="btn btn-primary w-sm">Back</a>
+                        <a href="{{ route('admin.visit-services.index') }}" class="btn btn-primary w-sm">Back</a>
                         
-                        @haspermission('admin.forms.update')
-                            <a href="{{ route('admin.forms.edit', $form->id) }}" class="btn btn-success w-sm">Edit</a>
+                        @haspermission('admin.visit-services.update')
+                            <a href="{{ route('admin.visit-services.edit', $visitService->id) }}" class="btn btn-success w-sm">Edit</a>
                         @endhaspermission
                     </div>
                 </div>

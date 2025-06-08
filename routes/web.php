@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\ProgramsController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\Admin\VisitServicesController;
 use App\Http\Controllers\PagesController as ControllersPagesController;
 use App\Models\Language;
 use Illuminate\Support\Facades\Route;
@@ -215,15 +216,18 @@ Route::middleware(['auth', 'force.admin.english'])->prefix('admin')->group(funct
     Route::get('settings/{setting}/edit', [SettingsController::class, 'edit'])->middleware('check.permission:admin.settings.edit')->name('admin.settings.edit');
     Route::patch('settings/{setting}', [SettingsController::class, 'update'])->middleware('check.permission:admin.settings.update')->name('admin.settings.update');
 
-    // Forms
-    Route::get('forms', [FormsController::class, 'index'])->middleware('check.permission:admin.forms.index')->name('admin.forms.index');
-    Route::get('forms/create', [FormsController::class, 'create'])->middleware('check.permission:admin.forms.store')->name('admin.forms.create');
-    Route::post('forms', [FormsController::class, 'store'])->middleware('check.permission:admin.forms.store')->name('admin.forms.store');
-    Route::get('forms/{form}', [FormsController::class, 'show'])->middleware('check.permission:admin.forms.show')->name('admin.forms.show');
-    Route::get('forms/{form}/edit', [FormsController::class, 'edit'])->middleware('check.permission:admin.forms.update')->name('admin.forms.edit');
-    Route::patch('forms/{form}/update-translation', [FormsController::class, 'updateTranslation'])->middleware('check.permission:admin.forms.update')->name('admin.forms.update-translation');
-    Route::patch('forms/{form}', [FormsController::class, 'update'])->middleware('check.permission:admin.forms.update')->name('admin.forms.update');
-    Route::delete('forms/{form}', [FormsController::class, 'destroy'])->middleware('check.permission:admin.forms.destroy')->name('admin.forms.destroy');
+    // Visits Services
+    Route::get('visit-services/order', [VisitServicesController::class, 'orderPage'])->middleware('check.permission:admin.visit-services.order')->name('admin.visit-services.order-page');
+    Route::post('visit-services/order', [VisitServicesController::class, 'order'])->middleware('check.permission:admin.visit-services.order')->name('admin.visit-services.order');
+
+    Route::get('visit-services', [VisitServicesController::class, 'index'])->middleware('check.permission:admin.visit-services.index')->name('admin.visit-services.index');
+    Route::get('visit-services/create', [VisitServicesController::class, 'create'])->middleware('check.permission:admin.visit-services.store')->name('admin.visit-services.create');
+    Route::post('visit-services', [VisitServicesController::class, 'store'])->middleware('check.permission:admin.visit-services.store')->name('admin.visit-services.store');
+    Route::get('visit-services/{visitService}', [VisitServicesController::class, 'show'])->middleware('check.permission:admin.visit-services.show')->name('admin.visit-services.show');
+    Route::get('visit-services/{visitService}/edit', [VisitServicesController::class, 'edit'])->middleware('check.permission:admin.visit-services.update')->name('admin.visit-services.edit');
+    Route::patch('visit-services/{visitService}/update-translation', [VisitServicesController::class, 'updateTranslation'])->middleware('check.permission:admin.visit-services.update')->name('admin.visit-services.update-translation');
+    Route::patch('visit-services/{visitService}', [VisitServicesController::class, 'update'])->middleware('check.permission:admin.visit-services.update')->name('admin.visit-services.update');
+    Route::delete('visit-services/{visitService}', [VisitServicesController::class, 'destroy'])->middleware('check.permission:admin.visit-services.destroy')->name('admin.visit-services.destroy');
 });
 
 Route::middleware(['set.locale'])->group(function () {
