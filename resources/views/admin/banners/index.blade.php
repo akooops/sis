@@ -133,7 +133,7 @@
                                                             <li><a class="dropdown-item" href="{{route('admin.banners.edit', $banner->id)}}"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit</a></li>
                                                         @endhaspermission
 
-                                                        @haspermission('admin.banners.delete')
+                                                        @haspermission('admin.banners.destroy')
                                                             <form action="{{route('admin.banners.destroy', $banner->id)}}" method="POST">
                                                                 @csrf
                                                                 @method('delete')

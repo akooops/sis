@@ -125,7 +125,7 @@
                                                         @endhaspermission
 
                                                         @if(!$page->is_system_page)
-                                                        @haspermission('admin.pages.delete')
+                                                        @haspermission('admin.pages.destroy')
                                                             <form action="{{route('admin.pages.destroy', $page->id)}}" method="POST">
                                                                 @csrf
                                                                 @method('delete')

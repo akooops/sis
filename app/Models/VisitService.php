@@ -23,6 +23,11 @@ class VisitService extends Model
         return $this->morphOne(File::class, 'model')->where('is_main', 1);
     }
 
+    public function visitTimeSlots()
+    {
+        return $this->hasMany(VisitTimeSlot::class);
+    }
+
     //Accessors & Mutators
     public function getThumbnailUrlAttribute()
     {

@@ -30,7 +30,7 @@ class StoreEventRequest extends FormRequest
             'content' => 'required|string',
             'status' => 'required|string|in:draft,hidden,published',
             'starts_at' => 'required|date_format:Y-m-d H:i',
-            'ends_at' => 'required|date_format:Y-m-d H:i|after_or_equal:ends_at',      
+            'ends_at' => 'required|date_format:Y-m-d H:i|after_or_equal:starts_at',      
             'file' => 'nullable|file|image', 
             'media_id' => 'nullable|exists:media,id',
         ];

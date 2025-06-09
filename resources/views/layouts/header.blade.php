@@ -45,7 +45,7 @@
                     </li>
 
                     <li class="nav-item d-none d-md-block me-6">
-                        <a class="nav-link text-white main-nav-link" href="#">
+                        <a class="nav-link text-white main-nav-link" href="https://eregistration.sis.edu.sa/en-GB/Saud">
                             {{getLanguageKeyLocalTranslation('navbar_applications_nav_link')}}
                         </a>
                     </li>

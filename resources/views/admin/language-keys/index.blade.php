@@ -92,7 +92,7 @@
                                                             <li><a class="dropdown-item" href="{{route('admin.language-keys.edit', $languageKey->id)}}"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit</a></li>
                                                         @endhaspermission
 
-                                                        @haspermission('admin.language-keys.delete')
+                                                        @haspermission('admin.language-keys.destroy')
                                                             <form action="{{route('admin.language-keys.destroy', $languageKey->id)}}" method="POST">
                                                                 @csrf
                                                                 @method('delete')

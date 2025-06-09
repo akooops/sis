@@ -6,7 +6,7 @@
     <title>@yield('title') | Saud international schools - Admin Control Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- App favicon -->
-    <link rel="shortcut icon" href="{{ URL::asset('assets/img/logo-light.png')}}">
+    <link rel="shortcut icon" href="{{ URL::asset('assets/img/favicon.png')}}">
         @include('admin.layouts.head-css')
   </head>
 

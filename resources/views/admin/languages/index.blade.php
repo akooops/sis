@@ -110,7 +110,7 @@
                                                         @endhaspermission
 
                                                         @if(!$language->is_default)
-                                                            @haspermission('admin.languages.delete')
+                                                            @haspermission('admin.languages.destroy')
                                                                 <form action="{{route('admin.languages.destroy', $language->id)}}" method="POST">
                                                                     @csrf
                                                                     @method('delete')

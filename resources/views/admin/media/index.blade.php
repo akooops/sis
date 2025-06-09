@@ -114,7 +114,7 @@
                                                         @endhaspermission
 
                                                         @if(!$media->mediable)
-                                                            @haspermission('admin.media.delete')
+                                                            @haspermission('admin.media.destroy')
                                                                 <form action="{{route('admin.media.destroy', $media->id)}}" method="POST">
                                                                     @csrf
                                                                     @method('delete')

@@ -118,7 +118,7 @@
                                                             <li><a class="dropdown-item" href="{{route('admin.albums.edit', $album->id)}}"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit</a></li>
                                                         @endhaspermission
 
-                                                        @haspermission('admin.albums.delete')
+                                                        @haspermission('admin.albums.destroy')
                                                             <form action="{{route('admin.albums.destroy', $album->id)}}" method="POST">
                                                                 @csrf
                                                                 @method('delete')

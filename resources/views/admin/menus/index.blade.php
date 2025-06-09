@@ -96,7 +96,7 @@
                                                             <li><a class="dropdown-item" href="{{route('admin.menus.edit', $menu->id)}}"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit</a></li>
                                                         @endhaspermission
 
-                                                        @haspermission('admin.menus.delete')
+                                                        @haspermission('admin.menus.destroy')
                                                             <form action="{{route('admin.menus.destroy', $menu->id)}}" method="POST">
                                                                 @csrf
                                                                 @method('delete')

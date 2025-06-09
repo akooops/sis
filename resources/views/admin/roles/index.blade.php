@@ -100,7 +100,7 @@
                                                             <li><a class="dropdown-item" href="{{route('admin.roles.edit', $role->id)}}"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit</a></li>
                                                         @endhaspermission
 
-                                                        @haspermission('admin.roles.delete')
+                                                        @haspermission('admin.roles.destroy')
                                                             <form action="{{route('admin.roles.destroy', $role->id)}}" method="POST">
                                                                 @csrf
                                                                 @method('delete')

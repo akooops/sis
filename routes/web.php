@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\VisitServicesController;
+use App\Http\Controllers\Admin\VisitTimeSlotsController;
 use App\Http\Controllers\PagesController as ControllersPagesController;
 use App\Models\Language;
 use Illuminate\Support\Facades\Route;
@@ -228,6 +229,15 @@ Route::middleware(['auth', 'force.admin.english'])->prefix('admin')->group(funct
     Route::patch('visit-services/{visitService}/update-translation', [VisitServicesController::class, 'updateTranslation'])->middleware('check.permission:admin.visit-services.update')->name('admin.visit-services.update-translation');
     Route::patch('visit-services/{visitService}', [VisitServicesController::class, 'update'])->middleware('check.permission:admin.visit-services.update')->name('admin.visit-services.update');
     Route::delete('visit-services/{visitService}', [VisitServicesController::class, 'destroy'])->middleware('check.permission:admin.visit-services.destroy')->name('admin.visit-services.destroy');
+
+    // Visits Time Slots
+    Route::get('visit-services/{visitService}/visit-time-slots', [VisitTimeSlotsController::class, 'index'])->middleware('check.permission:admin.visit-time-slots.index')->name('admin.visit-time-slots.index');
+    Route::get('visit-services/{visitService}/visit-time-slots/create', [VisitTimeSlotsController::class, 'create'])->middleware('check.permission:admin.visit-time-slots.store')->name('admin.visit-time-slots.create');
+    Route::post('visit-services/{visitService}/visit-time-slots', [VisitTimeSlotsController::class, 'store'])->middleware('check.permission:admin.visit-time-slots.store')->name('admin.visit-time-slots.store');
+    Route::get('visit-time-slots/{visitTimeSlot}', [VisitTimeSlotsController::class, 'show'])->middleware('check.permission:admin.visit-time-slots.show')->name('admin.visit-time-slots.show');
+    Route::get('visit-time-slots/{visitTimeSlot}/edit', [VisitTimeSlotsController::class, 'edit'])->middleware('check.permission:admin.visit-time-slots.update')->name('admin.visit-time-slots.edit');
+    Route::patch('visit-time-slots/{visitTimeSlot}', [VisitTimeSlotsController::class, 'update'])->middleware('check.permission:admin.visit-time-slots.update')->name('admin.visit-time-slots.update');
+    Route::delete('visit-time-slots/{visitTimeSlot}', [VisitTimeSlotsController::class, 'destroy'])->middleware('check.permission:admin.visit-time-slots.destroy')->name('admin.visit-time-slots.destroy');
 });
 
 Route::middleware(['set.locale'])->group(function () {

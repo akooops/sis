@@ -108,7 +108,7 @@
                                                             <li><a class="dropdown-item" href="{{route('admin.programs.edit', $program->id)}}"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit</a></li>
                                                         @endhaspermission
 
-                                                        @haspermission('admin.programs.delete')
+                                                        @haspermission('admin.programs.destroy')
                                                             <form action="{{route('admin.programs.destroy', $program->id)}}" method="POST">
                                                                 @csrf
                                                                 @method('delete')

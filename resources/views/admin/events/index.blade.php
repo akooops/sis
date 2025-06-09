@@ -124,7 +124,7 @@
                                                             <li><a class="dropdown-item" href="{{route('admin.events.edit', $event->id)}}"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit</a></li>
                                                         @endhaspermission
 
-                                                        @haspermission('admin.events.delete')
+                                                        @haspermission('admin.events.destroy')
                                                             <form action="{{route('admin.events.destroy', $event->id)}}" method="POST">
                                                                 @csrf
                                                                 @method('delete')
