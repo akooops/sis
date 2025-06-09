@@ -74,17 +74,17 @@ document.addEventListener('DOMContentLoaded', function() {
   var calendarEl = document.getElementById('calendar');
 
   var calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'timeGridWeek', // Set default view
+    initialView: 'dayGridWeek', // Set default view
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        right: 'dayGridMonth,dayGridWeek'
     },
     events: [
       @foreach($visitTimeSlots as $visitTimeSlot)
       {
+        title: '{{$visitTimeSlot->starts_at}}',
         start: '{{$visitTimeSlot->starts_at}}',
-        end: '{{$visitTimeSlot->ends_at}}',
         url: '{{route("admin.visit-time-slots.edit", $visitTimeSlot->id)}}'
       },
       @endforeach

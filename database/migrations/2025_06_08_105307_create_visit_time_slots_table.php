@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('visit_time_slots', function (Blueprint $table) {
             $table->id();
             $table->dateTime('starts_at');
-            $table->dateTime('ends_at');
 
             $table->unsignedBigInteger('visit_service_id')->nullable();
             $table->foreign('visit_service_id')->references('id')->on('visit_services')->nullOnDelete();

@@ -239,7 +239,27 @@ class LanguageTranslationSeeder extends Seeder
             'visits_page_select_button' => [
                 'en' => 'Select',
                 'ar' => 'إختيار'
-            ]
+            ],
+            'visit_page_step_1' => [
+                'en' => 'Service',
+                'ar' => 'الخدمة'
+            ],
+            'visit_page_step_2' => [
+                'en' => 'Time',
+                'ar' => 'الوقت'
+            ],
+            'visit_page_step_3' => [
+                'en' => 'Confirm',
+                'ar' => 'تأكيد'
+            ],
+            'visit_pages_visitors_count' => [
+                'en' => 'Visitors',
+                'ar' => 'الزوار'
+            ],
+            'visits_page_confirmation_title' => [
+                'en' => 'Please, confirm details',
+                'ar' => 'من فضلك قم بالتأكيد'
+            ],
         ];
 
         // Seed language keys and translations

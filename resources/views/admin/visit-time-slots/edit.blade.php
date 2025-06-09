@@ -42,18 +42,6 @@
                                         </p>
                                     @enderror
                                 </div>
-
-                                <div class="mb-4">
-                                    <label class="form-label" for="">Visit Time Slot Ends At</label>
-                                    <input name="ends_at" value="{{$visitTimeSlot->ends_at}}" type="text" id="datepicker-from-input" class="form-control flatpickr-input" data-provider="flatpickr" data-date-format="Y-m-d" data-enable-time="true" readonly="readonly">
-                                    @error('ends_at')
-                                        <p class="mx-2 my-2 text-danger">
-                                            <strong>
-                                                {{$message}}
-                                            </strong>
-                                        </p>
-                                    @enderror
-                                </div>
                             </div>
                         </div>
                         

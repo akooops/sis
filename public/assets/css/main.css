@@ -219,6 +219,53 @@
     object-fit: cover;
 }
 
+.step {
+    display: flex;
+    align-items: center;
+    color: #6c757d;
+}
+.step.active {
+    color: #2A5D91;
+    font-weight: bold;
+}
+.step.completed {
+    color: #198754;
+}
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+}
+.step.active .step-number {
+    background: #2A5D91;
+    color: white;
+}
+.step.completed .step-number {
+    background: #198754;
+    color: white;
+}
+.step-divider {
+    width: 35px;
+    height: 2px;
+    background: #e9ecef;
+    margin: 0 16px;
+}
+
+.fc-daygrid-event{  
+    cursor: pointer;
+    background-color: #2A5D91;
+    color: #fff;
+}
+
+.fc-daygrid-event:hover{  
+    background-color: #2A5D91;
+}
+
 @media (min-width: 1024px) {
     .logo{
         height: 72px;
