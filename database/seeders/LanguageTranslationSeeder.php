@@ -232,6 +232,14 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Events',
                 'ar' => 'الفعاليات'
             ],
+            'visits_page_read_more_cta' => [
+                'en' => 'Read more',
+                'ar' => 'تعرف على المزيد'
+            ],
+            'visits_page_select_button' => [
+                'en' => 'Select',
+                'ar' => 'إختيار'
+            ]
         ];
 
         // Seed language keys and translations

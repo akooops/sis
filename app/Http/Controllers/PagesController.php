@@ -9,6 +9,7 @@ use App\Models\Event;
 use App\Models\Grade;
 use App\Models\Page;
 use App\Models\Program;
+use App\Models\VisitService;
 use App\Services\IndexService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -55,6 +56,23 @@ class PagesController extends Controller
         if(!$page) abort(404);
 
         return view('page', compact('page'));
+    }
+
+    public function visits(Request $request)
+    {
+        $page = Page::where([
+            'slug' => 'visits',
+            'status' => 'published'
+        ])->first();
+
+        if(!$page) abort(404);
+
+        $visitServices = VisitService::orderBy('order')->latest()->get();
+
+        return view('visits', [
+            'page' => $page,
+            'visitServices' => $visitServices
+        ]);
     }
 
     public function articles(Request $request)

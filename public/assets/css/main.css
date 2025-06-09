@@ -210,6 +210,15 @@
     background-repeat: no-repeat;
 }
 
+.visit-service-figure{
+    height: 350px;
+}
+
+.visit-service-figure img{
+    height: 100% !important;
+    object-fit: cover;
+}
+
 @media (min-width: 1024px) {
     .logo{
         height: 72px;
