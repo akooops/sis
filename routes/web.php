@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\VisitServicesController;
 use App\Http\Controllers\Admin\VisitTimeSlotsController;
 use App\Http\Controllers\PagesController as ControllersPagesController;
+use App\Http\Controllers\VisitBookingsController;
 use App\Models\Language;
 use Illuminate\Support\Facades\Route;
 
@@ -256,6 +257,8 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/albums/{slug}', [ControllersPagesController::class, 'album'])->name('album');
     Route::get('/events/{slug}', [ControllersPagesController::class, 'event'])->name('event');
     Route::get('/grades/{slug}', [ControllersPagesController::class, 'grade'])->name('grade');
+
+    Route::post('visit-services/{visitService}/visit-bookings', [VisitBookingsController::class, 'visitBookings'])->name('visit-bookings.store');
 });
 
 Route::get('language/{locale}', function ($locale) {
@@ -268,3 +271,4 @@ Route::get('language/{locale}', function ($locale) {
     
     return redirect()->back();
 })->name('locale.switch');
+

@@ -60,7 +60,7 @@ class StoreVisitBookingRequest extends FormRequest
     
     protected function prepareForValidation()
     {
-        if ($this->has('phone')) {
+        if ($this->has('phone') && !empty($this->input('phone'))) {
             $phoneUtil = PhoneNumberUtil::getInstance();
             try {
                 $phoneNumber = $phoneUtil->parse($this->input('phone'), null);

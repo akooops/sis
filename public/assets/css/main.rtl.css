@@ -296,7 +296,9 @@
     border-bottom-left-radius: 0;
     border-radius: 0.4rem;
 }
-
+.iti--inline-dropdown .iti__dropdown-content{
+    z-index: 9999;
+}
 @media (min-width: 1024px) {
     .logo{
         height: 72px;

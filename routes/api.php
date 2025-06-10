@@ -19,5 +19,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('visit-services/{visitService}/visit-bookings', [VisitBookingsController::class, 'visitBookings'])->name('visit-bookings.store');
 

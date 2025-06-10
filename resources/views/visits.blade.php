@@ -82,6 +82,15 @@
 
         <!-- Step 1: Service Selection -->
         <div v-show="currentStep === 1">
+            <!-- Success/Error Alert -->
+            <div v-if="showAlert" class="alert mb-4" :class="alertType === 'success' ? 'alert-success' : 'alert-danger'" role="alert">
+                <div class="d-flex align-items-center">
+                    <i :class="alertType === 'success' ? 'uil uil-check-circle' : 'uil uil-exclamation-triangle'" class="me-2"></i>
+                    @{{ alertMessage }}
+                    <button type="button" class="btn-close ms-auto" @click="showAlert = false"></button>
+                </div>
+            </div>
+
             <div class="row gx-8 gy-4">
                 @foreach ($visitServices as $visitService)
                     <div class="col-md-6 col-lg-4">
@@ -186,74 +195,132 @@
         <div v-show="currentStep === 3">
             <div class="row justify-content-center">
                 <div class="col-10">
+                    <!-- Success/Error Alert -->
+                    <div v-if="showAlert" class="alert mb-4" :class="alertType === 'success' ? 'alert-success' : 'alert-danger'" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i :class="alertType === 'success' ? 'uil uil-check-circle' : 'uil uil-exclamation-triangle'" class="me-2"></i>
+                            @{{ alertMessage }}
+                            <button type="button" class="btn-close ms-auto" @click="showAlert = false"></button>
+                        </div>
+                    </div>
+
                     <div class="card">
                         <div class="card-body">
-
                             <h2>{{getLanguageKeyLocalTranslation('visits_page_confirmation_title')}}</h2>
 
                             <div class="mt-6" v-if="selectedTimeSlot">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="input-group mb-4">
-                                            <span class="input-group-text">
-                                                <i class="uil uil-user"></i>
-                                            </span>
-                                            <input id="nameInput" type="text" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('visits_page_name_input')}}">   
+                                <form @submit.prevent="confirmBooking()">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <!-- Guardian Name -->
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text">
+                                                    <i class="uil uil-user"></i>
+                                                </span>
+                                                <input id="nameInput" 
+                                                    v-model.trim="bookingForm.guardian_name"
+                                                    type="text" 
+                                                    class="form-control"
+                                                    :class="{ 'is-invalid': errors.guardian_name }"
+                                                    placeholder="{{getLanguageKeyLocalTranslation('visits_page_name_input')}}">   
+                                            </div>
+                                            <div v-if="errors.guardian_name" class="text-danger small mb-3">@{{ errors.guardian_name }}</div>
+                                            <div v-else class="mb-3"></div>
+
+                                            <!-- Email -->
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text">
+                                                    <i class="uil uil-envelope"></i>
+                                                </span>
+                                                <input id="emailInput" 
+                                                    v-model.trim="bookingForm.email"
+                                                    type="email" 
+                                                    class="form-control"
+                                                    :class="{ 'is-invalid': errors.email }"
+                                                    placeholder="{{getLanguageKeyLocalTranslation('visits_page_email_input')}}">   
+                                            </div>
+                                            <div v-if="errors.email" class="text-danger small mb-3">@{{ errors.email }}</div>
+                                            <div v-else class="mb-3"></div>
+
+                                            <!-- Phone -->
+                                            <div class="mb-2">
+                                                <input id="phoneInput" 
+                                                    v-model.trim="bookingForm.phone"
+                                                    type="text" 
+                                                    class="form-control"
+                                                    :class="{ 'is-invalid': errors.phone }"
+                                                    placeholder="{{getLanguageKeyLocalTranslation('visits_page_phone_input')}}">                                 
+                                            </div>
+                                            <div v-if="errors.phone" class="text-danger small mb-3">@{{ errors.phone }}</div>
+                                            <div v-else class="mb-3"></div>
+
+                                            <!-- Student Name -->
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text">
+                                                    <i class="uil uil-book-reader"></i>
+                                                </span>
+                                                <input id="studentNameInput" 
+                                                    v-model.trim="bookingForm.student_name"
+                                                    type="text" 
+                                                    class="form-control"
+                                                    :class="{ 'is-invalid': errors.student_name }"
+                                                    placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_name_input')}}">   
+                                            </div>
+                                            <div v-if="errors.student_name" class="text-danger small mb-3">@{{ errors.student_name }}</div>
+                                            <div v-else class="mb-3"></div>
+
+                                            <!-- Student Grade -->
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text">
+                                                    <i class="uil uil-code-branch"></i>
+                                                </span>
+                                                <input id="gradeInput" 
+                                                    v-model.trim="bookingForm.student_grade"
+                                                    type="text" 
+                                                    class="form-control"
+                                                    :class="{ 'is-invalid': errors.student_grade }"
+                                                    placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_grade_input')}}">   
+                                            </div>
+                                            <div v-if="errors.student_grade" class="text-danger small mb-3">@{{ errors.student_grade }}</div>
+                                            <div v-else class="mb-3"></div>
+
+                                            <!-- Student School -->
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text">
+                                                    <i class="uil uil-university"></i>
+                                                </span>
+                                                <input id="schoolInput" 
+                                                    v-model.trim="bookingForm.student_school"
+                                                    type="text" 
+                                                    class="form-control"
+                                                    :class="{ 'is-invalid': errors.student_school }"
+                                                    placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_school_input')}}">   
+                                            </div>
+                                            <div v-if="errors.student_school" class="text-danger small mb-3">@{{ errors.student_school }}</div>
+                                            <div v-else class="mb-3"></div>
                                         </div>
 
-                                        <div class="input-group mb-4">
-                                            <span class="input-group-text">
-                                                <i class="uil uil-envelope"></i>
-                                            </span>
-                                            <input id="emailInput" type="email" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('visits_page_email_input')}}">   
-                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>{{getLanguageKeyLocalTranslation('visit_pages_selected_service')}}:</strong> @{{ selectedService.name }}</p>
+                                            <p><strong>{{getLanguageKeyLocalTranslation('visits_page_date_time')}}:</strong> @{{ formatDateTime(selectedTimeSlot.start) }}</p>
+                                            <p><strong>{{getLanguageKeyLocalTranslation('visit_pages_visitors_count')}}:</strong> @{{ selectedService.visitorCount }}</p>
 
-                                        <div class="mb-4">
-                                            <input id="phoneInput" type="text" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('visits_page_phone_input')}}">                                 
-                                        </div>
-                                        <!-- /.form-floating -->
-
-                                        <div class="input-group mb-4">
-                                            <span class="input-group-text">
-                                                <i class="uil uil-book-reader"></i>
-                                            </span>
-                                            <input id="studentNameInput" type="text" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_name_input')}}">   
-                                        </div>
-
-                                        <div class="input-group mb-4">
-                                            <span class="input-group-text">
-                                                <i class="uil uil-code-branch"></i>
-                                            </span>
-                                            <input id="gradeInput" type="text" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_grade_input')}}">   
-                                        </div>
-
-                                        <div class="input-group mb-4">
-                                            <span class="input-group-text">
-                                                <i class="uil uil-university"></i>
-                                            </span>
-                                            <input id="schoolInput" type="text" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_school_input')}}">   
-                                        </div>
+                                            <div class="d-flex justify-content-end">
+                                                <button type="submit" class="btn btn-primary" :disabled="bookingInProgress">
+                                                    <span v-if="bookingInProgress" class="spinner-border spinner-border-sm me-2"></span>
+                                                    {{getLanguageKeyLocalTranslation('visits_page_confirm_button')}}
+                                                </button>
+                                            </div>
+                                        </div>  
                                     </div>
-
-                                    <div class="col-md-6">
-                                        <p><strong>{{getLanguageKeyLocalTranslation('visit_pages_selected_service')}}:</strong> @{{ selectedService.name }}</p>
-                                        <p><strong>{{getLanguageKeyLocalTranslation('visits_page_date_time')}}:</strong> @{{ formatDateTime(selectedTimeSlot.start) }}</p>
-                                        <p><strong>{{getLanguageKeyLocalTranslation('visit_pages_visitors_count')}}:</strong> @{{ selectedService.visitorCount }}</p>
-
-                                        <div class="d-flex justify-content-end">
-                                            <button class="btn btn-primary" :disabled="bookingInProgress">
-                                                <span v-if="bookingInProgress" class="spinner-border spinner-border-sm me-2"></span>
-                                                {{getLanguageKeyLocalTranslation('visits_page_confirm_button')}}
-                                            </button>
-                                        </div>
-                                    </div>  
-                                </div>              
+                                </form>              
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
 
     </div>
 </section>
@@ -282,6 +349,7 @@ window.visitServicesData = {
 <script src='{{ URL::asset('assets/libs/calendar/locales-all.min.js')}}'></script>
 
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/intlTelInput.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/utils.js"></script> <!-- Add this -->
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
@@ -302,7 +370,23 @@ createApp({
             },
             selectedTimeSlot: null,
             bookingInProgress: false,
-            iti: null 
+            iti: null,
+            
+            // Form data
+            bookingForm: {
+                guardian_name: '',
+                email: '',
+                phone: '',
+                student_name: '',
+                student_grade: '',
+                student_school: ''
+            },
+            
+            // Error handling
+            errors: {},
+            showAlert: false,
+            alertType: 'success', // 'success' or 'error'
+            alertMessage: ''
         }
     },
     methods: {
@@ -359,11 +443,11 @@ createApp({
                 id: event.id,
                 start: event.start,
                 end: event.end,
-                availableSpots: event.extendedProps.availableSpots
+                availableSpots: event.extendedProps?.availableSpots
             };
             
             this.currentStep = 3;
-
+            
             nextTick(() => {
                 this.initIntlTelInput();
             });
@@ -383,9 +467,95 @@ createApp({
                 preferredCountries: ["sa", "ae", "eg"],
                 separateDialCode: true,
                 formatOnDisplay: true,
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/utils.js"
             });
 
             input.iti = this.iti;
+        },
+
+        async confirmBooking() {
+            this.bookingInProgress = true;
+            this.errors = {};
+            this.showAlert = false;
+            
+            // Get the full international phone number
+            const fullPhoneNumber = this.iti ? this.iti.getNumber() : this.bookingForm.phone;
+
+            try {
+                const response = await fetch('{{route("visit-bookings.store", $visitService->id)}}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        guardian_name: this.bookingForm.guardian_name.trim() || null,
+                        email: this.bookingForm.email.trim() || null,
+                        phone: fullPhoneNumber.trim() || null,
+                        student_name: this.bookingForm.student_name.trim() || null,
+                        student_grade: this.bookingForm.student_grade.trim() || null,
+                        student_school: this.bookingForm.student_school.trim() || null,
+                        visitors_count: this.selectedService.visitorCount,
+                        visit_time_slot_id: this.selectedTimeSlot.id
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.status === 'success') {
+                    this.showSuccessAlert('{{getLanguageKeyLocalTranslation('visit_pages_booking_success')}}');
+                    this.resetBooking();
+                } else {
+                    if (result.errors) {
+                        this.handleValidationErrors(result.errors);
+                    } else {
+                        this.showErrorAlert(result.message || '{{getLanguageKeyLocalTranslation('visit_pages_booking_error')}}');
+                    }
+                }
+            } catch (error) {
+                this.showErrorAlert('{{getLanguageKeyLocalTranslation('visit_pages_booking_error')}}');
+            } finally {
+                this.bookingInProgress = false;
+            }
+        },
+
+        handleValidationErrors(errors) {
+            this.errors = {};
+            
+            // Handle Laravel validation errors format
+            if (Array.isArray(errors)) {
+                errors.forEach(error => {
+                    this.errors[error.field] = error.message;
+                });
+            } else {
+                // Handle standard Laravel validation errors
+                Object.keys(errors).forEach(field => {
+                    this.errors[field] = Array.isArray(errors[field]) ? errors[field][0] : errors[field];
+                });
+            }
+        },
+
+        showSuccessAlert(message) {
+            this.alertType = 'success';
+            this.alertMessage = message;
+            this.showAlert = true;
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                this.showAlert = false;
+            }, 5000);
+        },
+
+        showErrorAlert(message) {
+            this.alertType = 'error';
+            this.alertMessage = message;
+            this.showAlert = true;
+            
+            // Auto hide after 8 seconds
+            setTimeout(() => {
+                this.showAlert = false;
+            }, 8000);
         },
 
         formatDateTime(dateString) {
@@ -396,6 +566,16 @@ createApp({
             this.currentStep = 1;
             this.selectedService = { id: null, name: '', visitorCount: 1, capacity: 0 };
             this.selectedTimeSlot = null;
+            this.bookingForm = {
+                guardian_name: '',
+                email: '',
+                phone: '',
+                student_name: '',
+                student_grade: '',
+                student_school: ''
+            };
+            this.errors = {};
+            
             if (this.calendar) {
                 this.calendar.destroy();
                 this.calendar = null;
@@ -420,4 +600,5 @@ createApp({
     }
 }).mount('#booking-app');
 </script>
+
 @endsection

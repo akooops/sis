@@ -296,6 +296,15 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Selected service',
                 'ar' => 'الخدمة المختارة'
             ],
+            'visit_pages_booking_success' => [
+                'en' => 'Your booking has been confirmed successfully, our service will contact you soon!',
+                'ar' => 'تم تأكيد حجزك بنجاح، سيقوم فريقنا بالإتصال بكم قريبا!'
+            ],
+
+            'visit_pages_booking_error' => [
+                'en' => 'An error occurred while processing your booking. Please try again.',
+                'ar' => 'حدث خطأ أثناء معالجة حجزك. يرجى المحاولة مرة أخرى.'
+            ],
         ];
 
         // Seed language keys and translations
