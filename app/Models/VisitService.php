@@ -28,6 +28,11 @@ class VisitService extends Model
         return $this->hasMany(VisitTimeSlot::class);
     }
 
+    public function visitBookings()
+    {
+        return $this->hasMany(VisitBooking::class);
+    }
+
     //Accessors & Mutators
     public function getThumbnailUrlAttribute()
     {
