@@ -106,6 +106,14 @@
                                                     </a>
 
                                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink1" style="">
+                                                        @haspermission('admin.visit-time-slots.index')
+                                                            <li><a class="dropdown-item" href="{{route('admin.visit-time-slots.index', ['visitService' => $visitService->id])}}"><i class="ri-time-fill align-bottom me-2 text-muted"></i> Time Slots</a></li>
+                                                        @endhaspermission
+
+                                                        @haspermission('admin.visit-bookings.index')
+                                                            <li><a class="dropdown-item" href="{{route('admin.visit-bookings.index', ['visitService' => $visitService->id])}}"><i class="ri-book-fill align-bottom me-2 text-muted"></i> Bookings</a></li>
+                                                        @endhaspermission
+
                                                         @haspermission('admin.visit-services.show')
                                                             <li><a class="dropdown-item" href="{{route('admin.visit-services.show', $visitService->id)}}"><i class="ri-eye-fill align-bottom me-2 text-muted"></i> View</a></li>
                                                         @endhaspermission

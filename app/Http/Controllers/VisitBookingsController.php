@@ -22,7 +22,6 @@ class VisitBookingsController extends Controller
 {
     public function visitBookings(StoreVisitBookingRequest $request, VisitService $visitService)
     {
-        dd();
         $timeSlot = VisitTimeSlot::findOrFail($request->visit_time_slot_id);
 
         $booking  = VisitBooking::create(array_merge(

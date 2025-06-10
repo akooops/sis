@@ -20,10 +20,11 @@ use App\Http\Controllers\Admin\ProgramsController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\Admin\VisitBookingsController;
 use App\Http\Controllers\Admin\VisitServicesController;
 use App\Http\Controllers\Admin\VisitTimeSlotsController;
 use App\Http\Controllers\PagesController as ControllersPagesController;
-use App\Http\Controllers\VisitBookingsController;
+use App\Http\Controllers\VisitBookingsController as ControllersVisitBookingsController;
 use App\Models\Language;
 use Illuminate\Support\Facades\Route;
 
@@ -239,6 +240,12 @@ Route::middleware(['auth', 'force.admin.english'])->prefix('admin')->group(funct
     Route::get('visit-time-slots/{visitTimeSlot}/edit', [VisitTimeSlotsController::class, 'edit'])->middleware('check.permission:admin.visit-time-slots.update')->name('admin.visit-time-slots.edit');
     Route::patch('visit-time-slots/{visitTimeSlot}', [VisitTimeSlotsController::class, 'update'])->middleware('check.permission:admin.visit-time-slots.update')->name('admin.visit-time-slots.update');
     Route::delete('visit-time-slots/{visitTimeSlot}', [VisitTimeSlotsController::class, 'destroy'])->middleware('check.permission:admin.visit-time-slots.destroy')->name('admin.visit-time-slots.destroy');
+
+    // Visits Bookings
+    Route::get('visit-services/{visitService}/visit-bookings', [VisitBookingsController::class, 'index'])->middleware('check.permission:admin.visit-bookings.index')->name('admin.visit-bookings.index');
+    Route::get('visit-bookings/{visitBooking}', [VisitBookingsController::class, 'show'])->middleware('check.permission:admin.visit-bookings.show')->name('admin.visit-bookings.show');
+    Route::patch('vsit-bookings/{visitBooking}', [VisitBookingsController::class, 'update'])->middleware('check.permission:admin.visit-bookings.update')->name('admin.visit-bookings.update');
+    Route::delete('visit-bookings/{visitBooking}', [VisitBookingsController::class, 'destroy'])->middleware('check.permission:admin.visit-bookings.destroy')->name('admin.visit-bookings.destroy');
 });
 
 Route::middleware(['set.locale'])->group(function () {
@@ -258,7 +265,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/events/{slug}', [ControllersPagesController::class, 'event'])->name('event');
     Route::get('/grades/{slug}', [ControllersPagesController::class, 'grade'])->name('grade');
 
-    Route::post('visit-services/{visitService}/visit-bookings', [VisitBookingsController::class, 'visitBookings'])->name('visit-bookings.store');
+    Route::post('visit-services/{visitService}/visit-bookings', [ControllersVisitBookingsController::class, 'visitBookings'])->name('visit-bookings.store');
 });
 
 Route::get('language/{locale}', function ($locale) {
