@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Menus\DeleteMenuRequest;
 use App\Http\Requests\Admin\Menus\StoreMenuRequest;
 use App\Http\Requests\Admin\Menus\UpdateMenuRequest;
 use App\Models\Permission;
@@ -106,7 +107,7 @@ class MenusController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Menu $menu)
+    public function destroy(Menu $menu, DeleteMenuRequest $request)
     {
         $menu->delete();
 

@@ -48,35 +48,6 @@ class SettingsSeeder extends Seeder
                 'options' => null,
             ],
 
-            // Menu Settings
-            [
-                'key' => 'header_primary_menu',
-                'type' => 'menu',
-                'value' => '',
-                'description' => 'Primary menu displayed in header',
-                'group' => 'menus',
-                'is_encrypted' => false,
-                'options' => null,
-            ],
-            [
-                'key' => 'footer_primary_menu',
-                'type' => 'menu',
-                'value' => '',
-                'description' => 'Primary menu displayed in footer',
-                'group' => 'menus',
-                'is_encrypted' => false,
-                'options' => null,
-            ],
-            [
-                'key' => 'footer_secondary_menu',
-                'type' => 'menu',
-                'value' => '',
-                'description' => 'Secondary menu displayed in footer',
-                'group' => 'menus',
-                'is_encrypted' => false,
-                'options' => null,
-            ],
-
             // Social Media URLs
             [
                 'key' => 'social_facebook_url',

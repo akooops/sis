@@ -1,10 +1,5 @@
 @php
-    $setting = getSetting('header_primary_menu');
-    $menu = null;
-
-    if($setting && $setting->type == "menu"){
-        $menu = getMenu($setting->value);
-    }
+    $menu = getMenu('header_primary_menu');
 
     $languages = getLanguages();
 @endphp

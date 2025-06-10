@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::table('menus', function (Blueprint $table) {            
+            $table->boolean('is_system_menu')->default(false);
+        });
     }
 
     /**
@@ -19,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('menus', function (Blueprint $table) {
+            $table->dropColumn('is_system_page');
+        });
     }
 };

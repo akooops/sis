@@ -65,6 +65,7 @@
                                         <tr>
                                             <th scope="col" width="10%" width="100px">#</th>
                                             <th scope="col">Name</th> 
+                                            <th scope="col">System Menu</th> 
                                             <th scope="col" width="75px">Actions</th>                                        
                                         </tr>
                                     </thead>
@@ -76,6 +77,14 @@
                                             </td>
 
                                             <td>{{ $menu->name }}</td>  
+
+                                            <td>
+                                                @if($menu->is_system_menu)
+                                                    <span class="badge bg-success">yes</span>                                                    
+                                                @else
+                                                    <span class="badge bg-danger">no</span>
+                                                @endif
+                                            </td>  
 
                                             <td>
                                                 <div class="dropdown">
@@ -92,6 +101,7 @@
                                                             <li><a class="dropdown-item" href="{{route('admin.menus.show', $menu->id)}}"><i class="ri-eye-fill align-bottom me-2 text-muted"></i> View</a></li>
                                                         @endhaspermission
 
+                                                        @if(!$menu->is_system_menu)
                                                         @haspermission('admin.menus.update')
                                                             <li><a class="dropdown-item" href="{{route('admin.menus.edit', $menu->id)}}"><i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit</a></li>
                                                         @endhaspermission
@@ -104,6 +114,7 @@
                                                                 <li><button class="dropdown-item" type="submit"><i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Destroy</button></li>
                                                             </form>
                                                         @endhaspermission
+                                                        @endif
                                                     </ul>
                                                 </div>
                                             </td>

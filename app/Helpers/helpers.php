@@ -21,8 +21,8 @@ function getLanguages(){
     return Language::orderBy('is_default', 'DESC')->get();
 }
 
-function getMenu($id){
-    return Menu::find($id);
+function getMenu($name){
+    return Menu::where('name', $name)->first();
 }
 
 function getPage($id){

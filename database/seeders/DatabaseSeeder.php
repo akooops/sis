@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
         $this->call(LanguageTranslationSeeder::class);
         $this->call(SettingsSeeder::class);
         $this->call(PagesSeeder::class);
+        $this->call(MenusSeeder::class);
     }
 }

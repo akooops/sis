@@ -3,9 +3,8 @@
 namespace App\Http\Requests\Admin\Menus;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\Media;
 
-class UpdateMenuRequest extends FormRequest
+class DeleteMenuRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,11 +16,13 @@ class UpdateMenuRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+
         ];
     }
 
@@ -31,7 +32,7 @@ class UpdateMenuRequest extends FormRequest
 
         $validator->after(function ($validator) use ($menu){
             if ($menu->is_system_menu) {
-                $validator->errors()->add('menu', 'This menu cannot be updated as it is a system menu.');
+                $validator->errors()->add('menu', 'This menu cannot be deleted as it is a system menu.');
 
                 return;
             }

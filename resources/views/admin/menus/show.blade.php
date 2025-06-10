@@ -36,6 +36,15 @@
                             </div>
 
                             <div class="mb-3">
+                                <h4 class="fs-15">is system created menu?</h4>
+                                @if($menu->is_system_menu)
+                                    <span class="badge bg-success">yes</span>                                                    
+                                @else
+                                    <span class="badge bg-danger">no</span>
+                                @endif
+                            </div>
+
+                            <div class="mb-3">
                                 <h4 class="fs-15">Menu created at</h4>
                                 {{$menu->created_at}}
                             </div>

@@ -1,18 +1,7 @@
 @php
-    $primaryMenuSetting = getSetting('footer_primary_menu');
-    $primaryMenu = null;
-
-    if($primaryMenuSetting && $primaryMenuSetting->type == "menu"){
-        $primaryMenu = getMenu($primaryMenuSetting->value);
-    }
-
-    $secondaryMenuSetting = getSetting('footer_secondary_menu');
-    $secondaryMenu = null;
-
-    if($secondaryMenuSetting && $secondaryMenuSetting->type == "menu"){
-        $secondaryMenu = getMenu($secondaryMenuSetting->value);
-    }
-
+    $primaryMenu = getMenu('footer_primary_menu');
+    $secondaryMenu = getMenu('footer_secondary_menu');
+    
     $facebookUrl = getSetting('social_facebook_url');
     $instagramUrl = getSetting('social_instagram_url');
     $twitterUrl = getSetting('social_twitter_url');
