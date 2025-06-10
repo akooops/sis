@@ -260,6 +260,42 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Please, confirm details',
                 'ar' => 'من فضلك قم بالتأكيد'
             ],
+            'visits_page_name_input' => [
+                'en' => 'Enter your name',
+                'ar' => 'قم بإدخال إسمك'
+            ],
+            'visits_page_email_input' => [
+                'en' => 'Enter your email',
+                'ar' => 'قم بإدخال بريدك الإلكتروني'
+            ],
+            'visits_page_phone_input' => [
+                'en' => 'Enter your phone',
+                'ar' => 'قم بإدخال رقم الهاتف'
+            ],
+            'visits_page_student_name_input' => [
+                'en' => 'Enter student name',
+                'ar' => 'قم بإدخال إسم التلميذ'
+            ],
+            'visits_page_student_grade_input' => [
+                'en' => 'Enter student grade',
+                'ar' => 'قم بإدخال المستوى الدراسي للتلميذ'
+            ],
+            'visits_page_student_school_input' => [
+                'en' => 'Enter student school',
+                'ar' => 'قم بإدخال المدرسة الحالية للتميذ'
+            ],
+            'visits_page_confirm_button' => [
+                'en' => 'Confirm booking',
+                'ar' => 'تأكيد الحجز'
+            ],
+            'visits_page_date_time' => [
+                'en' => 'Date & Time',
+                'ar' => 'التاريخ والوقت'
+            ],
+            'visit_pages_selected_service' => [
+                'en' => 'Selected service',
+                'ar' => 'الخدمة المختارة'
+            ],
         ];
 
         // Seed language keys and translations

@@ -4,6 +4,7 @@
 @section('canonical', route('visits'))
 @section('css')
 <link href="{{ URL::asset('assets/libs/calendar/main.min.css')}}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/css/intlTelInput.min.css"/>
 @endsection
 @section('content')
 <section class="wrapper bg-dark page-main-section" style="background-image: url('{{ $page->thumbnailUrl  }}'); background-size: cover">
@@ -184,27 +185,70 @@
         <!-- Step 3: Confirmation -->
         <div v-show="currentStep === 3">
             <div class="row justify-content-center">
-                <div class="card">
-                    <div class="card-body">
+                <div class="col-10">
+                    <div class="card">
+                        <div class="card-body">
 
-                        <h2>{{getLanguageKeyLocalTranslation('visits_page_confirmation_title')}}</h2>
+                            <h2>{{getLanguageKeyLocalTranslation('visits_page_confirmation_title')}}</h2>
 
-                        <div v-if="selectedTimeSlot">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    ffgfd
-                                </div>
+                            <div class="mt-6" v-if="selectedTimeSlot">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="input-group mb-4">
+                                            <span class="input-group-text">
+                                                <i class="uil uil-user"></i>
+                                            </span>
+                                            <input id="nameInput" type="text" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('visits_page_name_input')}}">   
+                                        </div>
 
-                                <div class="col-md-6">
-                                    <p><strong>Service:</strong> @{{ selectedService.name }}</p>
-                                    <p><strong>Date & Time:</strong> @{{ formatDateTime(selectedTimeSlot.start) }}</p>
-                                    <p><strong>Visitors:</strong> @{{ selectedService.visitorCount }}</p>
-                                    <button class="btn btn-success" :disabled="bookingInProgress">
-                                        <span v-if="bookingInProgress" class="spinner-border spinner-border-sm me-2"></span>
-                                        {{getLanguageKeyLocalTranslation('booking_confirm_button') ?? 'Confirm Booking'}}
-                                    </button>
-                                </div>  
-                            </div>              
+                                        <div class="input-group mb-4">
+                                            <span class="input-group-text">
+                                                <i class="uil uil-envelope"></i>
+                                            </span>
+                                            <input id="emailInput" type="email" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('visits_page_email_input')}}">   
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <input id="phoneInput" type="text" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('visits_page_phone_input')}}">                                 
+                                        </div>
+                                        <!-- /.form-floating -->
+
+                                        <div class="input-group mb-4">
+                                            <span class="input-group-text">
+                                                <i class="uil uil-book-reader"></i>
+                                            </span>
+                                            <input id="studentNameInput" type="text" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_name_input')}}">   
+                                        </div>
+
+                                        <div class="input-group mb-4">
+                                            <span class="input-group-text">
+                                                <i class="uil uil-code-branch"></i>
+                                            </span>
+                                            <input id="gradeInput" type="text" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_grade_input')}}">   
+                                        </div>
+
+                                        <div class="input-group mb-4">
+                                            <span class="input-group-text">
+                                                <i class="uil uil-university"></i>
+                                            </span>
+                                            <input id="schoolInput" type="text" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_school_input')}}">   
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <p><strong>{{getLanguageKeyLocalTranslation('visit_pages_selected_service')}}:</strong> @{{ selectedService.name }}</p>
+                                        <p><strong>{{getLanguageKeyLocalTranslation('visits_page_date_time')}}:</strong> @{{ formatDateTime(selectedTimeSlot.start) }}</p>
+                                        <p><strong>{{getLanguageKeyLocalTranslation('visit_pages_visitors_count')}}:</strong> @{{ selectedService.visitorCount }}</p>
+
+                                        <div class="d-flex justify-content-end">
+                                            <button class="btn btn-primary" :disabled="bookingInProgress">
+                                                <span v-if="bookingInProgress" class="spinner-border spinner-border-sm me-2"></span>
+                                                {{getLanguageKeyLocalTranslation('visits_page_confirm_button')}}
+                                            </button>
+                                        </div>
+                                    </div>  
+                                </div>              
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -237,10 +281,12 @@ window.visitServicesData = {
 <script src="{{ URL::asset('assets/libs/calendar/main.min.js')}}"></script>
 <script src='{{ URL::asset('assets/libs/calendar/locales-all.min.js')}}'></script>
 
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/intlTelInput.min.js"></script>
+
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
 <script>
-const { createApp } = Vue;
+const { createApp, nextTick } = Vue;
 
 createApp({
     data() {
@@ -255,7 +301,8 @@ createApp({
                 capacity: 0
             },
             selectedTimeSlot: null,
-            bookingInProgress: false
+            bookingInProgress: false,
+            iti: null 
         }
     },
     methods: {
@@ -316,8 +363,31 @@ createApp({
             };
             
             this.currentStep = 3;
+
+            nextTick(() => {
+                this.initIntlTelInput();
+            });
         },
-        
+
+        initIntlTelInput() {
+            const input = document.getElementById('phoneInput');
+            if (!input) return;
+
+            if (input.iti) {
+                input.iti.destroy();
+                input.iti = null;
+            }
+
+            this.iti = window.intlTelInput(input, {
+                initialCountry: "sa",
+                preferredCountries: ["sa", "ae", "eg"],
+                separateDialCode: true,
+                formatOnDisplay: true,
+            });
+
+            input.iti = this.iti;
+        },
+
         formatDateTime(dateString) {
             return new Date(dateString).toLocaleString('{{app()->getLocale()}}');
         },

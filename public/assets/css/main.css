@@ -266,6 +266,37 @@
     background-color: #2A5D91;
 }
 
+.iti{
+    width: 100%;
+    display: flex;
+}
+
+.iti__flag-container{
+    position: relative;
+}
+
+.iti__selected-flag{
+    width: 64px !important;
+    background-color: #fefefe;
+    border: 1px solid rgba(8, 60, 130, 0.07);
+    justify-content: center;
+}
+
+#phoneInput{
+    padding: 0.6rem 1rem;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border: 1px solid rgba(8, 60, 130, 0.07)
+}
+
+.input-group .input-group-text{
+    width: 64px !important;
+    justify-content: center;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-radius: 0.4rem;
+}
+
 @media (min-width: 1024px) {
     .logo{
         height: 72px;
