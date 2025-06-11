@@ -61,7 +61,16 @@
 
 <section class="wrapper bg-light" id="booking-app">
     <div class="container pt-6 pb-12">
-        
+        <h2 class="display-5 mb-3">
+            {{$page->getLocalTranslation('title')}}
+        </h2>
+
+        <p class="lead fs-md">
+            {{$page->getLocalTranslation('description')}}
+        </p>
+
+        <hr class="mt-2 mb-4">
+
         <!-- Step Indicator -->
         <div class="d-flex justify-content-center align-items-center mb-6">
             <div class="step" :class="{ active: currentStep === 1, completed: currentStep > 1 }">
@@ -331,7 +340,7 @@ window.visitServicesData = {
     @foreach ($visitServices as $visitService)
     "{{$visitService->id}}": {
         timeSlots: [
-            @foreach ($visitService->visitTimeSlots as $timeSlot)
+            @foreach ($visitService->upcomingTimeSlots as $timeSlot)
             {
                 id: {{$timeSlot->id}},
                 starts_at: "{{$timeSlot->starts_at}}"

@@ -53,8 +53,8 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => 'مرحباً بكم في مدارسنا'
             ],
             'footer_main_subtitle' => [
-                'en' => '',
-                'ar' => ''
+                'en' => 'The mission of Saud International School is to provide a challenging educational environment that meets the needs of the diverse community by offering a worldwide known curriculum implemented with state of the art technology along with extra-curricular activities.',
+                'ar' => 'تتمثل رؤية مدرسة سعود العالمية في خلق بيئة داعمة تمكننا من تزويد طلابنا بالمهارات والقدرات التي ستتيح لهم التطور فكريا وجسديا واجتماعيا وعاطفيا وأخلاقيا وعندها يصبحون متعلمين ناجحين ومنتجين.'
             ],
             'footer_first_menu_title' => [
                 'en' => 'Need help?',
@@ -69,16 +69,16 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => 'تواصل معنا'
             ],
             'footer_get_in_touch_address' => [
-                'en' => '',
-                'ar' => ''
+                'en' => 'Saud International School Hamdan Street, Sulaimaniyah, Riyadh Kingdom of Saudi Arabia',
+                'ar' => 'Saud International School Hamdan Street, Sulaimaniyah, Riyadh Kingdom of Saudi Arabia'
             ],
             'footer_get_in_touch_email' => [
-                'en' => '',
-                'ar' => ''
+                'en' => 'enquiries@sis.edu.sa',
+                'ar' => 'enquiries@sis.edu.sa'
             ],
             'footer_get_in_touch_phone' => [
-                'en' => '',
-                'ar' => ''
+                'en' => '(966) 920002877',
+                'ar' => '(966) 920002877'
             ],
             'footer_all_rights_reserved' => [
                 'en' => '© 2025 Saudi international schools. All rights reserved.',
@@ -300,10 +300,57 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Your booking has been confirmed successfully, our service will contact you soon!',
                 'ar' => 'تم تأكيد حجزك بنجاح، سيقوم فريقنا بالإتصال بكم قريبا!'
             ],
-
             'visit_pages_booking_error' => [
                 'en' => 'An error occurred while processing your booking. Please try again.',
                 'ar' => 'حدث خطأ أثناء معالجة حجزك. يرجى المحاولة مرة أخرى.'
+            ],
+            'recaptcha_error' => [
+                'en' => 'Security verification failed. Please try again.',
+                'ar' => 'فشل التحقق الأمني. يرجى المحاولة مرة أخرى.'
+            ],
+            'inquiry_page_guardian_name_input' => [
+                'en' => 'Guardian Name',
+                'ar' => 'اسم ولي الأمر'
+            ],
+            'inquiry_page_email_input' => [
+                'en' => 'Email Address',
+                'ar' => 'البريد الإلكتروني'
+            ],
+            'inquiry_page_phone_input' => [
+                'en' => 'Phone Number',
+                'ar' => 'رقم الهاتف'
+            ],
+            'inquiry_page_student_name_input' => [
+                'en' => 'Student Name',
+                'ar' => 'اسم الطالب'
+            ],
+            'inquiry_page_birthdate_input' => [
+                'en' => 'Student Birthdate',
+                'ar' => 'تاريخ ميلاد الطالب'
+            ],
+            'inquiry_page_student_school_input' => [
+                'en' => 'Current School',
+                'ar' => 'المدرسة الحالية'
+            ],
+            'inquiry_page_select_academic_year' => [
+                'en' => 'Select Academic Year',
+                'ar' => 'اختر السنة الأكاديمية'
+            ],
+            'inquiry_page_select_grade' => [
+                'en' => 'Select Grade',
+                'ar' => 'اختر الصف'
+            ],
+            'inquiry_page_questions_input' => [
+                'en' => 'Questions or Comments',
+                'ar' => 'الأسئلة أو التعليقات'
+            ],
+            'inquiry_page_submit_button' => [
+                'en' => 'Submit Inquiry',
+                'ar' => 'إرسال الاستفسار'
+            ],
+            'inquiry_success_message' => [
+                'en' => 'Your inquiry has been submitted successfully! We will contact you soon.',
+                'ar' => 'تم إرسال استفسارك بنجاح! سنتواصل معك قريباً.'
             ],
         ];
 

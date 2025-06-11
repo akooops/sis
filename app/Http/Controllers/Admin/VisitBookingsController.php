@@ -75,7 +75,7 @@ class VisitBookingsController extends Controller
         $visitBooking->update($request->validated());
 
         return redirect()->route('admin.visit-bookings.index', $visitBooking->visitService->id)
-                        ->with('success','VisitService updated successfully');
+                        ->with('success','Visit Booking updated successfully');
     }
 
     /**
@@ -89,6 +89,6 @@ class VisitBookingsController extends Controller
         $visitBooking->delete();
 
         return redirect()->route('admin.visit-bookings.index', $visitBooking->visitService->id)
-                        ->with('success','VisitService deleted successfully');
+                        ->with('success','Visit Booking deleted successfully');
     }
 }

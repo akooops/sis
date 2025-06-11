@@ -154,6 +154,20 @@ return [
             'too_short' => 'رقم الهاتف قصير جداً.',
             'too_long' => 'رقم الهاتف طويل جداً.',
         ],
+        'custom' => [
+            'recaptcha' => [
+                'required' => 'يرجى إكمال التحقق من reCAPTCHA.',
+                'failed' => 'فشل التحقق من reCAPTCHA. يرجى المحاولة مرة أخرى.',
+                'not_configured' => 'reCAPTCHA غير مُكوّن بشكل صحيح.',
+                'connection_failed' => 'تعذر التحقق من reCAPTCHA. يرجى المحاولة مرة أخرى.',
+            ],
+            'g-recaptcha-response' => [
+                'required' => 'يرجى إكمال التحقق من reCAPTCHA.',
+                'failed' => 'فشل التحقق من reCAPTCHA. يرجى المحاولة مرة أخرى.',
+                'not_configured' => 'reCAPTCHA غير مُكوّن بشكل صحيح.',
+                'connection_failed' => 'تعذر التحقق من reCAPTCHA. يرجى المحاولة مرة أخرى.',
+            ],
+        ],
     ],
 
     /*

@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\Admin\FilesController;
 use App\Http\Controllers\Admin\FormsController;
 use App\Http\Controllers\Admin\GradesController;
+use App\Http\Controllers\Admin\InquiriesController;
 use App\Http\Controllers\Admin\LanguagesController;
 use App\Http\Controllers\Admin\LanguagesKeysController;
 use App\Http\Controllers\Admin\MediaController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\VisitBookingsController;
 use App\Http\Controllers\Admin\VisitServicesController;
 use App\Http\Controllers\Admin\VisitTimeSlotsController;
+use App\Http\Controllers\InquiriesController as ControllersInquiriesController;
 use App\Http\Controllers\PagesController as ControllersPagesController;
 use App\Http\Controllers\VisitBookingsController as ControllersVisitBookingsController;
 use App\Models\Language;
@@ -246,12 +248,23 @@ Route::middleware(['auth', 'force.admin.english'])->prefix('admin')->group(funct
     Route::get('visit-bookings/{visitBooking}', [VisitBookingsController::class, 'show'])->middleware('check.permission:admin.visit-bookings.show')->name('admin.visit-bookings.show');
     Route::patch('vsit-bookings/{visitBooking}', [VisitBookingsController::class, 'update'])->middleware('check.permission:admin.visit-bookings.update')->name('admin.visit-bookings.update');
     Route::delete('visit-bookings/{visitBooking}', [VisitBookingsController::class, 'destroy'])->middleware('check.permission:admin.visit-bookings.destroy')->name('admin.visit-bookings.destroy');
+
+    // Inquiries
+    Route::get('inquiries', [InquiriesController::class, 'index'])->middleware('check.permission:admin.inquiries.index')->name('admin.inquiries.index');
+    Route::get('inquiries/create', [InquiriesController::class, 'create'])->middleware('check.permission:admin.inquiries.store')->name('admin.inquiries.create');
+    Route::post('inquiries', [InquiriesController::class, 'store'])->middleware('check.permission:admin.inquiries.store')->name('admin.inquiries.store');
+    Route::get('inquiries/{inquiry}', [InquiriesController::class, 'show'])->middleware('check.permission:admin.inquiries.show')->name('admin.inquiries.show');
+    Route::get('inquiries/{inquiry}/edit', [InquiriesController::class, 'edit'])->middleware('check.permission:admin.inquiries.update')->name('admin.inquiries.edit');
+    Route::patch('inquiries/{inquiry}', [InquiriesController::class, 'update'])->middleware('check.permission:admin.inquiries.update')->name('admin.inquiries.update');
+    Route::delete('inquiries/{inquiry}', [InquiriesController::class, 'destroy'])->middleware('check.permission:admin.inquiries.destroy')->name('admin.inquiries.destroy');
 });
 
 Route::middleware(['set.locale'])->group(function () {
     Route::get('', [ControllersPagesController::class, 'index'])->name('index');
+    Route::get('home', [ControllersPagesController::class, 'index'])->name('index');
 
     Route::get('/visits', [ControllersPagesController::class, 'visits'])->name('visits');
+    Route::get('/inquiries', [ControllersPagesController::class, 'inquiries'])->name('inquiries');
 
     Route::get('/articles', [ControllersPagesController::class, 'articles'])->name('articles');
     Route::get('/albums', [ControllersPagesController::class, 'albums'])->name('albums');
@@ -266,6 +279,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/grades/{slug}', [ControllersPagesController::class, 'grade'])->name('grade');
 
     Route::post('visit-services/{visitService}/visit-bookings', [ControllersVisitBookingsController::class, 'visitBookings'])->name('visit-bookings.store');
+    Route::post('inquiries', [ControllersInquiriesController::class, 'storeInquiries'])->name('inquiries.store');
 });
 
 Route::get('language/{locale}', function ($locale) {

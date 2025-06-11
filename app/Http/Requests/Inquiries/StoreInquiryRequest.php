@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\VisitBookings;
+namespace App\Http\Requests\Inquiries;
 
 use App\Rules\CheckInternationalPhoneNumber;
 use App\Rules\ReCaptcha;
@@ -10,7 +10,7 @@ use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 
-class StoreVisitBookingRequest extends FormRequest
+class StoreInquiryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,8 +27,6 @@ class StoreVisitBookingRequest extends FormRequest
      */
     public function rules(): array
     {
-        $visitService = request()->route('visitService');
-
         return [
             'guardian_name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -41,20 +39,16 @@ class StoreVisitBookingRequest extends FormRequest
             ],
 
             'student_name' => 'required|string|max:255',
-            'student_grade' => 'required|string|max:255',
             'student_school' => 'required|string|max:255',
 
-            'visitors_count' => "required|integer|min:1|max:{$visitService->capacity}",
-            'visit_time_slot_id' => [
-                'required',
-                'exists:visit_time_slots,id',
-                function ($attribute, $value, $fail) use ($visitService) {
-                    $timeSlot = \App\Models\VisitTimeSlot::find($value);
-                    if ($timeSlot && $timeSlot->visit_service_id !== $visitService->id) {
-                        $fail('The selected time slot does not belong to the chosen service.');
-                    }
-                },
-            ],
+            'student_birthdate' => 'required|date_format:Y-m-d', 
+
+            'academic_year_applied' => 'required|string|max:255',
+            'grade_applied' => 'required|string|max:255',
+
+            'questions' => 'required|string',
+
+            'g-recaptcha-response' => ['required', new ReCaptcha()],
         ];
     }
 

@@ -60,6 +60,7 @@ class PagesController extends Controller
 
     public function visits(Request $request)
     {
+
         $page = Page::where([
             'slug' => 'visits',
             'status' => 'published'
@@ -72,6 +73,20 @@ class PagesController extends Controller
         return view('visits', [
             'page' => $page,
             'visitServices' => $visitServices
+        ]);
+    }
+
+    public function inquiries(Request $request)
+    {
+        $page = Page::where([
+            'slug' => 'inquiries',
+            'status' => 'published'
+        ])->first();
+
+        if(!$page) abort(404);
+
+        return view('inquiries', [
+            'page' => $page
         ]);
     }
 

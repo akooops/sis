@@ -38,6 +38,27 @@ class PagesSeeder extends Seeder
                 'is_system_page' => true,
                 'status' => 'published',
                 'menu_id' => null,
+            ],
+            [
+                'name' => 'Visits',
+                'slug' => 'visits',
+                'is_system_page' => true,
+                'status' => 'published',
+                'menu_id' => null,
+            ],
+            [
+                'name' => 'Inquiries',
+                'slug' => 'inquiries',
+                'is_system_page' => true,
+                'status' => 'published',
+                'menu_id' => null,
+            ],
+            [
+                'name' => 'Error',
+                'slug' => 'error',
+                'is_system_page' => true,
+                'status' => 'published',
+                'menu_id' => null,
             ]
         ];
 
@@ -116,6 +137,48 @@ class PagesSeeder extends Seeder
                 'content' => [
                     'en' => 'Stay updated with our school events',
                     'ar' => 'ابق على اطلاع بفعاليات مدرستنا'
+                ],
+            ],
+            'visits' => [
+                'title' => [
+                    'en' => 'School Visits',
+                    'ar' => 'زيارات المدرسة'
+                ],
+                'description' => [
+                    'en' => 'Book a visit to explore our school facilities and programs',
+                    'ar' => 'احجز زيارة لاستكشاف مرافق وبرامج مدرستنا'
+                ],
+                'content' => [
+                    'en' => 'We welcome you to visit our school and discover what makes us special. Choose from our available visit services and book a convenient time for your tour.',
+                    'ar' => 'نرحب بكم لزيارة مدرستنا واكتشاف ما يجعلنا مميزين. اختر من خدمات الزيارة المتاحة واحجز وقتاً مناسباً لجولتك.'
+                ]
+            ],
+            'inquiries' => [
+                'title' => [
+                    'en' => 'Student Inquiries',
+                    'ar' => 'استفسارات الطلاب'
+                ],
+                'description' => [
+                    'en' => 'Submit your inquiry about admissions and school programs',
+                    'ar' => 'قدم استفسارك حول القبول وبرامج المدرسة'
+                ],
+                'content' => [
+                    'en' => 'Have questions about our school? We\'re here to help! Please fill out the form below with your inquiry about admissions, programs, or any other questions you may have. Our admissions team will get back to you as soon as possible.',
+                    'ar' => 'لديك أسئلة حول مدرستنا؟ نحن هنا للمساعدة! يرجى ملء النموذج أدناه باستفسارك حول القبول أو البرامج أو أي أسئلة أخرى قد تكون لديك. سيتواصل معك فريق القبول في أقرب وقت ممكن.'
+                ]
+            ],
+            'error' => [
+                'title' => [
+                    'en' => 'Page Not Found',
+                    'ar' => 'الصفحة غير موجودة'
+                ],
+                'description' => [
+                    'en' => 'The page you are looking for could not be found',
+                    'ar' => 'لا يمكن العثور على الصفحة التي تبحث عنها'
+                ],
+                'content' => [
+                    'en' => 'Sorry, the page you are looking for could not be found. Please check the URL or return to our homepage.',
+                    'ar' => 'عذراً، لا يمكن العثور على الصفحة التي تبحث عنها. يرجى التحقق من الرابط أو العودة إلى صفحتنا الرئيسية.'
                 ]
             ]
         ];
