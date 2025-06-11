@@ -28,13 +28,13 @@
             <div class="navbar-other ms-lg-4">
                 <ul class="navbar-nav flex-row align-items-center ms-auto rounded ps-0 mx-0 ps-md-6">
                     <li class="nav-item d-none d-md-block me-6">
-                        <a class="nav-link text-white main-nav-link" href="#">
+                        <a class="nav-link text-white main-nav-link" href="{{route('visits')}}">
                             {{getLanguageKeyLocalTranslation('navbar_visits_nav_link')}}
                         </a>
                     </li>
 
                     <li class="nav-item d-none d-md-block me-6">
-                        <a class="nav-link text-white main-nav-link" href="#">
+                        <a class="nav-link text-white main-nav-link" href="{{route('inquiries')}}">
                             {{getLanguageKeyLocalTranslation('navbar_inquiries_nav_link')}}
                         </a>
                     </li>

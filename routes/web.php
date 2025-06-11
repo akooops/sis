@@ -248,7 +248,7 @@ Route::middleware(['auth', 'force.admin.english'])->prefix('admin')->group(funct
     // Visits Bookings
     Route::get('visit-services/{visitService}/visit-bookings', [VisitBookingsController::class, 'index'])->middleware('check.permission:admin.visit-bookings.index')->name('admin.visit-bookings.index');
     Route::get('visit-bookings/{visitBooking}', [VisitBookingsController::class, 'show'])->middleware('check.permission:admin.visit-bookings.show')->name('admin.visit-bookings.show');
-    Route::patch('vsit-bookings/{visitBooking}', [VisitBookingsController::class, 'update'])->middleware('check.permission:admin.visit-bookings.update')->name('admin.visit-bookings.update');
+    Route::patch('visit-bookings/{visitBooking}', [VisitBookingsController::class, 'update'])->middleware('check.permission:admin.visit-bookings.update')->name('admin.visit-bookings.update');
     Route::delete('visit-bookings/{visitBooking}', [VisitBookingsController::class, 'destroy'])->middleware('check.permission:admin.visit-bookings.destroy')->name('admin.visit-bookings.destroy');
 
     // Inquiries

@@ -154,6 +154,40 @@
                 </li>
                 @endhaspermission
 
+                <!-- Visits & Communications -->
+                <li class="menu-title"><span>Visits & Communications</span></li>
+
+                @haspermission('admin.visit-services.index')
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ 
+                        request()->routeIs('admin.visit-services.*') ? 'active' : '' 
+                    }}" href="{{ route('admin.visit-services.index') }}">
+                        <i class="ri-calendar-check-fill"></i> <span>Visit Services</span>
+                    </a>
+                </li>
+                @endhaspermission
+
+                @haspermission('admin.inquiries.index')
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ 
+                        request()->routeIs('admin.inquiries.*') ? 'active' : '' 
+                    }}" href="{{ route('admin.inquiries.index') }}">
+                        <i class="ri-question-answer-fill"></i> <span>Student Inquiries</span>
+                    </a>
+                </li>
+                @endhaspermission
+
+                @haspermission('admin.contact-submissions.index')
+                <li class="nav-item">
+                    <a class="nav-link menu-link {{ 
+                        request()->routeIs('admin.contact-submissions.*') ? 'active' : '' 
+                    }}" href="{{ route('admin.contact-submissions.index') }}">
+                        <i class="ri-mail-fill"></i> <span>Contact Messages</span>
+                    </a>
+                </li>
+                @endhaspermission
+
+
                 <!-- User Management -->
                 <li class="menu-title"><span>User Management</span></li>
 
