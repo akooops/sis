@@ -2,33 +2,64 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Inquiries\StoreInquiryRequest;
-use App\Http\Requests\VisitBookings\StoreVisitBookingRequest;
-use App\Models\Album;
-use App\Models\Article;
-use App\Models\Banner;
-use App\Models\Event;
-use App\Models\Grade;
 use App\Models\Inquiry;
-use App\Models\Page;
-use App\Models\Program;
-use App\Models\VisitBooking;
-use App\Models\VisitService;
-use App\Models\VisitTimeSlot;
-use App\Services\IndexService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 
 class InquiriesController extends Controller
 {
-    public function storeInquiries(StoreInquiryRequest $request)
+    public function index(Request $request)
     {
-        $inquiry  = Inquiry::create($request->validated());
+        $perPage = $this->indexService->limitPerPage($request->query('perPage', 10));
+        $page = $this->indexService->checkPageIfNull($request->query('page', 1));
+        $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        return response()->json([
-                'status' => 'success',
-                'message' => 'Inquiry created successfully!',
-        ], 200);
+        $inquiries = Inquiry::latest();
+
+        if ($search) {
+            $inquiries->where(function($query) use ($search) {
+                $query->where('id', $search)
+                      ->orWhere('guardian_name', 'like', '%' . $search . '%')
+                      ->orWhere('email', 'like', '%' . $search . '%')
+                      ->orWhere('phone', 'like', '%' . $search . '%')
+                      ->orWhere('student_name', 'like', '%' . $search . '%')
+                      ->orWhere('student_birthdate', 'like', '%' . $search . '%')
+                      ->orWhere('student_school', 'like', '%' . $search . '%')
+                      ->orWhere('academic_year_applied', 'like', '%' . $search . '%')
+                      ->orWhere('grade_applied', 'like', '%' . $search . '%')
+                      ->orWhere('questions', 'like', '%' . $search . '%');
+            });
+        }
+
+        $inquiries = $inquiries->paginate($perPage, ['*'], 'inquiry', $page);
+
+        return view('admin.inquiries.index', [
+            'inquiries' => $inquiries,
+            'pagination' => $this->indexService->handlePagination($inquiries)
+        ]);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Inquiry $inquiry)
+    {    
+        return view('admin.inquiries.show', compact('inquiry'));
+    }
+    
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+    */
+    public function destroy(Inquiry $inquiry)
+    {
+        $inquiry->delete();
+
+        return redirect()->route('admin.inquiries.index')
+                        ->with('success','Inquiry deleted successfully');
     }
 }
