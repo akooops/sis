@@ -190,6 +190,10 @@ return [
 
     'attributes' => [
         'g-recaptcha-response' => 'recaptcha',
+        'academic_year_applied' => 'Academic year applied for',
+        'grade_applied' => 'Grade applied for',
+        'questions' => 'Questions',
+        'student_birthdate' => 'Student Birthdate'
     ],
 
 ];

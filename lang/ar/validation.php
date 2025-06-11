@@ -230,6 +230,10 @@ return [
         'student_name'          => 'إسم الطالب',
         'student_grade'         => 'المستوى الدراسي',
         'student_school'        => 'مدرسة',
+        'academic_year_applied' => 'السنة الأكاديمية المطلوبة',
+        'grade_applied' => 'الصف المطلوب',
+        'questions' => 'أسئلة',
+        'student_birthdate' => 'تاريخ ميلاد الطالب',
     ],
 
 ];
