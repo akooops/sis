@@ -203,7 +203,7 @@
         <!-- Step 3: Confirmation -->
         <div v-show="currentStep === 3">
             <div class="row justify-content-center">
-                <div class="col-10">
+                <div class="col-lg-10">
                     <!-- Success/Error Alert -->
                     <div v-if="showAlert" class="alert mb-4" :class="alertType === 'success' ? 'alert-success' : 'alert-danger'" role="alert">
                         <div class="d-flex align-items-center">
@@ -309,12 +309,12 @@
                                             <div v-else class="mb-3"></div>
                                         </div>
 
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 text-center text-md-start mt-4 mt-md-0">
                                             <p><strong>{{getLanguageKeyLocalTranslation('visit_pages_selected_service')}}:</strong> @{{ selectedService.name }}</p>
                                             <p><strong>{{getLanguageKeyLocalTranslation('visits_page_date_time')}}:</strong> @{{ formatDateTime(selectedTimeSlot.start) }}</p>
                                             <p><strong>{{getLanguageKeyLocalTranslation('visit_pages_visitors_count')}}:</strong> @{{ selectedService.visitorCount }}</p>
 
-                                            <div class="d-flex justify-content-end">
+                                            <div class="d-flex justify-content-center justify-content-md-end">
                                                 <button type="submit" class="btn btn-primary" :disabled="bookingInProgress">
                                                     <span v-if="bookingInProgress" class="spinner-border spinner-border-sm me-2"></span>
                                                     {{getLanguageKeyLocalTranslation('visits_page_confirm_button')}}
