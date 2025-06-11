@@ -491,7 +491,7 @@ createApp({
             const fullPhoneNumber = this.iti ? this.iti.getNumber() : this.bookingForm.phone;
 
             try {
-                const response = await fetch('{{route("visit-bookings.store", $visitService->id)}}', {
+                const response = await fetch(`/visit-services/${this.selectedService.id}/visit-bookings`, { 
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

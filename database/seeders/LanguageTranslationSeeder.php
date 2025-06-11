@@ -392,6 +392,10 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Phone',
                 'ar' => 'رقم الهاتف'
             ],
+            'error_page_button_title' => [
+                'en' => 'Home page',
+                'ar' => 'الصفحة الرئيسية'
+            ],
         ];
 
         // Seed language keys and translations
