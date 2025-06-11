@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AlbumsController;
 use App\Http\Controllers\Admin\ArticlesController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BannersController;
+use App\Http\Controllers\Admin\ContactSubmissionsController;
 use App\Http\Controllers\Admin\DashboardContoller;
 use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\Admin\FilesController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\VisitBookingsController;
 use App\Http\Controllers\Admin\VisitServicesController;
 use App\Http\Controllers\Admin\VisitTimeSlotsController;
+use App\Http\Controllers\ContactSubmissionsController as ControllersContactSubmissionsController;
 use App\Http\Controllers\InquiriesController as ControllersInquiriesController;
 use App\Http\Controllers\PagesController as ControllersPagesController;
 use App\Http\Controllers\VisitBookingsController as ControllersVisitBookingsController;
@@ -251,12 +253,13 @@ Route::middleware(['auth', 'force.admin.english'])->prefix('admin')->group(funct
 
     // Inquiries
     Route::get('inquiries', [InquiriesController::class, 'index'])->middleware('check.permission:admin.inquiries.index')->name('admin.inquiries.index');
-    Route::get('inquiries/create', [InquiriesController::class, 'create'])->middleware('check.permission:admin.inquiries.store')->name('admin.inquiries.create');
-    Route::post('inquiries', [InquiriesController::class, 'store'])->middleware('check.permission:admin.inquiries.store')->name('admin.inquiries.store');
     Route::get('inquiries/{inquiry}', [InquiriesController::class, 'show'])->middleware('check.permission:admin.inquiries.show')->name('admin.inquiries.show');
-    Route::get('inquiries/{inquiry}/edit', [InquiriesController::class, 'edit'])->middleware('check.permission:admin.inquiries.update')->name('admin.inquiries.edit');
-    Route::patch('inquiries/{inquiry}', [InquiriesController::class, 'update'])->middleware('check.permission:admin.inquiries.update')->name('admin.inquiries.update');
     Route::delete('inquiries/{inquiry}', [InquiriesController::class, 'destroy'])->middleware('check.permission:admin.inquiries.destroy')->name('admin.inquiries.destroy');
+
+    // Contact Submissions
+    Route::get('contact-submissions', [ContactSubmissionsController::class, 'index'])->middleware('check.permission:admin.contact-submissions.index')->name('admin.contact-submissions.index');
+    Route::get('contact-submissions/{contactSubmission}', [ContactSubmissionsController::class, 'show'])->middleware('check.permission:admin.contact-submissions.show')->name('admin.contact-submissions.show');
+    Route::delete('contact-submissions/{contactSubmission}', [ContactSubmissionsController::class, 'destroy'])->middleware('check.permission:admin.contact-submissions.destroy')->name('admin.contact-submissions.destroy');
 });
 
 Route::middleware(['set.locale'])->group(function () {
@@ -265,6 +268,7 @@ Route::middleware(['set.locale'])->group(function () {
 
     Route::get('/visits', [ControllersPagesController::class, 'visits'])->name('visits');
     Route::get('/inquiries', [ControllersPagesController::class, 'inquiries'])->name('inquiries');
+    Route::get('/contact', [ControllersPagesController::class, 'contact'])->name('contact');
 
     Route::get('/articles', [ControllersPagesController::class, 'articles'])->name('articles');
     Route::get('/albums', [ControllersPagesController::class, 'albums'])->name('albums');
@@ -280,6 +284,7 @@ Route::middleware(['set.locale'])->group(function () {
 
     Route::post('visit-services/{visitService}/visit-bookings', [ControllersVisitBookingsController::class, 'visitBookings'])->name('visit-bookings.store');
     Route::post('inquiries', [ControllersInquiriesController::class, 'storeInquiries'])->name('inquiries.store');
+    Route::post('contact', [ControllersContactSubmissionsController::class, 'storeContactSubmission'])->name('contact-submissions.store');
 });
 
 Route::get('language/{locale}', function ($locale) {

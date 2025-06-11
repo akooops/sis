@@ -83,12 +83,12 @@
                         {{getLanguageKeyLocalTranslation('footer_get_in_touch_title')}}
                     </h4>
                     <address>
-                        {{getLanguageKeyLocalTranslation('footer_get_in_touch_address')}}
+                        {{getLanguageKeyLocalTranslation('get_in_touch_address')}}
                     </address>
-                    <a href="mailto:{{getLanguageKeyLocalTranslation('footer_get_in_touch_email')}}">
-                        {{getLanguageKeyLocalTranslation('footer_get_in_touch_email')}}
+                    <a href="mailto:{{getLanguageKeyLocalTranslation('get_in_touch_email')}}">
+                        {{getLanguageKeyLocalTranslation('get_in_touch_email')}}
                     </a>
-                    <br /> {{getLanguageKeyLocalTranslation('footer_get_in_touch_phone')}}
+                    <br /> {{getLanguageKeyLocalTranslation('get_in_touch_phone')}}
                 </div>
                 <!-- /.widget -->
             </div>

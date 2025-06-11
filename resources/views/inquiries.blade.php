@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('title', $page->getLocalTranslation('title'))
 @section('description', $page->getLocalTranslation('description'))
-@section('canonical', route('page', ['slug' => $page->slug]))
+@section('canonical', route('inquiries'))
 @section('css')
 <link href="{{ URL::asset('assets/admin/libs/flatpickr/flatpickr.min.css')}}" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/css/intlTelInput.min.css"/>

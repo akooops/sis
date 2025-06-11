@@ -41,7 +41,7 @@ class SettingsSeeder extends Seeder
             [
                 'key' => 'google_maps_url',
                 'type' => 'text',
-                'value' => '',
+                'value' => 'https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d14498.930662207516!2d46.69119!3d24.701715!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x5bd680a41f772144!2sSaud%20International%20School!5e0!3m2!1sen!2sus!4v1662044871512!5m2!1sen!2sus',
                 'description' => 'Google Maps url',
                 'group' => 'google',
                 'is_encrypted' => false,

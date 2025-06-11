@@ -54,6 +54,13 @@ class PagesSeeder extends Seeder
                 'menu_id' => null,
             ],
             [
+                'name' => 'Contact',
+                'slug' => 'contact',
+                'is_system_page' => true,
+                'status' => 'published',
+                'menu_id' => null,
+            ],
+            [
                 'name' => 'Error',
                 'slug' => 'error',
                 'is_system_page' => true,
@@ -165,6 +172,20 @@ class PagesSeeder extends Seeder
                 'content' => [
                     'en' => 'Have questions about our school? We\'re here to help! Please fill out the form below with your inquiry about admissions, programs, or any other questions you may have. Our admissions team will get back to you as soon as possible.',
                     'ar' => 'لديك أسئلة حول مدرستنا؟ نحن هنا للمساعدة! يرجى ملء النموذج أدناه باستفسارك حول القبول أو البرامج أو أي أسئلة أخرى قد تكون لديك. سيتواصل معك فريق القبول في أقرب وقت ممكن.'
+                ]
+            ],
+            'contact' => [
+                'title' => [
+                    'en' => 'Contact Us',
+                    'ar' => 'اتصل بنا'
+                ],
+                'description' => [
+                    'en' => 'Get in touch with us for any questions or information',
+                    'ar' => 'تواصل معنا لأي أسئلة أو معلومات'
+                ],
+                'content' => [
+                    'en' => 'We would love to hear from you! Please feel free to reach out to us with any questions, comments, or inquiries. Our team is here to help and will respond to your message as soon as possible.',
+                    'ar' => 'نحن نحب أن نسمع منك! لا تتردد في التواصل معنا لأي أسئلة أو تعليقات أو استفسارات. فريقنا هنا للمساعدة وسيرد على رسالتك في أقرب وقت ممكن.'
                 ]
             ],
             'error' => [

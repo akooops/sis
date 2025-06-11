@@ -68,15 +68,15 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Get in touch',
                 'ar' => 'تواصل معنا'
             ],
-            'footer_get_in_touch_address' => [
+            'get_in_touch_address' => [
                 'en' => 'Saud International School Hamdan Street, Sulaimaniyah, Riyadh Kingdom of Saudi Arabia',
                 'ar' => 'Saud International School Hamdan Street, Sulaimaniyah, Riyadh Kingdom of Saudi Arabia'
             ],
-            'footer_get_in_touch_email' => [
+            'get_in_touch_email' => [
                 'en' => 'enquiries@sis.edu.sa',
                 'ar' => 'enquiries@sis.edu.sa'
             ],
-            'footer_get_in_touch_phone' => [
+            'get_in_touch_phone' => [
                 'en' => '(966) 920002877',
                 'ar' => '(966) 920002877'
             ],
@@ -351,6 +351,46 @@ class LanguageTranslationSeeder extends Seeder
             'inquiry_success_message' => [
                 'en' => 'Your inquiry has been submitted successfully! We will contact you soon.',
                 'ar' => 'تم إرسال استفسارك بنجاح! سنتواصل معك قريباً.'
+            ],
+            'contact_page_name_input' => [
+                'en' => 'Full Name',
+                'ar' => 'الاسم الكامل'
+            ],
+            'contact_page_email_input' => [
+                'en' => 'Email Address',
+                'ar' => 'البريد الإلكتروني'
+            ],
+            'contact_page_phone_input' => [
+                'en' => 'Phone Number',
+                'ar' => 'رقم الهاتف'
+            ],
+            'contact_page_subject_input' => [
+                'en' => 'Subject',
+                'ar' => 'الموضوع'
+            ],
+            'contact_page_message_input' => [
+                'en' => 'Your Message',
+                'ar' => 'رسالتك'
+            ],
+            'contact_page_submit_button' => [
+                'en' => 'Send Message',
+                'ar' => 'إرسال الرسالة'
+            ],
+            'contact_submission_success_message' => [
+                'en' => 'Thank you for your message! We will get back to you as soon as possible.',
+                'ar' => 'شكراً لك على رسالتك! سنتواصل معك في أقرب وقت ممكن.'
+            ],
+            'contact_page_address_title' => [
+                'en' => 'Address',
+                'ar' => 'العنوان'
+            ],
+            'contact_page_email_title' => [
+                'en' => 'Email',
+                'ar' => 'البريد الإلكتروني'
+            ],
+            'contact_page_phone_title' => [
+                'en' => 'Phone',
+                'ar' => 'رقم الهاتف'
             ],
         ];
 

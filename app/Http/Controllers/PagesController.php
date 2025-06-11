@@ -90,6 +90,20 @@ class PagesController extends Controller
         ]);
     }
 
+    public function contact(Request $request)
+    {
+        $page = Page::where([
+            'slug' => 'contact',
+            'status' => 'published'
+        ])->first();
+
+        if(!$page) abort(404);
+
+        return view('contact', [
+            'page' => $page
+        ]);
+    }
+
     public function articles(Request $request)
     {
         $page = Page::where([
