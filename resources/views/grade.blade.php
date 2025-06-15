@@ -13,7 +13,7 @@
                 <h1 class="display-1 fs-48 mt-12 text-white animate__animated animate__slideInDown animate__delay-1s">
                     {{$grade->getLocalTranslation('title')}}
                 </h1>
-                <p class="lead fs-16 fw-semibold lh-sm mb-7 text-white animate__animated animate__slideInRight animate__delay-2s">                   
+                <p class="lead fs-16 fw-semibold lh-sm mb-7 text-white animate__animated animate__slideInDown animate__delay-2s">                   
                     {{$grade->program->getLocalTranslation('title')}}                                         
                 </p>
             </div>
@@ -92,36 +92,38 @@
                 <!-- /.card-header -->
                 <div id="grades-collapse" class="collapse show">
                     <div class="card-body">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col" width="25px">#</th>
-                                    <th scope="col" width="90%">
-                                        {{getLanguageKeyLocalTranslation('grade_page_table_header_file')}}
-                                    </th>
-                                    <th scope="col">
-                                        {{getLanguageKeyLocalTranslation('grade_page_table_header_option')}}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($grade->files as $key => $file)
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
                                     <tr>
-                                        <th scope="row">
-                                            {{$key + 1}}
+                                        <th scope="col" width="25px">#</th>
+                                        <th scope="col" width="90%">
+                                            {{getLanguageKeyLocalTranslation('grade_page_table_header_file')}}
                                         </th>
-                                        <td>
-                                           {{$file->original_name}}
-                                        </td>
-                                        <td>
-                                            <a href="{{$file->url}}" target="_blank" class="btn btn-sm btn-primary rounded">
-                                                {{getLanguageKeyLocalTranslation('grade_page_table_cta')}}
-                                            </a>
-                                        </td>
+                                        <th scope="col">
+                                            {{getLanguageKeyLocalTranslation('grade_page_table_header_option')}}
+                                        </th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach ($grade->files as $key => $file)
+                                        <tr>
+                                            <th scope="row">
+                                                {{$key + 1}}
+                                            </th>
+                                            <td>
+                                            {{$file->original_name}}
+                                            </td>
+                                            <td>
+                                                <a href="{{$file->url}}" target="_blank" class="btn btn-sm btn-primary rounded">
+                                                    {{getLanguageKeyLocalTranslation('grade_page_table_cta')}}
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <!-- /.card-body -->
                 </div>

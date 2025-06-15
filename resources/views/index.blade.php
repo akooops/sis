@@ -113,6 +113,7 @@
 <!-- /section -->
 
 <section class="wrapper bg-light grades-section">
+    <div class="container">
         <div class="row row-cols-1 row-cols-md-5 align-items-center">
             @foreach ($programs as $program)    
             <div class="col grades p-0">
@@ -139,6 +140,7 @@
             </div>
             @endforeach
         </div>
+    </div>
 </section>
 
 <section class="wrapper bg-light facts-section">
@@ -305,7 +307,7 @@
             {{getLanguageKeyLocalTranslation('index_page_forth_section_subtitle')}}
         </h3>
 
-        <div class="swiper-container blog grid-view mb-6" data-margin="30" data-dots="true" data-items-xl="3" data-items-md="2" data-items-xs="1">
+        <div class="swiper-container blog grid-view mb-12" data-margin="30" data-dots="true" data-items-xl="3" data-items-md="2" data-items-xs="1">
             <div class="swiper">
                 <div class="swiper-wrapper">
                     @foreach ($articles as $article)   
@@ -352,7 +354,7 @@
         </div>
         <!-- /.swiper-container -->
 
-        <div class="d-flex justify-content-center mt-4">
+        <div class="d-flex justify-content-center">
               <a href="{{route('articles')}}" class="btn btn-sm btn-primary rounded text-center">
                     {{getLanguageKeyLocalTranslation('index_page_forth_section_cta')}}
               </a>

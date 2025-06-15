@@ -50,7 +50,7 @@
                     <article class="post">
                         <div class="card">
                             <figure class="article-figure card-img-top overlay overlay-1 hover-scale" style="height: 500px">
-                                <img src="{{$article->thumbnailUrl}}" alt=""><span class="bg"></span>
+                                <img src="{{$article->thumbnailUrl}}" alt="" style="height: 500px !important; object-fit: cover"><span class="bg"></span>
                             </figure>
 
 

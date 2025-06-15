@@ -104,7 +104,7 @@
 
                                 <ul class="dropdown-menu">
                                     @foreach ($menuItem->children as $childMenuItem)
-                                        <a class="dropdown-item" 
+                                        <a class="dropdown-item text-wrap" 
                                             href="{{
                                                 $childMenuItem->page 
                                                     ? route('page', ['slug' => $childMenuItem->page->slug]) 
