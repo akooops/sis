@@ -1,12 +1,12 @@
 @extends('admin.layouts.master')
-@section('title') Grades @endsection
+@section('title') Visit Time Slots @endsection
 @section('css')
 <link href="{{ URL::asset('assets/admin/libs/calendar/main.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
 @component('admin.components.breadcrumb')
-@slot('li_1') Grades @endslot
-@slot('title') Grades @endslot
+@slot('li_1') Visit Time Slots @endslot
+@slot('title') Visit Time Slots @endslot
 @endcomponent
 <div class="row">
     <div class="col">
@@ -74,18 +74,20 @@ document.addEventListener('DOMContentLoaded', function() {
   var calendarEl = document.getElementById('calendar');
 
   var calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridWeek', // Set default view
+    initialView: 'timeGridWeek', // Set default view
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,dayGridWeek'
+        right: 'dayGridMonth,timeGridWeek'
     },
     events: [
       @foreach($visitTimeSlots as $visitTimeSlot)
       {
-        title: '{{$visitTimeSlot->starts_at}}',
+        title: '{{$visitTimeSlot->starts_at}} - {{$visitTimeSlot->ends_at}}',
         start: '{{$visitTimeSlot->starts_at}}',
-        url: '{{route("admin.visit-time-slots.edit", $visitTimeSlot->id)}}'
+        end: '{{$visitTimeSlot->ends_at}}',
+        url: '{{route("admin.visit-time-slots.edit", $visitTimeSlot->id)}}',
+        backgroundColor: '{{$visitTimeSlot->reserved ? "#dc3545" : "#198754"}}'
       },
       @endforeach
     ]

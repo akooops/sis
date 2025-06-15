@@ -17,4 +17,9 @@ class VisitBooking extends Model
     {
         return $this->belongsTo(VisitService::class);
     }
+
+    public function visitTimeSlot()
+    {
+        return $this->belongsTo(VisitTimeSlot::class);
+    }
 }

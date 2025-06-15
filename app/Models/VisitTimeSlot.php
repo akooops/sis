@@ -12,9 +12,22 @@ class VisitTimeSlot extends Model
     //Properties
     protected $guarded = ['id'];
 
+    protected $appends = ['reserved'];
+
     //Relationships
     public function visitService()
     {
         return $this->belongsTo(VisitService::class);
+    }
+
+    public function visitBooking()
+    {
+        return $this->hasOne(VisitBooking::class);
+    }
+
+    //Accessors
+    public function getReservedAttribute(): bool
+    {
+        return $this->visitBooking()->exists();
     }
 }

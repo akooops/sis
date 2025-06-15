@@ -5,6 +5,60 @@
 @section('css')
 <link href="{{ URL::asset('assets/libs/calendar/main.min.css')}}" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/css/intlTelInput.min.css"/>
+<style>
+    /* Available time slots */
+    .fc-event.available-slot {
+        background-color: #198754 !important;
+        border-color: #198754 !important;
+        cursor: pointer;
+    }
+
+    .fc-event.available-slot:hover {
+        background-color: #157347 !important;
+        border-color: #146c43 !important;
+    }
+
+    /* Reserved time slots */
+    .fc-event.reserved-slot {
+        background-color: #dc3545 !important;
+        border-color: #dc3545 !important;
+        cursor: not-allowed !important;
+        opacity: 0.6;
+    }
+
+    .fc-event.reserved-slot:hover {
+        background-color: #dc3545 !important;
+        border-color: #dc3545 !important;
+    }
+
+    /* Add a legend */
+    .time-slot-legend {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .legend-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+    }
+
+    .legend-available {
+        background-color: #198754;
+    }
+
+    .legend-reserved {
+        background-color: #dc3545;
+    }
+</style>
 @endsection
 @section('content')
 <section class="wrapper bg-dark page-main-section" style="background-image: url('{{ $page->thumbnailUrl  }}'); background-size: cover">
@@ -163,7 +217,9 @@
                                         <p class="lead">{{$visitService->getLocalTranslation('description')}}</p>
                                         <hr class="mt-2 mb-4">
                                         <p class="mb-6">
-                                            <x-markdown>{{ $visitService->getLocalTranslation('content') }}</x-markdown>
+                                            <div class="page-content">
+                                                <x-markdown>{{ $visitService->getLocalTranslation('content') }}</x-markdown>
+                                            </div>
                                         </p>
                                     </div>
                                 </div>
@@ -184,21 +240,32 @@
                                 <button class="btn btn-sm btn-primary mb-2" @click="goBackToServices()">
                                     <i class="uil uil-arrow-left"></i>
                                 </button>
-
                                 <h4 class="mb-0">@{{ selectedService.name }}</h4>
                                 <small class="text-muted">
                                     {{getLanguageKeyLocalTranslation('visit_pages_visitors_count')}}: @{{ selectedService.visitorCount }}
                                 </small>
                             </div>
-
                         </div>
                         <div class="card-body p-2 p-sm-8">
+                            <!-- Time Slot Legend -->
+                            <div class="time-slot-legend">
+                                <div class="legend-item">
+                                    <div class="legend-color legend-available"></div>
+                                    <span>{{getLanguageKeyLocalTranslation('visit_pages_available_slots')}}</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color legend-reserved"></div>
+                                    <span>{{getLanguageKeyLocalTranslation('visit_pages_reserved_slots')}}</span>
+                                </div>
+                            </div>
+                            
                             <div id="calendar" v-if="selectedService.id"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
 
         <!-- Step 3: Confirmation -->
         <div v-show="currentStep === 3">
@@ -343,7 +410,9 @@ window.visitServicesData = {
             @foreach ($visitService->upcomingTimeSlots as $timeSlot)
             {
                 id: {{$timeSlot->id}},
-                starts_at: "{{$timeSlot->starts_at}}"
+                starts_at: "{{$timeSlot->starts_at}}",
+                ends_at: "{{$timeSlot->ends_at}}",
+                reserved: "{{ $timeSlot->reserved }}"
             },
             @endforeach
         ]
@@ -425,29 +494,63 @@ createApp({
             const calendarEl = document.getElementById('calendar');
             this.calendar = new FullCalendar.Calendar(calendarEl, {
                 locale: '{{app()->getLocale()}}',
-                initialView: 'dayGridWeek',
+                initialView: 'timeGridWeek',
                 headerToolbar: {
                     left: 'prev,next',
-                    right: 'dayGridMonth,dayGridWeek'
+                    right: 'dayGridMonth,timeGridWeek'
                 },
                 height: 'auto',
                 slotMinTime: '08:00:00',
                 slotMaxTime: '18:00:00',
                 allDaySlot: false,
+                
+                // Create events with different colors based on reservation status
                 events: timeSlots.map(slot => ({
                     id: slot.id,
                     start: slot.starts_at,
-                    backgroundColor: '#2A5D91'           
+                    end: slot.ends_at,
+                    title: slot.reserved ? '{{getLanguageKeyLocalTranslation("visit_pages_reserved_slots")}}' : '{{getLanguageKeyLocalTranslation("visit_pages_available_slots")}}',
+                    backgroundColor: slot.reserved ? '#dc3545' : '#198754', // Red for reserved, Green for available
+                    borderColor: slot.reserved ? '#dc3545' : '#198754',
+                    textColor: '#ffffff',
+                    classNames: slot.reserved ? ['reserved-slot'] : ['available-slot'],
+                    extendedProps: {
+                        reserved: slot.reserved,
+                    }
                 })),
+                
+                // Handle event clicks - only allow selection of available slots
                 eventClick: (info) => {
-                    this.selectTimeSlot(info.event);
+                    if (info.event.extendedProps.reserved) {
+                        // Show alert for reserved slots
+                        this.showErrorAlert('{{getLanguageKeyLocalTranslation('visit_pages_slot_reserved_error')}}');
+                        return false; // Prevent selection
+                    } else {
+                        this.selectTimeSlot(info.event);
+                    }
+                },
+                
+                // Style the events
+                eventDidMount: function(info) {
+                    if (info.event.extendedProps.reserved) {
+                        info.el.style.cursor = 'not-allowed';
+                        info.el.style.opacity = '0.6';
+                    } else {
+                        info.el.style.cursor = 'pointer';
+                    }
                 }
             });
             
             this.calendar.render();
         },
-        
+
         selectTimeSlot(event) {
+            // Double-check if slot is reserved
+            if (event.extendedProps.reserved) {
+                this.showErrorAlert('{{getLanguageKeyLocalTranslation('visit_pages_slot_reserved_error')}}');
+                return;
+            }
+            
             this.selectedTimeSlot = {
                 id: event.id,
                 start: event.start,
@@ -461,6 +564,7 @@ createApp({
                 this.initIntlTelInput();
             });
         },
+
 
         initIntlTelInput() {
             const input = document.getElementById('phoneInput');

@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests\Admin\VisitTimeSlots;
 
-use App\Models\Media;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreVisitTimeSlotRequest extends FormRequest
+class DeleteVisitTimeSlotRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +22,20 @@ class StoreVisitTimeSlotRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'starts_at' => 'required|date_format:Y-m-d H:i',
-            'ends_at' => 'required|date_format:Y-m-d H:i|after_or_equal:starts_at',
+
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $visitTimeSlot = $this->route('visitTimeSlot');
+
+        $validator->after(function ($validator) use ($visitTimeSlot){
+            if ($visitTimeSlot->reserved) {
+                $validator->errors()->add('visit_time_slot', 'This time slots have been already reserved.');
+
+                return;
+            }
+        });
     }
 }

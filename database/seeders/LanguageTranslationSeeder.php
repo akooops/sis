@@ -304,6 +304,20 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'An error occurred while processing your booking. Please try again.',
                 'ar' => 'حدث خطأ أثناء معالجة حجزك. يرجى المحاولة مرة أخرى.'
             ],
+            'visit_pages_slot_reserved_error' => [
+                'en' => 'This time slot is already reserved. Please select another time.',
+                'ar' => 'هذا الوقت محجوز بالفعل. يرجى اختيار وقت آخر.'
+            ],
+
+            'visit_pages_available_slots' => [
+                'en' => 'Available',
+                'ar' => 'متاح'
+            ],
+
+            'visit_pages_reserved_slots' => [
+                'en' => 'Reserved',
+                'ar' => 'محجوز'
+            ],
             'recaptcha_error' => [
                 'en' => 'Security verification failed. Please try again.',
                 'ar' => 'فشل التحقق الأمني. يرجى المحاولة مرة أخرى.'

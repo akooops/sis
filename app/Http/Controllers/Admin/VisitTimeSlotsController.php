@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\VisitTimeSlots\DeleteVisitTimeSlotRequest;
 use App\Http\Requests\Admin\VisitTimeSlots\OrderVisitTimeSlotsRequest;
 use App\Http\Requests\Admin\VisitTimeSlots\StoreVisitTimeSlotRequest;
 use App\Http\Requests\Admin\VisitTimeSlots\UpdateVisitTimeSlotRequest;
@@ -104,7 +105,7 @@ class VisitTimeSlotsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(VisitTimeSlot $visitTimeSlot)
+    public function destroy(VisitTimeSlot $visitTimeSlot, DeleteVisitTimeSlotRequest $request)
     {
         $visitTimeSlot->delete();
 

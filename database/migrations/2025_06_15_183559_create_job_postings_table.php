@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('visit_time_slots', function (Blueprint $table) {
+        Schema::create('job_postings', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('starts_at');
-            $table->dateTime('ends_at');
-
-            $table->unsignedBigInteger('visit_service_id')->nullable();
-            $table->foreign('visit_service_id')->references('id')->on('visit_services')->nullOnDelete();
+            $table->string('name');
 
             $table->timestamps();
         });
@@ -28,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('visit_time_slots');
+        Schema::dropIfExists('job_postings');
     }
 };

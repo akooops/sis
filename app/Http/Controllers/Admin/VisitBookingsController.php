@@ -63,20 +63,6 @@ class VisitBookingsController extends Controller
         return view('admin.visit-bookings.show', compact('visitBooking'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(VisitBooking $visitBooking, UpdateVisitBookingRequest $request)
-    {
-        $visitBooking->update($request->validated());
-
-        return redirect()->route('admin.visit-bookings.index', $visitBooking->visitService->id)
-                        ->with('success','Visit Booking updated successfully');
-    }
 
     /**
      * Remove the specified resource from storage.

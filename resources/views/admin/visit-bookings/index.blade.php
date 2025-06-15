@@ -51,7 +51,6 @@
                                             <th scope="col" width="10%" width="100px">#</th>
                                             <th scope="col">Date/Time</th> 
                                             <th scope="col">Visitors Count</th> 
-                                            <th scope="col">Status</th> 
                                             <th scope="col" width="75px">Actions</th>                                        
                                         </tr>
                                     </thead>
@@ -63,21 +62,11 @@
                                             </td>
 
                                             <td>
-                                                <span class="badge bg-primary"> {{$visitBooking->starts_at }} </span>
+                                                <span class="badge bg-primary"> {{$visitBooking->visitTimeSlot->starts_at }} - {{$visitBooking->visitTimeSlot->ends_at }} </span>
                                             </td>  
 
                                             <td>
                                                 <span class="badge bg-primary"> {{$visitBooking->visitors_count }} </span>
-                                            </td>  
-
-                                            <td>
-                                                @if($visitBooking->status == 'pending')
-                                                    <span class="badge bg-info">Pending</span>   
-                                                @elseif($visitBooking->status == 'confirmed')   
-                                                    <span class="badge bg-success">Confirmed</span>                                                 
-                                                @else
-                                                    <span class="badge bg-danger">Canceled</span>
-                                                @endif
                                             </td>  
 
                                             <td>
@@ -90,51 +79,6 @@
                                                         @haspermission('admin.visit-bookings.show')
                                                             <li><a class="dropdown-item" href="{{route('admin.visit-bookings.show', $visitBooking->id)}}"><i class="ri-eye-fill align-bottom me-2 text-muted"></i> View</a></li>
                                                         @endhaspermission
-
-                                                        @haspermission('admin.visit-bookings.update')
-                                                            @if($visitBooking->status !== 'confirmed')
-                                                            <li>
-                                                                <form action="{{route('admin.visit-bookings.update', $visitBooking->id)}}" method="POST" class="status-form">
-                                                                    @csrf
-                                                                    @method('PATCH')
-                                                                    <input type="hidden" name="status" value="confirmed">
-                                                                    <button type="submit" class="dropdown-item">
-                                                                        <i class="ri-check-line align-bottom me-2 text-success"></i> 
-                                                                        <span class="text-success">Mark as Confirmed</span>
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                            @endif
-                                                            
-                                                            @if($visitBooking->status !== 'pending')
-                                                            <li>
-                                                                <form action="{{route('admin.visit-bookings.update', $visitBooking->id)}}" method="POST" class="status-form">
-                                                                    @csrf
-                                                                    @method('PATCH')
-                                                                    <input type="hidden" name="status" value="pending">
-                                                                    <button type="submit" class="dropdown-item">
-                                                                        <i class="ri-time-line align-bottom me-2 text-info"></i> 
-                                                                        <span class="text-info">Mark as Pending</span>
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                            @endif
-                                                            
-                                                            @if($visitBooking->status !== 'canceled')
-                                                            <li>
-                                                                <form action="{{route('admin.visit-bookings.update', $visitBooking->id)}}" method="POST" class="status-form">
-                                                                    @csrf
-                                                                    @method('PATCH')
-                                                                    <input type="hidden" name="status" value="canceled">
-                                                                    <button type="submit" class="dropdown-item">
-                                                                        <i class="ri-close-line align-bottom me-2 text-danger"></i> 
-                                                                        <span class="text-danger">Mark as Canceled</span>
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                            @endif
-                                                        @endhaspermission
-
 
                                                         @haspermission('admin.visit-bookings.destroy')
                                                             <form action="{{route('admin.visit-bookings.destroy', $visitBooking->id)}}" method="POST">

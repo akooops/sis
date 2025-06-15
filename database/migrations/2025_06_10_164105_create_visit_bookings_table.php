@@ -21,13 +21,14 @@ return new class extends Migration
             $table->string('student_grade');
             $table->string('student_school');
 
-            $table->dateTime('starts_at');
             $table->integer('visitors_count')->default(1);
-            $table->enum('status', ['pending', 'confirmed', 'canceled'])->default('pending');
 
             $table->unsignedBigInteger('visit_service_id')->nullable();
             $table->foreign('visit_service_id')->references('id')->on('visit_services')->cascadeOnDelete();
-
+            
+            $table->unsignedBigInteger('visit_time_slot_id')->nullable();
+            $table->foreign('visit_time_slot_id')->references('id')->on('visit_time_slots')->cascadeOnDelete();
+            
             $table->timestamps();
         });
     }

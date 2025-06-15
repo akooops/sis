@@ -27,8 +27,7 @@ class VisitBookingsController extends Controller
         $booking  = VisitBooking::create(array_merge(
             $request->validated(),
             [
-                'visit_service_id' =>  $visitService->id,
-                'starts_at' => $timeSlot->starts_at
+                'visit_service_id' =>  $visitService->id
             ]
         ));
 

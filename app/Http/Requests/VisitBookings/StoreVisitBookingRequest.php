@@ -50,8 +50,28 @@ class StoreVisitBookingRequest extends FormRequest
                 'exists:visit_time_slots,id',
                 function ($attribute, $value, $fail) use ($visitService) {
                     $timeSlot = \App\Models\VisitTimeSlot::find($value);
-                    if ($timeSlot && $timeSlot->visit_service_id !== $visitService->id) {
+                    
+                    if (!$timeSlot) {
+                        $fail('The selected time slot does not exist.');
+                        return;
+                    }
+                    
+                    // Check if time slot belongs to the service
+                    if ($timeSlot->visit_service_id !== $visitService->id) {
                         $fail('The selected time slot does not belong to the chosen service.');
+                        return;
+                    }
+                    
+                    // Check if time slot is in the past
+                    if ($timeSlot->starts_at < now()) {
+                        $fail('The selected time slot is in the past.');
+                        return;
+                    }
+                    
+                    // Check if time slot is already reserved
+                    if ($timeSlot->visitBooking()->exists()) {
+                        $fail('The selected time slot is already reserved. Please choose another time slot.');
+                        return;
                     }
                 },
             ],

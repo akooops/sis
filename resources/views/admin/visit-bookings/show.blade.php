@@ -37,23 +37,12 @@
 
                             <div class="mb-3">
                                 <h4 class="fs-15">Visit Booking datetime</h4>
-                                <span class="badge bg-primary"> {{$visitBooking->starts_at }} </span>
+                                <span class="badge bg-primary"> {{$visitBooking->visitTimeSlot->starts_at }} - {{$visitBooking->visitTimeSlot->ends_at }} </span>
                             </div>
 
                             <div class="mb-3">
                                 <h4 class="fs-15">Visit Booking Visitors Count</h4>
                                 <span class="badge bg-primary"> {{$visitBooking->visitors_count }} </span>
-                            </div>
-
-                            <div class="mb-3">
-                                <h4 class="fs-15">Visit Booking status</h4>
-                                @if($visitBooking->status == 'pending')
-                                    <span class="badge bg-info">Pending</span>   
-                                @elseif($visitBooking->status == 'confirmed')   
-                                    <span class="badge bg-success">Confirmed</span>                                                 
-                                @else
-                                    <span class="badge bg-danger">Canceled</span>
-                                @endif
                             </div>
 
                             <div class="mb-3">

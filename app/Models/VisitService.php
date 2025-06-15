@@ -33,6 +33,13 @@ class VisitService extends Model
         return $this->hasMany(VisitTimeSlot::class)->where('starts_at', '>=', now()->startOfDay());
     }
 
+    public function upcomingAvailableTimeSlots()
+    {
+        return $this->hasMany(VisitTimeSlot::class)
+            ->where('starts_at', '>=', now())
+            ->whereDoesntHave('visitBooking');
+    }
+
     public function visitBookings()
     {
         return $this->hasMany(VisitBooking::class);
