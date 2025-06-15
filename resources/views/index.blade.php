@@ -113,7 +113,7 @@
 <!-- /section -->
 
 <section class="wrapper bg-light grades-section">
-    <div class="container">
+    <div class="container-fluid">
         <div class="row row-cols-1 row-cols-md-5 align-items-center">
             @foreach ($programs as $program)    
             <div class="col grades p-0">
