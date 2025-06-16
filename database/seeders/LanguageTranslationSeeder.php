@@ -445,7 +445,105 @@ class LanguageTranslationSeeder extends Seeder
             'jobs_no_jobs_available' => [
                 'en' => 'No job openings available at the moment',
                 'ar' => 'لا توجد وظائف شاغرة متاحة في الوقت الحالي'
-            ]
+            ],
+            'breadcrumbs_jobs_page_title' => [
+                'en' => 'Jobs',
+                'ar' => 'الوظائف', 
+            ],
+            'job_description_title' => [
+                'en' => 'Job Description',
+                'ar' => 'وصف الوظيفة'
+            ],
+
+            'job_required_skills_title' => [
+                'en' => 'Required Skills',
+                'ar' => 'المهارات المطلوبة'
+            ],
+
+            'job_application_expired' => [
+                'en' => 'This job application has expired',
+                'ar' => 'انتهت صلاحية التقديم لهذه الوظيفة'
+            ],
+
+            'job_apply_now' => [
+                'en' => 'Apply Now',
+                'ar' => 'قدم الآن'
+            ],
+
+            'job_details_title' => [
+                'en' => 'Job Details',
+                'ar' => 'تفاصيل الوظيفة'
+            ],
+
+            'job_experience_required' => [
+                'en' => 'Years of Experience',
+                'ar' => 'سنوات الخبرة'
+            ],
+
+            'job_years' => [
+                'en' => 'years',
+                'ar' => 'سنوات'
+            ],
+
+            'job_skills_title' => [
+                'en' => 'Skills',
+                'ar' => 'المهارات'
+            ],
+
+            'job_employment_type' => [
+                'en' => 'Employment Type',
+                'ar' => 'نوع التوظيف'
+            ],
+
+            'jobs_full_time' => [
+                'en' => 'Full Time',
+                'ar' => 'دوام كامل'
+            ],
+
+            'jobs_part_time' => [
+                'en' => 'Part Time',
+                'ar' => 'دوام جزئي'
+            ],
+
+            'jobs_internship' => [
+                'en' => 'Internship',
+                'ar' => 'تدريب'
+            ],
+
+            'job_work_type' => [
+                'en' => 'Work Type',
+                'ar' => 'نوع العمل'
+            ],
+
+            'jobs_remote' => [
+                'en' => 'Remote',
+                'ar' => 'عن بُعد'
+            ],
+
+            'jobs_onsite' => [
+                'en' => 'On-site',
+                'ar' => 'في الموقع'
+            ],
+
+            'job_positions_available' => [
+                'en' => 'Positions Available',
+                'ar' => 'الوظائف المتاحة'
+            ],
+
+            'job_application_deadline' => [
+                'en' => 'Application Deadline',
+                'ar' => 'الموعد النهائي للتقديم'
+            ],
+
+            'jobs_closing_soon' => [
+                'en' => 'Closing Soon',
+                'ar' => 'ينتهي قريباً'
+            ],
+
+            'job_posted_date' => [
+                'en' => 'Posted Date',
+                'ar' => 'تاريخ النشر'
+            ],
         ];
 
         // Seed language keys and translations

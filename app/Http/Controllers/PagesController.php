@@ -140,6 +140,18 @@ class PagesController extends Controller
         ]);
     }
 
+    public function job(Request $request, $slug = null)
+    {
+        $job = JobPosting::where([
+            'slug' => $slug,
+            'status' => 'published'
+        ])->first();
+        
+        if(!$job) abort(404);
+
+        return view('job', compact('job'));
+    }
+
     public function articles(Request $request)
     {
         $page = Page::where([
