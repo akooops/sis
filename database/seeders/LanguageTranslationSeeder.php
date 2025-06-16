@@ -410,6 +410,42 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Home page',
                 'ar' => 'الصفحة الرئيسية'
             ],
+            'jobs_search_placeholder' => [
+                'en' => 'Search for job positions, keywords...',
+                'ar' => 'ابحث عن الوظائف، الكلمات المفتاحية...'
+            ],
+            'jobs_search_button' => [
+                'en' => 'Search',
+                'ar' => 'بحث'
+            ],
+            'jobs_full_time' => [
+                'en' => 'Full Time',
+                'ar' => 'دوام كامل'
+            ],
+            'jobs_part_time' => [
+                'en' => 'Part Time',
+                'ar' => 'دوام جزئي'
+            ],
+            'jobs_internship' => [
+                'en' => 'Internship',
+                'ar' => 'تدريب'
+            ],
+            'jobs_remote' => [
+                'en' => 'Remote',
+                'ar' => 'عن بُعد'
+            ],
+            'jobs_view_details' => [
+                'en' => 'View Details',
+                'ar' => 'عرض التفاصيل'
+            ],
+            'jobs_deadline' => [
+                'en' => 'Deadline',
+                'ar' => 'الموعد النهائي'
+            ],
+            'jobs_no_jobs_available' => [
+                'en' => 'No job openings available at the moment',
+                'ar' => 'لا توجد وظائف شاغرة متاحة في الوقت الحالي'
+            ]
         ];
 
         // Seed language keys and translations

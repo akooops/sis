@@ -283,6 +283,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/articles', [ControllersPagesController::class, 'articles'])->name('articles');
     Route::get('/albums', [ControllersPagesController::class, 'albums'])->name('albums');
     Route::get('/events', [ControllersPagesController::class, 'events'])->name('events');
+    Route::get('/jobs', [ControllersPagesController::class, 'jobs'])->name('jobs');
     Route::get('/programs/{program}', [ControllersPagesController::class, 'program'])->name('program');
 
     Route::get('/{slug}', [ControllersPagesController::class, 'page'])->name('page');
@@ -291,6 +292,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/albums/{slug}', [ControllersPagesController::class, 'album'])->name('album');
     Route::get('/events/{slug}', [ControllersPagesController::class, 'event'])->name('event');
     Route::get('/grades/{slug}', [ControllersPagesController::class, 'grade'])->name('grade');
+    Route::get('/jobs/{slug}', [ControllersPagesController::class, 'job'])->name('job');
 
     Route::post('visit-services/{visitService}/visit-bookings', [ControllersVisitBookingsController::class, 'visitBookings'])->name('visit-bookings.store');
     Route::post('inquiries', [ControllersInquiriesController::class, 'storeInquiries'])->name('inquiries.store');

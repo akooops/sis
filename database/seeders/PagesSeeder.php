@@ -61,6 +61,13 @@ class PagesSeeder extends Seeder
                 'menu_id' => null,
             ],
             [
+                'name' => 'Jobs',
+                'slug' => 'jobs',
+                'is_system_page' => true,
+                'status' => 'published',
+                'menu_id' => null,
+            ],
+            [
                 'name' => 'Error',
                 'slug' => 'error',
                 'is_system_page' => true,
@@ -186,6 +193,20 @@ class PagesSeeder extends Seeder
                 'content' => [
                     'en' => 'We would love to hear from you! Please feel free to reach out to us with any questions, comments, or inquiries. Our team is here to help and will respond to your message as soon as possible.',
                     'ar' => 'نحن نحب أن نسمع منك! لا تتردد في التواصل معنا لأي أسئلة أو تعليقات أو استفسارات. فريقنا هنا للمساعدة وسيرد على رسالتك في أقرب وقت ممكن.'
+                ]
+            ],
+            'jobs' => [ 
+                'title' => [
+                    'en' => 'Career Opportunities',
+                    'ar' => 'الفرص الوظيفية'
+                ],
+                'description' => [
+                    'en' => 'Join our team of dedicated educators and staff',
+                    'ar' => 'انضم إلى فريقنا من المعلمين والموظفين المتفانين'
+                ],
+                'content' => [
+                    'en' => 'Discover exciting career opportunities at Saud International Schools. We are always looking for passionate educators and dedicated professionals to join our team and help shape the future of education.',
+                    'ar' => 'اكتشف الفرص الوظيفية المثيرة في مدارس سعود العالمية. نحن نبحث دائماً عن معلمين متحمسين ومهنيين متفانين للانضمام إلى فريقنا والمساعدة في تشكيل مستقبل التعليم.'
                 ]
             ],
             'error' => [

@@ -7,6 +7,7 @@ use App\Models\Article;
 use App\Models\Banner;
 use App\Models\Event;
 use App\Models\Grade;
+use App\Models\JobPosting;
 use App\Models\Page;
 use App\Models\Program;
 use App\Models\VisitService;
@@ -104,6 +105,41 @@ class PagesController extends Controller
         ]);
     }
 
+    public function jobs(Request $request)
+    {
+        $page = Page::where([
+            'slug' => 'jobs',
+            'status' => 'published'
+        ])->first();
+
+        if(!$page) abort(404);
+
+        $pageNumber = $this->indexService->checkPageIfNull($request->query('page', 1));
+        $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
+
+        $jobs = JobPosting::latest()
+            ->where('status', 'published')
+            ->where(function($query) {
+                $query->whereNull('application_deadline')
+                    ->orWhere('application_deadline', '>', now());
+            });
+
+        if ($search) {
+            $jobs->where(function($query) use ($search) {
+                $query->where('id', $search)
+                      ->orWhere('name', 'like', '%' . $search . '%');
+            });
+        }
+
+        $jobs = $jobs->paginate('10', ['*'], 'page', $pageNumber);
+
+        return view('jobs', [
+            'page' => $page,
+            'jobs' => $jobs,
+            'pagination' => $this->indexService->handlePagination($jobs)
+        ]);
+    }
+
     public function articles(Request $request)
     {
         $page = Page::where([
@@ -116,7 +152,7 @@ class PagesController extends Controller
         $pageNumber = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $articles = Article::latest()->where('status', 'published');;
+        $articles = Article::latest()->where('status', 'published');
 
         if ($search) {
             $articles->where(function($query) use ($search) {
