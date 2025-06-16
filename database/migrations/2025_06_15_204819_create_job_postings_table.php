@@ -14,6 +14,16 @@ return new class extends Migration
         Schema::create('job_postings', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('slug')->unique();
+
+            $table->enum('employment_type', ['full_time', 'part_time', 'internship']);
+            $table->boolean('is_remote')->default(false);
+            $table->integer('number_of_positions')->default(1);
+
+            $table->integer('required_years_of_experience')->nullable();
+            $table->date('application_deadline')->nullable();
+
+            $table->enum('status', ['draft', 'published', 'hidden'])->default('draft');
 
             $table->timestamps();
         });

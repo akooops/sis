@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\FilesController;
 use App\Http\Controllers\Admin\FormsController;
 use App\Http\Controllers\Admin\GradesController;
 use App\Http\Controllers\Admin\InquiriesController;
+use App\Http\Controllers\Admin\JobPostingsController;
 use App\Http\Controllers\Admin\LanguagesController;
 use App\Http\Controllers\Admin\LanguagesKeysController;
 use App\Http\Controllers\Admin\MediaController;
@@ -259,6 +260,16 @@ Route::middleware(['auth', 'force.admin.english'])->prefix('admin')->group(funct
     Route::get('contact-submissions', [ContactSubmissionsController::class, 'index'])->middleware('check.permission:admin.contact-submissions.index')->name('admin.contact-submissions.index');
     Route::get('contact-submissions/{contactSubmission}', [ContactSubmissionsController::class, 'show'])->middleware('check.permission:admin.contact-submissions.show')->name('admin.contact-submissions.show');
     Route::delete('contact-submissions/{contactSubmission}', [ContactSubmissionsController::class, 'destroy'])->middleware('check.permission:admin.contact-submissions.destroy')->name('admin.contact-submissions.destroy');
+
+    // Job postings
+    Route::get('job-postings', [JobPostingsController::class, 'index'])->middleware('check.permission:admin.job-postings.index')->name('admin.job-postings.index');
+    Route::get('job-postings/create', [JobPostingsController::class, 'create'])->middleware('check.permission:admin.job-postings.store')->name('admin.job-postings.create');
+    Route::post('job-postings', [JobPostingsController::class, 'store'])->middleware('check.permission:admin.job-postings.store')->name('admin.job-postings.store');
+    Route::get('job-postings/{jobPosting}', [JobPostingsController::class, 'show'])->middleware('check.permission:admin.job-postings.show')->name('admin.job-postings.show');
+    Route::get('job-postings/{jobPosting}/edit', [JobPostingsController::class, 'edit'])->middleware('check.permission:admin.job-postings.update')->name('admin.job-postings.edit');
+    Route::patch('job-postings/{jobPosting}/update-translation', [JobPostingsController::class, 'updateTranslation'])->middleware('check.permission:admin.job-postings.update')->name('admin.job-postings.update-translation');
+    Route::patch('job-postings/{jobPosting}', [JobPostingsController::class, 'update'])->middleware('check.permission:admin.job-postings.update')->name('admin.job-postings.update');
+    Route::delete('job-postings/{jobPosting}', [JobPostingsController::class, 'destroy'])->middleware('check.permission:admin.job-postings.destroy')->name('admin.job-postings.destroy');
 });
 
 Route::middleware(['set.locale'])->group(function () {
