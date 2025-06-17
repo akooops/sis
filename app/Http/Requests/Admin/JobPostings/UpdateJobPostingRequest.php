@@ -20,18 +20,18 @@ class UpdateJobPostingRequest extends FormRequest
      */
     public function rules(): array
     {        
-        $album = $this->route('album');
+        $jobPosting = $this->route('jobPosting');
 
         return [
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:500|unique:job_postings,slug',
+            'slug' => 'required|string|max:500|unique:job_postings,slug,'.$jobPosting->id,
 
             'employment_type' => 'required|string|in:full_time,part_time,internship',
             'is_remote' => 'boolean',
 
             'required_years_of_experience' => 'nullable|integer|min:0',
             'number_of_positions' => 'required|integer|min:1',
-            'application_deadline' => 'nullable|date|after:today',
+            'application_deadline' => 'nullable|date',
             'status' => 'required|string|in:draft,hidden,published',
         ];
     }

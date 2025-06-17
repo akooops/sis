@@ -297,6 +297,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::post('visit-services/{visitService}/visit-bookings', [ControllersVisitBookingsController::class, 'visitBookings'])->name('visit-bookings.store');
     Route::post('inquiries', [ControllersInquiriesController::class, 'storeInquiries'])->name('inquiries.store');
     Route::post('contact', [ControllersContactSubmissionsController::class, 'storeContactSubmission'])->name('contact-submissions.store');
+    Route::post('contact', [ControllersContactSubmissionsController::class, 'storeContactSubmission'])->name('job-applications.store');
 });
 
 Route::get('language/{locale}', function ($locale) {

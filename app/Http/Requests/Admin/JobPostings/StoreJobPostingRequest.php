@@ -36,7 +36,7 @@ class StoreJobPostingRequest extends FormRequest
             
             'required_years_of_experience' => 'nullable|integer|min:0',
             'number_of_positions' => 'required|integer|min:1',
-            'application_deadline' => 'nullable|date|after:today',
+            'application_deadline' => 'nullable|date',
 
             'status' => 'required|string|in:draft,hidden,published',
         ];
