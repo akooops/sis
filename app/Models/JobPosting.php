@@ -14,7 +14,10 @@ class JobPosting extends Model
     protected $guarded = ['id'];
 
     //Relationships
-
+    public function jobApplications()
+    {
+        return $this->hasMany(JobApplication::class);
+    }
 
     //Accessors & Mutators
     public function getTranslatableFields(): array

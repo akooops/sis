@@ -114,38 +114,6 @@
         margin-left: 0.5rem;
         cursor: pointer;
     }
-
-    .file-upload-area {
-        border: 2px dashed #ced4da;
-        border-radius: 0.375rem;
-        padding: 2rem;
-        text-align: center;
-        transition: border-color 0.3s;
-    }
-    
-    .file-upload-area:hover {
-        border-color: #2A5D91;
-    }
-    
-    .file-upload-area.dragover {
-        border-color: #2A5D91;
-        background: rgba(13, 110, 253, 0.1);
-    }
-
-    .uploaded-file {
-        display: flex;
-        align-items: center;
-        padding: 0.5rem;
-        border: 1px solid #e9ecef;
-        border-radius: 0.375rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .uploaded-file .remove-file {
-        margin-left: auto;
-        color: #dc3545;
-        cursor: pointer;
-    }
 </style>
 @endsection
 
@@ -169,7 +137,7 @@
       <nav class="d-inline-block" aria-label="breadcrumb">
          <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item">
-                <a class="text-uppercase" href="{{route('index')}}">
+                <a class="text-uppercase" href="{{route('jobs')}}">
                     {{getLanguageKeyLocalTranslation('breadcrumbs_jobs_page_title')}}
                 </a>
             </li>
@@ -550,36 +518,37 @@
                         <div v-if="currentStep === 6">
                             <h3 class="mb-4">{{getLanguageKeyLocalTranslation('job_documents')}}</h3>
                             
-                            <!-- CV Upload -->
+                            <!-- CV Upload - Simple Bootstrap Input -->
                             <div class="mb-4">
-                                <label class="form-label">{{getLanguageKeyLocalTranslation('job_cv_required')}} <span class="text-danger">*</span></label>
-                                <div class="file-upload-area" 
-                                     @dragover.prevent="onDragOver" 
-                                     @dragleave.prevent="onDragLeave" 
-                                     @drop.prevent="onDrop($event, 'cv')">
-                                    <input ref="cvInput" 
-                                           @change="handleFileUpload($event, 'cv')" 
-                                           type="file" 
-                                           accept=".pdf,.doc,.docx" 
-                                           style="display: none;">
-                                    <div v-if="!applicationForm.documents.cv">
-                                        <i class="uil uil-cloud-upload" style="font-size: 3rem; color: #6c757d;"></i>
-                                        <p class="mb-2">{{getLanguageKeyLocalTranslation('job_drag_cv')}} 
-                                            <button @click="$refs.cvInput.click()" type="button" class="btn btn-link p-0">{{getLanguageKeyLocalTranslation('job_browse_files')}}</button>
-                                        </p>
-                                        <small class="text-muted">{{getLanguageKeyLocalTranslation('job_cv_formats')}}</small>
-                                    </div>
-                                    <div v-else class="uploaded-file">
-                                        <i class="uil uil-file-alt me-2"></i>
-                                        <span>@{{ applicationForm.documents.cv.name }}</span>
-                                        <span @click="removeFile('cv')" class="remove-file">
+                                <label for="cvInput" class="form-label">
+                                    {{getLanguageKeyLocalTranslation('job_cv_required')}} 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input id="cvInput"
+                                    ref="cvInput" 
+                                    @change="handleFileUpload($event, 'cv')" 
+                                    type="file" 
+                                    accept=".pdf,.doc,.docx" 
+                                    class="form-control"
+                                    :class="{ 'is-invalid': errors['cv'] }">
+                                <div class="form-text">{{getLanguageKeyLocalTranslation('job_cv_formats')}}</div>
+                                <div v-if="errors['cv']" class="invalid-feedback">@{{ errors['cv'] }}</div>
+                                
+                                <!-- Display uploaded file -->
+                                <div v-if="applicationForm.documents.cv" class="mt-2">
+                                    <div class="alert alert-success d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <i class="uil uil-file-alt me-2"></i>
+                                            @{{ applicationForm.documents.cv.name }}
+                                        </div>
+                                        <button @click="removeFile('cv')" type="button" class="btn btn-sm btn-outline-danger">
                                             <i class="uil uil-times"></i>
-                                        </span>
+                                        </button>
                                     </div>
                                 </div>
-                                <div v-if="errors['cv']" class="text-danger small mt-1">@{{ errors['cv'] }}</div>
                             </div>
                         </div>
+
 
                         <!-- Step 7: Review & Submit -->
                         <div v-if="currentStep === 7">
@@ -1048,43 +1017,37 @@ createApp({
             const files = event.target.files;
             const maxSize = 5 * 1024 * 1024; // 5MB
             
-            for (let file of files) {
+            if (type === 'cv' && files.length > 0) {
+                const file = files[0];
+                
+                // File size validation
                 if (file.size > maxSize) {
                     this.showErrorAlert('File size must be less than 5MB');
+                    this.$refs.cvInput.value = ''; // Clear the input
                     return;
                 }
-            }
-            
-            if (type === 'cv' && files.length > 0) {
+                
+                // File type validation
                 const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-                if (!allowedTypes.includes(files[0].type)) {
+                if (!allowedTypes.includes(file.type)) {
                     this.showErrorAlert('CV must be PDF, DOC, or DOCX format');
+                    this.$refs.cvInput.value = ''; // Clear the input
                     return;
                 }
-                this.applicationForm.documents.cv = files[0];
+                
+                // Clear any existing errors
+                if (this.errors['cv']) {
+                    delete this.errors['cv'];
+                }
+                
+                this.applicationForm.documents.cv = file;
             }
         },
-        
-        onDragOver(event) {
-            event.currentTarget.classList.add('dragover');
-        },
-        
-        onDragLeave(event) {
-            event.currentTarget.classList.remove('dragover');
-        },
-        
-        onDrop(event, type) {
-            event.currentTarget.classList.remove('dragover');
-            const files = event.dataTransfer.files;
-            
-            if (type === 'cv' && files.length > 0) {
-                this.applicationForm.documents.cv = files[0];
-            }
-        },
-        
+
         removeFile(type) {
             if (type === 'cv') {
                 this.applicationForm.documents.cv = null;
+                this.$refs.cvInput.value = ''; // Clear the file input
             }
         },
 
