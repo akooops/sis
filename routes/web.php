@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\FilesController;
 use App\Http\Controllers\Admin\FormsController;
 use App\Http\Controllers\Admin\GradesController;
 use App\Http\Controllers\Admin\InquiriesController;
+use App\Http\Controllers\Admin\JobApplicationsController;
 use App\Http\Controllers\Admin\JobPostingsController;
 use App\Http\Controllers\Admin\LanguagesController;
 use App\Http\Controllers\Admin\LanguagesKeysController;
@@ -271,6 +272,12 @@ Route::middleware(['auth', 'force.admin.english'])->prefix('admin')->group(funct
     Route::patch('job-postings/{jobPosting}/update-translation', [JobPostingsController::class, 'updateTranslation'])->middleware('check.permission:admin.job-postings.update')->name('admin.job-postings.update-translation');
     Route::patch('job-postings/{jobPosting}', [JobPostingsController::class, 'update'])->middleware('check.permission:admin.job-postings.update')->name('admin.job-postings.update');
     Route::delete('job-postings/{jobPosting}', [JobPostingsController::class, 'destroy'])->middleware('check.permission:admin.job-postings.destroy')->name('admin.job-postings.destroy');
+
+    // Job applciations
+    Route::get('job-postings/{jobPosting}/job-applications', [JobApplicationsController::class, 'index'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.index');
+    Route::get('job-postings/{jobPosting}/job-applications/export', [JobApplicationsController::class, 'export'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.export');
+    Route::get('job-applications/{jobApplication}', [JobApplicationsController::class, 'show'])->middleware('check.permission:admin.job-applications.show')->name('admin.job-applications.show');
+    Route::delete('job-applications/{jobApplication}', [JobApplicationsController::class, 'destroy'])->middleware('check.permission:admin.job-applications.destroy')->name('admin.job-applications.destroy');
 });
 
 Route::middleware(['set.locale'])->group(function () {
