@@ -286,46 +286,50 @@
                                     <input v-model.trim="applicationForm.personal.first_name" 
                                            type="text" 
                                            class="form-control"
-                                           :class="{ 'is-invalid': errors.first_name }"
+                                           :class="{ 'is-invalid': errors['personal.first_name'] }"
                                            placeholder="{{getLanguageKeyLocalTranslation('job_first_name')}}">
-                                    <div v-if="errors.first_name" class="invalid-feedback">@{{ errors.first_name }}</div>
+                                    <div v-if="errors['personal.first_name']" class="invalid-feedback">@{{ errors['personal.first_name'] }}</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <input v-model.trim="applicationForm.personal.last_name" 
                                            type="text" 
                                            class="form-control"
-                                           :class="{ 'is-invalid': errors.last_name }"
+                                           :class="{ 'is-invalid': errors['personal.last_name'] }"
                                            placeholder="{{getLanguageKeyLocalTranslation('job_last_name')}}">
-                                    <div v-if="errors.last_name" class="invalid-feedback">@{{ errors.last_name }}</div>
+                                    <div v-if="errors['personal.last_name']" class="invalid-feedback">@{{ errors['personal.last_name'] }}</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <input v-model.trim="applicationForm.personal.email" 
                                            type="email" 
                                            class="form-control"
-                                           :class="{ 'is-invalid': errors.email }"
+                                           :class="{ 'is-invalid': errors['personal.email'] }"
                                            placeholder="{{getLanguageKeyLocalTranslation('job_email')}}">
-                                    <div v-if="errors.email" class="invalid-feedback">@{{ errors.email }}</div>
+                                    <div v-if="errors['personal.email']" class="invalid-feedback">@{{ errors['personal.email'] }}</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <input id="phoneInput" 
                                            v-model.trim="applicationForm.personal.phone" 
                                            type="tel" 
                                            class="form-control"
-                                           :class="{ 'is-invalid': errors.phone }"
+                                           :class="{ 'is-invalid': errors['personal.phone'] }"
                                            placeholder="{{getLanguageKeyLocalTranslation('job_phone')}}">
-                                    <div v-if="errors.phone" class="invalid-feedback">@{{ errors.phone }}</div>
+                                    <div v-if="errors['personal.phone']" class="invalid-feedback">@{{ errors['personal.phone'] }}</div>
                                 </div>
                                 <div class="col-12 mb-3">
                                     <input v-model.trim="applicationForm.personal.nationality" 
                                            type="text" 
                                            class="form-control"
+                                           :class="{ 'is-invalid': errors['personal.nationality'] }"
                                         placeholder="{{getLanguageKeyLocalTranslation('job_nationality')}}">
+                                    <div v-if="errors['personal.nationality']" class="invalid-feedback">@{{ errors['personal.nationality'] }}</div>
                                 </div>
                                 <div class="col-12 mb-3">
                                     <textarea v-model.trim="applicationForm.personal.address" 
                                               class="form-control" 
                                               rows="3"
+                                              :class="{ 'is-invalid': errors['personal.address'] }"
                                               placeholder="{{getLanguageKeyLocalTranslation('job_address')}}"></textarea>
+                                    <div v-if="errors['personal.address']" class="invalid-feedback">@{{ errors['personal.address'] }}</div>
                                 </div>
                             </div>
                         </div>
@@ -333,6 +337,9 @@
                         <!-- Step 2: Education -->
                         <div v-if="currentStep === 2">
                             <h3 class="mb-4">{{getLanguageKeyLocalTranslation('job_education')}}</h3>
+                            <div v-if="errors['education']" class="alert alert-danger mb-3">
+                                @{{ errors['education'] }}
+                            </div>
                             <div v-for="(education, index) in applicationForm.education" :key="index" class="repeatable-section">
                                 <span v-if="applicationForm.education.length > 1" 
                                       @click="removeEducation(index)" 
@@ -344,19 +351,25 @@
                                         <input v-model.trim="education.institution" 
                                                type="text" 
                                                class="form-control"
+                                               :class="{ 'is-invalid': errors[`education.${index}.institution`] }"
                                                placeholder="{{getLanguageKeyLocalTranslation('job_institution')}}">
+                                        <div v-if="errors[`education.${index}.institution`]" class="invalid-feedback">@{{ errors[`education.${index}.institution`] }}</div>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <input v-model.trim="education.degree" 
                                                type="text" 
                                                class="form-control"
+                                               :class="{ 'is-invalid': errors[`education.${index}.degree`] }"
                                                placeholder="{{getLanguageKeyLocalTranslation('job_degree')}}">
+                                        <div v-if="errors[`education.${index}.degree`]" class="invalid-feedback">@{{ errors[`education.${index}.degree`] }}</div>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <input v-model.trim="education.field_of_study" 
                                                type="text" 
                                                class="form-control"
+                                               :class="{ 'is-invalid': errors[`education.${index}.field_of_study`] }"
                                                placeholder="{{getLanguageKeyLocalTranslation('job_field_study')}}">
+                                        <div v-if="errors[`education.${index}.field_of_study`]" class="invalid-feedback">@{{ errors[`education.${index}.field_of_study`] }}</div>
                                     </div>
                                     <div class="col-md-3 mb-3">
                                         <input v-model="education.start_year" 
@@ -364,7 +377,9 @@
                                                min="1950" 
                                                max="2030" 
                                                class="form-control"
+                                               :class="{ 'is-invalid': errors[`education.${index}.start_year`] }"
                                                placeholder="{{getLanguageKeyLocalTranslation('job_start_year')}}">
+                                        <div v-if="errors[`education.${index}.start_year`]" class="invalid-feedback">@{{ errors[`education.${index}.start_year`] }}</div>
                                     </div>
                                     <div class="col-md-3 mb-3">
                                         <input v-model="education.end_year" 
@@ -372,13 +387,17 @@
                                                min="1950" 
                                                max="2030" 
                                                class="form-control"
+                                               :class="{ 'is-invalid': errors[`education.${index}.end_year`] }"
                                                placeholder="{{getLanguageKeyLocalTranslation('job_end_year')}}">
+                                        <div v-if="errors[`education.${index}.end_year`]" class="invalid-feedback">@{{ errors[`education.${index}.end_year`] }}</div>
                                     </div>
                                     <div class="col-12 mb-3">
                                         <textarea v-model.trim="education.description" 
                                                   class="form-control" 
                                                   rows="2"
+                                                  :class="{ 'is-invalid': errors[`education.${index}.description`] }"
                                                   placeholder="{{getLanguageKeyLocalTranslation('job_description')}}"></textarea>
+                                        <div v-if="errors[`education.${index}.description`]" class="invalid-feedback">@{{ errors[`education.${index}.description`] }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -390,6 +409,9 @@
                         <!-- Step 3: Work Experience -->
                         <div v-if="currentStep === 3">
                             <h3 class="mb-4">{{getLanguageKeyLocalTranslation('job_work_experience')}}</h3>
+                            <div v-if="errors['experience']" class="alert alert-danger mb-3">
+                                @{{ errors['experience'] }}
+                            </div>
                             <div v-for="(experience, index) in applicationForm.experience" :key="index" class="repeatable-section">
                                 <span v-if="applicationForm.experience.length > 1" 
                                       @click="removeExperience(index)" 
@@ -401,13 +423,17 @@
                                         <input v-model.trim="experience.company_name" 
                                                type="text" 
                                                class="form-control"
-                                               placeholder="{{getLanguageKeyLocalTranslation('job_company_name')}} ">
+                                               :class="{ 'is-invalid': errors[`experience.${index}.company_name`] }"
+                                               placeholder="{{getLanguageKeyLocalTranslation('job_company_name')}}">
+                                        <div v-if="errors[`experience.${index}.company_name`]" class="invalid-feedback">@{{ errors[`experience.${index}.company_name`] }}</div>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <input v-model.trim="experience.job_title" 
                                                type="text" 
                                                class="form-control"
-                                               placeholder="{{getLanguageKeyLocalTranslation('job_job_title')}} ">
+                                               :class="{ 'is-invalid': errors[`experience.${index}.job_title`] }"
+                                               placeholder="{{getLanguageKeyLocalTranslation('job_job_title')}}">
+                                        <div v-if="errors[`experience.${index}.job_title`]" class="invalid-feedback">@{{ errors[`experience.${index}.job_title`] }}</div>
                                     </div>
                                     <div class="col-md-3 mb-3">
                                         <input v-model="experience.start_year" 
@@ -415,7 +441,9 @@
                                                min="1950" 
                                                max="2030" 
                                                class="form-control"
+                                               :class="{ 'is-invalid': errors[`experience.${index}.start_year`] }"
                                                placeholder="{{getLanguageKeyLocalTranslation('job_start_year')}}">
+                                        <div v-if="errors[`experience.${index}.start_year`]" class="invalid-feedback">@{{ errors[`experience.${index}.start_year`] }}</div>
                                     </div>
                                     <div class="col-md-3 mb-3">
                                         <input v-model="experience.end_year" 
@@ -423,7 +451,10 @@
                                                min="1950" 
                                                max="2030" 
                                                class="form-control"
+                                               :class="{ 'is-invalid': errors[`experience.${index}.end_year`] }"
+                                               :disabled="experience.is_current"
                                                placeholder="{{getLanguageKeyLocalTranslation('job_end_year')}}">
+                                        <div v-if="errors[`experience.${index}.end_year`]" class="invalid-feedback">@{{ errors[`experience.${index}.end_year`] }}</div>
                                     </div>
                                     <div class="col-md-6 mb-3 d-flex align-items-end">
                                         <div class="form-check">
@@ -440,7 +471,9 @@
                                         <textarea v-model.trim="experience.description" 
                                                   class="form-control" 
                                                   rows="3"
+                                                  :class="{ 'is-invalid': errors[`experience.${index}.description`] }"
                                                   placeholder="{{getLanguageKeyLocalTranslation('job_job_description')}}"></textarea>
+                                        <div v-if="errors[`experience.${index}.description`]" class="invalid-feedback">@{{ errors[`experience.${index}.description`] }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -452,6 +485,9 @@
                         <!-- Step 4: Languages -->
                         <div v-if="currentStep === 4">
                             <h3 class="mb-4">{{getLanguageKeyLocalTranslation('job_languages')}}</h3>
+                            <div v-if="errors['languages']" class="alert alert-danger mb-3">
+                                @{{ errors['languages'] }}
+                            </div>
                             <div v-for="(language, index) in applicationForm.languages" :key="index" class="repeatable-section">
                                 <span v-if="applicationForm.languages.length > 1" 
                                       @click="removeLanguage(index)" 
@@ -463,16 +499,21 @@
                                         <input v-model.trim="language.name" 
                                                type="text" 
                                                class="form-control"
+                                               :class="{ 'is-invalid': errors[`languages.${index}.name`] }"
                                                placeholder="{{getLanguageKeyLocalTranslation('job_language_name')}}">
+                                        <div v-if="errors[`languages.${index}.name`]" class="invalid-feedback">@{{ errors[`languages.${index}.name`] }}</div>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <select v-model="language.proficiency" class="form-control">
+                                        <select v-model="language.proficiency" 
+                                                class="form-control"
+                                                :class="{ 'is-invalid': errors[`languages.${index}.proficiency`] }">
                                             <option value="">{{getLanguageKeyLocalTranslation('job_select_proficiency')}}</option>
                                             <option value="basic">{{getLanguageKeyLocalTranslation('job_basic')}}</option>
                                             <option value="intermediate">{{getLanguageKeyLocalTranslation('job_intermediate')}}</option>
                                             <option value="advanced">{{getLanguageKeyLocalTranslation('job_advanced')}}</option>
                                             <option value="native">{{getLanguageKeyLocalTranslation('job_native')}}</option>
                                         </select>
+                                        <div v-if="errors[`languages.${index}.proficiency`]" class="invalid-feedback">@{{ errors[`languages.${index}.proficiency`] }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -484,6 +525,9 @@
                         <!-- Step 5: Skills -->
                         <div v-if="currentStep === 5">
                             <h3 class="mb-4">{{getLanguageKeyLocalTranslation('job_skills')}}</h3>
+                            <div v-if="errors['skills']" class="alert alert-danger mb-3">
+                                @{{ errors['skills'] }}
+                            </div>
                             <div class="mb-3">
                                 <input v-model="newSkill" 
                                        @keyup.enter="addSkill" 
@@ -533,7 +577,7 @@
                                         </span>
                                     </div>
                                 </div>
-                                <div v-if="errors.cv" class="text-danger small mt-1">@{{ errors.cv }}</div>
+                                <div v-if="errors['cv']" class="text-danger small mt-1">@{{ errors['cv'] }}</div>
                             </div>
                         </div>
 
@@ -558,7 +602,7 @@
                                     <h5 class="mt-4">{{getLanguageKeyLocalTranslation('job_work_experience')}}</h5>
                                     <div v-for="experience in applicationForm.experience" class="mb-2">
                                         <strong>@{{ experience.job_title }}</strong> - @{{ experience.company_name }}
-                                        <br><small class="text-muted">@{{ experience.start_date }} - @{{ experience.end_date || 'Present' }}</small>
+                                        <br><small class="text-muted">@{{ experience.start_year }} - @{{ experience.end_year || 'Present' }}</small>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -653,7 +697,7 @@
                             @if($job->getLocalTranslation('required_skills'))
                             <li class="mb-3">
                                 <i class="uil uil-star text-primary me-2"></i>
-                                <strong>{{getLanguageKeyLocalTranslation('job_skills_title') ?? 'Skills'}}:</strong>
+                                <strong>{{getLanguageKeyLocalTranslation('job_skills_title')}}:</strong>
                                 <div class="mt-2">
                                     @php
                                         $skills = explode(',', $job->getLocalTranslation('required_skills'));
@@ -702,7 +746,6 @@ createApp({
             applicationInProgress: false,
             iti: null,
             newSkill: '',
-            skillPlaceholder: 'Type a skill and press Enter',
             
             applicationForm: {
                 job_posting_id: {{ $job->id }},
@@ -726,8 +769,8 @@ createApp({
                 experience: [{
                     company_name: '',
                     job_title: '',
-                    start_date: '',
-                    end_date: '',
+                    start_year: '',
+                    end_year: '',
                     is_current: false,
                     description: ''
                 }],
@@ -759,33 +802,164 @@ createApp({
     },
     
     methods: {
-        nextStep() {
-            if (this.validateCurrentStep()) {
-                if (this.currentStep < 7) {
-                    this.currentStep++;
-                    if (this.currentStep === 1) {
-                        this.$nextTick(() => {
-                            this.initIntlTelInput();
-                        });
-                    }
+        async nextStep() {
+            let isValid = false;
+            
+            if (this.currentStep === 6) {
+                isValid = await this.validateDocumentsStep();
+            } else {
+                isValid = await this.validateCurrentStep();
+            }
+            
+            if (isValid && this.currentStep < 7) {
+                this.currentStep++;
+                
+                if (this.currentStep === 1) {
+                    this.$nextTick(() => {
+                        this.initIntlTelInput();
+                    });
                 }
             }
         },
 
-        validateCurrentStep() {
+        async validateCurrentStep() {
+            if (this.currentStep === 7) {
+                return true;
+            }
+            
+            try {
+                const stepData = this.getCurrentStepData();
+                const isValid = await this.validateStepWithServer(stepData);
+                return isValid;
+            } catch (error) {
+                console.error('Step validation error:', error);
+                this.showErrorAlert('Validation error occurred');
+                return false;
+            }
+        },
+
+        async validateStepWithServer(stepData) {
+            try {
+                const response = await fetch('{{ route("job-applications.validate") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(stepData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok && result.status === 'success') {
+                    this.errors = {};
+                    return true;
+                } else {
+                    if (result.errors) {
+                        this.handleValidationErrors(result.errors);
+                    }
+                    this.showErrorAlert(result.message || 'Please fix the errors before continuing');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                this.showErrorAlert('Network error. Please check your connection.');
+                return false;
+            }
+        },
+
+        getCurrentStepData() {
+            const baseData = { step: this.currentStep };
+            
+            switch (this.currentStep) {
+                case 1:
+                    return {
+                        ...baseData,
+                        personal: {
+                            ...this.applicationForm.personal,
+                            phone: this.iti ? this.iti.getNumber() : this.applicationForm.personal.phone
+                        }
+                    };
+                case 2:
+                    return {
+                        ...baseData,
+                        education: this.applicationForm.education
+                    };
+                case 3:
+                    return {
+                        ...baseData,
+                        experience: this.applicationForm.experience
+                    };
+                case 4:
+                    return {
+                        ...baseData,
+                        languages: this.applicationForm.languages
+                    };
+                case 5:
+                    return {
+                        ...baseData,
+                        skills: this.applicationForm.skills
+                    };
+                case 6:
+                    return this.getCurrentStepFormData();
+                default:
+                    return baseData;
+            }
+        },
+
+        getCurrentStepFormData() {
+            const formData = new FormData();
+            formData.append('step', this.currentStep);
+            
+            if (this.applicationForm.documents.cv) {
+                formData.append('cv', this.applicationForm.documents.cv);
+            }
+            
+            return formData;
+        },
+
+        async validateDocumentsStep() {
+            try {
+                const formData = this.getCurrentStepFormData();
+                
+                const response = await fetch('{{ route("job-applications.validate") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    this.errors = {};
+                    return true;
+                } else {
+                    if (result.errors) {
+                        this.handleValidationErrors(result.errors);
+                    }
+                    this.showErrorAlert('Please fix the document errors before continuing');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Document validation error:', error);
+                this.showErrorAlert('Error validating documents');
+                return false;
+            }
+        },
+
+        handleValidationErrors(errors) {
             this.errors = {};
             
-            if (this.currentStep === 1) {
-                
-            }
-            
-            if (this.currentStep === 6) {
-                
-            }
-            
-            return Object.keys(this.errors).length === 0;
+            Object.keys(errors).forEach(field => {
+                const errorMessage = Array.isArray(errors[field]) ? errors[field][0] : errors[field];
+                this.errors[field] = errorMessage;
+            });
         },
-        
+
         initIntlTelInput() {
             this.$nextTick(() => {
                 const input = document.getElementById('phoneInput');
@@ -827,8 +1001,8 @@ createApp({
             this.applicationForm.experience.push({
                 company_name: '',
                 job_title: '',
-                start_date: '',
-                end_date: '',
+                start_year: '',
+                end_year: '',
                 is_current: false,
                 description: ''
             });
@@ -842,7 +1016,7 @@ createApp({
 
         handleCurrentJobChange(experience) {
             if (experience.is_current) {
-                experience.end_date = '';
+                experience.end_year = '';
             }
         },
 
@@ -922,8 +1096,10 @@ createApp({
             try {
                 const formData = new FormData();
                 
+                // Add job posting ID and form data
                 formData.append('job_posting_id', this.applicationForm.job_posting_id);
                 
+                // Personal Information
                 Object.keys(this.applicationForm.personal).forEach(key => {
                     if (key === 'phone' && this.iti) {
                         formData.append(`personal[${key}]`, this.iti.getNumber());
@@ -932,33 +1108,44 @@ createApp({
                     }
                 });
                 
+                // Education
                 this.applicationForm.education.forEach((education, index) => {
                     Object.keys(education).forEach(key => {
                         formData.append(`education[${index}][${key}]`, education[key] || '');
                     });
                 });
                 
+                // Experience
                 this.applicationForm.experience.forEach((experience, index) => {
                     Object.keys(experience).forEach(key => {
-                        formData.append(`experience[${index}][${key}]`, experience[key] || '');
+                        if (key === 'is_current') {
+                            // Always send boolean true/false, never empty
+                            formData.append(`experience[${index}][${key}]`, experience[key] ? 'true' : 'false');
+                        } else {
+                            formData.append(`experience[${index}][${key}]`, experience[key] || '');
+                        }
                     });
                 });
-                
+
+                // Languages
                 this.applicationForm.languages.forEach((language, index) => {
                     Object.keys(language).forEach(key => {
                         formData.append(`languages[${index}][${key}]`, language[key] || '');
                     });
                 });
                 
+                // Skills
                 this.applicationForm.skills.forEach((skill, index) => {
                     formData.append(`skills[${index}]`, skill);
                 });
                 
+                // Documents
                 if (this.applicationForm.documents.cv) {
                     formData.append('cv', this.applicationForm.documents.cv);
                 }
                 
-                const response = await fetch(`{{ route('job-applications.store', $job->slug) }}`, {
+                // Submit to dedicated storage route
+                const response = await fetch('{{ route("job-applications.store", $job->id) }}', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -969,12 +1156,16 @@ createApp({
                 
                 const result = await response.json();
                 
-                if (response.ok && result.status === 'success') {
+                if (response.ok && result.status === 'success') {                    
+                    // Then show success message on job description page
                     this.showSuccessAlert('Application submitted successfully!');
+                    
+                    // Reset form data
                     this.resetForm();
                 } else {
                     if (result.errors) {
                         this.handleValidationErrors(result.errors);
+                        this.showErrorAlert(result.message || 'Error submitting application');
                     } else {
                         this.showErrorAlert(result.message || 'Error submitting application');
                     }
@@ -987,23 +1178,22 @@ createApp({
             }
         },
 
-        handleValidationErrors(errors) {
-            this.errors = {};
-            let firstErrorStep = 1;
+        navigateToFirstErrorStep() {
+            const errorFields = Object.keys(this.errors);
+            if (errorFields.length === 0) return;
             
-            Object.keys(errors).forEach(field => {
-                this.errors[field] = Array.isArray(errors[field]) ? errors[field][0] : errors[field];
-                
-                if (field.includes('personal')) firstErrorStep = Math.min(firstErrorStep, 1);
-                if (field.includes('education')) firstErrorStep = Math.min(firstErrorStep, 2);
-                if (field.includes('experience')) firstErrorStep = Math.min(firstErrorStep, 3);
-                if (field.includes('languages')) firstErrorStep = Math.min(firstErrorStep, 4);
-                if (field.includes('skills')) firstErrorStep = Math.min(firstErrorStep, 5);
-                if (field.includes('cv')) firstErrorStep = Math.min(firstErrorStep, 6);
-            });
+            let targetStep = 1;
             
-            this.currentStep = firstErrorStep;
-            this.showErrorAlert('Please fix the errors and try again');
+            for (const field of errorFields) {
+                if (field.includes('personal')) targetStep = Math.min(targetStep, 1);
+                else if (field.includes('education')) targetStep = Math.min(targetStep, 2);
+                else if (field.includes('experience')) targetStep = Math.min(targetStep, 3);
+                else if (field.includes('languages')) targetStep = Math.min(targetStep, 4);
+                else if (field.includes('skills')) targetStep = Math.min(targetStep, 5);
+                else if (field.includes('cv')) targetStep = Math.min(targetStep, 6);
+            }
+            
+            this.currentStep = targetStep;
         },
 
         showSuccessAlert(message) {
@@ -1025,8 +1215,12 @@ createApp({
         },
 
         resetForm() {
-            this.showApplicationForm = false;
             this.currentStep = 1;
+            
+            this.$nextTick(() => {
+                this.initIntlTelInput();
+            });
+
             this.applicationForm = {
                 job_posting_id: {{ $job->id }},
                 personal: {
@@ -1049,8 +1243,8 @@ createApp({
                 experience: [{
                     company_name: '',
                     job_title: '',
-                    start_date: '',
-                    end_date: '',
+                    start_year: '',
+                    end_year: '',
                     is_current: false,
                     description: ''
                 }],

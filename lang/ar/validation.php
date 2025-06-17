@@ -234,6 +234,42 @@ return [
         'grade_applied' => 'الصف المطلوب',
         'questions' => 'أسئلة',
         'student_birthdate' => 'تاريخ ميلاد الطالب',
+        
+        // Job Application - Personal Information
+        'personal.first_name' => 'الاسم الأول',
+        'personal.last_name' => 'الاسم الأخير',
+        'personal.email' => 'البريد الإلكتروني',
+        'personal.phone' => 'رقم الهاتف',
+        'personal.nationality' => 'الجنسية',
+        'personal.date_of_birth' => 'تاريخ الميلاد',
+        'personal.address' => 'العنوان',
+        
+        // Job Application - Education
+        'education' => 'التعليم',
+        'education.*.institution' => 'اسم المؤسسة التعليمية',
+        'education.*.degree' => 'الدرجة العلمية',
+        'education.*.field_of_study' => 'مجال الدراسة',
+        'education.*.start_year' => 'سنة البداية',
+        'education.*.end_year' => 'سنة النهاية',
+        'education.*.description' => 'وصف التعليم',
+        
+        // Job Application - Experience
+        'experience' => 'الخبرة العملية',
+        'experience.*.company_name' => 'اسم الشركة',
+        'experience.*.job_title' => 'المسمى الوظيفي',
+        'experience.*.start_year' => 'سنة البداية',
+        'experience.*.end_year' => 'سنة النهاية',
+        'experience.*.is_current' => 'الوظيفة الحالية',
+        'experience.*.description' => 'وصف الوظيفة',
+        
+        // Job Application - Languages
+        'languages' => 'اللغات',
+        'languages.*.name' => 'اسم اللغة',
+        'languages.*.proficiency' => 'مستوى الإتقان',
+        
+        // Job Application - Skills & Documents
+        'skills' => 'المهارات',
+        'cv' => 'السيرة الذاتية',
     ],
 
 ];

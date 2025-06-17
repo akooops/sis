@@ -193,7 +193,43 @@ return [
         'academic_year_applied' => 'Academic year applied for',
         'grade_applied' => 'Grade applied for',
         'questions' => 'Questions',
-        'student_birthdate' => 'Student Birthdate'
+        'student_birthdate' => 'Student Birthdate',
+
+        // Job Application - Personal Information
+        'personal.first_name' => 'first name',
+        'personal.last_name' => 'last name',
+        'personal.email' => 'email address',
+        'personal.phone' => 'phone number',
+        'personal.nationality' => 'nationality',
+        'personal.date_of_birth' => 'date of birth',
+        'personal.address' => 'address',
+        
+        // Job Application - Education
+        'education' => 'education',
+        'education.*.institution' => 'institution name',
+        'education.*.degree' => 'degree',
+        'education.*.field_of_study' => 'field of study',
+        'education.*.start_year' => 'start year',
+        'education.*.end_year' => 'end year',
+        'education.*.description' => 'education description',
+        
+        // Job Application - Experience
+        'experience' => 'work experience',
+        'experience.*.company_name' => 'company name',
+        'experience.*.job_title' => 'job title',
+        'experience.*.start_year' => 'start year',
+        'experience.*.end_year' => 'end year',
+        'experience.*.is_current' => 'current position',
+        'experience.*.description' => 'job description',
+        
+        // Job Application - Languages
+        'languages' => 'languages',
+        'languages.*.name' => 'language name',
+        'languages.*.proficiency' => 'proficiency level',
+        
+        // Job Application - Skills & Documents
+        'skills' => 'skills',
+        'cv' => 'CV/Resume',
     ],
 
 ];

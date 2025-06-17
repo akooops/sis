@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\VisitServicesController;
 use App\Http\Controllers\Admin\VisitTimeSlotsController;
 use App\Http\Controllers\ContactSubmissionsController as ControllersContactSubmissionsController;
 use App\Http\Controllers\InquiriesController as ControllersInquiriesController;
+use App\Http\Controllers\JobApplicationsController as ControllersJobApplicationsController;
 use App\Http\Controllers\PagesController as ControllersPagesController;
 use App\Http\Controllers\VisitBookingsController as ControllersVisitBookingsController;
 use App\Models\Language;
@@ -297,6 +298,10 @@ Route::middleware(['set.locale'])->group(function () {
     Route::post('visit-services/{visitService}/visit-bookings', [ControllersVisitBookingsController::class, 'visitBookings'])->name('visit-bookings.store');
     Route::post('inquiries', [ControllersInquiriesController::class, 'storeInquiries'])->name('inquiries.store');
     Route::post('contact', [ControllersContactSubmissionsController::class, 'storeContactSubmission'])->name('contact-submissions.store');
+
+    Route::post('/job-applications/validate', [ControllersJobApplicationsController::class, 'validateApplication'])->name('job-applications.validate');
+    Route::post('/job-postings/{jobPosting}/job-applications', [ControllersJobApplicationsController::class, 'storeApplication'])->name('job-applications.store');
+
     Route::post('contact', [ControllersContactSubmissionsController::class, 'storeContactSubmission'])->name('job-applications.store');
 });
 
