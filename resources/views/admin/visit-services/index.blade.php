@@ -71,7 +71,6 @@
                                             <th scope="col" width="10%" width="100px">#</th>
                                             <th scope="col">Name</th> 
                                             <th scope="col">Duration</th> 
-                                            <th scope="col">Capacity</th> 
                                             <th scope="col" width="75px">Actions</th>                                        
                                         </tr>
                                     </thead>
@@ -94,11 +93,7 @@
                                             <td>
                                                 <span class="badge bg-primary"> {{$visitService->formattedDuration }} </span>
                                             </td>  
-
-                                            <td>
-                                                <span class="badge bg-primary"> {{$visitService->capacity }} </span>
-                                            </td>  
-
+                                            
                                             <td>
                                                 <div class="dropdown">
                                                     <a href="#" visitService="button" id="dropdownMenuLink1" data-bs-toggle="dropdown" aria-expanded="false" class="">

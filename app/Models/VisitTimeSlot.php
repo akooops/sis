@@ -12,7 +12,7 @@ class VisitTimeSlot extends Model
     //Properties
     protected $guarded = ['id'];
 
-    protected $appends = ['reserved'];
+    protected $appends = ['reserved', 'remaining_capacity'];
 
     //Relationships
     public function visitService()
@@ -20,14 +20,15 @@ class VisitTimeSlot extends Model
         return $this->belongsTo(VisitService::class);
     }
 
-    public function visitBooking()
+    public function visitBookings()
     {
-        return $this->hasOne(VisitBooking::class);
+        return $this->hasMany(VisitBooking::class);
     }
 
     //Accessors
-    public function getReservedAttribute(): bool
+    public function getRemainingCapacityAttribute()
     {
-        return $this->visitBooking()->exists();
+        $currentBookings = $this->visitBookings()->sum('visitors_count');
+        return  $this->capacity - $currentBookings;
     }
 }

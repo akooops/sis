@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
     events: [
       @foreach($visitTimeSlots as $visitTimeSlot)
       {
-        title: '{{$visitTimeSlot->starts_at}} - {{$visitTimeSlot->ends_at}}',
+        title: 'From {{$visitTimeSlot->starts_at}} To {{$visitTimeSlot->ends_at}} with capacity {{$visitTimeSlot->capacity}}',
         start: '{{$visitTimeSlot->starts_at}}',
         end: '{{$visitTimeSlot->ends_at}}',
         url: '{{route("admin.visit-time-slots.edit", $visitTimeSlot->id)}}',

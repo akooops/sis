@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('field_of_study');
             $table->integer('start_year');
             $table->integer('end_year');
-            $table->text('description');
+            $table->text('description')->nullable();
 
             $table->unsignedBigInteger('job_application_id')->nullable();
             $table->foreign('job_application_id')->references('id')->on('job_applications')->cascadeOnDelete();

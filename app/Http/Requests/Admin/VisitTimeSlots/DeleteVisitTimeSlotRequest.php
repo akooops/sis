@@ -31,7 +31,7 @@ class DeleteVisitTimeSlotRequest extends FormRequest
         $visitTimeSlot = $this->route('visitTimeSlot');
 
         $validator->after(function ($validator) use ($visitTimeSlot){
-            if ($visitTimeSlot->reserved) {
+            if ($visitTimeSlot->visitBookings()->exists()) {
                 $validator->errors()->add('visit_time_slot', 'This time slots have been already reserved.');
 
                 return;

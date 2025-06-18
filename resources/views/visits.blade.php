@@ -18,25 +18,39 @@
         border-color: #146c43 !important;
     }
 
-    /* Reserved time slots */
-    .fc-event.reserved-slot {
+    /* Insufficient capacity time slots */
+    .fc-event.insufficient-capacity-slot {
+        background-color: #fd7e14 !important;
+        border-color: #fd7e14 !important;
+        cursor: not-allowed !important;
+        opacity: 0.7;
+    }
+
+    .fc-event.insufficient-capacity-slot:hover {
+        background-color: #fd7e14 !important;
+        border-color: #fd7e14 !important;
+    }
+
+    /* Fully booked time slots */
+    .fc-event.fully-booked-slot {
         background-color: #dc3545 !important;
         border-color: #dc3545 !important;
         cursor: not-allowed !important;
         opacity: 0.6;
     }
 
-    .fc-event.reserved-slot:hover {
+    .fc-event.fully-booked-slot:hover {
         background-color: #dc3545 !important;
         border-color: #dc3545 !important;
     }
 
-    /* Add a legend */
+    /* Updated legend */
     .time-slot-legend {
         display: flex;
         gap: 20px;
         margin-bottom: 20px;
         justify-content: center;
+        flex-wrap: wrap;
     }
 
     .legend-item {
@@ -55,9 +69,14 @@
         background-color: #198754;
     }
 
-    .legend-reserved {
+    .legend-insufficient {
+        background-color: #fd7e14;
+    }
+
+    .legend-fully-booked {
         background-color: #dc3545;
     }
+
 </style>
 @endsection
 @section('content')
@@ -184,11 +203,11 @@
 
                                     <div class="d-flex my-2">
                                         <input type="number" 
-                                               min="1" 
-                                               max="{{$visitService->capacity}}" 
-                                               class="form-control" 
-                                               v-model="visitorCounts[{{$visitService->id}}]"
-                                               :value="visitorCounts[{{$visitService->id}}] || 1">
+                                            min="1" 
+                                            class="form-control" 
+                                            v-model="visitorCounts[{{$visitService->id}}]"
+                                            @input="updateVisitorCount({{$visitService->id}})"
+                                            :value="visitorCounts[{{$visitService->id}}] || 1">
                                         <button class="btn btn-primary ms-2" 
                                                 @click="selectService({{$visitService->id}}, '{{$visitService->getLocalTranslation('title')}}', {{$visitService->capacity}})">
                                             {{getLanguageKeyLocalTranslation('visits_page_select_button')}}
@@ -247,18 +266,21 @@
                             </div>
                         </div>
                         <div class="card-body p-2 p-sm-8">
-                            <!-- Time Slot Legend -->
                             <div class="time-slot-legend">
                                 <div class="legend-item">
                                     <div class="legend-color legend-available"></div>
                                     <span>{{getLanguageKeyLocalTranslation('visit_pages_available_slots')}}</span>
                                 </div>
                                 <div class="legend-item">
-                                    <div class="legend-color legend-reserved"></div>
-                                    <span>{{getLanguageKeyLocalTranslation('visit_pages_reserved_slots')}}</span>
+                                    <div class="legend-color legend-insufficient"></div>
+                                    <span>{{getLanguageKeyLocalTranslation('visit_pages_insufficient_capacity')}}</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color legend-fully-booked"></div>
+                                    <span>{{getLanguageKeyLocalTranslation('visit_pages_fully_booked')}}</span>
                                 </div>
                             </div>
-                            
+
                             <div id="calendar" v-if="selectedService.id"></div>
                         </div>
                     </div>
@@ -412,7 +434,8 @@ window.visitServicesData = {
                 id: {{$timeSlot->id}},
                 starts_at: "{{$timeSlot->starts_at}}",
                 ends_at: "{{$timeSlot->ends_at}}",
-                reserved: "{{ $timeSlot->reserved }}"
+                remaining_capacity: "{{$timeSlot->remaining_capacity}}",
+                total_capacity: "{{$timeSlot->capacity}}"
             },
             @endforeach
         ]
@@ -490,6 +513,7 @@ createApp({
             }
             
             const timeSlots = window.visitServicesData[serviceId]?.timeSlots || [];
+            const selectedVisitorCount = this.selectedService.visitorCount;
             
             const calendarEl = document.getElementById('calendar');
             this.calendar = new FullCalendar.Calendar(calendarEl, {
@@ -504,35 +528,69 @@ createApp({
                 slotMaxTime: '18:00:00',
                 allDaySlot: false,
                 
-                // Create events with different colors based on reservation status
-                events: timeSlots.map(slot => ({
-                    id: slot.id,
-                    start: slot.starts_at,
-                    end: slot.ends_at,
-                    title: slot.reserved ? '{{getLanguageKeyLocalTranslation("visit_pages_reserved_slots")}}' : '{{getLanguageKeyLocalTranslation("visit_pages_available_slots")}}',
-                    backgroundColor: slot.reserved ? '#dc3545' : '#198754', // Red for reserved, Green for available
-                    borderColor: slot.reserved ? '#dc3545' : '#198754',
-                    textColor: '#ffffff',
-                    classNames: slot.reserved ? ['reserved-slot'] : ['available-slot'],
-                    extendedProps: {
-                        reserved: slot.reserved,
+                // Create events with dynamic colors based on capacity only
+                events: timeSlots.map(slot => {
+                    let eventColor, eventTitle, eventClass, isClickable;
+                    
+                    if (slot.remaining_capacity <= 0) {
+                        // Fully booked
+                        eventColor = '#dc3545'; // Red
+                        eventTitle = `Fully Booked (${slot.total_capacity}/${slot.total_capacity})`;
+                        eventClass = ['fully-booked-slot'];
+                        isClickable = false;
+                    } else if (selectedVisitorCount > slot.remaining_capacity) {
+                        // Not enough capacity for selected visitor count
+                        eventColor = '#fd7e14'; // Orange
+                        eventTitle = `Available (${slot.remaining_capacity}/${slot.total_capacity})`;
+                        eventClass = ['insufficient-capacity-slot'];
+                        isClickable = false;
+                    } else {
+                        // Available with enough capacity
+                        eventColor = '#198754'; // Green
+                        eventTitle = `{{getLanguageKeyLocalTranslation("visit_pages_available_slots")}} (${slot.remaining_capacity}/${slot.total_capacity})`;
+                        eventClass = ['available-slot'];
+                        isClickable = true;
                     }
-                })),
+                    
+                    return {
+                        id: slot.id,
+                        start: slot.starts_at,
+                        end: slot.ends_at,
+                        title: eventTitle,
+                        backgroundColor: eventColor,
+                        borderColor: eventColor,
+                        textColor: '#ffffff',
+                        classNames: eventClass,
+                        extendedProps: {
+                            remaining_capacity: slot.remaining_capacity,
+                            total_capacity: slot.total_capacity,
+                            clickable: isClickable,
+                            insufficient_capacity: selectedVisitorCount > slot.remaining_capacity,
+                            fully_booked: slot.remaining_capacity <= 0
+                        }
+                    };
+                }),
                 
-                // Handle event clicks - only allow selection of available slots
+                // Handle event clicks with capacity-only logic
                 eventClick: (info) => {
-                    if (info.event.extendedProps.reserved) {
-                        // Show alert for reserved slots
-                        this.showErrorAlert('{{getLanguageKeyLocalTranslation('visit_pages_slot_reserved_error')}}');
-                        return false; // Prevent selection
+                    const extendedProps = info.event.extendedProps;
+                    
+                    if (extendedProps.fully_booked) {
+                        this.showErrorAlert('This time slot is fully booked. Please choose another time slot.');
+                        return false;
+                    } else if (extendedProps.insufficient_capacity) {
+                        this.showErrorAlert(`This time slot only has ${extendedProps.remaining_capacity} spots available. You selected ${selectedVisitorCount} visitors.`);
+                        return false;
                     } else {
                         this.selectTimeSlot(info.event);
                     }
                 },
                 
-                // Style the events
+                // Enhanced styling for events
                 eventDidMount: function(info) {
-                    if (info.event.extendedProps.reserved) {
+                    const extendedProps = info.event.extendedProps;
+                    
+                    if (!extendedProps.clickable) {
                         info.el.style.cursor = 'not-allowed';
                         info.el.style.opacity = '0.6';
                     } else {
@@ -544,10 +602,18 @@ createApp({
             this.calendar.render();
         },
 
+
         selectTimeSlot(event) {
-            // Double-check if slot is reserved
-            if (event.extendedProps.reserved) {
-                this.showErrorAlert('{{getLanguageKeyLocalTranslation('visit_pages_slot_reserved_error')}}');
+            const extendedProps = event.extendedProps;
+            
+            // Check capacity constraints
+            if (extendedProps.fully_booked) {
+                this.showErrorAlert('This time slot is fully booked. Please choose another time slot.');
+                return;
+            }
+            
+            if (extendedProps.insufficient_capacity) {
+                this.showErrorAlert(`This time slot only has ${extendedProps.remaining_capacity} spots available. You selected ${this.selectedService.visitorCount} visitors.`);
                 return;
             }
             
@@ -555,7 +621,8 @@ createApp({
                 id: event.id,
                 start: event.start,
                 end: event.end,
-                availableSpots: event.extendedProps?.availableSpots
+                remaining_capacity: extendedProps.remaining_capacity,
+                total_capacity: extendedProps.total_capacity
             };
             
             this.currentStep = 3;
@@ -563,6 +630,13 @@ createApp({
             nextTick(() => {
                 this.initIntlTelInput();
             });
+        },
+
+        updateVisitorCount(serviceId) {
+            if (this.selectedService.id === serviceId && this.currentStep === 2) {
+                this.selectedService.visitorCount = this.visitorCounts[serviceId] || 1;
+                this.initializeCalendar(serviceId); // Refresh calendar with new visitor count
+            }
         },
 
 
@@ -622,6 +696,10 @@ createApp({
                 } else {
                     if (result.errors) {
                         this.handleValidationErrors(result.errors);
+
+                        if (result.errors.visit_time_slot_id) {
+                            this.showErrorAlert(result.message || '{{getLanguageKeyLocalTranslation('visit_pages_insufficient_capacity')}}');
+                        }
                     } else {
                         this.showErrorAlert(result.message || '{{getLanguageKeyLocalTranslation('visit_pages_booking_error')}}');
                     }

@@ -53,6 +53,18 @@
                                         </p>
                                     @enderror
                                 </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label" for="">Visit Time Slot capacity<span class="text-danger">*</span></label>
+                                    <input name="capacity" value="{{old('capacity')}}" type="number" min="0" class="form-control">
+                                    @error('capacity')
+                                        <p class="mx-2 my-2 text-danger">
+                                            <strong>
+                                                {{$message}}
+                                            </strong>
+                                        </p>
+                                    @enderror
+                                </div>  
                             </div>
                         </div>
                         

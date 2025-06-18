@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('start_year');
             $table->integer('end_year')->nullable();
             $table->boolean('is_current')->default(false);
-            $table->text('description');
+            $table->text('description')->nullable();
             
             $table->unsignedBigInteger('job_application_id')->nullable();
             $table->foreign('job_application_id')->references('id')->on('job_applications')->cascadeOnDelete();

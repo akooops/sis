@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->float('duration')->default(1);
-            $table->integer('capacity')->default(1);
             $table->integer('order')->default(0);
             $table->timestamps();
         });

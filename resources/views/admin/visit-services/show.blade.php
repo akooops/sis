@@ -47,12 +47,6 @@
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">Visit Service capacity</h4>
-                                <span class="badge bg-primary"> {{$visitService->capacity }} </span>
-                            </div>
-
-
-                            <div class="mb-3">
                                 <h4 class="fs-15">VisitService created at</h4>
                                 {{$visitService->created_at}}
                             </div>

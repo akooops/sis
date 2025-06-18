@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->dateTime('starts_at');
             $table->dateTime('ends_at');
+            $table->integer('capacity')->default(1);
 
             $table->unsignedBigInteger('visit_service_id')->nullable();
             $table->foreign('visit_service_id')->references('id')->on('visit_services')->nullOnDelete();

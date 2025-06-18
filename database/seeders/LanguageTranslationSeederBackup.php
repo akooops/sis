@@ -211,6 +211,8 @@ class LanguageTranslationSeeder extends Seeder
             'visits_page_student_grade_input' => ['en' => 'Enter student grade', 'ar' => 'قم بإدخال المستوى الدراسي للتلميذ'],
             'visits_page_student_name_input' => ['en' => 'Enter student name', 'ar' => 'قم بإدخال إسم التلميذ'],
             'visits_page_student_school_input' => ['en' => 'Enter student school', 'ar' => 'قم بإدخال المدرسة الحالية للتميذ'],
+            'visit_pages_insufficient_capacity' => ['en' => 'Insufficient Capacity','ar' => 'سعة غير كافية'],
+            'visit_pages_fully_booked' => ['en' => 'Fully Booked','ar' => 'محجوز بالكامل'],
             'website_title' => ['en' => 'Saud International Schools', 'ar' => 'مدارس سعود العالمية'],
         ];
 

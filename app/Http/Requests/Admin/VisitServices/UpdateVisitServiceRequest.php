@@ -26,7 +26,6 @@ class UpdateVisitServiceRequest extends FormRequest
             'name' => 'required|string|max:255',
             
             'duration' => 'required|integer|min:0',
-            'capacity' => 'required|integer|min:0',
 
             'file' => 'nullable|file|image',
             'media_id' => 'nullable|exists:media,id',

@@ -44,7 +44,7 @@ class StoreVisitBookingRequest extends FormRequest
             'student_grade' => 'required|string|max:255',
             'student_school' => 'required|string|max:255',
 
-            'visitors_count' => "required|integer|min:1|max:{$visitService->capacity}",
+            'visitors_count' => "required|integer|min:1",
             'visit_time_slot_id' => [
                 'required',
                 'exists:visit_time_slots,id',
@@ -68,9 +68,16 @@ class StoreVisitBookingRequest extends FormRequest
                         return;
                     }
                     
-                    // Check if time slot is already reserved
-                    if ($timeSlot->visitBooking()->exists()) {
-                        $fail('The selected time slot is already reserved. Please choose another time slot.');
+                    $remainingCapacity = $timeSlot->remaining_capacity;
+                    $requestedVisitors = $this->input('visitors_count');
+                    
+                    // Check if requested visitors exceed remaining capacity
+                    if ($requestedVisitors > $remainingCapacity) {
+                        if ($remainingCapacity <= 0) {
+                            $fail('The selected time slot is fully booked. Please choose another time slot.');
+                        } else {
+                            $fail("Only {$remainingCapacity} spot(s) remaining in this time slot. You requested {$requestedVisitors} visitors.");
+                        }
                         return;
                     }
                 },

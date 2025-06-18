@@ -25,6 +25,7 @@ class StoreVisitTimeSlotRequest extends FormRequest
         return [
             'starts_at' => 'required|date_format:Y-m-d H:i',
             'ends_at' => 'required|date_format:Y-m-d H:i|after_or_equal:starts_at',
+            'capacity' => 'required|integer|min:0',
         ];
     }
 }

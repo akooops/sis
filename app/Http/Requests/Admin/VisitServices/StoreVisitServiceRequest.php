@@ -29,7 +29,6 @@ class StoreVisitServiceRequest extends FormRequest
             'content' => 'required|string',
 
             'duration' => 'required|integer|min:0',
-            'capacity' => 'required|integer|min:0',
 
             'file' => 'nullable|file|image', 
             'media_id' => 'nullable|exists:media,id',

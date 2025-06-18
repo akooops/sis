@@ -83,18 +83,6 @@
                                 </div>  
 
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Visit Service capacity<span class="text-danger">*</span></label>
-                                    <input name="capacity" value="{{$visitService->capacity}}" type="number" min="0" class="form-control">
-                                    @error('capacity')
-                                        <p class="mx-2 my-2 text-danger">
-                                            <strong>
-                                                {{$message}}
-                                            </strong>
-                                        </p>
-                                    @enderror
-                                </div>  
-
-                                <div class="mb-4">
                                     <label class="form-label" for="">Visit Service thumbnail <span class="text-danger">(Keep it empty if you don't want to change it)</span></label>
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="form-check me-3">

@@ -48,7 +48,7 @@ class StoreJobApplicationRequest extends FormRequest
             'education.*.field_of_study' => 'required|string|max:255',
             'education.*.start_year' => 'required|integer|min:1950|max:2030',
             'education.*.end_year' => 'required|integer|min:1950|max:2030|gte:education.*.start_year',
-            'education.*.description' => 'required|string|max:500',
+            'education.*.description' => 'nullable|string|max:500',
             
             // Experience
             'experience' => 'required|array|min:1',
@@ -57,7 +57,7 @@ class StoreJobApplicationRequest extends FormRequest
             'experience.*.start_year' => 'required|integer|min:1950|max:2030',
             'experience.*.end_year' => 'nullable|required_if:experience.*.is_current,false|integer|min:1950|max:2030|gte:experience.*.start_year',
             'experience.*.is_current' => 'required|in:true,false',
-            'experience.*.description' => 'required|string|max:500',
+            'experience.*.description' => 'nullable|string|max:500',
             
             // Languages
             'languages' => 'required|array|min:1',
