@@ -1,132 +1,9 @@
-@font-face {
-  font-family: 'Brandon';
-  src: url('fonts/Brandon_Grotesque_light.otf') format('otf');
-  font-weight: 300;
-  font-style:normal;
-}
-
-@font-face {
-  font-family: 'Brandon';
-  src: url('fonts/Brandon_Grotesque_regular.otf') format('otf');
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Brandon';
-  src: url('fonts/Brandon_Grotesque_medium-Bold.otf') format('otf');
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Brandon';
-  src: url('fonts/Brandon_Grotesque_bold.otf') format('otf');
-  font-weight: 600;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Brandon';
-  src: url('fonts/Brandon_Grotesque_black.otf') format('otf');
-  font-weight: 700;
-  font-style: normal;
-}
-
-:root {
-  --bs-font-sans-serif: "Brandon", sans-serif;
-  --bs-navbar-color: #2A5D91;
-}
-
 .navbar{
-    height: 112px;
+    height: 96px;
 }
 
-.navbar-stick{
-    height: 88px;
-}
-
-.navbar-clone{
-    background-color: rgba(0, 0, 0, 0.85) !important;
-}
-
-.navbar-clone .navbar-container{
-    margin-top: 0px !important;
-}
-
-.navbar .logo{
-    height: 72px;
-}
-
-.navbar-clone .logo{
-    height: 64px;
-}
-
-.navbar .nav-link{
-    text-transform: uppercase;
-    font-weight: 600;
-    font-size: 15px;
-}
-
-.languages-dropdown .dropdown-item{
-    text-transform: uppercase;
-    font-weight: 600;
-    font-size: 15px;
-}
-
-.navbar-cta-container{
-    border-radius: 0.3rem;
-}
-
-.navbar-offcanvas-menu{
-    width: 100% !important;
-}
-
-.navbar-offcanvas-menu .search-form .form-control{
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.navbar-offcanvas-menu .btn-close::before {
-    border-radius: 0;
-    height: 51px;
-    width: 51px;
-    border-top-right-radius: 0.3rem;
-    border-bottom-right-radius: 0.3rem;
-    background-color: var(--bs-primary);
-    color: #fff;
-}
-
-.navbar-offcanvas-menu .accordion-item{
-    border-bottom: 1px solid #eee;
-}
-
-.navbar-offcanvas-menu .accordion-wrapper .card-header button{
-    font-size: 25px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.navbar-offcanvas-menu .accordion-wrapper .card-header .collapsed{
-    color: var(--bs-primary);
-}
-
-.navbar-offcanvas-menu .accordion-wrapper .card-header button:before{
-    left: unset;
-    right: 1.3rem;
-    margin-top: 0rem;
-    font-size: 1.3rem;
-}
-
-.navbar-offcanvas-menu .accordion-wrapper .accordion-collapse .nav-link{
-    text-transform: uppercase;
-    font-weight: 600;
-    font-size: 15px;
-    color: var(--bs-dark);
-}
-
-.navbar-offcanvas-menu .accordion-wrapper .accordion-collapse .nav-link:hover{
-    color: var(--bs-primary);
+.navbar .container{
+    height: 96px;
 }
 
 .text-gold{
@@ -135,6 +12,24 @@
 
 .bg-gold{
     background-color: #E0B65D;
+}
+
+.nav-link{
+    font-weight: 500;
+}
+
+.logo{
+    height: 64px;
+}
+
+.logo-canvas{
+    height: 64px;
+}
+
+.offcanvas-nav .nav-link{
+    padding-top: .3rem;
+    padding-bottom: .3rem;
+    border-bottom: 1px solid #eee;
 }
 
 .offcanvas-nav .dropdown-menu {
@@ -161,7 +56,7 @@
     position: absolute;
     width: 80%;
     height: 400px;
-    left: -124px;
+    right: -124px;
     top: 25px;
 }
 
@@ -302,7 +197,7 @@
 .banner-image {
     position: absolute;
     top: 0;
-    left: 0;
+    right: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -344,7 +239,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 8px;
+    margin-left: 8px;
 }
 .step.active .step-number {
     background: #2A5D91;
@@ -389,41 +284,23 @@
 
 #phoneInput{
     padding: 0.6rem 1rem;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
     border: 1px solid rgba(8, 60, 130, 0.07)
 }
 
 .input-group .input-group-text{
     width: 64px !important;
     justify-content: center;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
     border-radius: 0.4rem;
 }
 .iti--inline-dropdown .iti__dropdown-content{
     z-index: 9999;
 }
-
-@media (min-width: 768px) {
-    .navbar-cta-container{
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-        border-top-right-radius: 0.3rem;
-        border-bottom-right-radius: 0.3rem;
-    }
-        
-    .navbar-offcanvas-menu{
-        width: 420px !important;
-    }
-}
-
-@media (min-width: 992px) {
-    .navbar .logo{
-        height: 88px;
-    }
-
-    .navbar-clone .logo{
+@media (min-width: 1024px) {
+    .logo{
         height: 72px;
     }
 }
