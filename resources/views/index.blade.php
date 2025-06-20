@@ -23,43 +23,55 @@
 @endsection
 @section('content')
 
-<section class="wrapper">
-    <div class="swiper-container swiper-hero dots-over swiper-container-0" data-margin="0" data-autoplay="true" data-autoplaytime="7000" data-nav="true" data-dots="true" data-items="1">
-        <div class="swiper swiper-initialized swiper-horizontal swiper-backface-hidden">
-            <div class="swiper-wrapper" id="swiper-wrapper-f9c21ed344bd05ba" aria-live="off">
+<section class="wrapper banners-section">
+    <div class="swiper-container" 
+        data-margin="0" 
+        data-autoplay="true" 
+        data-autoplaytime="7000" 
+        data-nav="true" 
+        data-dots="true" 
+        data-items="1">
+        
+        <div class="swiper">
+            <div class="swiper-wrapper">
 
                 @foreach ($banners as $banner)
-                    <div class="swiper-slide bg-overlay bg-overlay-400 bg-dark swiper-slide-prev" role="group">
+                    <div class="swiper-slide bg-overlay">
                         
                         @if($banner->video)
                             <!-- Video Background -->
                             <video class="banner-video" autoplay muted loop playsinline>
                                 <source src="{{ $banner->videoUrl }}">
+
                                 <!-- Fallback to image if video fails -->
-                                <img src="{{ $banner->thumbnailUrl }}" alt="">
+                                <img src="{{ $banner->thumbnailUrl }}" alt="{{$banner->getLocalTranslation('title')}}">
                             </video>
                         @else
                             <!-- Image Background -->
-                            <div class="banner-image" style="background-image: url('{{ $banner->thumbnailUrl }}')"></div>
+                            <div class="banner-img" style="background-image: url('{{ $banner->thumbnailUrl }}')"></div>
                         @endif
 
                         <div class="container h-100">
-                            <div class="row h-100">
-                                <div class="banner-container col-lg-6 text-center text-lg-start justify-content-center align-self-center align-items-start">
-                                    <h2 class="display-1 fs-36 mt-12 fw-semibold mb-4 text-white animate__animated animate__slideInDown animate__delay-1s">
-                                        {{$banner->getLocalTranslation('title')}}
-                                    </h2>
-                                    <p class="lead fs-16 fw-semibold lh-sm mb-7 text-white animate__animated animate__slideInRight animate__delay-2s">                   
-                                        {{$banner->getLocalTranslation('subtitle')}}                                         
-                                    </p>
-                                    <div class="animate__animated animate__slideInUp animate__delay-3s">
+                            <div class="row h-100 align-items-end px-8 px-lg-0 pb-16">           
+                                <div class="row px-0 px-lg-14">
+                                    <div class="col-12 col-lg-8 px-0">
+                                        <h2 class="mb-0">
+                                            {{$banner->getLocalTranslation('title')}}
+                                        </h2>
+                                    </div>
+                                    <!--/.col -->
+
+                                    <div class="d-flex col-12 col-lg-4 align-items-start mt-4 mt-lg-0 px-0 px-lg-16">
                                         <a href="{{$banner->page ? route('page', ['slug' => $banner->page->slug]) : $banner->url}}" 
-                                            class="btn btn-sm bg-primary rounded text-white">
+                                            class="btn py-1 px-14">
+                                            <i class="uil uil-angle-right-b me-2"></i>
+
                                             {{$banner->getLocalTranslation('cta')}}
                                         </a>
                                     </div>
-                                </div>
-                                <!--/column -->
+                                    <!--/.col -->
+                                </div>     
+                                <!--/.row -->      
                             </div>
                             <!--/.row -->
                         </div>

@@ -14,7 +14,7 @@
             <div class="col-lg-4">
                 <div class="widget">
                     <a href="{{route('index')}}">
-                        <img class="logo-canvas" src="{{ URL::asset('assets/img/logo.png')}}" alt="" />
+                        <img class="logo-canvas" src="{{ URL::asset('assets/img/logo.png')}}" alt="" height="24px"/>
                     </a>
                     <h3 class="h2 my-3 text-white">
                         {{getLanguageKeyLocalTranslation('footer_main_title')}}
