@@ -87,12 +87,12 @@
     </div>
     <!-- /.swiper-container -->
 </section>
-
+<!-- /section -->
 
 <section class="wrapper welcome-section">
-    <div class="container py-12">
+    <div class="container pt-12 pb-6">
         <div class="row align-items-center">
-            <div class="col-lg-6 position-relative">
+            <div class="col-lg-6 position-relative" data-aos="fade-right" data-aos-duration="1000">
                 <div class="shape rellax"></div>
                 
                 <figure>
@@ -102,18 +102,20 @@
             <!--/column -->
 
             <div class="col-lg-6 mt-12 mt-lg-0 text-center text-lg-start">
-                <h2 class="text-primary mb-0">
+                <h2 class="text-primary mb-0" data-aos="fade-left" data-aos-duration="1000">
                     {{getLanguageKeyLocalTranslation('index_page_first_section_title')}}
                 </h2>
                 
-                <p class="mt-4 mb-8">
+                <p class="mt-4 mb-8" data-aos="fade-left" data-aos-duration="1500">
                     {{getLanguageKeyLocalTranslation('index_page_first_section_subtitle')}}
                 </p>
 
                 @if($firstSectionCtaPage)
-                    <a href="{{route('page', ['slug' => $firstSectionCtaPage->slug])}}" class="btn btn-primary rounded">
+                    <a href="{{route('page', ['slug' => $firstSectionCtaPage->slug])}}" class="btn btn-primary rounded" data-aos="fade-left" data-aos-duration="2000">
                         <i class="uil uil-angle-right-b me-2"></i>
-                        {{getLanguageKeyLocalTranslation('index_page_first_section_cta')}}
+                        <span>
+                            {{getLanguageKeyLocalTranslation('index_page_first_section_cta')}}
+                        </span>
                     </a>
                 @endif
             </div>
@@ -125,149 +127,182 @@
 </section>
 <!-- /section -->
 
-<section class="wrapper bg-light grades-section">
-    <div class="container-fluid">
-        <div class="row row-cols-1 row-cols-md-5 align-items-center">
-            @foreach ($programs as $program)    
-            <div class="col grades p-0">
-                <figure class="overlay caption caption-overlay mb-0">
-                    <a href="{{route('program', ['slug' => $program->slug])}}"> 
-                      <img src="{{$program->thumbnailUrl}}" style="object-fit: cover" alt="">
-                      <span class="bg"></span>
-                    </a>
+<section class="wrapper divider-section">
+    <div class="container pb-8">
+        <div class="row" data-aos="fade-up" data-aos-duration="1000">
+            <div class="divider-line"></div>
 
-                    <figcaption>
-
-                        <h2 class="post-title h3 mb-2 fw-normal">
-                          <a href="{{route('program', ['slug' => $program->slug])}}">
-                            {{$program->getLocalTranslation('title')}}
-                          </a>
-                        </h2>
-                       
-                        <span class="badge badge-lg bg-primary my-2 fw-semibold" style="color: white !important">
-                            {{$program->getLocalTranslation('subtitle')}}
-                        </span>
-                    </figcaption>
-                    <!-- /figcaption -->
-                </figure>
+            <div class="d-flex justify-content-center" data-aos="zoom-in" data-aos-duration="2000">
+                <img class="logo" src="{{ URL::asset('assets/img/logo.png')}}" alt="{{getLanguageKeyLocalTranslation('website_title')}}">              
             </div>
-            @endforeach
         </div>
     </div>
 </section>
+<!-- /section -->
 
-<section class="wrapper bg-light facts-section">
-    <div class="container py-14">
-        <div class="row gx-lg-0 gy-10 align-items-center">
-            <div class="col-lg-6 order-lg-2 offset-lg-1 grid">
+<section class="wrapper grades-section">
+    <div class="container">
+        <div class="row text-center mb-6">
+            <h2 class="text-primary" data-aos="fade-up" data-aos-duration="1000">
+                {{getLanguageKeyLocalTranslation('index_page_second_section_title')}}
+            </h2>
+        </div>
+    </div>
+    <!-- /.container -->
+
+    <div class="swiper-container"
+        data-margin="0" 
+        data-items-xl="5" 
+        data-items-md="2" 
+        data-items-xs="1"
+        
+        data-aos="fade-up" 
+        data-aos-duration="2000">
+
+        <div class="swiper">
+            <div class="swiper-wrapper">
+
+                @foreach ($programs as $program)
+                    <div class="swiper-slide bg-overlay">
+                        <div class="grade-img" style="background-image: url('{{ $program->thumbnailUrl }}')"></div>
+
+                        <div class="container h-100">
+                            <div class="row h-100 align-items-end pb-8 pb-lg-12">           
+                                <div class="col-12 px-8">
+                                    <p class="px-0">
+                                            {{$program->getLocalTranslation('title')}}
+                                    </p>
+
+                                    <h3 class="px-0">
+                                        {{$program->getLocalTranslation('subtitle')}}
+                                    </h3>
+
+                                    <a href="{{$banner->page ? route('page', ['slug' => $banner->page->slug]) : $banner->url}}" 
+                                        class="btn py-1">
+                                        <i class="uil uil-angle-right-b me-2"></i>
+
+                                        {{getLanguageKeyLocalTranslation('index_page_second_section_cta')}}
+                                    </a>
+                                </div>     
+                                <!--/.row -->      
+                            </div>
+                            <!--/.row -->
+                        </div>
+                        <!--/.container -->
+                    </div>
+                    <!--/.swiper-slide -->
+                @endforeach
+            </div>
+            <!--/.swiper-wrapper -->
+        </div>
+        <!-- /.swiper -->
+    </div>
+    <!-- /.swiper-container -->
+</section>
+
+<section class="wrapper facts-section">
+    <div class="container h-100 py-12">
+        <div class="row h-100 align-items-center">
+            <div class="col-lg-5 pe-0 pe-lg-16 mb-8 mb-lg-0 facts-content-container" data-aos="fade-right" data-aos-duration="2000">
+                <h3 data-aos="fade-up" data-aos-duration="1500">
+                    {{getLanguageKeyLocalTranslation('index_page_third_section_title')}}
+                </h3>
+
+                <p class="mt-4 mb-8 text-light">
+                   {{getLanguageKeyLocalTranslation('index_page_third_section_subtitle')}}
+                </p>
+
+                @if($thirdSectionCtaPage)
+                    <a href="{{route('page', ['slug' => $thirdSectionCtaPage->slug])}}" 
+                        class="btn py-1 px-8">
+                        <i class="uil uil-angle-right-b me-2"></i>
+                        {{getLanguageKeyLocalTranslation('index_page_third_section_cta')}}
+                    </a>
+                @endif
+            </div>
+            <!--/column -->
+
+            <div class="col-lg-7 grid facts-numbers-container" data-aos="fade-left" data-aos-duration="3000">
                 <div class="row gx-md-5 gy-5 align-items-center counter-wrapper isotope">
-                    <div class="item col-md-6">
-                        <div class="card shadow-lg bg-primary">
-                            <div class="card-body">
-                                <div class="d-flex d-lg-block d-xl-flex flex-row">
-                                    <div>
-                                        <div class="icon btn btn-circle btn-lg btn-soft-purple pe-none mx-auto me-4 mb-lg-3 mb-xl-0"> <i class="uil uil-presentation-check"></i> </div>
-                                    </div>
-                                    <div>
-                                        <h3 class="counter mb-1 text-gold">
-                                            {{getLanguageKeyLocalTranslation('index_page_first_number_value')}}
-                                        </h3>
-                                        <p class="mb-0 text-light">
-                                            {{getLanguageKeyLocalTranslation('index_page_first_number_title')}}
-                                        </p>
-                                    </div>
-                                </div>
+                    <div class="item col-md-6 px-2 py-4">
+                        <div class="d-flex flex-row">
+                            <div class="icon btn btn-circle me-4"> 
+                                <i class="uil uil-presentation-check"></i> 
                             </div>
-                            <!--/.card-body -->
+
+                            <div>
+                                <h4 class="counter">
+                                    {{getLanguageKeyLocalTranslation('index_page_first_number_value')}}
+                                </h4>
+
+                                <p>
+                                    {{getLanguageKeyLocalTranslation('index_page_first_number_title')}}
+                                </p>
+                            </div>
                         </div>
-                        <!--/.card -->
                     </div>
                     <!--/column -->
-                    <div class="item col-md-6">
-                        <div class="card shadow-lg bg-primary">
-                            <div class="card-body">
-                                <div class="d-flex d-lg-block d-xl-flex flex-row">
-                                    <div>
-                                        <div class="icon btn btn-circle btn-lg btn-soft-red pe-none mx-auto me-4 mb-lg-3 mb-xl-0"> <i class="uil uil-users-alt"></i> </div>
-                                    </div>
-                                    <div>
-                                        <h3 class="counter mb-1 text-gold">
-                                            {{getLanguageKeyLocalTranslation('index_page_second_number_value')}}
-                                        </h3>
-                                        <p class="mb-0 text-light">
-                                            {{getLanguageKeyLocalTranslation('index_page_second_number_title')}}
-                                        </p>
-                                    </div>
-                                </div>
+
+                    <div class="item col-md-6 px-2 py-4">
+                        <div class="d-flex flex-row">
+                            <div class="icon btn btn-circle me-4"> 
+                                <i class="uil uil-users-alt"></i> 
                             </div>
-                            <!--/.card-body -->
+
+                            <div>
+                                <h4 class="counter">
+                                    {{getLanguageKeyLocalTranslation('index_page_second_number_value')}}
+                                </h4>
+
+                                <p>
+                                    {{getLanguageKeyLocalTranslation('index_page_second_number_title')}}
+                                </p>
+                            </div>
                         </div>
-                        <!--/.card -->
                     </div>
                     <!--/column -->
-                    <div class="item col-md-6">
-                        <div class="card shadow-lg bg-primary">
-                            <div class="card-body">
-                                <div class="d-flex d-lg-block d-xl-flex flex-row">
-                                    <div>
-                                        <div class="icon btn btn-circle btn-lg btn-soft-yellow pe-none mx-auto me-4 mb-lg-3 mb-xl-0"> <i class="uil uil-user-check"></i> </div>
-                                    </div>
-                                    <div>
-                                        <h3 class="counter mb-1 text-gold">
-                                            {{getLanguageKeyLocalTranslation('index_page_third_number_value')}}
-                                        </h3>
-                                        <p class="mb-0 text-light">
-                                            {{getLanguageKeyLocalTranslation('index_page_third_number_title')}}
-                                        </p>
-                                    </div>
-                                </div>
+
+                    <div class="item col-md-6 px-2 py-4">
+                        <div class="d-flex flex-row">
+                            <div class="icon btn btn-circle me-4"> 
+                                <i class="uil uil-user-check"></i> 
                             </div>
-                            <!--/.card-body -->
+
+                            <div>
+                                <h4 class="counter">
+                                    {{getLanguageKeyLocalTranslation('index_page_third_number_value')}}
+                                </h4>
+
+                                <p>
+                                    {{getLanguageKeyLocalTranslation('index_page_third_number_title')}}
+                                </p>
+                            </div>
                         </div>
-                        <!--/.card -->
                     </div>
                     <!--/column -->
-                    <div class="item col-md-6">
-                        <div class="card shadow-lg bg-primary">
-                            <div class="card-body">
-                                <div class="d-flex d-lg-block d-xl-flex flex-row">
-                                    <div>
-                                        <div class="icon btn btn-circle btn-lg btn-soft-aqua pe-none mx-auto me-4 mb-lg-3 mb-xl-0"> <i class="uil uil-trophy"></i> </div>
-                                    </div>
-                                    <div>
-                                        <h3 class="counter mb-1 text-gold">
-                                            {{getLanguageKeyLocalTranslation('index_page_forth_number_value')}}
-                                        </h3>
-                                        <p class="mb-0 text-light">
-                                            {{getLanguageKeyLocalTranslation('index_page_forth_number_title')}}
-                                        </p>
-                                    </div>
-                                </div>
+
+                    <div class="item col-md-6 px-2 py-4">
+                        <div class="d-flex flex-row">
+                            <div class="icon btn btn-circle me-4"> 
+                                <i class="uil uil-trophy"></i> 
                             </div>
-                            <!--/.card-body -->
+
+                            <div>
+                                <h4 class="counter">
+                                    {{getLanguageKeyLocalTranslation('index_page_forth_number_value')}}
+                                </h4>
+
+                                <p>
+                                    {{getLanguageKeyLocalTranslation('index_page_forth_number_title')}}
+                                </p>
+                            </div>
                         </div>
-                        <!--/.card -->
                     </div>
                     <!--/column -->
                 </div>
                 <!--/.row -->
             </div>
             <!--/column -->
-            <div class="col-lg-5">
-                 <h3 class="display-5 mb-2 text-gold">
-                    {{getLanguageKeyLocalTranslation('index_page_second_section_title')}}
-                </h3>
-                <p class="mb-4 text-light">
-                   {{getLanguageKeyLocalTranslation('index_page_second_section_subtitle')}}
-                </p>
-
-                @if($secondSectionCtaPage)
-                    <a href="{{route('page', ['slug' => $secondSectionCtaPage->slug])}}" class="btn btn-sm btn-primary rounded">
-                        {{getLanguageKeyLocalTranslation('index_page_second_section_cta')}}
-                    </a>
-                @endif
-            </div>
-            <!--/column -->
         </div>
         <!--/.row -->
     </div>
@@ -275,52 +310,55 @@
 </section>
 <!-- /section -->
 
-<section class="wrapper bg-light-primary">
-    <div class="container py-12">
-        <h3 class="display-5 mb-4 text-center text-gold">
-            {{getLanguageKeyLocalTranslation('index_page_forth_section_title')}}
-            <br>
-            {{getLanguageKeyLocalTranslation('index_page_forth_section_subtitle')}}
-        </h3>
+<section class="wrapper divider-section pt-8">
+    <div class="container pb-8">
+        <div class="row" data-aos="fade-up" data-aos-duration="1000">
+            <div class="divider-line"></div>
 
-        <div class="swiper-container blog grid-view mb-12" data-margin="30" data-dots="true" data-items-xl="3" data-items-md="2" data-items-xs="1">
-            <div class="swiper">
+            <div class="d-flex justify-content-center" data-aos="zoom-in" data-aos-duration="2000">
+                <img class="logo" src="{{ URL::asset('assets/img/logo.png')}}" alt="{{getLanguageKeyLocalTranslation('website_title')}}">              
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /section -->
+
+<section class="wrapper events-section">
+    <div class="container pb-8">
+        <div class="row text-center mb-6">
+            <h2 class="text-primary" data-aos="fade-up" data-aos-duration="1000">
+                {{getLanguageKeyLocalTranslation('index_page_forth_section_title')}}
+            </h2>
+        </div>
+
+        <div class="swiper-container px-8" 
+            data-margin="10" 
+            data-dots="false" 
+            data-items-xl="3" 
+            data-items-md="2" 
+            data-items-xs="1"
+            data-aos="fade-up" 
+            data-aos-duration="2000">
+
+            <div class="swiper mb-8">
                 <div class="swiper-wrapper">
-                    @foreach ($articles as $article)   
+                    @foreach ($events as $event)   
                     <div class="swiper-slide">
-                        <article>
-                            <figure class="article-figure overlay overlay-1 hover-scale rounded mb-5">
-                                <a href="{{route('article', ['slug' => $article->slug])}}">
-                                    <img src="{{$article->thumbnailUrl}}" alt="" />
+                        <figure class="hover-scale mb-5">
+                            <a href="{{route('event', ['slug' => $event->slug])}}">
+                                <img src="{{$event->thumbnailUrl}}" alt="" />
+                            </a>
+                        </figure>
+
+                        <div class="px-8">
+                            <h3 class="pt-8 pb-2">
+                                <a href="{{route('event', ['slug' => $event->slug])}}">
+                                    {{$event->getLocalTranslation('title')}}
                                 </a>
-                                <figcaption>
-                                    <h5 class="from-top mb-0"></h5>
-                                </figcaption>
-                            </figure>
-                            <div class="post-header">
-                                <h2 class="post-title h3 mt-1 mb-3">
-                                    <a class="link-dark" href="{{route('article', ['slug' => $article->slug])}}">
-                                        {{$article->getLocalTranslation('title')}}
-                                    </a>
-                                </h2>
-                            </div>
-                            <div class="post-content">
-                                <p class="truncate-3-lines">{{$article->getLocalTranslation('description')}}</p>
-                            </div>
-                            <!-- /.post-header -->
-                            <div class="post-footer">
-                                <ul class="post-meta">
-                                    <li class="post-date">
-                                        <i class="uil uil-calendar-alt"></i><span>
-                                            {{$article->created_at->format('Y-m-d')}}
-                                        </span>
-                                    </li>
-                                </ul>
-                                <!-- /.post-meta -->
-                            </div>
-                            <!-- /.post-footer -->
-                        </article>
-                        <!-- /article -->
+                            </h3>
+
+                            <span class="arrow">⟶</span>      
+                        </div>
                     </div>
                     @endforeach
                 </div>

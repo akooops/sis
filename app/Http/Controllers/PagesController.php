@@ -41,10 +41,10 @@ class PagesController extends Controller
 
         $banners = Banner::orderBy('order')->get();
         $programs = Program::latest()->get();
-        $articles = Article::latest()->where('status', 'published')->limit(6)->get();
+        $events = Event::latest()->where('status', 'published')->limit(6)->get();
         $albums = Album::latest()->where('status', 'published')->limit(6)->get();
 
-        return view('index', compact('page', 'banners', 'programs', 'articles', 'albums'));
+        return view('index', compact('page', 'banners', 'programs', 'events', 'albums'));
     }
 
     public function page(Request $request, $slug = null)

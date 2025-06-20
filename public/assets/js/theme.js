@@ -36,6 +36,8 @@ var theme = {
     theme.pricingSwitcher();
     theme.textRotator();
     theme.codeSnippet();
+
+    AOS.init();
   },
   /**
    * Sticky Header
