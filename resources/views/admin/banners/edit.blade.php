@@ -232,13 +232,6 @@
                                             </div>
 
                                             <div class="mb-4">
-                                                <label class="form-label" for="subtitle-{{$language->id}}">Subtitle <span class="text-danger">*</span></label>
-                                                <input type="text" id="subtitle-{{$language->id}}" name="subtitle" class="form-control translation-subtitle" value="{{$banner->getTranslation('subtitle', $language->code)}}">
-                                                <div class="translation-error" id="error-subtitle-{{$language->id}}"></div>
-                                            </div>
-
-
-                                            <div class="mb-4">
                                                 <label class="form-label" for="cta-{{$language->id}}">Cta <span class="text-danger">*</span></label>
                                                 <input type="text" id="cta-{{$language->id}}" name="cta" class="form-control translation-cta" value="{{$banner->getTranslation('cta', $language->code)}}">
                                                 <div class="translation-error" id="error-cta-{{$language->id}}"></div>
@@ -334,17 +327,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const languageId = this.dataset.languageId;
             const languageCode = this.dataset.language;
             const titleInput = document.getElementById(`title-${languageId}`);
-            const subtitleInput = document.getElementById(`subtitle-${languageId}`);
             const ctaInput = document.getElementById(`cta-${languageId}`);
             const submitButton = this.querySelector('.translation-submit');
             
             // Reset validation state
             titleInput.classList.remove('is-invalid');
-            subtitleInput.classList.remove('is-invalid');
             ctaInput.classList.remove('is-invalid');
 
             document.getElementById(`error-title-${languageId}`).textContent = '';
-            document.getElementById(`error-subtitle-${languageId}`).textContent = '';
             document.getElementById(`error-cta-${languageId}`).textContent = '';
             
             // Show loading spinner on button
@@ -358,7 +348,6 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('_method', 'PATCH');
             formData.append('language_id', languageId);
             formData.append('title', titleInput.value);
-            formData.append('subtitle', subtitleInput.value);
             formData.append('cta', ctaInput.value);
 
             // Send AJAX request
@@ -394,11 +383,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (error.errors.title) {
                         titleInput.classList.add('is-invalid');
                         document.getElementById(`error-title-${languageId}`).textContent = error.errors.title[0];
-                    }
-                    
-                    if (error.errors.subtitle) {
-                        subtitleInput.classList.add('is-invalid');
-                        document.getElementById(`error-subtitle-${languageId}`).textContent = error.errors.subtitle[0];
                     }
                     
                     if (error.errors.cta) {

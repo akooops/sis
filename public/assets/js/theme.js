@@ -100,7 +100,7 @@ var theme = {
     var navbar = document.querySelector(".navbar");
     if (navbar == null) return;
     const navOffCanvasBtn = document.querySelectorAll(".offcanvas-nav-btn");
-    const navOffCanvas = document.querySelector('.navbar:not(.navbar-clone) .offcanvas-nav');
+    const navOffCanvas = document.querySelector('.offcanvas-nav');
     const bsOffCanvas = new bootstrap.Offcanvas(navOffCanvas, {scroll: true});
     const scrollLink = document.querySelectorAll('.onepage .navbar li a.scroll');
     const searchOffcanvas = document.getElementById('offcanvas-search');

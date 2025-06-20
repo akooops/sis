@@ -112,11 +112,6 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <h4 class="fs-15">Banner {{$language->name}} subtitle</h4>
-                                            {{$banner->getTranslation('subtitle', $language->code)}}
-                                        </div>
-
-                                        <div class="mb-3">
                                             <h4 class="fs-15">Banner {{$language->name}} cta</h4>
                                             {{$banner->getTranslation('cta', $language->code)}}
                                         </div>

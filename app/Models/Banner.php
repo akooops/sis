@@ -46,6 +46,6 @@ class Banner extends Model
 
     public function getTranslatableFields(): array
     {
-        return ['title', 'subtitle', 'cta'];
+        return ['title', 'cta'];
     } 
 }

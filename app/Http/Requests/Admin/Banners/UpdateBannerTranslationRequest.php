@@ -23,7 +23,6 @@ class UpdateBannerTranslationRequest extends FormRequest
     {
         $data = [
             'title' => 'required|string|max:1000',
-            'subtitle' => 'required|string|max:3000',
             'cta' => 'required|string|max:255',
             'language_id' => 'required|exists:languages,id',
         ];

@@ -22,8 +22,9 @@
 @section('css')
 @endsection
 @section('content')
-<section class="wrapper bg-dark">
-    <div class="swiper-container swiper-hero dots-over swiper-container-0" data-margin="0" data-autoplay="true" data-autoplaytime="7000" data-nav="false" data-dots="true" data-items="1">
+
+<section class="wrapper">
+    <div class="swiper-container swiper-hero dots-over swiper-container-0" data-margin="0" data-autoplay="true" data-autoplaytime="7000" data-nav="true" data-dots="true" data-items="1">
         <div class="swiper swiper-initialized swiper-horizontal swiper-backface-hidden">
             <div class="swiper-wrapper" id="swiper-wrapper-f9c21ed344bd05ba" aria-live="off">
 

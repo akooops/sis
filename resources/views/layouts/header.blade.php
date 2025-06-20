@@ -12,7 +12,7 @@
                 <div class="col-lg-4 d-none d-lg-flex">
                     <ul class="navbar-nav rounded bg-white">
                         <li class="nav-item dropdown">
-                            <a class="nav-link py-2" href="#" data-bs-toggle="dropdown">
+                            <a class="nav-link py-2" href="#" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" role="button">
                                 {{$currentLanguage->name}}
                             </a>
 
@@ -33,7 +33,7 @@
 
                 <div class="navbar-brand d-flex col-6 col-lg-4 justify-content-start justify-content-lg-center pe-0 pe-lg-14 py-0">
                     <a href="{{route('index')}}">
-                        <img class="logo" src="{{ URL::asset('assets/img/logo.png')}}" alt="">                
+                        <img class="logo" src="{{ URL::asset('assets/img/logo.png')}}" alt="{{getLanguageKeyLocalTranslation('website_title')}}">                
                     </a>
                 </div>
 
@@ -97,8 +97,8 @@
                 @if($menu)
                     @foreach ($menu->items as $menuItem)
                         @if(count($menuItem->children) == 0)
-                            <li class="nav-item">
-                                <a class="nav-link" 
+                            <li class="nav-item mt-2">
+                                <a class="nav-link py-0" 
                                     href="{{
                                         $menuItem->page 
                                             ? route('page', ['slug' => $menuItem->page->slug]) 
@@ -138,12 +138,12 @@
                 @endif
 
                 @if(count($languages) >= 0)
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="" data-bs-toggle="dropdown">               
+                    <li class="nav-item mt-2 dropdown">
+                        <a class="nav-link dropdown-toggle py-0" href="" data-bs-toggle="dropdown">               
                             {{getLanguageKeyLocalTranslation('navbar_change_language_nav_link')}}
                         </a>
 
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu py-0">
                             @foreach ($languages as $language)
                                 @if($language->code != app()->getLocale())
                                     <a class="dropdown-item" href="{{route('locale.switch', ['locale' => $language->code])}}">

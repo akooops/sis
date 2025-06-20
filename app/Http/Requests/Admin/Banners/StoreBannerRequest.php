@@ -26,7 +26,6 @@ class StoreBannerRequest extends FormRequest
             'name' => 'required|string|max:255',
 
             'title' => 'required|string|max:1000',
-            'subtitle' => 'required|string|max:3000',
             'cta' => 'required|string|max:255',
 
             'external' => 'required|integer',

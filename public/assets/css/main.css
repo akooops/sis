@@ -129,6 +129,13 @@
     color: var(--bs-primary);
 }
 
+.navbar-offcanvas-menu .nav-link{
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--bs-primary);
+}
+
 .text-gold{
     color: #E0B65D;
 }

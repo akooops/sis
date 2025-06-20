@@ -156,18 +156,6 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="form-label" for="">Banner {{$defaultLanguage->name}} subtitle <span class="text-danger">*</span></label>
-                                    <input name="subtitle" value="{{old('subtitle')}}" type="text" class="form-control">
-                                    @error('subtitle')
-                                        <p class="mx-2 my-2 text-danger">
-                                            <strong>
-                                                {{$message}}
-                                            </strong>
-                                        </p>
-                                    @enderror
-                                </div>
-
-                                <div class="mb-4">
                                     <label class="form-label" for="">Banner {{$defaultLanguage->name}} cta <span class="text-danger">*</span></label>
                                     <input name="cta" value="{{old('cta')}}" type="text" class="form-control">
                                     @error('cta')
