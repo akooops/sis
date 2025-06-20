@@ -43,6 +43,37 @@
 :root {
   --bs-font-sans-serif: "Brandon", sans-serif;
   --bs-navbar-color: #2A5D91;
+  --bs-secondary: #3c70a3;
+  --bs-light: #EEF8FF;
+}
+
+p{
+    font-size: 17px;
+    line-height: 25px;
+    font-weight: 400;
+    color: var(--bs-dark);
+}
+
+.btn {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(to right, var(--bs-secondary) 50%, transparent 50%);
+    background-size: 200% 100%;
+    background-position: right bottom;
+    background-color: var(--bs-primary);
+    transition: all 0.4s ease;
+    color: white;
+    border: none; /* No outline */
+    text-transform: uppercase;
+    font-size: 15px;
+    font-weight: 450;
+    font-family: "Brandon", sans-serif;
+}
+
+.btn:hover {
+    background-position: left bottom;
+    color: white; 
+    border: none;
 }
 
 .navbar{
@@ -158,7 +189,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to bottom, transparent 15%, rgba(0, 0, 0, 0.75) 100%);
+    background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.75) 100%);
     pointer-events: none;
     z-index: 1;
     opacity: 1;
@@ -166,7 +197,7 @@
 }
 
 .banners-section .swiper-container .bg-overlay:hover::before {
-    opacity: 0.75;
+    opacity: 0.5;
 }
 
 .banners-section .banner-video,
@@ -222,6 +253,30 @@
 .banners-section .btn i{
     font-size: 20px;
 }
+
+.welcome-section{
+    background-color: var(--bs-light);
+}
+
+.welcome-section h2{
+    font-size: 25px;
+    line-height: 35px;
+    text-transform: uppercase;
+    font-weight: 900;
+}
+
+.welcome-section .shape{
+    background-color: var(--bs-primary);
+    position: absolute;
+    width: 80%;
+    height: 420px;
+    left: -124px;
+    top: 50px;
+}
+
+.welcome-section img{
+    width: 90%;
+}
 /*---------------------------------------*/
 
 .text-gold{
@@ -232,28 +287,7 @@
     background-color: #E0B65D;
 }
 
-.offcanvas-nav .dropdown-menu {
-    position: static !important;
-    inset: none !important;
-    transform: none !important;
-    box-shadow: none;
-}
 
-.offcanvas-nav .dropdown-menu .dropdown-item{
-    font-weight: 500;
-}
-
-.shape-welcome-image{
-    width: 85%;
-}
-
-.shape-welcome{
-    position: absolute;
-    width: 80%;
-    height: 400px;
-    left: -124px;
-    top: 25px;
-}
 
 .grades-section{
     border-bottom: 4px solid #E0B65D;
@@ -489,9 +523,18 @@
     .navbar-offcanvas-menu{
         width: 420px !important;
     }
+    
+    .welcome-section .shape{
+        height: 500px;
+    }
 }
 
 @media (min-width: 992px) {
+    p{
+        font-size: 18px;
+        line-height: 30px;
+    }
+
     .navbar .logo{
         height: 88px;
     }
@@ -501,7 +544,39 @@
     }
     
     .banners-section h2{
-        font-size: 52px;
+        font-size: 55px;
         line-height: 52px;
     }
+
+    .welcome-section h2{
+        font-size: 32px;
+        line-height: 52px;
+    }
+
+    .welcome-section .shape{
+        height: 360px;
+    }
 }
+
+@media (min-width: 1200px) {
+    p{
+        font-size: 20px;
+    }
+
+    .welcome-section h2{
+        font-size: 48px;
+        line-height: 60px;
+    }
+
+    .welcome-section .shape{
+        height: 420px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .welcome-section .shape{
+        height: 500px;
+    }
+}
+
+

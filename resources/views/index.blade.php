@@ -63,7 +63,7 @@
 
                                     <div class="d-flex col-12 col-lg-4 align-items-start mt-4 mt-lg-0 px-0 px-lg-16">
                                         <a href="{{$banner->page ? route('page', ['slug' => $banner->page->slug]) : $banner->url}}" 
-                                            class="btn py-1 px-14">
+                                            class="btn py-1 px-16">
                                             <i class="uil uil-angle-right-b me-2"></i>
 
                                             {{$banner->getLocalTranslation('cta')}}
@@ -89,30 +89,30 @@
 </section>
 
 
-<section class="wrapper bg-light">
+<section class="wrapper welcome-section">
     <div class="container py-12">
         <div class="row align-items-center">
             <div class="col-lg-6 position-relative">
-                <div class="shape shape-welcome bg-primary rellax d-md-block" data-rellax-speed="0"></div>
+                <div class="shape rellax"></div>
                 
                 <figure>
-                  <img class="shape-welcome-image ms-6" src="{{ URL::asset('assets/img/home-1-welcome.png')}}" alt="">
+                    <img class="ms-4 ms-sm-6" src="{{ URL::asset('assets/img/home-1-welcome.png')}}" alt="">
                 </figure>
             </div>
             <!--/column -->
 
             <div class="col-lg-6 mt-12 mt-lg-0 text-center text-lg-start">
-                <h3 class="display-4 mb-2 text-gold">
+                <h2 class="text-primary mb-0">
                     {{getLanguageKeyLocalTranslation('index_page_first_section_title')}}
-                </h3>
+                </h2>
                 
-                <p class="mb-4">
+                <p class="mt-4 mb-8">
                     {{getLanguageKeyLocalTranslation('index_page_first_section_subtitle')}}
                 </p>
 
                 @if($firstSectionCtaPage)
-                    <a href="{{route('page', ['slug' => $firstSectionCtaPage->slug])}}" class="btn btn-sm btn-primary rounded">
-                        <i class="uil uil-angle-right"></i>
+                    <a href="{{route('page', ['slug' => $firstSectionCtaPage->slug])}}" class="btn btn-primary rounded">
+                        <i class="uil uil-angle-right-b me-2"></i>
                         {{getLanguageKeyLocalTranslation('index_page_first_section_cta')}}
                     </a>
                 @endif
@@ -264,43 +264,6 @@
                 @if($secondSectionCtaPage)
                     <a href="{{route('page', ['slug' => $secondSectionCtaPage->slug])}}" class="btn btn-sm btn-primary rounded">
                         {{getLanguageKeyLocalTranslation('index_page_second_section_cta')}}
-                    </a>
-                @endif
-            </div>
-            <!--/column -->
-        </div>
-        <!--/.row -->
-    </div>
-    <!-- /.container -->
-</section>
-<!-- /section -->
-
-
-<section class="wrapper bg-light">
-    <div class="container py-12">
-        <div class="row align-items-center">
-            <div class="col-lg-6 position-relative">
-                <div class="shape shape-welcome bg-primary rellax d-md-block" data-rellax-speed="0"></div>
-                
-                <figure>
-                  <img class="shape-welcome-image ms-6" src="{{ URL::asset('assets/img/home-1-welcome.png')}}" alt="">
-                </figure>
-            </div>
-            <!--/column -->
-
-            <div class="col-lg-6 mt-12 mt-lg-0 text-center text-lg-start">
-                <h3 class="display-4 mb-2 text-gold">
-                    {{getLanguageKeyLocalTranslation('index_page_third_section_title')}}
-                </h3>
-                
-                <p class="mb-4">
-                    {{getLanguageKeyLocalTranslation('index_page_third_section_subtitle')}}
-                </p>
-
-                @if($thirdSectionCtaPage)
-                    <a href="{{route('page', ['slug' => $thirdSectionCtaPage->slug])}}" class="btn btn-sm btn-primary rounded">
-                        <i class="uil uil-angle-right"></i>
-                        {{getLanguageKeyLocalTranslation('index_page_third_section_cta')}}
                     </a>
                 @endif
             </div>
