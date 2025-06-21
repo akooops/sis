@@ -244,7 +244,7 @@
                                     </button>
 
                                     <h2 class="mb-0">@{{ selectedService.name }}</h2>
-                                    <small class="text-muted">
+                                    <class="text-muted">
                                         {{getLanguageKeyLocalTranslation('visit_pages_visitors_count')}}: @{{ selectedService.visitorCount }}
                                     </small>
                                 </div>
@@ -293,7 +293,7 @@
                                     </button>
 
                                     <h2 class="mb-0">@{{ selectedService.name }}</h2>
-                                    <small class="text-muted">
+                                    <class="text-muted">
                                         {{getLanguageKeyLocalTranslation('visit_pages_visitors_count')}}: @{{ selectedService.visitorCount }}
                                     </small>
                                 </div>
@@ -318,7 +318,7 @@
                                                         :class="{ 'is-invalid': errors.guardian_name }"
                                                         placeholder="{{getLanguageKeyLocalTranslation('visits_page_name_input')}}">   
                                                 </div>
-                                                <div v-if="errors.guardian_name" class="text-danger small mb-3">@{{ errors.guardian_name }}</div>
+                                                <div v-if="errors.guardian_name" class="text-danger mb-3">@{{ errors.guardian_name }}</div>
                                                 <div v-else class="mb-3"></div>
 
                                                 <!-- Email -->
@@ -333,7 +333,7 @@
                                                         :class="{ 'is-invalid': errors.email }"
                                                         placeholder="{{getLanguageKeyLocalTranslation('visits_page_email_input')}}">   
                                                 </div>
-                                                <div v-if="errors.email" class="text-danger small mb-3">@{{ errors.email }}</div>
+                                                <div v-if="errors.email" class="text-danger mb-3">@{{ errors.email }}</div>
                                                 <div v-else class="mb-3"></div>
 
                                                 <!-- Phone -->
@@ -345,7 +345,7 @@
                                                         :class="{ 'is-invalid': errors.phone }"
                                                         placeholder="{{getLanguageKeyLocalTranslation('visits_page_phone_input')}}">                                 
                                                 </div>
-                                                <div v-if="errors.phone" class="text-danger small mb-3">@{{ errors.phone }}</div>
+                                                <div v-if="errors.phone" class="text-danger mb-3">@{{ errors.phone }}</div>
                                                 <div v-else class="mb-3"></div>
 
                                                 <!-- Student Name -->
@@ -360,7 +360,7 @@
                                                         :class="{ 'is-invalid': errors.student_name }"
                                                         placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_name_input')}}">   
                                                 </div>
-                                                <div v-if="errors.student_name" class="text-danger small mb-3">@{{ errors.student_name }}</div>
+                                                <div v-if="errors.student_name" class="text-danger mb-3">@{{ errors.student_name }}</div>
                                                 <div v-else class="mb-3"></div>
 
                                                 <!-- Student Grade -->
@@ -375,7 +375,7 @@
                                                         :class="{ 'is-invalid': errors.student_grade }"
                                                         placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_grade_input')}}">   
                                                 </div>
-                                                <div v-if="errors.student_grade" class="text-danger small mb-3">@{{ errors.student_grade }}</div>
+                                                <div v-if="errors.student_grade" class="text-danger mb-3">@{{ errors.student_grade }}</div>
                                                 <div v-else class="mb-3"></div>
 
                                                 <!-- Student School -->
@@ -390,7 +390,7 @@
                                                         :class="{ 'is-invalid': errors.student_school }"
                                                         placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_school_input')}}">   
                                                 </div>
-                                                <div v-if="errors.student_school" class="text-danger small mb-3">@{{ errors.student_school }}</div>
+                                                <div v-if="errors.student_school" class="text-danger mb-3">@{{ errors.student_school }}</div>
                                                 <div v-else class="mb-3"></div>
                                             </div>
 

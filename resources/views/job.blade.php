@@ -565,13 +565,13 @@
                                     <h5 class="mt-4">{{getLanguageKeyLocalTranslation('job_education')}}</h5>
                                     <div v-for="education in applicationForm.education" class="mb-2">
                                         <strong>@{{ education.degree }}</strong> - @{{ education.institution }}
-                                        <br><small class="text-muted">@{{ education.start_year }} - @{{ education.end_year || 'Present' }}</small>
+                                        <br><class="text-muted">@{{ education.start_year }} - @{{ education.end_year || 'Present' }}</small>
                                     </div>
                                     
                                     <h5 class="mt-4">{{getLanguageKeyLocalTranslation('job_work_experience')}}</h5>
                                     <div v-for="experience in applicationForm.experience" class="mb-2">
                                         <strong>@{{ experience.job_title }}</strong> - @{{ experience.company_name }}
-                                        <br><small class="text-muted">@{{ experience.start_year }} - @{{ experience.end_year || 'Present' }}</small>
+                                        <br><class="text-muted">@{{ experience.start_year }} - @{{ experience.end_year || 'Present' }}</small>
                                     </div>
                                 </div>
                                 <div class="col-md-6">

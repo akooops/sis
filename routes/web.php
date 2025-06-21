@@ -308,8 +308,6 @@ Route::middleware(['set.locale'])->group(function () {
 
     Route::post('/job-applications/validate', [ControllersJobApplicationsController::class, 'validateApplication'])->name('job-applications.validate');
     Route::post('/job-postings/{jobPosting}/job-applications', [ControllersJobApplicationsController::class, 'storeApplication'])->name('job-applications.store');
-
-    Route::post('contact', [ControllersContactSubmissionsController::class, 'storeContactSubmission'])->name('job-applications.store');
 });
 
 Route::get('language/{locale}', function ($locale) {
