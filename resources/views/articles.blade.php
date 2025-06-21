@@ -92,7 +92,7 @@
 
 <section class="wrapper">
     <div class="container pt-6 pb-12 articles-container" data-aos="fade-up" data-aos-duration="1000">
-        <div class="row gx-lg-8 gx-xl-12">
+        <div class="row">
             <div class="col-lg-8">
                 <div class="row gy-4 mb-8">
                     @foreach ($articles as $article)

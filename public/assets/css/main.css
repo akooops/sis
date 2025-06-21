@@ -940,11 +940,15 @@ footer .copyright p{
     object-fit: cover;
 }
 
-.articles-container h2 a{
+.articles-container h2{
     font-size: 22px;
     line-height: 35px;
     text-transform: uppercase;
     font-weight: 900;
+    color: var(--bs-primary);
+}
+
+.articles-container h2 a{
     color: var(--bs-primary);
 }
 

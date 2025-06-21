@@ -5,24 +5,49 @@
 @section('css')
 @endsection
 @section('content')
-<section class="wrapper bg-dark page-main-section" style="background-image: url('{{ $page->thumbnailUrl  }}'); background-size: cover">
-    <div class="container page-main-container">
-        <div class="row h-100">
-            <div class="col-md-10 offset-md-1 col-lg-7 offset-lg-0 col-xl-6 col-xxl-5 text-center text-lg-start justify-content-center align-self-center align-items-start">
-                <h1 class="display-1 fs-48 mt-12 text-white animate__animated animate__slideInDown animate__delay-1s">
-                    {{$page->getLocalTranslation('title')}}
-                </h1>
+<section class="wrapper banners-section">
+    <div class="swiper-container" 
+        data-margin="0" 
+        data-autoplay="true" 
+        data-autoplaytime="7000" 
+        data-nav="true" 
+        data-dots="true" 
+        data-items="1">
+        
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide bg-overlay">
+                    <div class="banner-img" style="background-image: url('{{ $page->thumbnailUrl }}')"></div>
 
+                    <div class="container h-100">
+                        <div class="row h-100 align-items-end px-8 px-lg-0 pb-16">           
+                            <div class="row px-0 px-lg-4">
+                                <div class="col-12 col-lg-8 px-0">
+                                    <h1 class="mb-0 animate__animated animate__slideInDown animate__delay-1s">
+                                        {{$page->getLocalTranslation('title')}}
+                                    </h1>
+                                </div>
+                                <!--/.col -->
+                            </div>     
+                            <!--/.row -->      
+                        </div>
+                        <!--/.row -->
+                    </div>
+                    <!--/.container -->
+                </div>
+                <!--/.swiper-slide -->            
             </div>
-            <!--/column -->
+            <!--/.swiper-wrapper -->
         </div>
-        <!--/.row -->
+        <!-- /.swiper -->
     </div>
-    <!--/.container -->
+    <!-- /.swiper-container -->
 </section>
+<!-- /section -->
+
 
 @if($page->menu)
-<section class="wrapper bg-light-primary">
+<section class="wrapper page-menu-section">
     <div class="container py-8 d-flex justify-content-center">
         <ul class="nav justify-content-center">
             @foreach ($page->menu->items as $menuItem)
@@ -34,7 +59,7 @@
                 @endphp
 
                 <li class="nav-item text-nowrap">
-                    <a class="nav-link py-2 text-uppercase fs-14 text-center fw-semibold {{ $currentUrl === $menuUrl ? 'active' : '' }}"
+                    <a class="nav-link py-2 {{ $currentUrl === $menuUrl ? 'active' : '' }}"
                     href="{{ $menuUrl }}">
                         {{$menuItem->getLocalTranslation('title')}}
                     </a>
@@ -45,7 +70,7 @@
 </section>
 @endif
 
-<section class="wrapper bg-light">
+<section class="wrapper">
    <div class="container py-3 py-md-5">
       <nav class="d-inline-block" aria-label="breadcrumb">
          <ol class="breadcrumb mb-0">
@@ -64,19 +89,16 @@
    <!-- /.container -->
 </section>
 
-<section class="wrapper bg-light">
-    <div class="container pt-6 pb-12">
+<section class="wrapper">
+    <div class="container pt-6 pb-12 albums-container" data-aos="fade-up" data-aos-duration="1000">
         <div class="row">
             @foreach ($albums as $album)   
                 <div class="col-12 col-sm-6 col-md-4 pb-4">
                     <div class="card shadow-lg">
-                        <figure class="album-figure card-img-top overlay overlay-1">
+                        <figure class="hover-scale">
                             <a href="{{route('album', ['slug' => $album->slug])}}"> 
                                 <img src="{{$album->thumbnailUrl}}" alt="" />
                             </a>
-                            <figcaption>
-                                <h5 class="from-top mb-0"></h5>
-                            </figcaption>
                         </figure>
                     </div>
                     <!-- /.card -->

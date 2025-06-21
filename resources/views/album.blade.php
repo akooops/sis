@@ -6,23 +6,47 @@
 @section('css')
 @endsection
 @section('content')
-<section class="wrapper bg-dark page-main-section" style="background-image: url('{{ $album->thumbnailUrl  }}'); background-size: cover">
-    <div class="container page-main-container">
-        <div class="row h-100">
-            <div class="col-md-10 offset-md-1 col-lg-7 offset-lg-0 col-xl-6 col-xxl-5 text-center text-lg-start justify-content-center align-self-center align-items-start">
-                <h1 class="display-1 fs-48 mt-12 text-white animate__animated animate__slideInDown animate__delay-1s">
-                    {{$album->getLocalTranslation('title')}}
-                </h1>
+<section class="wrapper banners-section">
+    <div class="swiper-container" 
+        data-margin="0" 
+        data-autoplay="true" 
+        data-autoplaytime="7000" 
+        data-nav="true" 
+        data-dots="true" 
+        data-items="1">
+        
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide bg-overlay">
+                    <div class="banner-img" style="background-image: url('{{ $album->thumbnailUrl }}')"></div>
 
+                    <div class="container h-100">
+                        <div class="row h-100 align-items-end px-8 px-lg-0 pb-16">           
+                            <div class="row px-0 px-lg-4">
+                                <div class="col-12 col-lg-8 px-0">
+                                    <h1 class="mb-0 animate__animated animate__slideInDown animate__delay-1s">
+                                        {{$album->getLocalTranslation('title')}}
+                                    </h1>
+                                </div>
+                                <!--/.col -->
+                            </div>     
+                            <!--/.row -->      
+                        </div>
+                        <!--/.row -->
+                    </div>
+                    <!--/.container -->
+                </div>
+                <!--/.swiper-slide -->            
             </div>
-            <!--/column -->
+            <!--/.swiper-wrapper -->
         </div>
-        <!--/.row -->
+        <!-- /.swiper -->
     </div>
-    <!--/.container -->
+    <!-- /.swiper-container -->
 </section>
+<!-- /section -->
 
-<section class="wrapper bg-light">
+<section class="wrapper">
    <div class="container py-3 py-md-5">
       <nav class="d-inline-block" aria-label="breadcrumb">
          <ol class="breadcrumb mb-0">
@@ -41,22 +65,21 @@
    <!-- /.container -->
 </section>
 
-<section class="wrapper bg-light">
-    <div class="container pt-6 pb-12">
+<section class="wrapper">
+    <div class="container pt-6 pb-12 page-content-section">
         <div class="row">
-            <h2 class="display-5 mb-3">
+            <h2 data-aos="fade-up" data-aos-duration="1000">
                 {{$album->getLocalTranslation('title')}}
             </h2>
 
-            <p class="lead fs-md">
+            <p data-aos="fade-up" data-aos-duration="1500">
                 {{$album->getLocalTranslation('description')}}
             </p>
 
-            <hr class="mt-2 mb-4">
+            <hr class="mt-2 mb-4" data-aos="fade-up" data-aos-duration="1500">
         </div>
 
-        <div class="row mt-5 gx-md-6 gy-6">
-
+        <div class="row mt-5 gx-md-6 gy-6" data-aos="fade-up" data-aos-duration="2000">
             @foreach ($album->files as $file)
                 <div class="item col-12 col-sm-6 col-md-4">
                     <figure class="hover-scale rounded cursor-dark">
