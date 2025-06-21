@@ -5,24 +5,49 @@
 @section('css')
 @endsection
 @section('content')
-<section class="wrapper bg-dark page-main-section" style="background-image: url('{{ $page->thumbnailUrl  }}'); background-size: cover">
-    <div class="container page-main-container">
-        <div class="row h-100">
-            <div class="col-md-10 offset-md-1 col-lg-7 offset-lg-0 col-xl-6 col-xxl-5 text-center text-lg-start justify-content-center align-self-center align-items-start">
-                <h1 class="display-1 fs-48 mt-12 text-white animate__animated animate__slideInDown animate__delay-1s">
-                    {{$page->getLocalTranslation('title')}}
-                </h1>
+<section class="wrapper banners-section">
+    <div class="swiper-container" 
+        data-margin="0" 
+        data-autoplay="true" 
+        data-autoplaytime="7000" 
+        data-nav="true" 
+        data-dots="true" 
+        data-items="1">
+        
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide bg-overlay">
+                    <div class="banner-img" style="background-image: url('{{ $page->thumbnailUrl }}')"></div>
 
+                    <div class="container h-100">
+                        <div class="row h-100 align-items-end px-8 px-lg-0 pb-16">           
+                            <div class="row px-0 px-lg-4">
+                                <div class="col-12 col-lg-8 px-0">
+                                    <h1 class="mb-0 animate__animated animate__slideInDown animate__delay-1s">
+                                        {{$page->getLocalTranslation('title')}}
+                                    </h1>
+                                </div>
+                                <!--/.col -->
+                            </div>     
+                            <!--/.row -->      
+                        </div>
+                        <!--/.row -->
+                    </div>
+                    <!--/.container -->
+                </div>
+                <!--/.swiper-slide -->            
             </div>
-            <!--/column -->
+            <!--/.swiper-wrapper -->
         </div>
-        <!--/.row -->
+        <!-- /.swiper -->
     </div>
-    <!--/.container -->
+    <!-- /.swiper-container -->
 </section>
+<!-- /section -->
+
 
 @if($page->menu)
-<section class="wrapper bg-light-primary">
+<section class="wrapper page-menu-section">
     <div class="container py-8 d-flex justify-content-center">
         <ul class="nav justify-content-center">
             @foreach ($page->menu->items as $menuItem)
@@ -34,7 +59,7 @@
                 @endphp
 
                 <li class="nav-item text-nowrap">
-                    <a class="nav-link py-2 text-uppercase fs-14 text-center fw-semibold {{ $currentUrl === $menuUrl ? 'active' : '' }}"
+                    <a class="nav-link py-2 {{ $currentUrl === $menuUrl ? 'active' : '' }}"
                     href="{{ $menuUrl }}">
                         {{$menuItem->getLocalTranslation('title')}}
                     </a>
@@ -45,7 +70,7 @@
 </section>
 @endif
 
-<section class="wrapper bg-light">
+<section class="wrapper">
    <div class="container py-3 py-md-5">
       <nav class="d-inline-block" aria-label="breadcrumb">
          <ol class="breadcrumb mb-0">
@@ -65,56 +90,50 @@
 </section>
 
 
-<section class="wrapper bg-light">
-    <div class="container pt-6 pb-12">
+<section class="wrapper">
+    <div class="container pt-6 pb-12 articles-container" data-aos="fade-up" data-aos-duration="1000">
         <div class="row gx-lg-8 gx-xl-12">
             <div class="col-lg-8">
-                <div class="blog grid grid-view">
-                    <div class="row isotope gx-md-8 gy-8 mb-8">
-                        @foreach ($articles as $article)
-                            <article class="item post col-md-6">
-                                <div class="card">
-                                    <figure class="article-figure card-img-top overlay overlay-1 hover-scale">
+                <div class="row gy-4 mb-8">
+                    @foreach ($articles as $article)
+                        <div class="col-md-6">
+                            <div class="card">
+                                <figure class="hover-scale">
+                                    <a href="{{route('article', ['slug' => $article->slug])}}">
+                                        <img src="{{$article->thumbnailUrl}}" alt="" />
+                                    </a>
+                                </figure>
+
+                                <div class="card-body">
+                                    <h2>
                                         <a href="{{route('article', ['slug' => $article->slug])}}">
-                                            <img src="{{$article->thumbnailUrl}}" alt="" />
+                                            {{$article->getLocalTranslation('title')}}
                                         </a>
-                                        <figcaption>
-                                            <h5 class="from-top mb-0"></h5>
-                                        </figcaption>
-                                    </figure>
-                                    <div class="card-body">
-                                        <div class="post-header">
-                                            <h2 class="post-title h3 mt-1 mb-3">
-                                                <a class="link-dark" href="{{route('article', ['slug' => $article->slug])}}">
-                                                    {{$article->getLocalTranslation('title')}}
-                                                </a>
-                                            </h2>
-                                        </div>
-                                        <!-- /.post-header -->
-                                        <div class="post-content">
-                                            <p class="truncate-3-lines">{{$article->getLocalTranslation('description')}}</p>
-                                        </div>
-                                        <!-- /.post-content -->
-                                    </div>
-                                    <!--/.card-body -->
-                                    <div class="card-footer">
-                                        <ul class="post-meta d-flex mb-0">
-                                            <li class="post-date">
-                                                <i class="uil uil-calendar-alt"></i>
-                                                <span>{{$article->created_at->format('Y-m-d')}}</span>
-                                            </li>
-                                        </ul>
-                                        <!-- /.post-meta -->
-                                    </div>
-                                    <!-- /.card-footer -->
+                                    </h2>
+
+                                    <p class="truncate-3-lines mb-0">
+                                        {{$article->getLocalTranslation('description')}}
+                                    </p>
                                 </div>
-                                <!-- /.card -->
-                            </article>
-                            <!-- /.post -->
-                        @endforeach
-                    </div>
-                    <!-- /.row -->
+                                <!--/.card-body -->
+                                
+                                <div class="card-footer">
+                                    <ul class="post-meta d-flex mb-0">
+                                        <li class="post-date">
+                                            <i class="uil uil-calendar-alt"></i>
+                                            <span>{{$article->created_at->format('Y-m-d')}}</span>
+                                        </li>
+                                    </ul>
+                                    <!-- /.post-meta -->
+                                </div>
+                                <!-- /.card-footer -->
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                        <!-- /.post -->
+                    @endforeach
                 </div>
+                <!-- /.row -->
                                 
                 <nav class="d-flex" aria-label="pagination">
                     <ul class="pagination">
@@ -147,12 +166,9 @@
             <aside class="col-lg-4 sidebar">
                 <div class="widget">
                     <form class="search-form">
-                        <div class="form-floating mb-0">
+                        <div class="mb-0">
                             <form action="{{route('articles')}}">
-                                <input name="search" value="{{request()->get('search')}}" id="search-form" type="text" class="form-control" placeholder="Search">
-                                <label for="search-form">
-                                    {{getLanguageKeyLocalTranslation('sidebar_search_form_placeholder')}}
-                                </label>
+                                <input name="search" value="{{request()->get('search')}}" id="search-form" type="text" class="form-control">
                             </form>  
                         </div>
                     </form>
@@ -160,18 +176,20 @@
                 </div>
                 <!-- /.widget -->
 
-                <div class="widget">
+                <div class="widget popular-articles-container ">
                     <h4 class="widget-title mb-3">
                         {{getLanguageKeyLocalTranslation('sidebar_popular_article_title')}}
                     </h4>
+                    
                     <ul class="image-list">
                         @foreach ($popularArticles as $popularArticle)
                             <li>
-                                <figure class="popular-article-figure rounded">
+                                <figure>
                                     <a href="{{route('article', ['slug' => $popularArticle->slug])}}">
-                                        <img src="{{$popularArticle->thumbnailUrl}}" alt="" />
+                                        <img src="{{$popularArticle->thumbnailUrl}}" alt="{{$popularArticle->getLocalTranslation('title')}}" />
                                     </a>
                                 </figure>
+
                                 <div class="post-content">
                                     <h6 class="mb-2"> 
                                         <a class="link-dark" href="{{route('article', ['slug' => $popularArticle->slug])}}">

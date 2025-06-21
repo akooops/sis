@@ -931,22 +931,55 @@ footer .copyright p{
     overflow: hidden;
 }
 
+.articles-container figure{
+    height: 350px;
+}
+
+.articles-container img{
+    height: 100% !important;
+    object-fit: cover;
+}
+
+.articles-container h2 a{
+    font-size: 22px;
+    line-height: 35px;
+    text-transform: uppercase;
+    font-weight: 900;
+    color: var(--bs-primary);
+}
+
+.articles-container h2 a:hover{
+    color: var(--bs-secondary);
+}
+
+.sidebar .widget-title{
+    font-size: 22px;
+    line-height: 35px;
+    text-transform: uppercase;
+    font-weight: 900;
+    color: var(--bs-primary);
+}
+
+.sidebar .widget-title{
+    font-size: 22px;
+    line-height: 35px;
+    text-transform: uppercase;
+    font-weight: 900;
+    color: var(--bs-primary);
+}
+
+.popular-articles-container figure{
+    height: 85px;
+}
+
+.popular-articles-container img{
+    height: 100% !important;
+    object-fit: cover;
+}
+
 /*---------------------------------------*/
 .active{
     color: #2A5D91;
-}
-
-.popular-article-figure{
-    height: 70px !important;
-}
-
-.popular-article-figure a{
-    height: 100% !important;
-}
-
-.popular-article-figure a img{
-    height: 100% !important;
-    object-fit: cover;
 }
 
 .album-figure{

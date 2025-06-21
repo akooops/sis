@@ -664,10 +664,6 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Popular articles',
                 'ar' => 'أشهر المقالات'
             ],
-            'sidebar_search_form_placeholder' => [
-                'en' => 'Search...',
-                'ar' => 'قم بالبحث'
-            ],
             'visit_page_step_1' => [
                 'en' => 'Service',
                 'ar' => 'الخدمة'
