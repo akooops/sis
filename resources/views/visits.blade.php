@@ -244,7 +244,7 @@
                                     </button>
 
                                     <h2 class="mb-0">@{{ selectedService.name }}</h2>
-                                    <class="text-muted">
+                                    <small class="text-muted">
                                         {{getLanguageKeyLocalTranslation('visit_pages_visitors_count')}}: @{{ selectedService.visitorCount }}
                                     </small>
                                 </div>
@@ -293,7 +293,7 @@
                                     </button>
 
                                     <h2 class="mb-0">@{{ selectedService.name }}</h2>
-                                    <class="text-muted">
+                                    <small class="text-muted">
                                         {{getLanguageKeyLocalTranslation('visit_pages_visitors_count')}}: @{{ selectedService.visitorCount }}
                                     </small>
                                 </div>
