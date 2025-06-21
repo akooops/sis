@@ -202,6 +202,8 @@ class PagesController extends Controller
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Page', $page->id, true);
         }
     
+        cache()->forget("page-{$page->id}");
+
         return redirect()->route('admin.pages.index')
                         ->with('success','Page updated successfully');
     }
@@ -228,6 +230,8 @@ class PagesController extends Controller
     public function destroy(Page $page, DeletePageRequest $request)
     {
         $page->delete();
+
+        cache()->forget("page-{$page->id}");
 
         return redirect()->route('admin.pages.index')
                         ->with('success','Page deleted successfully');

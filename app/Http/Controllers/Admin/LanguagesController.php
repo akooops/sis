@@ -69,6 +69,8 @@ class LanguagesController extends Controller
 
         $language = Language::create($request->validated());
     
+        cache()->forget("all-languages");
+
         return redirect()->route('admin.languages.index')
                         ->with('success','Language created successfully');
     }
@@ -113,7 +115,9 @@ class LanguagesController extends Controller
         }
 
         $language->update($request->validated());
-    
+        
+        cache()->forget("all-languages");
+
         return redirect()->route('admin.languages.index')
                         ->with('success','Language updated successfully');
     }
@@ -127,6 +131,8 @@ class LanguagesController extends Controller
     public function destroy(Language $language, DeleteLanguageRequest $request)
     {
         $language->delete();
+
+        cache()->forget("all-languages");
 
         return redirect()->route('admin.languages.index')
                         ->with('success','Language deleted successfully');

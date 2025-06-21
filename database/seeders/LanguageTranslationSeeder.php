@@ -93,28 +93,20 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => '© 2025 مدارس سعود العالمية. جميع الحقوق محفوظة.'
             ],
             'footer_first_menu_title' => [
-                'en' => 'Need help?',
-                'ar' => 'تحتاج مساعدة؟'
+                'en' => 'Quick links',
+                'ar' => 'روابط سريعة'
             ],
             'footer_get_in_touch_title' => [
                 'en' => 'Get in touch',
                 'ar' => 'تواصل معنا'
             ],
-            'footer_main_subtitle' => [
-                'en' => 'The mission of Saud International School is to provide a challenging educational environment that meets the needs of the diverse community by offering a worldwide known curriculum implemented with state of the art technology along with extra-curricular activities.',
-                'ar' => 'تتمثل رؤية مدرسة سعود العالمية في خلق بيئة داعمة تمكننا من تزويد طلابنا بالمهارات والقدرات التي ستتيح لهم التطور فكريا وجسديا واجتماعيا وعاطفيا وأخلاقيا وعندها يصبحون متعلمين ناجحين ومنتجين.'
-            ],
-            'footer_main_title' => [
-                'en' => 'Welcome to our schools',
-                'ar' => 'مرحباً بكم في مدارسنا'
-            ],
-            'footer_second_menu_title' => [
-                'en' => 'Learn more',
-                'ar' => 'اعرف المزيد'
+            'footer_nav_menu_title' => [
+                'en' => 'Follow Us',
+                'ar' => 'تابعنا'
             ],
             'get_in_touch_address' => [
-                'en' => 'Saud International School Hamdan Street, Sulaimaniyah, Riyadh Kingdom of Saudi Arabia',
-                'ar' => 'Saud International School Hamdan Street, Sulaimaniyah, Riyadh Kingdom of Saudi Arabia'
+                'en' => 'Hamdan Street, Sulaimaniyah, Riyadh Kingdom of Saudi Arabia',
+                'ar' => 'Hamdan Street, Sulaimaniyah, Riyadh Kingdom of Saudi Arabia'
             ],
             'get_in_touch_email' => [
                 'en' => 'enquiries@sis.edu.sa',
@@ -144,13 +136,9 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'View more albums',
                 'ar' => 'عرض المزيد من الألبومات'
             ],
-            'index_page_fifth_section_subtitle' => [
-                'en' => 'Latest albums',
-                'ar' => 'أحدث الألبومات'
-            ],
             'index_page_fifth_section_title' => [
-                'en' => 'Saud international schools ',
-                'ar' => 'مدارس سعود العالمية'
+                'en' => 'Saud international schools Latest albums',
+                'ar' => 'أحدث ألبومات مدارس سعود العالمية'
             ],
             'index_page_first_number_title' => [
                 'en' => 'Schools',
@@ -184,13 +172,9 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'View more articles',
                 'ar' => 'عرض المزيد من المقالات'
             ],
-            'index_page_forth_section_subtitle' => [
-                'en' => 'Latest articles',
-                'ar' => 'أحدث المقالات'
-            ],
             'index_page_forth_section_title' => [
-                'en' => 'Saud international schools ',
-                'ar' => 'مدارس سعود العالمية'
+                'en' => 'Saud international schools latest events',
+                'ar' => 'أخر فعاليات مدارس سعود العالمية'
             ],
             'index_page_second_number_title' => [
                 'en' => 'Students',
@@ -204,13 +188,9 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Learn more',
                 'ar' => 'اعرف المزيد'
             ],
-            'index_page_second_section_subtitle' => [
-                'en' => 'The vision of Saud International School is to create a supportive environment enabling us to equip our students with skills and abilities which will allow them to develop intellectually, physically, socially, emotionally and morally as they become successful and productive lifelong learners in the 21st Century.',
-                'ar' => 'رؤية مدارس سعود العالمية هي خلق بيئة داعمة تمكننا من تزويد طلابنا بالمهارات والقدرات التي تسمح لهم بالتطور فكرياً وجسدياً واجتماعياً وعاطفياً وأخلاقياً ليصبحوا متعلمين مدى الحياة ناجحين ومنتجين في القرن الحادي والعشرين.'
-            ],
             'index_page_second_section_title' => [
-                'en' => 'Saud international schools In number',
-                'ar' => 'مدارس سعود العالمية بالأرقام'
+                'en' => 'Our school courses',
+                'ar' => 'دورات مدرستنا'
             ],
             'index_page_third_number_title' => [
                 'en' => 'Alumni',
@@ -225,12 +205,12 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => 'اعرف المزيد'
             ],
             'index_page_third_section_subtitle' => [
-                'en' => 'Message From The Head of School',
-                'ar' => 'رسالة من مدير المدرسة'
+                'en' => '',
+                'ar' => ''
             ],
             'index_page_third_section_title' => [
-                'en' => 'Message From The Head of School',
-                'ar' => 'رسالة من مدير المدرسة'
+                'en' => 'Saud international schools In number',
+                'ar' => 'مدارس سعود العالمية بالأرقام'
             ],
             'inquiry_page_birthdate_input' => [
                 'en' => 'Student Birthdate',

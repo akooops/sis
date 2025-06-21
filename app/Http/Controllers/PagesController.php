@@ -40,7 +40,7 @@ class PagesController extends Controller
         if(!$page) abort(404);
 
         $banners = Banner::orderBy('order')->get();
-        $programs = Program::latest()->get();
+        $programs = getPrograms();
         $events = Event::latest()->where('status', 'published')->limit(6)->get();
         $albums = Album::latest()->where('status', 'published')->limit(6)->get();
 

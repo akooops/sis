@@ -4,6 +4,7 @@ use App\Models\Language;
 use App\Models\LanguageKey;
 use App\Models\Menu;
 use App\Models\Page;
+use App\Models\Program;
 use App\Models\Setting;
 
 function getCurrentLanguage(){
@@ -17,16 +18,28 @@ function getCurrentLanguage(){
     return $language;
 }
 
-function getLanguages(){
-    return Language::orderBy('is_default', 'DESC')->get();
+function getLanguages() {
+    return cache()->remember('all-languages', 3600, function() {
+        return Language::orderBy('is_default', 'DESC')->get();
+    });
 }
 
-function getMenu($name){
-    return Menu::where('name', $name)->first();
+function getPrograms() {
+    return cache()->remember('all-programs', 3600, function() {
+        return Program::latest()->get();
+    });
 }
 
-function getPage($id){
-    return Page::find($id);
+function getMenu($name) {
+    return cache()->remember("menu-{$name}", 3600, function() use ($name) {
+        return Menu::where('name', $name)->first();
+    });
+}
+
+function getPage($id) {
+    return cache()->remember("page-{$id}", 3600, function() use ($id) {
+        return Page::find($id);
+    });
 }
 
 function getSetting($key) {

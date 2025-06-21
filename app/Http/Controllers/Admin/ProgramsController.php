@@ -118,6 +118,8 @@ class ProgramsController extends Controller
     
         $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Program', $program->id, true);
 
+        cache()->forget("all-programs");
+
         return redirect()->route('admin.programs.index')
                         ->with('success','Program created successfully');
     }
@@ -196,6 +198,8 @@ class ProgramsController extends Controller
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Program', $program->id, true);
         }
 
+        cache()->forget("all-programs");
+
         return redirect()->route('admin.programs.index')
                         ->with('success','Program updated successfully');
     }
@@ -223,6 +227,8 @@ class ProgramsController extends Controller
     {
         $program->delete();
 
+        cache()->forget("all-programs");
+        
         return redirect()->route('admin.programs.index')
                         ->with('success','Program deleted successfully');
     }

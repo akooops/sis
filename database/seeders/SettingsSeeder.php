@@ -97,15 +97,6 @@ class SettingsSeeder extends Seeder
                 'options' => null,
             ],
             [
-                'key' => 'index_page_second_section_cta_page',
-                'type' => 'page',
-                'value' => '',
-                'description' => 'Page linked to second section CTA button',
-                'group' => 'homepage',
-                'is_encrypted' => false,
-                'options' => null,
-            ],
-            [
                 'key' => 'index_page_third_section_cta_page',
                 'type' => 'page',
                 'value' => '',

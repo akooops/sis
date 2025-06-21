@@ -97,6 +97,8 @@ class MenusController extends Controller
     {
         $menu->update($request->validated());
     
+        cache()->forget("menu-{$menu->name}");
+
         return redirect()->route('admin.menus.index')
                         ->with('success','Menu updated successfully');
     }
@@ -110,6 +112,8 @@ class MenusController extends Controller
     public function destroy(Menu $menu, DeleteMenuRequest $request)
     {
         $menu->delete();
+
+        cache()->forget("menu-{$menu->name}");
 
         return redirect()->route('admin.menus.index')
                         ->with('success','Menu deleted successfully');

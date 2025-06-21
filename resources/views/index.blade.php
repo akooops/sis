@@ -4,11 +4,6 @@
 
     if($firstSectionCtaPageSetting) $firstSectionCtaPage = getPage($firstSectionCtaPageSetting->value);
 
-    $secondSectionCtaPageSetting = getSetting('index_page_second_section_cta_page');
-    $secondSectionCtaPage = null;
-
-    if($secondSectionCtaPageSetting) $secondSectionCtaPage = getPage($secondSectionCtaPageSetting->value);
-
     $thirdSectionCtaPageSetting = getSetting('index_page_third_section_cta_page');
     $thirdSectionCtaPage = null;
 
@@ -170,14 +165,14 @@
                             <div class="row h-100 align-items-end pb-8 pb-lg-12">           
                                 <div class="col-12 px-8">
                                     <p class="px-0">
-                                            {{$program->getLocalTranslation('title')}}
+                                        {{$program->getLocalTranslation('title')}}
                                     </p>
 
                                     <h3 class="px-0">
                                         {{$program->getLocalTranslation('subtitle')}}
                                     </h3>
 
-                                    <a href="{{$banner->page ? route('page', ['slug' => $banner->page->slug]) : $banner->url}}" 
+                                    <a href="{{route('program', ['slug' => $program->slug])}}" 
                                         class="btn py-1">
                                         <i class="uil uil-angle-right-b me-2"></i>
 
@@ -323,8 +318,8 @@
 </section>
 <!-- /section -->
 
-<section class="wrapper events-section">
-    <div class="container pb-8">
+<section class="wrapper events-section mb-8">
+    <div class="container pb-12">
         <div class="row text-center mb-6">
             <h2 class="text-primary" data-aos="fade-up" data-aos-duration="1000">
                 {{getLanguageKeyLocalTranslation('index_page_forth_section_title')}}
@@ -334,6 +329,8 @@
         <div class="swiper-container px-8" 
             data-margin="10" 
             data-dots="false" 
+            data-autoplay="true" 
+            data-autoplaytime="7000" 
             data-items-xl="3" 
             data-items-md="2" 
             data-items-xs="1"
@@ -368,8 +365,9 @@
         </div>
         <!-- /.swiper-container -->
 
-        <div class="d-flex justify-content-center">
-              <a href="{{route('articles')}}" class="btn btn-sm btn-primary rounded text-center">
+        <div class="d-flex justify-content-center justify-content-lg-end px-0 px-lg-8">
+              <a href="{{route('articles')}}" class="btn btn-primary rounded text-center">
+                    <i class="uil uil-angle-right-b me-2"></i>
                     {{getLanguageKeyLocalTranslation('index_page_forth_section_cta')}}
               </a>
         </div>
@@ -378,51 +376,51 @@
 </section>
 <!-- /section -->
 
-<section class="wrapper bg-light">
+<section class="wrapper albums-section">
     <div class="overflow-hidden">
-        <div class="container py-12">
-            <div class="row">
-                <div class="col-xl-7 col-xxl-6 mx-auto text-center">
-                    <h3 class="display-5 mb-4 text-center text-gold">
-                        {{getLanguageKeyLocalTranslation('index_page_fifth_section_title')}}
-                        <br>
-                        {{getLanguageKeyLocalTranslation('index_page_fifth_section_subtitle')}}
-                    </h3>
-                </div>
-                <!--/column -->
+        <div class="container py-18">
+            <div class="row text-center mb-6">
+                <h2 class="text-primary" data-aos="fade-up" data-aos-duration="1000">
+                    {{getLanguageKeyLocalTranslation('index_page_fifth_section_title')}}
+                </h2>
             </div>
-            <!--/.row -->
 
-            <div class="swiper-container nav-bottom nav-color mb-14" data-margin="30" data-dots="false" data-nav="true" data-items-lg="3" data-items-md="2" data-items-xs="1">
-                <div class="swiper overflow-visible pb-2">
+            <div class="swiper-container mb-8" 
+                data-margin="30" 
+                data-autoplay="true" 
+                data-autoplaytime="2000" 
+                data-dots="false" 
+                data-nav="false" 
+                data-items-lg="4"
+                data-items-md="3" 
+                data-items-xs="2"
+                data-aos="fade-up" 
+                data-aos-duration="2000">
+
+                <div class="swiper overflow-visible">
                     <div class="swiper-wrapper">
                         @foreach ($albums as $album)   
                             <div class="swiper-slide">
-                                <div class="card shadow-lg">
-                                    <figure class="album-figure card-img-top overlay overlay-1">
-                                        <a href="{{route('album', ['slug' => $album->slug])}}"> 
-                                            <img src="{{$album->thumbnailUrl}}" alt="" />
-                                        </a>
-                                        <figcaption>
-                                            <h5 class="from-top mb-0"></h5>
-                                        </figcaption>
-                                    </figure>
-                                </div>
-                                <!-- /.card -->
+                                <figure class="hover-scale">
+                                    <img src="{{$album->thumbnailUrl}}" alt="{{$album->getLocalTranslation('title')}}" />
+                                    <a class="item-link" href="{{route('album', ['slug' => $album->slug])}}">
+                                        <i class="uil uil-link"></i>
+                                    </a>
+                                </figure>
                             </div>
-                            <!--/.swiper-slide -->
                         @endforeach
                     </div>
                     <!--/.swiper-wrapper -->
                 </div>
-                <!-- /.swiper -->
+                <!--/.swiper -->
             </div>
             <!-- /.swiper-container -->
 
-            <div class="d-flex justify-content-center mt-2">
-              <a href="{{route('albums')}}" class="btn btn-sm btn-primary rounded text-center">
+            <div class="d-flex justify-content-center px-0 px-lg-8">
+                <a href="{{route('albums')}}" class="btn btn-primary rounded text-center">
+                    <i class="uil uil-angle-right-b me-2"></i>
                     {{getLanguageKeyLocalTranslation('index_page_fifth_section_cta')}}
-              </a>
+                </a>
             </div>
         </div>
         <!-- /.container -->
