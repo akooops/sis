@@ -6,31 +6,52 @@
 @section('css')
 @endsection
 @section('content')
-<section class="wrapper bg-dark page-main-section" style="background-image: url('{{ $program->thumbnailUrl  }}'); background-size: cover">
-    <div class="container page-main-container">
-        <div class="row h-100">
-            <div class="col-md-10 offset-md-1 col-lg-7 offset-lg-0 col-xl-6 col-xxl-5 text-center text-lg-start justify-content-center align-self-center align-items-start">
-                <h1 class="display-1 fs-48 mt-12 text-white animate__animated animate__slideInDown animate__delay-1s">
-                    {{$program->getLocalTranslation('title')}}
-                </h1>
+<section class="wrapper banners-section">
+    <div class="swiper-container" 
+        data-margin="0" 
+        data-autoplay="true" 
+        data-autoplaytime="7000" 
+        data-nav="true" 
+        data-dots="true" 
+        data-items="1">
+        
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide bg-overlay">
+                    <div class="banner-img" style="background-image: url('{{ $program->thumbnailUrl }}')"></div>
 
-                <p class="lead fs-16 fw-semibold lh-sm mb-7 text-white animate__animated animate__slideInDown animate__delay-2s">                   
-                    {{$program->getLocalTranslation('subtitle')}}                                         
-                </p>
+                    <div class="container h-100">
+                        <div class="row h-100 align-items-end px-8 px-lg-0 pb-16">           
+                            <div class="row px-0 px-lg-4">
+                                <div class="col-12 col-lg-8 px-0">
+                                    <h1 class="mb-0 animate__animated animate__slideInDown animate__delay-1s">
+                                        {{$program->getLocalTranslation('title')}}
+                                    </h1>
+                                </div>
+                                <!--/.col -->
+                            </div>     
+                            <!--/.row -->      
+                        </div>
+                        <!--/.row -->
+                    </div>
+                    <!--/.container -->
+                </div>
+                <!--/.swiper-slide -->            
             </div>
-            <!--/column -->
+            <!--/.swiper-wrapper -->
         </div>
-        <!--/.row -->
+        <!-- /.swiper -->
     </div>
-    <!--/.container -->
+    <!-- /.swiper-container -->
 </section>
+<!-- /section -->
 
-<section class="wrapper bg-light-primary">
+<section class="wrapper page-menu-section">
     <div class="container py-8 d-flex justify-content-center">
         <ul class="nav justify-content-center">
             @foreach ($programs as $menuProgram)
                 <li class="nav-item text-nowrap">
-                    <a class="nav-link py-2 text-uppercase fs-14 text-center fw-semibold 
+                    <a class="nav-link py-2
                     {{ $program->id === $menuProgram->id ? 'active' : '' }}"
                     href="{{route('program', ['slug' => $menuProgram->slug])}}">
                         {{$menuProgram->getLocalTranslation('title')}}
@@ -41,7 +62,7 @@
     </div>
 </section>
 
-<section class="wrapper bg-light">
+<section class="wrapper">
    <div class="container py-3 py-md-5">
       <nav class="d-inline-block" aria-label="breadcrumb">
          <ol class="breadcrumb mb-0">
@@ -61,79 +82,80 @@
 </section>
 
 
-<section class="wrapper bg-light">
-<div class="container py-12 py-md-5">
-    
-    <div class="row">
-        <h2 class="display-5 mb-3">
-            {{$program->getLocalTranslation('title')}}
-        </h2>
+<section class="wrapper page-content-section">
+   <div class="container pt-6 pb-12">
+        <div class="row">
+            <h2 data-aos="fade-up" data-aos-duration="1000">
+                {{$program->getLocalTranslation('title')}}
+            </h2>
 
-        <p class="lead fs-md">
-            {{$program->getLocalTranslation('description')}}
-        </p>
+            <p data-aos="fade-up" data-aos-duration="1500">
+                {{$program->getLocalTranslation('description')}}
+            </p>
 
-        <hr class="mt-2 mb-4">
+            <hr class="mt-2 mb-4" data-aos="fade-up" data-aos-duration="1500">
 
-        <div class="w-100 page-content">
-            <x-markdown>
-                {{ $program->getLocalTranslation('content') }}
-            </x-markdown>
-        </div>
-    </div>
-
-    <div class="row pt-6">
-        <div id="accordion-3" class="accordion-wrapper">
-            <div class="card accordion-item">
-                <div class="card-header" id="accordion-heading-3-1">
-                    <button class="collapsed" data-bs-toggle="collapse" data-bs-target="#grades-collapse" aria-expanded="false" aria-controls="grades-collapse">
-                        {{getLanguageKeyLocalTranslation('program_page_collapse_title')}}
-                    </button>
-                </div>
-                <!-- /.card-header -->
-                <div id="grades-collapse" class="collapse show">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col" width="25px">#</th>
-                                        <th scope="col" width="90%">
-                                            {{getLanguageKeyLocalTranslation('program_page_table_header_grade')}}
-                                        </th>
-                                        <th scope="col">
-                                            {{getLanguageKeyLocalTranslation('program_page_table_header_option')}}
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($program->grades as $key => $grade)
-                                        <tr>
-                                            <th scope="row">
-                                                {{$key + 1}}
-                                            </th>
-                                            <td>
-                                                {{$grade->getLocalTranslation('title') }}
-                                            </td>
-                                            <td>
-                                                <a href="{{route('grade', ['slug' => $grade->slug])}}" class="btn btn-sm btn-primary rounded">
-                                                    {{getLanguageKeyLocalTranslation('program_page_table_cta')}}
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <!-- /.card-body -->
-                </div>
-                <!-- /.collapse -->
+            <div class="w-100" data-aos="fade-up" data-aos-duration="2000">
+                <x-markdown>
+                    {{ $program->getLocalTranslation('content') }}
+                </x-markdown>
             </div>
         </div>
+
+        <div class="row pt-6" data-aos="fade-up" data-aos-duration="2000">
+            <div class="accordion-wrapper">
+                <div class="card accordion-item">
+                    <div class="card-header">
+                        <button class="collapsed" data-bs-toggle="collapse" data-bs-target="#grades-collapse" aria-expanded="false" aria-controls="grades-collapse">
+                            {{getLanguageKeyLocalTranslation('program_page_collapse_title')}}
+                        </button>
+                    </div>
+                    <!-- /.card-header -->
+
+                    <div id="grades-collapse" class="collapse show">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" width="25px">#</th>
+                                            <th scope="col" width="90%">
+                                                {{getLanguageKeyLocalTranslation('program_page_table_header_grade')}}
+                                            </th>
+                                            <th scope="col">
+                                                {{getLanguageKeyLocalTranslation('program_page_table_header_option')}}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($program->grades as $key => $grade)
+                                            <tr>
+                                                <th scope="row">
+                                                    {{$key + 1}}
+                                                </th>
+                                                <td>
+                                                    {{$grade->getLocalTranslation('title') }}
+                                                </td>
+                                                <td>
+                                                    <a href="{{route('grade', ['slug' => $grade->slug])}}" class="btn btn-primary">
+                                                        <i class="uil uil-angle-right-b me-2"></i>
+                                                        {{getLanguageKeyLocalTranslation('program_page_table_cta')}}
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.collapse -->
+                </div>
+            </div>
+        </div>
+        <!-- /.container -->
     </div>
-    <!-- /.container -->
-</div>
 </section>
 
 @endsection
