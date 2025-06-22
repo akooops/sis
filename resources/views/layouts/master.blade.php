@@ -24,14 +24,6 @@
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ URL::asset('assets/img/favicon.png')}}">
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    @if($currentLanguage && $currentLanguage->is_rtl) 
-        <link href="https://fonts.googleapis.com/css2?family=Changa:wght@300;400;500;600;700&display=swap" rel="stylesheet">     
-    @endif
-
     @include('layouts.head-css')
 
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">

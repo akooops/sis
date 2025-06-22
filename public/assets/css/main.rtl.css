@@ -722,7 +722,7 @@ footer .copyright p{
     color: #6c757d;
     padding: 12px 20px;
     margin: 0;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -931,33 +931,52 @@ footer .copyright p{
     overflow: hidden;
 }
 
-/*---------------------------------------*/
-.active{
-    color: #2A5D91;
+.articles-container figure{
+    height: 350px;
 }
 
-.popular-article-figure{
-    height: 70px !important;
-}
-
-.popular-article-figure a{
-    height: 100% !important;
-}
-
-.popular-article-figure a img{
+.articles-container img{
     height: 100% !important;
     object-fit: cover;
 }
 
-.album-figure{
-    height: 250px;
+.articles-container h2{
+    font-size: 22px;
+    line-height: 35px;
+    text-transform: uppercase;
+    font-weight: 900;
+    color: var(--bs-primary);
 }
 
-.album-figure a{
-    height: 100% !important;
+.articles-container h2 a{
+    color: var(--bs-primary);
 }
 
-.album-figure a img{
+.articles-container h2 a:hover{
+    color: var(--bs-secondary);
+}
+
+.sidebar .widget-title{
+    font-size: 22px;
+    line-height: 35px;
+    text-transform: uppercase;
+    font-weight: 900;
+    color: var(--bs-primary);
+}
+
+.sidebar .widget-title{
+    font-size: 22px;
+    line-height: 35px;
+    text-transform: uppercase;
+    font-weight: 900;
+    color: var(--bs-primary);
+}
+
+.popular-articles-container figure{
+    height: 85px;
+}
+
+.popular-articles-container img{
     height: 100% !important;
     object-fit: cover;
 }
@@ -1004,6 +1023,84 @@ footer .copyright p{
 }
 .iti--inline-dropdown .iti__dropdown-content{
     z-index: 9999;
+}
+
+.active{
+    color: var(--bs-primary);
+}
+
+.jobs-container h2{
+    font-size: 22px;
+    line-height: 35px;
+    text-transform: uppercase;
+    font-weight: 900;
+    color: var(--bs-primary);
+}
+
+.jobs-container h2 a{
+    color: var(--bs-primary);
+}
+
+.jobs-container h2 a:hover{
+    color: var(--bs-secondary);
+}
+
+.jobs-container .repeatable-section {
+    border: 1px solid #e9ecef;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.jobs-container .remove-section {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.jobs-container .add-section-btn {
+    border: 2px dashed #2A5D91;
+    background: transparent;
+    color: #2A5D91;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.jobs-container .add-section-btn:hover {
+    background: rgba(13, 110, 253, 0.1);
+}
+
+.jobs-container .skills-container {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    min-height: 100px;
+}
+
+.jobs-container .skill-tag {
+    display: inline-block;
+    background: #2A5D91;
+    color: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: 1rem;
+    margin: 0.25rem;
+}
+
+.jobs-container .skill-tag .remove-skill {
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+
+.jobs-container .step-indicator .step {
+    padding: 12px 16px;
+    font-size: 12px;
 }
 
 @media (min-width: 768px) {
