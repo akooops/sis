@@ -6,47 +6,47 @@
 @section('css')
 @endsection
 @section('content')
-<section class="wrapper bg-dark page-main-section" style="background-image: url('{{ $event->thumbnailUrl  }}'); background-size: cover">
-    <div class="container page-main-container">
-        <div class="row h-100">
-            <div class="col-md-10 offset-md-1 col-lg-7 offset-lg-0 col-xl-6 col-xxl-5 text-center text-lg-start justify-content-center align-self-center align-items-start">
-                <h1 class="display-1 fs-48 mt-12 text-white animate__animated animate__slideInDown animate__delay-1s">
-                    {{$event->getLocalTranslation('title')}}
-                </h1>
+<section class="wrapper banners-section">
+    <div class="swiper-container" 
+        data-margin="0" 
+        data-autoplay="true" 
+        data-autoplaytime="7000" 
+        data-nav="true" 
+        data-dots="true" 
+        data-items="1">
+        
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide bg-overlay">
+                    <div class="banner-img" style="background-image: url('{{ $event->thumbnailUrl }}')"></div>
 
+                    <div class="container h-100">
+                        <div class="row h-100 align-items-end px-8 px-lg-0 pb-16">           
+                            <div class="row px-0 px-lg-4">
+                                <div class="col-12 col-lg-8 px-0">
+                                    <h1 class="mb-0 animate__animated animate__slideInDown animate__delay-1s">
+                                        {{$event->getLocalTranslation('title')}}
+                                    </h1>
+                                </div>
+                                <!--/.col -->
+                            </div>     
+                            <!--/.row -->      
+                        </div>
+                        <!--/.row -->
+                    </div>
+                    <!--/.container -->
+                </div>
+                <!--/.swiper-slide -->            
             </div>
-            <!--/column -->
+            <!--/.swiper-wrapper -->
         </div>
-        <!--/.row -->
+        <!-- /.swiper -->
     </div>
-    <!--/.container -->
+    <!-- /.swiper-container -->
 </section>
+<!-- /section -->
 
-@if($event->menu)
-<section class="wrapper bg-light-primary">
-    <div class="container py-8 d-flex justify-content-center">
-        <ul class="nav justify-content-center">
-            @foreach ($event->menu->items as $menuItem)
-                @php
-                    $menuUrl = $menuItem->page
-                        ? route('page', ['slug' => $menuItem->page->slug])
-                        : $menuItem->url;
-                    $currentUrl = url()->current();
-                @endphp
-
-                <li class="nav-item text-nowrap">
-                    <a class="nav-link py-2 text-uppercase fs-14 text-center fw-semibold {{ $currentUrl === $menuUrl ? 'active' : '' }}"
-                    href="{{ $menuUrl }}">
-                        {{$menuItem->getLocalTranslation('title')}}
-                    </a>
-                </li>
-            @endforeach
-        </ul>
-    </div>
-</section>
-@endif
-
-<section class="wrapper bg-light">
+<section class="wrapper">
    <div class="container py-3 py-md-5">
       <nav class="d-inline-block" aria-label="breadcrumb">
          <ol class="breadcrumb mb-0">
@@ -66,28 +66,31 @@
    <!-- /.container -->
 </section>
 
-<section class="wrapper bg-light">
-   <div class="container py-12 py-md-5">
-    <h2 class="display-5 mb-3">
-        {{$event->getLocalTranslation('title')}}
-    </h2>
+<section class="wrapper page-content-section">
+   <div class="container pt-6 pb-12">
+        <h2 data-aos="fade-up" data-aos-duration="1000">
+            {{$event->getLocalTranslation('title')}}
+        </h2>
 
-    <p class="lead fs-md">
-        {{$event->getLocalTranslation('description')}}
-    </p>
+        <p data-aos="fade-up" data-aos-duration="1000">{{$event->starts_at}} - {{$event->ends_at}}</p>
 
-    <hr class="mt-2 mb-4">
+        <hr class="mt-2 mb-4" data-aos="fade-up" data-aos-duration="1000">
 
-    <div class="w-100 page-content">
-        <x-markdown>
-            {{ $event->getLocalTranslation('content') }}
-        </x-markdown>
-    </div>
 
+        <p data-aos="fade-up" data-aos-duration="1500">
+            {{$event->getLocalTranslation('description')}}
+        </p>
+
+        <hr class="mt-2 mb-4" data-aos="fade-up" data-aos-duration="1500">
+
+        <div class="w-100" data-aos="fade-up" data-aos-duration="2000">
+            <x-markdown>
+                {{ $event->getLocalTranslation('content') }}
+            </x-markdown>
+        </div>
    </div>
    <!-- /.container -->
 </section>
-
 @endsection
 @section('script')
 @endsection
