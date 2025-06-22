@@ -4,135 +4,52 @@
 @section('canonical', route('job', ['slug' => $job->slug]))
 @section('css')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/css/intlTelInput.min.css"/>
-<style>
-    .step-indicator {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
-    }
-    
-    .step {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin: 4px 10px;
-        opacity: 0.5;
-        transition: opacity 0.3s;
-    }
-    
-    .step.active {
-        opacity: 1;
-    }
-    
-    .step.completed {
-        opacity: 0.8;
-        color: #198754;
-    }
-    
-    .step-number {
-        border-radius: 50%;
-        background: #e9ecef;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    
-    .step.active .step-number {
-        background: #2A5D91;
-        color: white;
-    }
-    
-    .step.completed .step-number {
-        background: #198754;
-        color: white;
-    }
-    
-    .step-divider {
-        width: 50px;
-        height: 2px;
-        background: #e9ecef;
-        margin: 0 10px;
-    }
-    
-    .step.completed + .step-divider {
-        background: #198754;
-    }
-
-    .repeatable-section {
-        border: 1px solid #e9ecef;
-        border-radius: 0.375rem;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        position: relative;
-    }
-    
-    .remove-section {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        color: #dc3545;
-        cursor: pointer;
-        font-size: 1.2rem;
-    }
-    
-    .add-section-btn {
-        border: 2px dashed #2A5D91;
-        background: transparent;
-        color: #2A5D91;
-        padding: 1rem;
-        border-radius: 0.375rem;
-        width: 100%;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    
-    .add-section-btn:hover {
-        background: rgba(13, 110, 253, 0.1);
-    }
-
-    .skills-container {
-        border: 1px solid #ced4da;
-        border-radius: 0.375rem;
-        padding: 0.75rem;
-        min-height: 100px;
-    }
-    
-    .skill-tag {
-        display: inline-block;
-        background: #2A5D91;
-        color: white;
-        padding: 0.15rem 0.5rem;
-        border-radius: 1rem;
-        margin: 0.25rem;
-    }
-    
-    .skill-tag .remove-skill {
-        margin-left: 0.5rem;
-        cursor: pointer;
-    }
-</style>
 @endsection
 
 @section('content')
-<!-- Hero Section -->
-<section class="wrapper bg-dark page-main-section" style="background-image: url('{{ $job->thumbnailUrl }}'); background-size: cover">
-    <div class="container page-main-container">
-        <div class="row h-100">
-            <div class="col-md-10 offset-md-1 col-lg-7 offset-lg-0 col-xl-6 col-xxl-5 text-center text-lg-start justify-content-center align-self-center align-items-start">
-                <h1 class="display-1 fs-48 mt-12 text-white animate__animated animate__slideInDown animate__delay-1s">
-                    {{$job->getLocalTranslation('title')}}
-                </h1>
+
+<section class="wrapper banners-section">
+    <div class="swiper-container" 
+        data-margin="0" 
+        data-autoplay="true" 
+        data-autoplaytime="7000" 
+        data-nav="true" 
+        data-dots="true" 
+        data-items="1">
+        
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide bg-overlay">
+                    <div class="banner-img" style="background-image: url('{{ $job->thumbnailUrl }}')"></div>
+
+                    <div class="container h-100">
+                        <div class="row h-100 align-items-end px-8 px-lg-0 pb-16">           
+                            <div class="row px-0 px-lg-4">
+                                <div class="col-12 col-lg-8 px-0">
+                                    <h1 class="mb-0 animate__animated animate__slideInDown animate__delay-1s">
+                                        {{$job->getLocalTranslation('title')}}
+                                    </h1>
+                                </div>
+                                <!--/.col -->
+                            </div>     
+                            <!--/.row -->      
+                        </div>
+                        <!--/.row -->
+                    </div>
+                    <!--/.container -->
+                </div>
+                <!--/.swiper-slide -->            
             </div>
+            <!--/.swiper-wrapper -->
         </div>
+        <!-- /.swiper -->
     </div>
+    <!-- /.swiper-container -->
 </section>
+<!-- /section -->
 
 <!-- Breadcrumb -->
-<section class="wrapper bg-light">
+<section class="wrapper">
    <div class="container py-3 py-md-5">
       <nav class="d-inline-block" aria-label="breadcrumb">
          <ol class="breadcrumb mb-0">
@@ -150,14 +67,16 @@
 </section>
 
 <!-- Main Content -->
-<section class="wrapper bg-light" id="job-application-app">
+<section class="wrapper" id="job-application-app" data-aos="fade-up" data-aos-duration="1000">
     <div class="container py-12 py-md-5">
-        <div class="row">
+        <div class="row jobs-container">
             <!-- Job Details Column -->
             <div class="col-lg-8">
                 <div class="card shadow-lg" v-if="!showApplicationForm">
                     <div class="card-body">
-                        <h2 class="h1 mb-3">{{getLanguageKeyLocalTranslation('job_description_title')}}</h2>
+                        <h2 class="mb-3">
+                            {{getLanguageKeyLocalTranslation('job_description_title')}}
+                        </h2>
                         
                         @if($job->getLocalTranslation('description'))
                         <div class="mb-4">
@@ -181,8 +100,9 @@
                                     {{getLanguageKeyLocalTranslation('job_application_expired')}}
                                 </div>
                             @else
-                                <button @click="showApplicationForm = true" class="btn btn-primary rounded-pill">
-                                    <i class="uil uil-envelope me-2"></i>{{getLanguageKeyLocalTranslation('job_apply_now')}}
+                                <button @click="showApplicationForm = true" class="btn btn-primary">
+                                    <i class="uil uil-envelope me-2"></i>
+                                    {{getLanguageKeyLocalTranslation('job_apply_now')}}
                                 </button>
                             @endif
                         </div>
@@ -209,39 +129,26 @@
                         </div>
 
                         <!-- Step Indicator -->
-                        <div class="step-indicator align-items-center">
-                            <div class="step" :class="{ active: currentStep === 1, completed: currentStep > 1 }">
-                                <div class="step-number">1</div>
+                        <div class="row row-cols-1 row-cols-lg-8 px-2 mb-4 step-indicator">
+                            <div class="col step mb-2" :class="{ active: currentStep === 1, completed: currentStep > 1 }">
                                 <span>{{getLanguageKeyLocalTranslation('job_step_personal')}}</span>
                             </div>
-                            <div class="step-divider" :class="{ completed: currentStep > 1 }"></div>
-                            <div class="step" :class="{ active: currentStep === 2, completed: currentStep > 2 }">
-                                <div class="step-number">2</div>
+                            <div class="col step mb-2" :class="{ active: currentStep === 2, completed: currentStep > 2 }">
                                 <span>{{getLanguageKeyLocalTranslation('job_step_education')}}</span>
                             </div>
-                            <div class="step-divider" :class="{ completed: currentStep > 2 }"></div>
-                            <div class="step" :class="{ active: currentStep === 3, completed: currentStep > 3 }">
-                                <div class="step-number">3</div>
+                            <div class="col step mb-2" :class="{ active: currentStep === 3, completed: currentStep > 3 }">
                                 <span>{{getLanguageKeyLocalTranslation('job_step_experience')}}</span>
                             </div>
-                            <div class="step-divider" :class="{ completed: currentStep > 3 }"></div>
-                            <div class="step" :class="{ active: currentStep === 4, completed: currentStep > 4 }">
-                                <div class="step-number">4</div>
+                            <div class="col step mb-2" :class="{ active: currentStep === 4, completed: currentStep > 4 }">
                                 <span>{{getLanguageKeyLocalTranslation('job_step_languages')}}</span>
                             </div>
-                            <div class="step-divider" :class="{ completed: currentStep > 4 }"></div>
-                            <div class="step" :class="{ active: currentStep === 5, completed: currentStep > 5 }">
-                                <div class="step-number">5</div>
+                            <div class="col step mb-2" :class="{ active: currentStep === 5, completed: currentStep > 5 }">
                                 <span>{{getLanguageKeyLocalTranslation('job_step_skills')}}</span>
                             </div>
-                            <div class="step-divider" :class="{ completed: currentStep > 5 }"></div>
-                            <div class="step" :class="{ active: currentStep === 6, completed: currentStep > 6 }">
-                                <div class="step-number">6</div>
+                            <div class="col step mb-2" :class="{ active: currentStep === 6, completed: currentStep > 6 }">
                                 <span>{{getLanguageKeyLocalTranslation('job_step_documents')}}</span>
                             </div>
-                            <div class="step-divider" :class="{ completed: currentStep > 6 }"></div>
-                            <div class="step" :class="{ active: currentStep === 7 }">
-                                <div class="step-number">7</div>
+                            <div class="col step mb-2" :class="{ active: currentStep === 7 }">
                                 <span>{{getLanguageKeyLocalTranslation('job_step_review')}}</span>
                             </div>
                         </div>
@@ -565,13 +472,13 @@
                                     <h5 class="mt-4">{{getLanguageKeyLocalTranslation('job_education')}}</h5>
                                     <div v-for="education in applicationForm.education" class="mb-2">
                                         <strong>@{{ education.degree }}</strong> - @{{ education.institution }}
-                                        <br><class="text-muted">@{{ education.start_year }} - @{{ education.end_year || 'Present' }}</small>
+                                        <br><small>@{{ education.start_year }} - @{{ education.end_year || 'Present' }}</small>
                                     </div>
                                     
                                     <h5 class="mt-4">{{getLanguageKeyLocalTranslation('job_work_experience')}}</h5>
                                     <div v-for="experience in applicationForm.experience" class="mb-2">
                                         <strong>@{{ experience.job_title }}</strong> - @{{ experience.company_name }}
-                                        <br><class="text-muted">@{{ experience.start_year }} - @{{ experience.end_year || 'Present' }}</small>
+                                        <br><small>@{{ experience.start_year }} - @{{ experience.end_year || 'Present' }}</small>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -621,7 +528,7 @@
             <div class="col-lg-4">
                 <div class="card shadow-lg mb-4">
                     <div class="card-body">
-                        <h3 class="h3 mb-4">{{getLanguageKeyLocalTranslation('job_details_title')}}</h3>
+                        <h2 class="h3 mb-4">{{getLanguageKeyLocalTranslation('job_details_title')}}</h2>
                         <ul class="list-unstyled mb-0">
                             @if($job->required_years_of_experience)
                             <li class="mb-3">
@@ -633,6 +540,7 @@
 
                             <li class="mb-3">
                                 <i class="uil uil-briefcase text-primary me-2"></i>
+                                
                                 <strong>{{getLanguageKeyLocalTranslation('job_employment_type')}}:</strong>
                                 <span class="ms-2">
                                     @if($job->employment_type == 'full_time')

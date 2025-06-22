@@ -121,12 +121,13 @@
                     </button>
                 </div>
             </form>
+
             <!-- Job Listings -->
-            <div class="row mt-8">
+            <div class="row mt-8 jobs-container">
                 @foreach ($jobs as $job)
-                <div class="card col-md-6 col-lg-4 mb-4 hover-lift">
+                <div class="card col-md-6 col-lg-4 mb-4 hover-lift ">
                     <div class="card-body">
-                        <h2 class="h3 mt-1 mb-3">
+                        <h2 class="mt-1 mb-3">
                             <a href="{{route('job', ['slug' => $job->slug])}}" class="link-dark text-decoration-none">
                                 {{$job->getLocalTranslation('title')}}
                             </a>
@@ -171,7 +172,7 @@
                             @endif
                         </div>
 
-                        <div class="mb-2">
+                        <div class="mt-6 mb-2">
                             @if($job->application_deadline)
                             <small class="text-muted d-block">
                             <i class="uil uil-calendar-alt me-1"></i>
@@ -179,8 +180,10 @@
                             </small>
                             @endif
                         </div>
+
                         <a href="{{route('job', ['slug' => $job->slug])}}" class="btn btn-sm btn-primary">
-                        {{getLanguageKeyLocalTranslation('jobs_view_details')}}
+                            <i class="uil uil-angle-right-b me-2"></i>
+                            {{getLanguageKeyLocalTranslation('jobs_view_details')}}
                         </a>
                     </div>
                 </div>
