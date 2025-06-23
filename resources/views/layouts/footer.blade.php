@@ -70,11 +70,7 @@
                                     @foreach ($footerMenu->items as $footerMenuItem)
                                         <li class="nav-item">
                                             <a
-                                                href="{{
-                                                    $footerMenuItem->page 
-                                                        ? route('page', ['slug' => $footerMenuItem->page->slug]) 
-                                                        : $footerMenuItem->url
-                                                    }}">
+                                                href="{{$footerMenuItem->url}}">
                                                 {{$footerMenuItem->getLocalTranslation('title')}}
                                             </a>
                                         </li>

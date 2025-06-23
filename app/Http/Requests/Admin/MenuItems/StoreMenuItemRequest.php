@@ -68,4 +68,20 @@ class StoreMenuItemRequest extends FormRequest
             }
         });
     }
+
+    public function prepareForValidation()
+    {
+        if ($this->input('external') == 1) {
+            // External link: clear linkable fields
+            $this->merge([
+                'linkable_id' => null,
+                'linkable_type' => null,
+            ]);
+        } else {
+            // Internal link: clear url field
+            $this->merge([
+                'url' => null,
+            ]);
+        }
+    }
 }

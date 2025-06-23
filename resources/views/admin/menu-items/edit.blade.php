@@ -24,6 +24,7 @@
 @slot('li_1') Menu Items @endslot
 @slot('title') Edit Menu Item @endslot
 @endcomponent
+
 <div class="row">
     <div class="col">
         <div class="h-100">
@@ -81,7 +82,7 @@
                                 <!-- External URL Section -->
                                 <div id="is-external" class="mb-3" style="display: none;">
                                     <label class="form-label">External URL</label>
-                                    <input name="url" value="{{old('url', $menuItem->url)}}" type="url" class="form-control" placeholder="https://example.com">
+                                    <input name="url" value="{{old('url', $menuItem->url)}}" class="form-control" placeholder="https://example.com">
                                     @error('url')
                                         <p class="mx-2 my-2 text-danger">
                                             <strong>{{$message}}</strong>

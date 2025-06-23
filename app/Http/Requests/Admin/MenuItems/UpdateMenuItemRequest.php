@@ -25,8 +25,8 @@ class UpdateMenuItemRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'external' => 'required|integer',
-            'url' => 'nullable|required_without:linkable_id|url',
-            'linkable_id' => 'nullable|required_without:url|integer',
+            'url' => 'nullable|required_if:external,1|url',
+            'linkable_id' => 'nullable|required_if:external,0|integer',
             'linkable_type' => [
                 'nullable',
                 'required_with:linkable_id',
@@ -66,5 +66,21 @@ class UpdateMenuItemRequest extends FormRequest
                 }
             }
         });
+    }
+
+    public function prepareForValidation()
+    {
+        if ($this->input('external') == 1) {
+            // External link: clear linkable fields
+            $this->merge([
+                'linkable_id' => null,
+                'linkable_type' => null,
+            ]);
+        } else {
+            // Internal link: clear url field
+            $this->merge([
+                'url' => null,
+            ]);
+        }
     }
 }

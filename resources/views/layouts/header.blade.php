@@ -99,11 +99,7 @@
                         @if(count($menuItem->children) == 0)
                             <li class="nav-item mt-2">
                                 <a class="nav-link py-0" 
-                                    href="{{
-                                        $menuItem->page 
-                                            ? route('page', ['slug' => $menuItem->page->slug]) 
-                                            : $menuItem->url
-                                        }}">
+                                    href="{{$menuItem->url}}">
                                     {{$menuItem->getLocalTranslation('title')}}
                                 </a>
                             </li>
@@ -119,11 +115,7 @@
                                     <div id="collapse-menu-item-{{$menuItem->id}}" class="accordion-collapse collapse mt-2">
                                         @foreach ($menuItem->children as $childMenuItem)
                                             <a class="nav-link text-wrap py-1" 
-                                            href="{{
-                                                $childMenuItem->page 
-                                                    ? route('page', ['slug' => $childMenuItem->page->slug]) 
-                                                    : $childMenuItem->url
-                                                }}">
+                                            href="{{$childMenuItem->url}}">
                                             {{$childMenuItem->getLocalTranslation('title')}}
                                         </a>
                                         @endforeach
