@@ -74,7 +74,6 @@
                                         <tr>
                                             <th scope="col" width="10%" width="100px">#</th>
                                             <th scope="col">Name</th> 
-                                            <th scope="col">Page</th> 
                                             <th scope="col">Url</th>
                                             <th scope="col">Parent</th> 
                                             <th scope="col" width="75px">Actions</th>                                        
@@ -90,23 +89,11 @@
                                             <td>{{ $menuItem->name }}</td>  
 
                                             <td>
-                                                @if($menuItem->page)
-                                                    <span class="badge bg-primary"> {{$menuItem->page->name }} </span>
-                                                @else
-                                                    <span class="badge bg-danger"> not linked</span>
-                                                @endif
-                                            </td>  
-
-                                            <td>
-                                                @if(!$menuItem->page)
-                                                    <a href="{{$menuItem->url}}" target="_blank" rel="noopener noreferrer" class="me-2">
-                                                        <span class="badge bg-primary">
-                                                            <i class="ri-link"></i> Open
-                                                        </span>
-                                                    </a>                                                
-                                                @else
-                                                    <span class="badge bg-danger"> linked</span>
-                                                @endif
+                                                <a href="{{$menuItem->url}}" target="_blank" rel="noopener noreferrer" class="me-2">
+                                                    <span class="badge bg-primary">
+                                                        <i class="ri-link"></i> Open
+                                                    </span>
+                                                 </a>                                                
                                             </td> 
 
                                             <td>

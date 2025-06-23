@@ -6,12 +6,18 @@ use App\Http\Requests\Admin\MenuItems\OrderMenuItemsRequest;
 use App\Http\Requests\Admin\MenuItems\StoreMenuItemRequest;
 use App\Http\Requests\Admin\MenuItems\UpdateMenuItemRequest;
 use App\Http\Requests\Admin\MenuItems\UpdateMenuItemTranslationRequest;
+use App\Models\Album;
+use App\Models\Article;
+use App\Models\Event;
+use App\Models\Grade;
+use App\Models\JobPosting;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use App\Models\MenuItem;
 use App\Models\Media;
 use App\Models\Menu;
 use App\Models\Page;
+use App\Models\Program;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
@@ -28,7 +34,7 @@ class MenuItemsController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $menuItems = $menu->allItems()->orderBy('menu_item_id')->orderBy('order')->latest();
+        $menuItems = $menu->allItems()->latest();
 
         if ($search) {
             $menuItems->where(function($query) use ($search) {
@@ -53,15 +59,13 @@ class MenuItemsController extends Controller
      */
     public function create(Menu $menu)
     {
-        $defaultLanguage = Language::where([
-            'is_default' => true,
-        ])->first();
+        $defaultLanguage = Language::where('is_default', true)->first();
 
-        $pages = Page::get();
+        $linkableItems = $this->getLinkableItems();
 
-        return view('admin.menu-items.create', compact('defaultLanguage', 'menu', 'pages'));
+        return view('admin.menu-items.create', compact('defaultLanguage', 'menu', 'linkableItems'));
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -75,7 +79,8 @@ class MenuItemsController extends Controller
         $validatedData['order'] = $menu->items()->max('order') + 1;
 
         if($request->input('external')){
-            $validatedData['page_id'] = null;
+            $validatedData['linkable_id'] = null;
+            $validatedData['linkable_type'] = null;
         }else{
             $validatedData['url'] = null;
         }
@@ -123,10 +128,9 @@ class MenuItemsController extends Controller
     public function edit(MenuItem $menuItem)
     {
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $linkableItems = $this->getLinkableItems();
 
-        $pages = Page::get();
-
-        return view('admin.menu-items.edit', compact('menuItem', 'languages', 'pages'));
+        return view('admin.menu-items.edit', compact('menuItem', 'languages', 'linkableItems'));
     }
     
     /**
@@ -141,7 +145,8 @@ class MenuItemsController extends Controller
         $validatedData = $request->validated();
 
         if($request->input('external')){
-            $validatedData['page_id'] = null;
+            $validatedData['linkable_id'] = null;
+            $validatedData['linkable_type'] = null;
         }else{
             $validatedData['url'] = null;
         }
@@ -199,5 +204,18 @@ class MenuItemsController extends Controller
         return response()->json([
             'status' => 'success',
         ]);
+    }
+
+    private function getLinkableItems()
+    {
+        return [
+            'Page' => Page::get(),
+            'Program' => Program::get(),
+            'Article' => Article::get(),
+            'Album' => Album::get(),
+            'Event' => Event::get(),
+            'Grade' => Grade::get(),
+            'JobPosting' => JobPosting::get(),
+        ];
     }
 }

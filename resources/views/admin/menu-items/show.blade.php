@@ -36,25 +36,12 @@
                             </div>
 
                             <div class="mb-3">
-                                <h4 class="fs-15">Menu Item page</h4>
-                                @if($menuItem->page)
-                                    <span class="badge bg-primary"> {{$menuItem->page->name }} </span>
-                                @else
-                                    <span class="badge bg-danger"> not linked</span>
-                                @endif
-                            </div>
-
-                            <div class="mb-3">
                                 <h4 class="fs-15">Menu Item url</h4>
-                                @if(!$menuItem->page)
-                                    <a href="{{$menuItem->url}}" target="_blank" rel="noopener noreferrer" class="me-2">
-                                        <span class="badge bg-primary">
-                                            <i class="ri-link"></i> Open
-                                        </span>
-                                    </a>                                                
-                                @else
-                                    <span class="badge bg-danger"> linked</span>
-                                @endif
+                                <a href="{{$menuItem->url}}" target="_blank" rel="noopener noreferrer" class="me-2">
+                                    <span class="badge bg-primary">
+                                        <i class="ri-link"></i> Open
+                                    </span>
+                                </a>                                                
                             </div>
 
                             <div class="mb-3">

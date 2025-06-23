@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Admin\MenuItems;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\Media;
+use Illuminate\Validation\Rule;
 
 class UpdateMenuItemRequest extends FormRequest
 {
@@ -17,14 +17,54 @@ class UpdateMenuItemRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {        
+    {
         return [
             'name' => 'required|string|max:255',
             'external' => 'required|integer',
-            'url' => 'nullable|required_without:page_id|url',
-            'page_id' => 'nullable|required_without:url|exists:pages,id',
+            'url' => 'nullable|required_without:linkable_id|url',
+            'linkable_id' => 'nullable|required_without:url|integer',
+            'linkable_type' => [
+                'nullable',
+                'required_with:linkable_id',
+                Rule::in([
+                    'App\Models\Page',
+                    'App\Models\Program', 
+                    'App\Models\Article',
+                    'App\Models\Album',
+                    'App\Models\Event',
+                    'App\Models\Grade',
+                    'App\Models\JobPosting'
+                ])
+            ],
         ];
+    }
+
+    /**
+     * Configure the validator instance.
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if ($this->filled(['linkable_id', 'linkable_type'])) {
+                $linkableType = $this->input('linkable_type');
+                $linkableId = $this->input('linkable_id');
+                
+                if (class_exists($linkableType)) {
+                    $model = new $linkableType;
+                    $exists = $model->where('id', $linkableId)->exists();
+                    
+                    if (!$exists) {
+                        $modelName = class_basename($linkableType);
+                        $validator->errors()->add('linkable_id', "The selected {$modelName} does not exist.");
+                    }
+                } else {
+                    $validator->errors()->add('linkable_type', 'The selected linkable type is invalid.');
+                }
+            }
+        });
     }
 }
