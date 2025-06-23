@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8" />
     <title>{{getLanguageKeyLocalTranslation('website_title')}} - @yield('title')</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="@yield('description')">
 
     <meta property="og:title" content="{{getLanguageKeyLocalTranslation('website_title')}} - @yield('title')" />
@@ -23,10 +23,10 @@
 
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ URL::asset('assets/img/favicon.png')}}">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     @include('layouts.head-css')
 
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
 
 <body dir="{{($currentLanguage && $currentLanguage->is_rtl) ? 'rtl' : 'ltr'}}">

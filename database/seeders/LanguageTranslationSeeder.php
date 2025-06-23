@@ -169,8 +169,8 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => 'أول'
             ],
             'index_page_forth_section_cta' => [
-                'en' => 'View more articles',
-                'ar' => 'عرض المزيد من المقالات'
+                'en' => 'View more events',
+                'ar' => 'عرض المزيد من الفعاليات'
             ],
             'index_page_forth_section_title' => [
                 'en' => 'Saud international schools latest events',

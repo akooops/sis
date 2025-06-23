@@ -366,7 +366,7 @@
         <!-- /.swiper-container -->
 
         <div class="d-flex justify-content-center justify-content-lg-end px-0 px-lg-8">
-              <a href="{{route('articles')}}" class="btn btn-primary rounded text-center">
+              <a href="{{route('events')}}" class="btn btn-primary rounded text-center">
                     <i class="uil uil-angle-right-b me-2"></i>
                     {{getLanguageKeyLocalTranslation('index_page_forth_section_cta')}}
               </a>
@@ -392,8 +392,8 @@
                 data-dots="false" 
                 data-nav="false" 
                 data-items-lg="4"
-                data-items-md="3" 
-                data-items-xs="2"
+                data-items-md="2" 
+                data-items-xs="1"
                 data-aos="fade-up" 
                 data-aos-duration="2000">
 

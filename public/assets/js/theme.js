@@ -7,6 +7,8 @@ var theme = {
    * Do not forget to remove dependency from src/js/vendor/ and recompile.
    */
   init: function () {
+    AOS.init();
+
     theme.stickyHeader();
     theme.subMenu();
     theme.offCanvas();
@@ -36,8 +38,6 @@ var theme = {
     theme.pricingSwitcher();
     theme.textRotator();
     theme.codeSnippet();
-
-    AOS.init();
   },
   /**
    * Sticky Header
@@ -48,7 +48,7 @@ var theme = {
     var navbar = document.querySelector(".navbar");
     if (navbar == null) return;
     var options = {
-      offset: 350,
+      offset: 0,
       offsetSide: 'top',
       classes: {
         clone: 'navbar-clone fixed',
