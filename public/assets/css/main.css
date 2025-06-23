@@ -1280,4 +1280,57 @@ footer .copyright p{
     }
 }
 
+.navbar {
+    height: 112px;
+    background: transparent;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(0px);
+}
 
+.navbar.navbar-scrolled {
+    height: 88px;
+    background: rgba(0, 0, 0, 0.85); /* Black background like your original */
+    backdrop-filter: blur(15px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    position: fixed !important;
+}
+
+.navbar .logo {
+    height: 72px;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar.navbar-scrolled .logo {
+    height: 64px;
+}
+
+.navbar-container {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar.navbar-scrolled .navbar-container {
+    margin-top: 0px !important;
+}
+
+@media (min-width: 992px) {
+    .navbar .logo {
+        height: 88px;
+    }
+    
+    .navbar.navbar-scrolled .logo {
+        height: 72px;
+    }
+    
+    .navbar-container {
+        margin-top: 40px;
+    }
+    
+    .navbar.navbar-scrolled .navbar-container {
+        margin-top: 12px;
+    }
+}
+
+/* Remove old clone styles */
+.navbar-clone {
+    display: none !important;
+}

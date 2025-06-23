@@ -39,31 +39,57 @@ var theme = {
     theme.textRotator();
     theme.codeSnippet();
   },
-  /**
-   * Sticky Header
-   * Enables sticky behavior on navbar on page scroll
-   * Requires assets/js/vendor/headhesive.min.js
-  */
   stickyHeader: () => {
     var navbar = document.querySelector(".navbar");
     if (navbar == null) return;
-    var options = {
-      offset: 0,
-      offsetSide: 'top',
-      classes: {
-        clone: 'navbar-clone fixed',
-        stick: 'navbar-stick',
-        unstick: 'navbar-unstick',
-      },
-      onStick: function() {
-        var navbarClonedClass = this.clonedElem.classList;
-        if (navbarClonedClass.contains('transparent') && navbarClonedClass.contains('navbar-dark')) {
-          this.clonedElem.className = this.clonedElem.className.replace("navbar-dark","navbar-light");
+    
+    let isScrolled = false;
+    const scrollThreshold = 0;
+    
+    function updateNavbar() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const shouldBeScrolled = scrollTop > scrollThreshold;
+        
+        if (shouldBeScrolled !== isScrolled) {
+            isScrolled = shouldBeScrolled;
+            navbar.classList.toggle('navbar-scrolled', isScrolled);
+            
+            // Handle color changes for navbar elements
+            if (isScrolled) {
+                // Change to light theme for black background
+                if (navbar.classList.contains('navbar-dark')) {
+                    navbar.classList.remove('navbar-dark');
+                    navbar.classList.add('navbar-light');
+                    navbar.setAttribute('data-was-dark', 'true');
+                }
+            } else {
+                // Restore original colors
+                if (navbar.getAttribute('data-was-dark') === 'true') {
+                    navbar.classList.remove('navbar-light');
+                    navbar.classList.add('navbar-dark');
+                    navbar.removeAttribute('data-was-dark');
+                }
+            }
         }
-      }
-    };
-    var banner = new Headhesive('.navbar', options);
-  },
+    }
+    
+    let ticking = false;
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateNavbar);
+            ticking = true;
+        }
+    }
+    
+    window.addEventListener('scroll', () => {
+        ticking = false;
+        requestTick();
+    }, { passive: true });
+    
+    updateNavbar();
+},
+
+
   /**
    * Sub Menus
    * Enables multilevel dropdown
