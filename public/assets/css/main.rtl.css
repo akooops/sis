@@ -1,3 +1,4 @@
+/* Font Faces */
 @font-face {
   font-family: 'Brandon';
   src: url('fonts/BrandonGrotesqueThin.ttf') format('truetype');
@@ -40,6 +41,7 @@
   font-style: normal;
 }
 
+/* CSS Variables */
 :root {
   --bs-font-sans-serif: "Brandon", sans-serif;
   --bs-navbar-color: #2A5D91;
@@ -48,13 +50,15 @@
   --bs-gold: #E0B65D;
 }
 
-p{
+/* Global Styles */
+p {
     font-size: 17px;
     line-height: 25px;
     font-weight: 400;
     color: var(--bs-dark);
 }
 
+/* Global Button Styles */
 .btn {
     position: relative;
     overflow: hidden;
@@ -64,7 +68,7 @@ p{
     background-color: var(--bs-primary);
     transition: all 0.4s ease;
     color: white;
-    border: none; /* No outline */
+    border: none;
     text-transform: uppercase;
     font-size: 15px;
     font-weight: 450;
@@ -77,51 +81,71 @@ p{
     border: none;
 }
 
-.navbar{
+.swiper-controls .swiper-navigation .swiper-button.swiper-button-prev:after{
+    content: "\e94c";
+}
+
+.swiper-controls .swiper-navigation .swiper-button.swiper-button-next:after{
+    content: "\e949";
+}
+
+/* =============================================================================
+   NAVBAR STYLES - NEW SMOOTH TRANSFORMATION
+   ============================================================================= */
+
+.navbar {
     height: 112px;
+    background: transparent;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(0px);
 }
 
-.navbar-stick{
+.navbar.navbar-scrolled {
     height: 88px;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    position: fixed !important;
 }
 
-.navbar-clone{
-    background-color: rgba(0, 0, 0, 0.85) !important;
-}
-
-.navbar-clone .navbar-container{
-    margin-top: 0px !important;
-}
-
-.navbar .logo{
+.navbar .logo {
     height: 72px;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.navbar-clone .logo{
+.navbar.navbar-scrolled .logo {
     height: 64px;
 }
 
-.navbar .nav-link{
+.navbar-container {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar.navbar-scrolled .navbar-container {
+    margin-top: 0px !important;
+}
+
+.navbar .nav-link {
     text-transform: uppercase;
     font-weight: 600;
     font-size: 15px;
 }
 
-.languages-dropdown .dropdown-item{
+.languages-dropdown .dropdown-item {
     text-transform: uppercase;
     font-weight: 600;
     font-size: 15px;
 }
 
-.navbar-cta-container{
+.navbar-cta-container {
     border-radius: 0.3rem;
 }
 
-.navbar-offcanvas-menu{
+.navbar-offcanvas-menu {
     width: 100% !important;
 }
 
-.navbar-offcanvas-menu .search-form .form-control{
+.navbar-offcanvas-menu .search-form .form-control {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
@@ -136,54 +160,58 @@ p{
     color: #fff;
 }
 
-.navbar-offcanvas-menu .accordion-item{
+.navbar-offcanvas-menu .accordion-item {
     border-bottom: 1px solid #eee;
 }
 
-.navbar-offcanvas-menu .accordion-wrapper .card-header button{
+.navbar-offcanvas-menu .accordion-wrapper .card-header button {
     font-size: 25px;
     font-weight: 900;
     text-transform: uppercase;
 }
 
-.navbar-offcanvas-menu .accordion-wrapper .card-header .collapsed{
+.navbar-offcanvas-menu .accordion-wrapper .card-header .collapsed {
     color: var(--bs-primary);
 }
 
-.navbar-offcanvas-menu .accordion-wrapper .card-header button:before{
+.navbar-offcanvas-menu .accordion-wrapper .card-header button:before {
     right: unset;
     left: 1.3rem;
     margin-top: 0rem;
     font-size: 1.3rem;
 }
 
-.navbar-offcanvas-menu .accordion-wrapper .accordion-collapse .nav-link{
+.navbar-offcanvas-menu .accordion-wrapper .accordion-collapse .nav-link {
     text-transform: uppercase;
     font-weight: 600;
     font-size: 15px;
     color: var(--bs-dark);
 }
 
-.navbar-offcanvas-menu .accordion-wrapper .accordion-collapse .nav-link:hover{
+.navbar-offcanvas-menu .accordion-wrapper .accordion-collapse .nav-link:hover {
     color: var(--bs-primary);
 }
 
-.navbar-offcanvas-menu .nav-link{
+.navbar-offcanvas-menu .nav-link {
     text-transform: uppercase;
     font-weight: 600;
     font-size: 15px;
     color: var(--bs-primary);
 }
 
-.banners-section .swiper-container .swiper-slide{
+/* =============================================================================
+   BANNER SECTION
+   ============================================================================= */
+
+.banners-section .swiper-container .swiper-slide {
     height: 100vh !important;
 }
 
-.banners-section .swiper-container .swiper-controls .swiper-pagination{
+.banners-section .swiper-container .swiper-controls .swiper-pagination {
     bottom: 1.8rem;    
 } 
 
-.banners-section .swiper-container .bg-overlay::before{
+.banners-section .swiper-container .bg-overlay::before {
     content: '';
     position: absolute;
     top: 0;
@@ -212,14 +240,14 @@ p{
     z-index: -1;
 }
 
-.banners-section .banner-img{
+.banners-section .banner-img {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
-
-.banners-section h1{
+.banners-section h1,
+.banners-section h2 {
     font-weight: 600;
     font-size: 32px;
     line-height: 32px;
@@ -231,19 +259,7 @@ p{
     margin-bottom: 30px;
 }
 
-.banners-section h2{
-    font-weight: 600;
-    font-size: 32px;
-    line-height: 32px;
-    color: #ffffff;
-    padding: 0px 40px 0px 0;
-    margin: 0;
-    text-transform: uppercase;
-    border-right: 10px solid var(--bs-primary);
-    margin-bottom: 30px;
-}
-
-.banners-section .btn{
+.banners-section .btn {
     position: relative;
     overflow: hidden;
     background: linear-gradient(to left, white 50%, transparent 50%);
@@ -255,31 +271,35 @@ p{
     text-transform: uppercase;
     font-size: 15px;
     font-weight: 450;
-    font-family: "Brandon", sans-serif;;
+    font-family: "Brandon", sans-serif;
 }
 
-.banners-section .btn:hover{
+.banners-section .btn:hover {
     background-position: right bottom;
     color: black;
     border-color: white;
 }
 
-.banners-section .btn i{
+.banners-section .btn i {
     font-size: 20px;
 }
 
-.welcome-section{
+/* =============================================================================
+   WELCOME SECTION
+   ============================================================================= */
+
+.welcome-section {
     background-color: var(--bs-light);
 }
 
-.welcome-section h2{
+.welcome-section h2 {
     font-size: 25px;
     line-height: 35px;
     text-transform: uppercase;
     font-weight: 900;
 }
 
-.welcome-section .shape{
+.welcome-section .shape {
     background-color: var(--bs-primary);
     position: absolute;
     width: 80%;
@@ -288,14 +308,14 @@ p{
     top: 50px;
 }
 
-.welcome-section img{
+.welcome-section img {
     width: 90%;
 }
 
 .welcome-section .btn {
     position: relative;
     overflow: hidden;
-    background: var(--bs-primary); /* Start with primary background */
+    background: var(--bs-primary);
     color: white;
     border: 1px solid var(--bs-primary);
     text-transform: uppercase;
@@ -336,11 +356,15 @@ p{
     font-size: 20px;
 }
 
-.divider-section{
+/* =============================================================================
+   DIVIDER SECTION
+   ============================================================================= */
+
+.divider-section {
     background-color: var(--bs-light);
 }
 
-.divider-section .divider-line{
+.divider-section .divider-line {
     display: block;
     width: 4px;
     height: 72px;
@@ -349,15 +373,19 @@ p{
     padding: 0;
 }
 
-.divider-section .logo{
+.divider-section .logo {
     height: 112px;
 }
 
-.grades-section{
+/* =============================================================================
+   GRADES SECTION
+   ============================================================================= */
+
+.grades-section {
     background-color: var(--bs-light);
 }
 
-.grades-section h2{
+.grades-section h2 {
     font-size: 25px;
     line-height: 35px;
     text-transform: uppercase;
@@ -372,19 +400,16 @@ p{
     height: 100%;
     object-fit: cover;
     z-index: -1;
-}
-
-.grades-section .grade-img{
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
-.grades-section .swiper .swiper-wrapper{
+.grades-section .swiper .swiper-wrapper {
     height: 400px;
 }
 
-.grades-section p{
+.grades-section p {
     color: #FFF;
     font-weight: 420;
     line-height: 33px;
@@ -393,7 +418,7 @@ p{
     font-size: 18px;
 }
 
-.grades-section h3{
+.grades-section h3 {
     color: #FFF;
     font-size: 28px;
     font-style: normal;
@@ -403,7 +428,7 @@ p{
     margin-bottom: 20px;    
 }
 
-.grades-section .btn{
+.grades-section .btn {
     position: relative;
     overflow: hidden;
     background: linear-gradient(to left, white 50%, transparent 50%);
@@ -419,13 +444,13 @@ p{
     width: 100%;
 }
 
-.grades-section .btn:hover{
+.grades-section .btn:hover {
     background-position: right bottom;
     color: black;
     border-color: white;
 }
 
-.grades-section .btn i{
+.grades-section .btn i {
     font-size: 20px;
 }
 
@@ -465,6 +490,10 @@ p{
     opacity: 1; 
 }
 
+/* =============================================================================
+   FACTS SECTION
+   ============================================================================= */
+
 .facts-section {
     position: relative;
     background-image: url('../img/facts-background.jpg');
@@ -486,7 +515,7 @@ p{
     z-index: 2;
 }
 
-.facts-section .facts-content-container h3{
+.facts-section .facts-content-container h3 {
     font-size: 40px;
     line-height: 45px;
     text-transform: uppercase;
@@ -494,14 +523,14 @@ p{
     color: #fff;
 }
 
-.facts-section .facts-content-container p{
+.facts-section .facts-content-container p {
     font-weight: 300;
 }
 
 .facts-section .facts-content-container .btn {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(to left, transparent 50%, white 50%); /* Define gradient in base state */
+    background: linear-gradient(to left, transparent 50%, white 50%);
     background-size: 200% 100%;
     background-position: left bottom;  
     transition: all 0.4s ease;
@@ -523,12 +552,12 @@ p{
     font-size: 20px;
 }
 
-.facts-section .facts-numbers-container .icon{
+.facts-section .facts-numbers-container .icon {
     min-width: 85px;
     height: 85px;
 }
 
-.facts-section .facts-numbers-container .counter{
+.facts-section .facts-numbers-container .counter {
     color: #FFF;
     font-size: 60px;
     font-style: normal;
@@ -536,42 +565,42 @@ p{
     line-height: 70px;
 }
 
-.facts-section .facts-numbers-container p{
+.facts-section .facts-numbers-container p {
     color: #FFF;
     font-size: 17px;
     font-weight: 300;
     line-height: 30px;
 }
 
-.events-section{
+/* =============================================================================
+   EVENTS SECTION
+   ============================================================================= */
+
+.events-section {
     background-color: var(--bs-light);
 }
 
-.events-section{
-    background-color: var(--bs-light);
-}
-
-.events-section h2{
+.events-section h2 {
     font-size: 25px;
     line-height: 35px;
     text-transform: uppercase;
     font-weight: 900;
 }
 
-.events-section .swiper-container .swiper-slide{
+.events-section .swiper-container .swiper-slide {
     background-color: #fff;
 }
 
-.events-section .swiper-container .swiper-slide figure{
+.events-section .swiper-container .swiper-slide figure {
     height: 250px;
 }
 
-.events-section .swiper-container .swiper-slide figure img{
+.events-section .swiper-container .swiper-slide figure img {
     height: 100% !important;
     object-fit: cover;
 }
 
-.events-section .swiper-container .swiper-slide h3 a{
+.events-section .swiper-container .swiper-slide h3 a {
     color: var(--bs-primary);
     font-size: 18px;
     font-style: normal;
@@ -580,32 +609,36 @@ p{
     text-transform: uppercase;
 }
 
-.events-section .swiper-container .swiper-slide .arrow{
+.events-section .swiper-container .swiper-slide .arrow {
     font-size: 36px;
     color: var(--bs-primary);
     display: inline-block;
     rotate: 0;
 }
 
-.albums-section h2{
+/* =============================================================================
+   ALBUMS SECTION
+   ============================================================================= */
+
+.albums-section {
+    position: relative;
+    overflow: visible; 
+}
+
+.albums-section h2 {
     font-size: 25px;
     line-height: 35px;
     text-transform: uppercase;
     font-weight: 900;
 }
 
-.albums-section .swiper-container .swiper-slide figure{
+.albums-section .swiper-container .swiper-slide figure {
     height: 350px;
 }
 
-.albums-section .swiper-container .swiper-slide figure img{
+.albums-section .swiper-container .swiper-slide figure img {
     height: 100% !important;
     object-fit: cover;
-}
-
-.albums-section {
-    position: relative;
-    overflow: visible; 
 }
 
 .albums-section::before {
@@ -623,20 +656,24 @@ p{
     background-position: left;
 }
 
-footer{
+/* =============================================================================
+   FOOTER
+   ============================================================================= */
+
+footer {
     background: linear-gradient(-180deg, #C6E6FD 0%, rgba(198, 230, 253, 0.00) 50.05%);
 }
 
-footer .logo{
+footer .logo {
     height: 80px;
 }
 
-footer .widget{
+footer .widget {
     height: 100%;
     border-left: unset;
 }
 
-footer .program a{
+footer .program a {
     color: var(--bs-primary);
     font-size: 15px;
     font-style: normal;
@@ -645,11 +682,11 @@ footer .program a{
     text-transform: uppercase;
 }
 
-footer .program a:hover{
+footer .program a:hover {
     color: var(--bs-secondary);
 }
 
-footer .widget-title{
+footer .widget-title {
     color: var(--bs-primary);
     font-size: 20px;
     font-style: normal;
@@ -657,7 +694,7 @@ footer .widget-title{
     line-height: 25px;
 }
 
-footer .widget p{
+footer .widget p {
     color: var(--bs-primary);
     margin: 0;
     font-size: 20px;
@@ -666,7 +703,7 @@ footer .widget p{
     line-height: 30px;
 } 
 
-footer .nav-item a{
+footer .nav-item a {
     color: var(--bs-primary);
     font-size: 17px;
     font-style: normal;
@@ -675,11 +712,11 @@ footer .nav-item a{
     text-transform: capitalize;
 }
 
-footer .nav-item a:hover{
+footer .nav-item a:hover {
     color: var(--bs-secondary);
 }
 
-footer .copyright p{
+footer .copyright p {
     color: var(--bs-primary);
     margin: 0;
     font-size: 20px;
@@ -688,22 +725,26 @@ footer .copyright p{
     line-height: 30px;
 }
 
-.page-menu-section{
+/* =============================================================================
+   PAGE COMPONENTS
+   ============================================================================= */
+
+.page-menu-section {
     background-color: var(--bs-light);
 }
 
-.page-menu-section .nav-link{
+.page-menu-section .nav-link {
     font-size: 15px;
     font-weight: 600;
     text-transform: uppercase;
     color: var(--bs-primary);
 }
 
-.page-menu-section .nav-link:hover{
+.page-menu-section .nav-link:hover {
     color: var(--bs-secondary);
 }
 
-.page-content-section h2{
+.page-content-section h2 {
     font-weight: 600;
     font-size: 32px;
     line-height: 32px;
@@ -712,9 +753,13 @@ footer .copyright p{
     margin-bottom: 16px;
 }
 
-.page-content-section img{
+.page-content-section img {
     max-width: 100%;
 }
+
+/* =============================================================================
+   STEP INDICATOR
+   ============================================================================= */
 
 .step-indicator .step {
     position: relative;
@@ -773,16 +818,20 @@ footer .copyright p{
     font-weight: 500;
 }
 
-.visit-service-container figure{
+/* =============================================================================
+   VISIT SERVICE COMPONENTS
+   ============================================================================= */
+
+.visit-service-container figure {
     height: 350px;
 }
 
-.visit-service-container img{
+.visit-service-container img {
     height: 100% !important;
     object-fit: cover;
 }
 
-.visit-service-container h2{
+.visit-service-container h2 {
     font-size: 22px;
 }
 
@@ -854,9 +903,10 @@ footer .copyright p{
 .visit-service-container .counter-controls .btn:hover {
     background-position: right bottom;
     color: white; 
-    transform:unset;
+    transform: unset;
 }
 
+/* Calendar Events */
 .visit-service-container .fc-event.available-slot {
     background-color: #198754 !important;
     border-color: #198754 !important;
@@ -892,6 +942,7 @@ footer .copyright p{
     border-color: #dc3545 !important;
 }
 
+/* Time Slot Legend */
 .visit-service-container .time-slot-legend {
     display: flex;
     gap: 20px;
@@ -924,6 +975,10 @@ footer .copyright p{
     background-color: #dc3545;
 }
 
+/* =============================================================================
+   UTILITY CLASSES
+   ============================================================================= */
+
 .truncate-3-lines {
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -931,16 +986,24 @@ footer .copyright p{
     overflow: hidden;
 }
 
-.articles-container figure{
+.active {
+    color: var(--bs-primary);
+}
+
+/* =============================================================================
+   ARTICLES & CONTENT
+   ============================================================================= */
+
+.articles-container figure {
     height: 350px;
 }
 
-.articles-container img{
+.articles-container img {
     height: 100% !important;
     object-fit: cover;
 }
 
-.articles-container h2{
+.articles-container h2 {
     font-size: 22px;
     line-height: 35px;
     text-transform: uppercase;
@@ -948,15 +1011,15 @@ footer .copyright p{
     color: var(--bs-primary);
 }
 
-.articles-container h2 a{
+.articles-container h2 a {
     color: var(--bs-primary);
 }
 
-.articles-container h2 a:hover{
+.articles-container h2 a:hover {
     color: var(--bs-secondary);
 }
 
-.sidebar .widget-title{
+.sidebar .widget-title {
     font-size: 22px;
     line-height: 35px;
     text-transform: uppercase;
@@ -964,72 +1027,69 @@ footer .copyright p{
     color: var(--bs-primary);
 }
 
-.sidebar .widget-title{
-    font-size: 22px;
-    line-height: 35px;
-    text-transform: uppercase;
-    font-weight: 900;
-    color: var(--bs-primary);
-}
-
-.popular-articles-container figure{
+.popular-articles-container figure {
     height: 85px;
 }
 
-.popular-articles-container img{
+.popular-articles-container img {
     height: 100% !important;
     object-fit: cover;
 }
 
-.fc-daygrid-event{  
+/* =============================================================================
+   CALENDAR & FORM COMPONENTS
+   ============================================================================= */
+
+.fc-daygrid-event {  
     cursor: pointer;
     background-color: #2A5D91;
     color: #fff;
 }
 
-.fc-daygrid-event:hover{  
+.fc-daygrid-event:hover {  
     background-color: #2A5D91;
 }
 
-.iti{
+.iti {
     width: 100%;
     display: flex;
 }
 
-.iti__flag-container{
+.iti__flag-container {
     position: relative;
 }
 
-.iti__selected-flag{
+.iti__selected-flag {
     width: 64px !important;
     background-color: #fefefe;
     border: 1px solid rgba(8, 60, 130, 0.07);
     justify-content: center;
 }
 
-#phoneInput{
+#phoneInput {
     padding: 0.6rem 1rem;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     border: 1px solid rgba(8, 60, 130, 0.07)
 }
 
-.input-group .input-group-text{
+.input-group .input-group-text {
     width: 64px !important;
     justify-content: center;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-radius: 0.4rem;
 }
-.iti--inline-dropdown .iti__dropdown-content{
+
+.iti--inline-dropdown .iti__dropdown-content {
     z-index: 9999;
 }
 
-.active{
-    color: var(--bs-primary);
-}
+/* =============================================================================
+   JOBS SECTION
+   ============================================================================= */
 
-.jobs-container h2{
+.jobs-container h2 {
     font-size: 22px;
     line-height: 35px;
     text-transform: uppercase;
@@ -1037,11 +1097,11 @@ footer .copyright p{
     color: var(--bs-primary);
 }
 
-.jobs-container h2 a{
+.jobs-container h2 a {
     color: var(--bs-primary);
 }
 
-.jobs-container h2 a:hover{
+.jobs-container h2 a:hover {
     color: var(--bs-secondary);
 }
 
@@ -1103,61 +1163,69 @@ footer .copyright p{
     font-size: 12px;
 }
 
+/* =============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================= */
+
 @media (min-width: 768px) {
-    .navbar-cta-container{
+    .navbar-cta-container {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
         border-top-left-radius: 0.3rem;
         border-bottom-left-radius: 0.3rem;
     }
         
-    .navbar-offcanvas-menu{
+    .navbar-offcanvas-menu {
         width: 420px !important;
     }
     
-    .welcome-section .shape{
+    .welcome-section .shape {
         height: 500px;
     }
 }
 
 @media (min-width: 992px) {
-    p{
+    p {
         font-size: 18px;
         line-height: 30px;
     }
 
-    .navbar .logo{
+    .navbar .logo {
         height: 88px;
     }
 
-    .navbar-clone .logo{
+    .navbar.navbar-scrolled .logo {
         height: 72px;
     }
     
-    .banners-section h1{
+    .navbar-container {
+        margin-top: 40px;
+    }
+    
+    .navbar.navbar-scrolled .navbar-container {
+        margin-top: 12px;
+    }
+    
+    .banners-section h1,
+    .banners-section h2 {
         font-size: 55px;
         line-height: 52px;
     }
 
-    .banners-section h2{
-        font-size: 55px;
-        line-height: 52px;
-    }
-
-    .welcome-section h2{
+    .welcome-section h2 {
         font-size: 32px;
         line-height: 52px;
     }
 
-    .welcome-section .shape{
+    .welcome-section .shape {
         height: 360px;
     }
 
-    .grades-section .swiper .swiper-wrapper{
+    .grades-section .swiper .swiper-wrapper {
         height: 500px;
     }
 
-    .grades-section h2{
+    .grades-section h2 {
         font-size: 36px;
         line-height: 60px;
     }
@@ -1166,16 +1234,16 @@ footer .copyright p{
         height: 750px;
     }
 
-    .events-section h2{
+    .events-section h2 {
         font-size: 36px;
         line-height: 60px;
     }
 
-    .events-section .swiper-container .swiper-slide h3 a{
+    .events-section .swiper-container .swiper-slide h3 a {
         font-size: 25px;
     }
 
-    .albums-section h2{
+    .albums-section h2 {
         font-size: 36px;
         line-height: 60px;
     }
@@ -1185,7 +1253,7 @@ footer .copyright p{
         height: 666px;
     }
 
-    footer .widget{
+    footer .widget {
         height: 100%;
         width: 100%;
         border-left: 1px solid rgba(26, 63, 121, 0.20);
@@ -1240,44 +1308,42 @@ footer .copyright p{
 }
 
 @media (min-width: 1200px) {
-    p{
+    p {
         font-size: 20px;
     }
 
-    .welcome-section h2{
+    .welcome-section h2 {
         font-size: 48px;
         line-height: 60px;
     }
 
-    .grades-section h2{
+    .grades-section h2 {
         font-size: 48px;
         line-height: 60px;
     }
 
-    .welcome-section .shape{
+    .welcome-section .shape {
         height: 420px;
     }
 
-    .facts-section .facts-content-container h3{
+    .facts-section .facts-content-container h3 {
         font-size: 55px;
         line-height: 70px;
     }
 
-    .events-section h2{
+    .events-section h2 {
         font-size: 48px;
         line-height: 60px;
     }
 
-    .albums-section h2{
+    .albums-section h2 {
         font-size: 48px;
         line-height: 60px;
     }
 }
 
 @media (min-width: 1400px) {
-    .welcome-section .shape{
+    .welcome-section .shape {
         height: 500px;
     }
 }
-
-
