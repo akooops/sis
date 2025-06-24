@@ -107,9 +107,7 @@
 
                                         <div class="mb-3">
                                             <h4 class="fs-15">Event {{$language->name}} content</h4>
-                                            <x-markdown>
-                                                {{ $event->getTranslation('content', $language->code) }}
-                                            </x-markdown>
+                                            {!! $event->getTranslation('content', $language->code) !!}
                                         </div>
                                     </div>
                                 @endforeach
