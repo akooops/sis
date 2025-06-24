@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BannersController;
 use App\Http\Controllers\Admin\ContactSubmissionsController;
 use App\Http\Controllers\Admin\DashboardContoller;
+use App\Http\Controllers\Admin\DocumentsController;
 use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\Admin\FilesController;
 use App\Http\Controllers\Admin\FormsController;
@@ -219,6 +220,17 @@ Route::middleware(['auth', 'force.admin.english'])->prefix('admin')->group(funct
     Route::patch('banners/{banner}/update-translation', [BannersController::class, 'updateTranslation'])->middleware('check.permission:admin.banners.update')->name('admin.banners.update-translation');
     Route::patch('banners/{banner}', [BannersController::class, 'update'])->middleware('check.permission:admin.banners.update')->name('admin.banners.update');
     Route::delete('banners/{banner}', [BannersController::class, 'destroy'])->middleware('check.permission:admin.banners.destroy')->name('admin.banners.destroy');
+
+
+    // Documents
+    Route::get('documents', [DocumentsController::class, 'index'])->middleware('check.permission:admin.documents.index')->name('admin.documents.index');
+    Route::get('documents/create', [DocumentsController::class, 'create'])->middleware('check.permission:admin.documents.store')->name('admin.documents.create');
+    Route::post('documents', [DocumentsController::class, 'store'])->middleware('check.permission:admin.documents.store')->name('admin.documents.store');
+    Route::get('documents/{document}', [DocumentsController::class, 'show'])->middleware('check.permission:admin.documents.show')->name('admin.documents.show');
+    Route::get('documents/{document}/edit', [DocumentsController::class, 'edit'])->middleware('check.permission:admin.documents.update')->name('admin.documents.edit');
+    Route::patch('documents/{document}/update-translation', [DocumentsController::class, 'updateTranslation'])->middleware('check.permission:admin.documents.update')->name('admin.documents.update-translation');
+    Route::patch('documents/{document}', [DocumentsController::class, 'update'])->middleware('check.permission:admin.documents.update')->name('admin.documents.update');
+    Route::delete('documents/{document}', [DocumentsController::class, 'destroy'])->middleware('check.permission:admin.documents.destroy')->name('admin.documents.destroy');
 
     //Settings
     Route::get('settings', [SettingsController::class, 'index'])->middleware('check.permission:admin.settings.index')->name('admin.settings.index');
