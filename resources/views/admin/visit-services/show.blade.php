@@ -87,9 +87,7 @@
 
                                         <div class="mb-3">
                                             <h4 class="fs-15">VisitService {{$language->name}} content</h4>
-                                            <x-markdown>
-                                                {{ $visitService->getTranslation('content', $language->code) }}
-                                            </x-markdown>
+                                            {!! $visitService->getTranslation('content', $language->code) !!}
                                         </div>
                                     </div>
                                 @endforeach
