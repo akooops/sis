@@ -1,5 +1,7 @@
 @php
     $currentLanguage = getCurrentLanguage();
+
+    $googleAnalyticsIdSetting = getSetting('google_analytics_id');
 @endphp
 
 <!DOCTYPE html>
@@ -27,6 +29,16 @@
 
     @include('layouts.head-css')
 
+    @if($googleAnalyticsIdSetting && !empty($googleAnalyticsIdSetting->value))
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ $googleAnalyticsIdSetting }}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '{{ $googleAnalyticsIdSetting->value }}');
+        </script>
+    @endif
 </head>
 
 <body dir="{{($currentLanguage && $currentLanguage->is_rtl) ? 'rtl' : 'ltr'}}">

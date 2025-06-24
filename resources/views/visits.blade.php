@@ -101,9 +101,7 @@
         <hr class="mt-2 mb-4" data-aos="fade-up" data-aos-duration="1500">
 
         <div class="w-100" data-aos="fade-up" data-aos-duration="2000">
-            <x-markdown>
-                {{ $page->getLocalTranslation('content') }}
-            </x-markdown>
+            {!! $page->getLocalTranslation('content') !!}
         </div>
 
         <hr class="mt-4 mb-8" data-aos="fade-up" data-aos-duration="1500">

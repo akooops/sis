@@ -106,9 +106,7 @@
         <hr class="mt-2 mb-4" data-aos="fade-up" data-aos-duration="1500">
 
         <div class="w-100" data-aos="fade-up" data-aos-duration="2000">
-            <x-markdown>
-                {{ $page->getLocalTranslation('content') }}
-            </x-markdown>
+            {!! $page->getLocalTranslation('content') !!}
 
             <a class="btn btn-md btn-primary rounded me-2" href="{{route('index')}}">
                 {{getLanguageKeyLocalTranslation('error_page_button_title')}}
