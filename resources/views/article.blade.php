@@ -87,9 +87,7 @@
 
                         <div class="post-content">
                             <div class="w-100">
-                                <x-markdown>
-                                    {{ $article->getLocalTranslation('content') }}
-                                </x-markdown>
+                                {!! $article->getLocalTranslation('content') !!}
                             </div>
                         </div>
                         <!-- /.post-content -->

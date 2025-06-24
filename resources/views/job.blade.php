@@ -78,19 +78,13 @@
                             {{getLanguageKeyLocalTranslation('job_description_title')}}
                         </h2>
                         
-                        @if($job->getLocalTranslation('description'))
                         <div class="mb-4">
                             <p>{{$job->getLocalTranslation('description')}}</p>
                         </div>
-                        @endif
 
-                        @if($job->getLocalTranslation('content'))
                         <div class="mb-6">
-                            <x-markdown>
-                                {{ $job->getLocalTranslation('content') }}
-                            </x-markdown>
+                            {!! $job->getLocalTranslation('content') !!}
                         </div>
-                        @endif
                         
                         <!-- Application Actions -->
                         <div class="d-flex align-items-center">

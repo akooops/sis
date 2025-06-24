@@ -220,7 +220,7 @@
 
                                             <p class="mb-6">
                                                 <div class="page-content">
-                                                    <x-markdown>{{ $visitService->getLocalTranslation('content') }}</x-markdown>
+                                                    {!! $visitService->getLocalTranslation('content') !!}
                                                 </div>
                                             </p>
                                         </div>

@@ -96,9 +96,7 @@
             <hr class="mt-2 mb-4" data-aos="fade-up" data-aos-duration="1500">
 
             <div class="w-100" data-aos="fade-up" data-aos-duration="2000">
-                <x-markdown>
-                    {{ $grade->getLocalTranslation('content') }}
-                </x-markdown>
+                {!!$grade->getLocalTranslation('content') !!}
             </div>
         </div>
 
