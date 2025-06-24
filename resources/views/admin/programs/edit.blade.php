@@ -1,8 +1,14 @@
 @extends('admin.layouts.master')
 @section('title') Programs @endsection
 @section('css')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<link href="{{ URL::asset('assets/admin/libs/summernote/summernote-lite.min.css')}}" rel="stylesheet" type="text/css" />
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
 <style>
+    .note-editable{
+        background-color: #fff
+    }
+
     .is-invalid {
         border-color: #dc3545 !important;
     }
@@ -135,19 +141,9 @@
                             </div>
                         </div>
                     </form>
-                    
-                    <!-- Success alert for AJAX responses -->
-                    <div class="alert alert-success alert-dismissible fade translation-success" role="alert" id="translationSuccess">
-                        <strong>Success!</strong> <span id="successMessage">Translation updated successfully.</span>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
 
                     <div class="card">
                         <div class="card-body">
-                            @foreach ($languages as $language)
-                                <input type="file" id="image-upload-{{$language->id}}" accept="image/*" style="display: none;">
-                            @endforeach
-
                             <!-- Nav tabs -->
                             <ul class="nav nav-tabs nav-justified nav-border-top nav-border-top-success mb-3" role="tablist">
                                 @foreach ($languages as $key => $language)
@@ -186,7 +182,7 @@
 
                                             <div class="mb-4">
                                                 <label class="form-label" for="content-{{$language->id}}">Content <span class="text-danger">*</span></label>
-                                                <textarea id="content-{{$language->id}}" name="content" class="form-control translation-content markdown-editor">{{$program->getTranslation('content', $language->code)}}</textarea>
+                                                <textarea id="content-{{$language->id}}" name="content" class="form-control summernote-editor">{{$program->getTranslation('content', $language->code)}}</textarea>
                                                 <div class="translation-error" id="error-content-{{$language->id}}"></div>
                                             </div>
 
@@ -215,7 +211,8 @@
 @endsection
 @section('script')
 <script src="{{ URL::asset('/assets/admin/js/app.min.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+<script src="{{ URL::asset('assets/admin/libs/summernote/summernote-lite.min.js')}}"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Toggle between upload and select
@@ -254,40 +251,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize editors object to store references
     const editors = {};
     
-    // Initialize SimpleMDE on visible tab first
+    // Initialize Summernote on visible tab first
     const activeTab = document.querySelector('.tab-pane.active');
     if (activeTab) {
-        const editorElement = activeTab.querySelector('.markdown-editor');
+        const editorElement = activeTab.querySelector('.summernote-editor');
         if (editorElement) {
-            const languageId = editorElement.id.split('-')[1];
-            editors[editorElement.id] = initializeEditor(editorElement, languageId);
-            setupFileUploadListener(languageId);
+            editors[editorElement.id] = initializeEditor(editorElement);
         }
     }
     
-    function initializeEditor(element, languageId) {
-        return new SimpleMDE({
-            element: element,
-            spellChecker: false,
-            autosave: {
-                enabled: false,
-                delay: 1000,
-                uniqueId: element.id
-            },
-            toolbar: [
-                "bold", "italic", "heading", "|", 
-                "quote", "unordered-list", "ordered-list", "|",
-                {
-                    name: "custom-image",
-                    action: function(editor) {
-                        document.getElementById(`image-upload-${languageId}`).click();
-                    },
-                    className: "fa fa-picture-o",
-                    title: "Upload Image",
-                },
-                "link", "preview", "side-by-side", "fullscreen"
-            ]
+    function initializeEditor(element) {
+        $(element).summernote({
+            height: 400,
+            minHeight: 300,
+            maxHeight: 600,
+            focus: false,
+            codeviewFilter: false,
+            codeviewIframeFilter: false,
+            disableDragAndDrop: false,
         });
+        return $(element);
     }
     
     // Listen for tab show events
@@ -296,76 +279,14 @@ document.addEventListener('DOMContentLoaded', function() {
         tab.addEventListener('shown.bs.tab', function(event) {
             const targetId = event.target.getAttribute('href').substring(1);
             const targetPane = document.getElementById(targetId);
-            const editorElement = targetPane.querySelector('.markdown-editor');
+            const editorElement = targetPane.querySelector('.summernote-editor');
             
-            if (editorElement) {
-                const languageId = editorElement.id.split('-')[1];
-                
-                if (editors[editorElement.id]) {
-                    // If editor exists, refresh it
-                    editors[editorElement.id].codemirror.refresh();
-                } else {
-                    // If editor doesn't exist yet, initialize it
-                    editors[editorElement.id] = initializeEditor(editorElement, languageId);
-                    setupFileUploadListener(languageId);
-                }
+            if (editorElement && !editors[editorElement.id]) {
+                // Initialize editor if it doesn't exist yet
+                editors[editorElement.id] = initializeEditor(editorElement);
             }
         });
     });
-
-    function setupFileUploadListener(languageId) {
-        document.getElementById(`image-upload-${languageId}`).addEventListener('change', function(e) {
-            e.stopPropagation(); 
-
-            const file = this.files[0];
-            if (!file) return;
-            
-            const editorId = `content-${languageId}`;
-            const editor = editors[editorId];
-            
-            // Show loading indicator in editor
-            const cm = editor.codemirror;
-            const cursor = cm.getCursor();
-            cm.replaceRange('![Uploading image...]()', cursor);
-            
-            // Create form data for upload
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('_token', document.querySelector('input[name="_token"]').value);
-
-            // Send to your server
-            fetch('{{ route('admin.files.upload') }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    // Replace loading text with actual image markdown
-                    const text = cm.getValue();
-                    const newText = text.replace(
-                        '![Uploading image...]()', 
-                        `![${file.name}](${data.data.file.url})`
-                    );
-                    cm.setValue(newText);
-                } else {
-                    throw new Error('Upload failed');
-                }
-            })
-            .catch(error => {
-                // Handle error - replace loading text with error message
-                const text = cm.getValue();
-                cm.setValue(text.replace('![Uploading image...]()', '![Upload failed]()')); 
-                console.error('Upload failed:', error);
-            });
-            
-            // Clear the input so the same file can be selected again
-            this.value = '';
-        });
-    }
 
     // Auto slug generation
     const nameInput = document.querySelector('input[name="name"]');
@@ -413,6 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Reset validation state
             titleInput.classList.remove('is-invalid');
+            subtitleInput.classList.remove('is-invalid');
             descriptionTextarea.classList.remove('is-invalid');
             document.getElementById(`error-title-${languageId}`).textContent = '';
             document.getElementById(`error-subtitle-${languageId}`).textContent = '';
@@ -432,7 +354,10 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('title', titleInput.value);
             formData.append('subtitle', subtitleInput.value);
             formData.append('description', descriptionTextarea.value);
-            formData.append('content', editors[contentId].value());
+            
+            // Get Summernote content
+            const summernoteContent = $(`#${contentId}`).summernote('code');
+            formData.append('content', summernoteContent);
             
             // Send AJAX request
             fetch('{{ route('admin.programs.update-translation', $program->id) }}', {
@@ -470,7 +395,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
 
                     if (error.errors.subtitle) {
-                        titleInput.classList.add('is-invalid');
+                        subtitleInput.classList.add('is-invalid');
                         document.getElementById(`error-subtitle-${languageId}`).textContent = error.errors.subtitle[0];
                     }
                     
@@ -495,6 +420,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
 </script>
 @endsection
