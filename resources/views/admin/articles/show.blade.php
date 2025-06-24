@@ -97,10 +97,8 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <h4 class="fs-15">Article {{$language->name}} content</h4>
-                                            <x-markdown>
-                                                {{ $article->getTranslation('content', $language->code) }}
-                                            </x-markdown>
+                                            <h4 class="fs-15">Article {{$language->name}} content</h4>                 
+                                            {!! $article->getTranslation('content', $language->code) !!}
                                         </div>
                                     </div>
                                 @endforeach
