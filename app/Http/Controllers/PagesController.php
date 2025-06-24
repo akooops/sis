@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Album;
 use App\Models\Article;
 use App\Models\Banner;
+use App\Models\Document;
 use App\Models\Event;
 use App\Models\Grade;
 use App\Models\JobPosting;
@@ -293,5 +294,22 @@ class PagesController extends Controller
         $grades = Grade::where('program_id', $grade->program_id)->get();
 
         return view('grade', compact('grade', 'grades'));
+    }
+
+    public function documents(Request $request)
+    {
+        $page = Page::where([
+            'slug' => 'documents',
+            'status' => 'published'
+        ])->first();
+
+        if(!$page) abort(404);
+
+        $documents = Document::get();
+
+        return view('documents', [
+            'page' => $page,
+            'documents' => $documents
+        ]);
     }
 }

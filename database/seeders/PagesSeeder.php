@@ -68,6 +68,13 @@ class PagesSeeder extends Seeder
                 'menu_id' => null,
             ],
             [
+                'name' => 'Documents',
+                'slug' => 'documents',
+                'is_system_page' => true,
+                'status' => 'published',
+                'menu_id' => null,
+            ],
+            [
                 'name' => 'Error',
                 'slug' => 'error',
                 'is_system_page' => true,
@@ -207,6 +214,20 @@ class PagesSeeder extends Seeder
                 'content' => [
                     'en' => 'Discover exciting career opportunities at Saud International Schools. We are always looking for passionate educators and dedicated professionals to join our team and help shape the future of education.',
                     'ar' => 'اكتشف الفرص الوظيفية المثيرة في مدارس سعود العالمية. نحن نبحث دائماً عن معلمين متحمسين ومهنيين متفانين للانضمام إلى فريقنا والمساعدة في تشكيل مستقبل التعليم.'
+                ]
+            ],
+            'documents' => [
+                'title' => [
+                    'en' => 'School Documents',
+                    'ar' => 'وثائق المدرسة'
+                ],
+                'description' => [
+                    'en' => 'Access important school documents, policies, and forms',
+                    'ar' => 'الوصول إلى وثائق المدرسة المهمة والسياسات والنماذج'
+                ],
+                'content' => [
+                    'en' => 'Find all the important school documents including policies, handbooks, forms, and official communications. All documents are available for download.',
+                    'ar' => 'ابحث عن جميع وثائق المدرسة المهمة بما في ذلك السياسات والكتيبات والنماذج والمراسلات الرسمية. جميع الوثائق متاحة للتحميل.'
                 ]
             ],
             'error' => [

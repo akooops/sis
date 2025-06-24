@@ -84,6 +84,22 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Thank you for your message! We will get back to you as soon as possible.',
                 'ar' => 'شكراً لك على رسالتك! سنتواصل معك في أقرب وقت ممكن.'
             ],
+            'documents_page_collapse_title' => [
+                'en' => 'Files',
+                'ar' => 'الملفات'
+            ],
+            'documents_page_table_cta' => [
+                'en' => 'Download',
+                'ar' => 'التحميل'
+            ],
+            'documents_page_table_header_file' => [
+                'en' => 'File',
+                'ar' => 'الملف'
+            ],
+            'documents_page_table_header_option' => [
+                'en' => 'Options',
+                'ar' => 'الإطلاع'
+            ],
             'error_page_button_title' => [
                 'en' => 'Home page',
                 'ar' => 'الصفحة الرئيسية'
@@ -153,8 +169,8 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => 'اعرف المزيد'
             ],
             'index_page_first_section_subtitle' => [
-                'en' => 'The mission of Saud International School is to provide a challenging educational environment that meets the needs of the diverse community by offering a worldwide known curriculum implemented with state of the art technology along with  extra-curricular activities.',
-                'ar' => 'مهمة مدارس سعود العالمية هي توفير بيئة تعليمية تحدي تلبي احتياجات المجتمع المتنوع من خلال تقديم منهج معروف عالمياً مطبق بأحدث التقنيات مع الأنشطة اللامنهجية.'
+                'en' => 'Welcome to Saud International School! We\'re thrilled to have you join our diverse community where we provide a challenging and inspiring educational environment. Together, we\'ll explore our internationally recognized curriculum enhanced with cutting-edge technology and enriching extra-curricular activities designed to help you thrive and discover your potential.',
+                'ar' => 'مرحباً بكم في مدارس سعود العالمية! نحن متحمسون لانضمامكم إلى مجتمعنا المتنوع حيث نوفر بيئة تعليمية تحدي وملهمة. معاً، سنستكشف منهجنا المعترف به دولياً والمعزز بأحدث التقنيات والأنشطة اللامنهجية الإثرائية المصممة لمساعدتكم على الازدهار واكتشاف إمكاناتكم.'
             ],
             'index_page_first_section_title' => [
                 'en' => 'Welcome to Saud international schools',
@@ -205,8 +221,8 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => 'اعرف المزيد'
             ],
             'index_page_third_section_subtitle' => [
-                'en' => '',
-                'ar' => ''
+                'en' => 'Discover the impressive milestones and achievements that showcase our commitment to educational excellence.',
+                'ar' => 'اكتشف المعالم والإنجازات المثيرة للإعجاب التي تظهر التزامنا بالتميز التعليمي.'
             ],
             'index_page_third_section_title' => [
                 'en' => 'Saud international schools In number',

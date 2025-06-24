@@ -305,6 +305,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/events', [ControllersPagesController::class, 'events'])->name('events');
     Route::get('/jobs', [ControllersPagesController::class, 'jobs'])->name('jobs');
     Route::get('/programs/{program}', [ControllersPagesController::class, 'program'])->name('program');
+    Route::get('/documents', [ControllersPagesController::class, 'documents'])->name('documents');
 
     Route::get('/{slug}', [ControllersPagesController::class, 'page'])->name('page');
     Route::get('/program/{slug}', [ControllersPagesController::class, 'program'])->name('program');
