@@ -157,10 +157,8 @@
                                         <div class="mb-4">
                                             <h4 class="fs-15">Job {{$language->name}} Content</h4>
                                             @if($jobPosting->getTranslation('content', $language->code))
-                                                <div class="border rounded p-3" style="background: #f8f9fa;">
-                                                    <x-markdown>
-                                                        {{ $jobPosting->getTranslation('content', $language->code) }}
-                                                    </x-markdown>
+                                                <div class="border rounded p-3" style="background: #f8f9fa;">                                       
+                                                    {!! $jobPosting->getTranslation('content', $language->code) !!}
                                                 </div>
                                             @else
                                                 <p class="text-muted mb-0"><em>No translation available</em></p>
