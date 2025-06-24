@@ -122,9 +122,7 @@
 
                                         <div class="mb-3">
                                             <h4 class="fs-15">Grade {{$language->name}} content</h4>
-                                            <x-markdown>
-                                                {{ $grade->getTranslation('content', $language->code) }}
-                                            </x-markdown>
+                                            {!! $grade->getTranslation('content', $language->code) !!}
                                         </div>
                                     </div>
                                 @endforeach

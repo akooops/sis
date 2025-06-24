@@ -1,22 +1,14 @@
 @extends('admin.layouts.master')
 @section('title') Grades @endsection
 @section('css')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<link href="{{ URL::asset('assets/admin/libs/summernote/summernote-lite.min.css')}}" rel="stylesheet" type="text/css" />
 <link href="{{ URL::asset('assets/admin/libs/dropzone/dropzone.min.css')}}" rel="stylesheet" type="text/css" />
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <style>
-    .editor-toolbar.fullscreen{
-        z-index: 9999999;
-    }
-
-    .CodeMirror-fullscreen{
-        z-index: 9999999;
-    }
-
-    .editor-preview-side {
-        z-index: 9999999;
+    .note-editable{
+        background-color: #fff
     }
 </style>
 @endsection
@@ -175,8 +167,6 @@
                                     </ul>
                                     <!-- end dropzon-preview -->
                                 </div>
-
-
                             </div>
                         </div>
 
@@ -207,10 +197,8 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <input type="file" id="image-upload" accept="image/*" style="display: none;">
-
                                     <label class="form-label" for="">Grade {{$defaultLanguage->name}} content <span class="text-danger">*</span></label>
-                                    <textarea id="markdown-editor" name="content" type="text" class="form-control">{{old('content')}}</textarea>
+                                    <textarea id="summernote-editor" name="content" class="form-control">{{old('content')}}</textarea>
                                     @error('content')
                                         <p class="mx-2 my-2 text-danger">
                                             <strong>
@@ -248,13 +236,13 @@
 <script src="{{ URL::asset('assets/admin/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
 
 <script src="{{ URL::asset('/assets/admin/js/app.min.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+<script src="{{ URL::asset('assets/admin/libs/summernote/summernote-lite.min.js')}}"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-        var previewTemplate,
-        dropzone,
-        dropzonePreviewNode = document.querySelector("#dropzone-preview-list");
+    var previewTemplate,
+    dropzone,
+    dropzonePreviewNode = document.querySelector("#dropzone-preview-list");
     (dropzonePreviewNode.id = ""),
         dropzonePreviewNode &&
             ((previewTemplate = dropzonePreviewNode.parentNode.innerHTML),
@@ -298,7 +286,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-        
     // Toggle between upload and select
     document.getElementById('media_option_upload').addEventListener('change', function() {
         document.getElementById('upload_section').style.display = '';
@@ -332,26 +319,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    const simplemde = new SimpleMDE({ 
-        element: document.getElementById("markdown-editor"),
-        spellChecker: false,
-        autosave: {
-            enabled: false,
-            delay: 1000,
-        },
-        toolbar: [
-            "bold", "italic", "heading", "|", 
-            "quote", "unordered-list", "ordered-list", "|",
-            {
-                name: "custom-image",
-                action: function customFunction(editor){
-                    document.getElementById('image-upload').click();
-                },
-                className: "fa fa-picture-o",
-                title: "Upload Image",
-            },
-            "link", "preview", "side-by-side", "fullscreen"
-        ]
+    // Initialize Summernote
+    $('#summernote-editor').summernote({
+        height: 400,
+        minHeight: 300,
+        maxHeight: 600,
+        focus: false,
+        codeviewFilter: false,
+        codeviewIframeFilter: false,
+        disableDragAndDrop: false,
     });
 
     // Handle name to slug conversion
@@ -381,54 +357,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set flag when slug is manually edited
     slugInput.addEventListener('input', function() {
         slugManuallyEdited = true;
-    });
-
-    // Handle image upload
-    document.getElementById('image-upload').addEventListener('change', function() {
-        const file = this.files[0];
-        if (!file) return;
-        
-        // Show loading indicator in editor
-        const cm = simplemde.codemirror;
-        const cursor = cm.getCursor();
-        cm.replaceRange('![Uploading image...]()', cursor);
-        
-        // Create form data for upload
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        // Send to your server
-        fetch('{{ route('admin.files.upload') }}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Replace loading text with actual image markdown
-                const text = cm.getValue();
-                const newText = text.replace(
-                    '![Uploading image...]()', 
-                    `![${file.name}](${data.data.file.url})`
-                );
-                cm.setValue(newText);
-            } else {
-                throw new Error('Upload failed');
-            }
-        })
-        .catch(error => {
-            // Handle error - replace loading text with error message
-            const text = cm.getValue();
-            cm.setValue(text.replace('![Uploading image...]()', '![Upload failed]()')); 
-            console.error('Upload failed:', error);
-        });
-        
-        // Clear the input so the same file can be selected again
-        this.value = '';
     });
 });
 </script>

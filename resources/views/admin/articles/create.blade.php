@@ -252,28 +252,6 @@ document.addEventListener('DOMContentLoaded', function() {
         codeviewIframeFilter: false,
         disableDragAndDrop: false,
     });
-
-    // Form validation to check for content
-    $('form').on('submit', function(e) {
-        const content = $('#summernote-editor').summernote('code').trim();
-        
-        // Remove empty HTML tags for validation
-        const textContent = content.replace(/<[^>]*>/g, '').trim();
-        
-        if (textContent.length === 0) {
-            e.preventDefault();
-            alert('Content cannot be empty');
-            return false;
-        }
-        
-        // Optional: Check for potentially dangerous HTML
-        if (content.includes('<script') || content.includes('javascript:')) {
-            if (!confirm('Your content contains potentially dangerous code. Are you sure you want to continue?')) {
-                e.preventDefault();
-                return false;
-            }
-        }
-    });
 });
 </script>
 @endsection
