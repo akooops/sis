@@ -13,11 +13,12 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class DashboardContoller extends Controller
 {
     public function index()
     {
-        return view('admin.index');
+        return Inertia::render('Home');
     }
 }

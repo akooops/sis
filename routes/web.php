@@ -66,7 +66,7 @@ Route::prefix('admin')->middleware(['force.admin.english'])->group(function () {
     Route::get('auth/azure/callback', [AuthController::class, 'handleAzureCallback'])->name('admin.auth.azure.callback');
 });
 
-Route::middleware(['auth', 'force.admin.english'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('admin')->group(function () {
     Route::get('/', [DashboardContoller::class, 'index'])->middleware('check.permission:admin.dashboard.index')->name('admin.dashboard');
 
     //Auth
