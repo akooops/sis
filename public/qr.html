@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR/Barcode Scanner - Web Serial API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .connect-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .connect-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .disconnect-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .disconnect-btn:hover {
+            background-color: #da190b;
+        }
+        
+        .clear-btn {
+            background-color: #008CBA;
+            color: white;
+        }
+        
+        .clear-btn:hover {
+            background-color: #007B9A;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .status.disconnected {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .status.connected {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .results {
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            min-height: 200px;
+            background-color: #fafafa;
+        }
+        
+        .result-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            border-left: 4px solid #4CAF50;
+            word-break: break-all;
+        }
+        
+        .timestamp {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .barcode-data {
+            font-family: monospace;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .settings {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .setting-group {
+            margin-bottom: 10px;
+        }
+        
+        label {
+            display: inline-block;
+            width: 100px;
+            font-weight: bold;
+        }
+        
+        select, input {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 QR/Barcode Scanner via Web Serial</h1>
+        
+        <!-- Connection Status -->
+        <div id="status" class="status disconnected">
+            Status: Disconnected
+        </div>
+        
+        <!-- Serial Port Settings -->
+        <div class="settings">
+            <h3>Serial Port Settings</h3>
+            <div class="setting-group">
+                <label>Baud Rate:</label>
+                <select id="baudRate">
+                    <option value="9600" selected>9600</option>
+                    <option value="19200">19200</option>
+                    <option value="38400">38400</option>
+                    <option value="57600">57600</option>
+                    <option value="115200">115200</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label>Data Bits:</label>
+                <select id="dataBits">
+                    <option value="8" selected>8</option>
+                    <option value="7">7</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label>Stop Bits:</label>
+                <select id="stopBits">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+            <div class="setting-group">
+                <label>Parity:</label>
+                <select id="parity">
+                    <option value="none" selected>None</option>
+                    <option value="even">Even</option>
+                    <option value="odd">Odd</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Control Buttons -->
+        <div class="controls">
+            <button id="connectBtn" class="connect-btn">Connect Scanner</button>
+            <button id="disconnectBtn" class="disconnect-btn" disabled>Disconnect</button>
+            <button id="clearBtn" class="clear-btn">Clear Results</button>
+        </div>
+        
+        <!-- Error Display -->
+        <div id="errorDisplay" style="display: none;"></div>
+        
+        <!-- Results Display -->
+        <div class="results">
+            <h3>Scanned Results:</h3>
+            <div id="results">
+                <p style="color: #666; font-style: italic;">No scans yet. Connect your scanner and start scanning!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class BarcodeScanner {
+            constructor() {
+                this.port = null;
+                this.reader = null;
+                this.writer = null;
+                this.isConnected = false;
+                this.scanCount = 0;
+                
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                document.getElementById('connectBtn').addEventListener('click', () => this.connect());
+                document.getElementById('disconnectBtn').addEventListener('click', () => this.disconnect());
+                document.getElementById('clearBtn').addEventListener('click', () => this.clearResults());
+            }
+
+            async connect() {
+                try {
+                    this.showError(''); // Clear any previous errors
+                    
+                    // Check if Web Serial API is supported
+                    if (!('serial' in navigator)) {
+                        throw new Error('Web Serial API is not supported in this browser. Please use Chrome or Edge.');
+                    }
+
+                    // Request port access
+                    this.port = await navigator.serial.requestPort();
+                    
+                    // Get serial port settings from UI
+                    const settings = this.getSerialSettings();
+                    
+                    // Open the port
+                    await this.port.open(settings);
+                    
+                    this.isConnected = true;
+                    this.updateConnectionStatus(true);
+                    this.updateButtonStates();
+                    
+                    console.log('Connected to barcode scanner with settings:', settings);
+                    
+                    // Start reading data
+                    this.startReading();
+                    
+                } catch (error) {
+                    console.error('Connection failed:', error);
+                    this.showError(`Connection failed: ${error.message}`);
+                    this.updateConnectionStatus(false);
+                }
+            }
+
+            async disconnect() {
+                try {
+                    if (this.reader) {
+                        await this.reader.cancel();
+                        this.reader = null;
+                    }
+                    
+                    if (this.port) {
+                        await this.port.close();
+                        this.port = null;
+                    }
+                    
+                    this.isConnected = false;
+                    this.updateConnectionStatus(false);
+                    this.updateButtonStates();
+                    
+                    console.log('Disconnected from barcode scanner');
+                    
+                } catch (error) {
+                    console.error('Disconnect error:', error);
+                    this.showError(`Disconnect error: ${error.message}`);
+                }
+            }
+
+            async startReading() {
+                try {
+                    while (this.port && this.port.readable) {
+                        const textDecoder = new TextDecoderStream();
+                        const readableStreamClosed = this.port.readable.pipeTo(textDecoder.writable);
+                        
+                        this.reader = textDecoder.readable
+                            .pipeThrough(new TransformStream(new LineBreakTransformer()))
+                            .getReader();
+
+                        try {
+                            while (true) {
+                                const { value, done } = await this.reader.read();
+                                if (done) break;
+                                
+                                if (value && value.trim()) {
+                                    const cleanData = value.trim();
+                                    console.log('Scanned data:', cleanData);
+                                    this.handleScannedData(cleanData);
+                                }
+                            }
+                        } catch (error) {
+                            if (error.name !== 'AbortError') {
+                                console.error('Reading error:', error);
+                                this.showError(`Reading error: ${error.message}`);
+                            }
+                        } finally {
+                            if (this.reader) {
+                                this.reader.releaseLock();
+                            }
+                        }
+                        
+                        await readableStreamClosed.catch(() => {}); // Ignore the error
+                    }
+                } catch (error) {
+                    console.error('Start reading error:', error);
+                    this.showError(`Reading error: ${error.message}`);
+                }
+            }
+
+            handleScannedData(data) {
+                this.scanCount++;
+                const timestamp = new Date().toLocaleString();
+                
+                // Create result element
+                const resultElement = document.createElement('div');
+                resultElement.className = 'result-item';
+                resultElement.innerHTML = `
+                    <div class="timestamp">Scan #${this.scanCount} - ${timestamp}</div>
+                    <div class="barcode-data">${this.escapeHtml(data)}</div>
+                `;
+                
+                // Add to results
+                const resultsContainer = document.getElementById('results');
+                
+                // Remove "no scans" message if it exists
+                if (this.scanCount === 1) {
+                    resultsContainer.innerHTML = '';
+                }
+                
+                // Insert at the top
+                resultsContainer.insertBefore(resultElement, resultsContainer.firstChild);
+                
+                // Limit to 50 results to prevent memory issues
+                const results = resultsContainer.children;
+                if (results.length > 50) {
+                    resultsContainer.removeChild(results[results.length - 1]);
+                }
+                
+                // Trigger custom event for external handling
+                const customEvent = new CustomEvent('barcodeScanned', {
+                    detail: { data: data, timestamp: timestamp, scanNumber: this.scanCount }
+                });
+                document.dispatchEvent(customEvent);
+            }
+
+            getSerialSettings() {
+                return {
+                    baudRate: parseInt(document.getElementById('baudRate').value),
+                    dataBits: parseInt(document.getElementById('dataBits').value),
+                    stopBits: parseInt(document.getElementById('stopBits').value),
+                    parity: document.getElementById('parity').value,
+                    flowControl: "none"
+                };
+            }
+
+            updateConnectionStatus(connected) {
+                const statusElement = document.getElementById('status');
+                if (connected) {
+                    statusElement.textContent = 'Status: Connected ✅';
+                    statusElement.className = 'status connected';
+                } else {
+                    statusElement.textContent = 'Status: Disconnected ❌';
+                    statusElement.className = 'status disconnected';
+                }
+            }
+
+            updateButtonStates() {
+                document.getElementById('connectBtn').disabled = this.isConnected;
+                document.getElementById('disconnectBtn').disabled = !this.isConnected;
+                
+                // Disable settings when connected
+                const settingElements = ['baudRate', 'dataBits', 'stopBits', 'parity'];
+                settingElements.forEach(id => {
+                    document.getElementById(id).disabled = this.isConnected;
+                });
+            }
+
+            clearResults() {
+                document.getElementById('results').innerHTML = 
+                    '<p style="color: #666; font-style: italic;">Results cleared.</p>';
+                this.scanCount = 0;
+            }
+
+            showError(message) {
+                const errorDisplay = document.getElementById('errorDisplay');
+                if (message) {
+                    errorDisplay.innerHTML = `<div class="error">${this.escapeHtml(message)}</div>`;
+                    errorDisplay.style.display = 'block';
+                } else {
+                    errorDisplay.style.display = 'none';
+                }
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        // Line break transformer to handle data chunks properly
+        class LineBreakTransformer {
+            constructor() {
+                this.chunks = "";
+            }
+
+            transform(chunk, controller) {
+                this.chunks += chunk;
+                const lines = this.chunks.split(/\r\n|\r|\n/);
+                this.chunks = lines.pop() || "";
+                lines.forEach((line) => {
+                    if (line.length > 0) {
+                        controller.enqueue(line);
+                    }
+                });
+            }
+
+            flush(controller) {
+                if (this.chunks.length > 0) {
+                    controller.enqueue(this.chunks);
+                }
+            }
+        }
+
+        // Initialize the scanner when page loads
+        let scanner;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            scanner = new BarcodeScanner();
+            
+            // Listen for custom barcode events (optional - for external integration)
+            document.addEventListener('barcodeScanned', (event) => {
+                console.log('Custom event - Barcode scanned:', event.detail);
+                // You can add additional processing here
+            });
+            
+            // Check for Web Serial support
+            if (!('serial' in navigator)) {
+                scanner.showError('⚠️ Web Serial API is not supported in this browser. Please use Chrome 89+ or Edge 89+.');
+            }
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (scanner && scanner.isConnected) {
+                scanner.disconnect();
+            }
+        });
+    </script>
+</body>
+</html>

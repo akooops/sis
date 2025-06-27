@@ -225,8 +225,8 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => 'اكتشف المعالم والإنجازات المثيرة للإعجاب التي تظهر التزامنا بالتميز التعليمي.'
             ],
             'index_page_third_section_title' => [
-                'en' => 'Saud international schools In number',
-                'ar' => 'مدارس سعود العالمية بالأرقام'
+                'en' => 'Saud facts and figures',
+                'ar' => 'حقائق وأرقام مدارس سعود'
             ],
             'inquiry_page_birthdate_input' => [
                 'en' => 'Student Birthdate',
