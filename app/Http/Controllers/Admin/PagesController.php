@@ -241,10 +241,9 @@ class PagesController extends Controller
      */
     public function destroy(Page $page, DeletePageRequest $request)
     {
-        dd($page);
-        //$page->delete();
+        $page->delete();
 
-        //cache()->forget("page-{$page->id}");
+        cache()->forget("page-{$page->id}");
 
         return response()->json([
             'status' => 'success',
