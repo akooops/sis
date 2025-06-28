@@ -39,10 +39,14 @@ class PagesController extends Controller
 
         $pages = $pages->paginate($perPage, ['*'], 'page', $page);
 
-        return view('admin.pages.index', [
-            'pages' => $pages,
-            'pagination' => $this->indexService->handlePagination($pages)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'pages' => $pages->items(),
+                'pagination' => $this->indexService->handlePagination($pages)
+            ]);
+        }
+
+        return inertia('Pages/Index');
     }
     
     /**

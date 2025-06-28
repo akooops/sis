@@ -1,7 +1,11 @@
 <script>
-  import Sidebar from './Sidebar.svelte';
-  import Topbar from './Topbar.svelte';
-  import Breadcrumbs from './Breadcrumbs.svelte';
+  import Sidebar from '../Components/Sidebar.svelte';
+  import Topbar from '../Components/Topbar.svelte';
+  import Breadcrumbs from '../Components/Breadcrumbs.svelte';
+  
+  // Props for the layout
+  export let breadcrumbs = [];
+  export let pageTitle = 'Dashboard';
 </script>
 
 <div class="flex grow">
@@ -16,10 +20,11 @@
         <!-- End of Sidebar -->
 
         <!-- Main -->
-        <div class="flex flex-col grow lg:rounded-l-xl bg-background border border-input lg:ms-(--sidebar-width) h-screen lg:h-[calc(100vh-var(--header-height))]">
+        <div class="flex flex-col grow lg:rounded-l-xl bg-background border border-input lg:ms-(--sidebar-width) h-screen" style="min-height: 100vh; width: 100%;">
             <div class="flex flex-col grow kt-scrollable-y-auto lg:[--kt-scrollbar-width:auto] pt-5 overflow-y-auto" id="scrollable_content">
                 <main class="grow" role="content">
-                    <Breadcrumbs />
+                    <Breadcrumbs {breadcrumbs} {pageTitle} />
+
                     <slot />
                 </main>
             </div>
