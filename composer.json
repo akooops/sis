@@ -14,7 +14,8 @@
         "laravel/socialite": "^5.20",
         "laravel/tinker": "^2.8",
         "socialiteproviders/microsoft-azure": "^5.2",
-        "spatie/laravel-markdown": "^2.7"
+        "spatie/laravel-markdown": "^2.7",
+        "tightenco/ziggy": "^2.5"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

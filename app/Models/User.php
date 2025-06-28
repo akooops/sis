@@ -50,6 +50,18 @@ class User extends Authenticatable
             ->using(UserRole::class)
             ->withTimestamps();
     }
+
+    public function permissions()
+    {
+        return $this->roles()
+            ->with('permissions')
+            ->get()
+            ->pluck('permissions')
+            ->flatten()
+            ->unique('id')
+            ->values()
+            ->pluck('name');
+    }
     
     //Scopes
 
@@ -100,4 +112,4 @@ class User extends Authenticatable
 
         return $query->exists();
     }
-}
+}   

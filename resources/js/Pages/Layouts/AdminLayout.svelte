@@ -16,8 +16,8 @@
         <!-- End of Sidebar -->
 
         <!-- Main -->
-        <div class="flex flex-col grow lg:rounded-l-xl bg-background border border-input lg:ms-(--sidebar-width)">
-            <div class="flex flex-col grow kt-scrollable-y-auto lg:[--kt-scrollbar-width:auto] pt-5" id="scrollable_content">
+        <div class="flex flex-col grow lg:rounded-l-xl bg-background border border-input lg:ms-(--sidebar-width) h-screen lg:h-[calc(100vh-var(--header-height))]">
+            <div class="flex flex-col grow kt-scrollable-y-auto lg:[--kt-scrollbar-width:auto] pt-5 overflow-y-auto" id="scrollable_content">
                 <main class="grow" role="content">
                     <Breadcrumbs />
                     <slot />

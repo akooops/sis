@@ -118,6 +118,58 @@ class PermissionsSeeder extends Seeder
             'admin.banners.destroy',
             'admin.banners.order',
             
+            // Documents Management
+            'admin.documents.index',
+            'admin.documents.store',
+            'admin.documents.show',
+            'admin.documents.update',
+            'admin.documents.destroy',
+            
+            // Visit Services Management
+            'admin.visit-services.index',
+            'admin.visit-services.store',
+            'admin.visit-services.show',
+            'admin.visit-services.update',
+            'admin.visit-services.destroy',
+            'admin.visit-services.order',
+            
+            // Visit Time Slots Management
+            'admin.visit-time-slots.index',
+            'admin.visit-time-slots.store',
+            'admin.visit-time-slots.show',
+            'admin.visit-time-slots.update',
+            'admin.visit-time-slots.destroy',
+            
+            // Visit Bookings Management
+            'admin.visit-bookings.index',
+            'admin.visit-bookings.show',
+            'admin.visit-bookings.destroy',
+            
+            // Inquiries Management
+            'admin.inquiries.index',
+            'admin.inquiries.show',
+            'admin.inquiries.destroy',
+            
+            // Contact Submissions Management
+            'admin.contact-submissions.index',
+            'admin.contact-submissions.show',
+            'admin.contact-submissions.destroy',
+            
+            // Job Postings Management
+            'admin.job-postings.index',
+            'admin.job-postings.store',
+            'admin.job-postings.show',
+            'admin.job-postings.update',
+            'admin.job-postings.destroy',
+            
+            // Job Applications Management
+            'admin.job-applications.index',
+            'admin.job-applications.show',
+            'admin.job-applications.destroy',
+            
+            // Files Management
+            'admin.files.upload',
+            
             // Settings Management
             'admin.settings.index',
             'admin.settings.show',
@@ -177,6 +229,8 @@ class PermissionsSeeder extends Seeder
             ->orWhere('name', 'like', '%events%')
             ->orWhere('name', 'like', '%media%')
             ->orWhere('name', 'like', '%banners%')
+            ->orWhere('name', 'like', '%documents%')
+            ->orWhere('name', 'like', '%files%')
             ->get();
             
         $editorRole->permissions()->sync($editorPermissions->pluck('id'));
@@ -184,6 +238,10 @@ class PermissionsSeeder extends Seeder
         // Assign view-only permissions to Viewer
         $viewerPermissions = Permission::where('name', 'like', '%.index')
             ->orWhere('name', 'like', '%.show')
+            ->orWhere('name', 'like', '%inquiries%')
+            ->orWhere('name', 'like', '%contact-submissions%')
+            ->orWhere('name', 'like', '%visit-bookings%')
+            ->orWhere('name', 'like', '%job-applications%')
             ->get();
         $viewerRole->permissions()->sync($viewerPermissions->pluck('id'));
     }

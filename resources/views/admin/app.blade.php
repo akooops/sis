@@ -17,6 +17,7 @@
     <meta content="SIS - School Information System" property="og:title"/>
     <meta content="" property="og:description"/>
     <meta content="assets/media/app/og-image.png" property="og:image"/>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <!-- Favicon -->
     <link href="/assets/admin/media/app/favicon.ico" rel="shortcut icon"/>
@@ -32,10 +33,11 @@
     <link href="/assets/admin/vendors/keenicons/styles.bundle.css" rel="stylesheet"/>
     <link href="/assets/admin/css/styles.css" rel="stylesheet"/>
 
+    @routes
     @vite('resources/js/app.js')
     @inertiaHead
   </head>
-  <body class="antialiased flex h-full text-base text-foreground bg-background [--header-height:60px] [--sidebar-width:270px] lg:overflow-hidden bg-mono dark:bg-background">
+  <body class="antialiased flex h-full text-base text-foreground bg-background [--header-height:60px] [--sidebar-width:270px] bg-mono dark:bg-background">
   
   <!-- Theme Mode -->
   <script>
@@ -77,16 +79,5 @@
     
     <!-- Metronic Layout Scripts -->
     <script src="/assets/admin/js/widgets/general.js"></script>
-
-    <!-- Initialize Metronic -->
-    <script>
-      // Initialize Metronic components when DOM is ready
-      document.addEventListener('DOMContentLoaded', function() {
-        // Initialize any Metronic components here
-        if (typeof KT !== 'undefined') {
-          KT.init();
-        }
-      });
-    </script>
   </body>
 </html>

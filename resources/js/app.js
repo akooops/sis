@@ -3,6 +3,8 @@ import './bootstrap';
 import { createInertiaApp } from '@inertiajs/svelte'
 import { mount } from 'svelte'
 
+const route = window.route;
+
 createInertiaApp({
   resolve: name => {
     const pages = import.meta.glob('./Pages/**/*.svelte', { eager: true })
