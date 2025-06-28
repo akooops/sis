@@ -1,8 +1,7 @@
 <script>
     import AdminLayout from '../Layouts/AdminLayout.svelte';
     import Pagination from '../Components/Pagination.svelte';
-    import PageDetailsDrawer from './View.svelte';
-    import { onMount } from 'svelte';
+    import { onMount, tick } from 'svelte';
 
     // Define breadcrumbs for this page
     const breadcrumbs = [
@@ -29,10 +28,6 @@
     let currentPage = 1;
     let searchTimeout;
 
-    // Drawer state
-    let selectedPage = null;
-    let isDrawerOpen = false;
-
     // Fetch pages data
     async function fetchPages() {
         loading = true;
@@ -52,6 +47,12 @@
             const data = await response.json();
             pages = data.pages;
             pagination = data.pagination;
+            
+            // Wait for DOM to update, then initialize menus
+            await tick();
+            if (window.KTMenu) {
+                window.KTMenu.init();
+            }
         } catch (error) {
             console.error('Error fetching pages:', error);
         } finally {
@@ -122,32 +123,6 @@
         }
     }
 
-    // Open page details drawer
-    function openPageDetails(page) {
-        selectedPage = page;
-        isDrawerOpen = true;
-        
-        // Use Metronic's drawer toggle system
-        const drawerToggle = document.getElementById('page_details_drawer_toggle');
-        if (drawerToggle) {
-            drawerToggle.click();
-        }
-    }
-
-    // Close page details drawer
-    function closePageDetails() {
-        isDrawerOpen = false;
-        selectedPage = null;
-    }
-
-    // Handle page deleted from drawer
-    function handlePageDeleted(event) {
-        const { pageId } = event.detail;
-        // Remove the deleted page from the list
-        pages = pages.filter(page => page.id !== pageId);
-        closePageDetails();
-    }
-
     // Delete page
     async function deletePage(pageId) {
         if (!confirm('Are you sure you want to delete this page? This action cannot be undone.')) {
@@ -155,23 +130,49 @@
         }
 
         try {
-            const response = await fetch(`/admin/pages/${pageId}`, {
-                method: 'DELETE',
+            const formData = new FormData();
+            formData.append('_method', 'DELETE');
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
+
+            const response = await fetch(route('admin.pages.destroy', { page: pageId }), {
+                method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
                     'X-Requested-With': 'XMLHttpRequest'
-                }
+                },
+                body: formData
             });
 
             if (response.ok) {
+                // Show success toast
+                KTToast.show({
+                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+                    message: "Page deleted successfully!",
+                    variant: "success",
+                    position: "bottom-right",
+                });
+
                 // Refresh the pages list
                 fetchPages();
             } else {
-                alert('Error deleting page. Please try again.');
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.message || 'Error deleting page. Please try again.';
+                
+                KTToast.show({
+                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+                    message: errorMessage,
+                    variant: "destructive",
+                    position: "bottom-right",
+                });
             }
         } catch (error) {
             console.error('Error deleting page:', error);
-            alert('Error deleting page. Please try again.');
+            
+            KTToast.show({
+                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+                    message: "Network error. Please check your connection and try again.",
+                    variant: "destructive",
+                    position: "bottom-right",
+            });
         }
     }
 
@@ -291,9 +292,6 @@
                                                 <div class="kt-skeleton w-16 h-6 rounded"></div>
                                             </td>
                                             <td class="p-4">
-                                                <div class="kt-skeleton w-20 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-8 rounded"></div>
                                             </td>
                                         </tr>
@@ -320,7 +318,7 @@
                                 {:else}
                                     <!-- Actual data rows -->
                                     {#each pages as page}
-                                        <tr class="cursor-pointer hover:bg-muted/50" on:click={() => openPageDetails(page)}>
+                                        <tr class="hover:bg-muted/50">
                                             <td>
                                                 <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={page.id}/>
                                             </td>
@@ -339,9 +337,6 @@
                                                     <div class="flex flex-col gap-1">
                                                         <span class="text-sm font-medium text-mono hover:text-primary">
                                                             {page.name}
-                                                        </span>
-                                                        <span class="text-xs text-secondary-foreground">
-                                                            {page.title || 'No title'}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -363,39 +358,41 @@
                                                     {getStatusText(page.status)}
                                                 </span>
                                             </td>
-                                            <td>
-                                                <div class="kt-menu" data-kt-menu="true">
-                                                    <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" data-kt-menu-toggle="true" on:click|stopPropagation={() => {}}>
-                                                        <i class="ki-filled ki-dots-vertical text-lg"></i>
-                                                    </button>
-                                                    <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
-                                                        <div class="kt-menu-item">
-                                                            <button class="kt-menu-link" on:click={() => openPageDetails(page)}>
-                                                                <span class="kt-menu-icon">
-                                                                    <i class="ki-filled ki-eye"></i>
-                                                                </span>
-                                                                <span class="kt-menu-title">View</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="kt-menu-item">
-                                                            <a class="kt-menu-link" href={`/admin/pages/${page.id}/edit`}>
-                                                                <span class="kt-menu-icon">
-                                                                    <i class="ki-filled ki-pencil"></i>
-                                                                </span>
-                                                                <span class="kt-menu-title">Edit</span>
-                                                            </a>
-                                                        </div>
-                                                        {#if !page.is_system_page}
-                                                            <div class="kt-menu-separator"></div>
+                                            <td class="text-center">
+                                                <div class="kt-menu flex-inline" data-kt-menu="true">
+                                                    <div class="kt-menu-item" data-kt-menu-item-offset="0, 10px" data-kt-menu-item-placement="bottom-end" data-kt-menu-item-placement-rtl="bottom-start" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click">
+                                                        <button class="kt-menu-toggle kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+                                                            <i class="ki-filled ki-dots-vertical text-lg"></i>
+                                                        </button>
+                                                        <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
                                                             <div class="kt-menu-item">
-                                                                <button class="kt-menu-link text-destructive" on:click={() => deletePage(page.id)}>
+                                                                <a class="kt-menu-link" href={route('admin.pages.show', { page: page.id })}>
                                                                     <span class="kt-menu-icon">
-                                                                        <i class="ki-filled ki-trash"></i>
+                                                                        <i class="ki-filled ki-search-list"></i>
                                                                     </span>
-                                                                    <span class="kt-menu-title">Delete</span>
-                                                                </button>
+                                                                    <span class="kt-menu-title">View</span>
+                                                                </a>
                                                             </div>
-                                                        {/if}
+                                                            <div class="kt-menu-item">
+                                                                <a class="kt-menu-link" href={route('admin.pages.edit', { page: page.id })}>
+                                                                    <span class="kt-menu-icon">
+                                                                        <i class="ki-filled ki-pencil"></i>
+                                                                    </span>
+                                                                    <span class="kt-menu-title">Edit</span>
+                                                                </a>
+                                                            </div>
+                                                            {#if !page.is_system_page}
+                                                                <div class="kt-menu-separator"></div>
+                                                                <div class="kt-menu-item">
+                                                                    <button class="kt-menu-link" on:click={() => deletePage(page.id)}>
+                                                                        <span class="kt-menu-icon">
+                                                                            <i class="ki-filled ki-trash"></i>
+                                                                        </span>
+                                                                        <span class="kt-menu-title">Remove</span>
+                                                                    </button>
+                                                                </div>
+                                                            {/if}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -420,19 +417,4 @@
         </div>
     </div>
     <!-- End of Container -->
-
-    <!-- Page Details Drawer -->
-    <PageDetailsDrawer 
-        page={selectedPage} 
-        isOpen={isDrawerOpen} 
-        on:close={closePageDetails}
-        on:pageDeleted={handlePageDeleted}
-    />
-
-    <!-- Hidden drawer toggle button for Metronic -->
-    <button 
-        class="hidden" 
-        data-kt-drawer-toggle="#page_details_drawer" 
-        id="page_details_drawer_toggle"
-    ></button>
 </AdminLayout>

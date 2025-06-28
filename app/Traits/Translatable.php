@@ -110,5 +110,17 @@ trait Translatable
             ->exists();
     }
 
+    public function getTranslatableFieldsByLanguages(): array
+    {
+        $translatableFields = $this->getTranslatableFields();
+        $result = [];
+
+        foreach ($translatableFields as $field) {
+            $result[$field] = $this->getTranslations($field);
+        }
+
+        return $result;
+    }
+
     abstract public function getTranslatableFields(): array;
 }

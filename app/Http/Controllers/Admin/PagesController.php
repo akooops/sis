@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Models\Page;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class PagesController extends Controller
 {
@@ -138,9 +139,16 @@ class PagesController extends Controller
      */
     public function show(Page $page)
     {    
-        $languages = Language::orderBy('is_default', 'DESC')->get();
+        $page->load('menu');
 
-        return view('admin.pages.show', compact('page', 'languages'));
+        $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $page->getTranslatableFieldsByLanguages();
+
+        return Inertia::render('Pages/Show', [
+            'page' => $page,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -233,11 +241,14 @@ class PagesController extends Controller
      */
     public function destroy(Page $page, DeletePageRequest $request)
     {
-        $page->delete();
+        dd($page);
+        //$page->delete();
 
-        cache()->forget("page-{$page->id}");
+        //cache()->forget("page-{$page->id}");
 
-        return redirect()->route('admin.pages.index')
-                        ->with('success','Page deleted successfully');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Page deleted successfully',
+        ]);
     }
 }

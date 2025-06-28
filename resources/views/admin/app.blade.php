@@ -19,6 +19,10 @@
         @inertiaHead
 
         <style>
+          #app{
+              width: 100%;
+              min-height: 100vh;
+          }
           .kt-skeleton {
               background: linear-gradient(90deg, var(--accent) 25%, var(--border) 50%, var(--accent) 75%);
               background-size: 200% 100%;
@@ -30,11 +34,15 @@
               0% { background-position: -200% 0; }
               100% { background-position: 200% 0; }
           }
+          
+          .w-fit{
+            width: fit-content;
+          }
       </style>
 
     </head>
     <body class="antialiased flex h-full text-base text-foreground bg-background [--header-height:60px] [--sidebar-width:270px] bg-mono dark:bg-background">
-        <!-- Theme Mode -->
+      <!-- Theme Mode -->
         <script>
             const defaultThemeMode = 'light';
                let themeMode;
