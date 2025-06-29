@@ -245,7 +245,7 @@ class BannersController extends Controller
     {
         $banners = Banner::orderBy('order')->get();
 
-        return view('admin.banners.order', compact('banners'));
+        return inertia('Banners/Order', compact('banners'));
     }
 
     public function order(OrderBannersRequest $request)
@@ -259,6 +259,7 @@ class BannersController extends Controller
             
         return response()->json([
             'status' => 'success',
+            'message' => 'Banner ordered successfully',
         ]);
     }
 }

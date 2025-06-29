@@ -215,6 +215,11 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
+                    {#if hasPermission('admin.banners.order')}
+                    <a href="{route('admin.banners.order-page')}" class="kt-btn kt-btn-outline">
+                        Order Banners
+                    </a>
+                    {/if}
                     {#if hasPermission('admin.banners.store')}
                     <a href="{route('admin.banners.create')}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-plus text-base"></i>

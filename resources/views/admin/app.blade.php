@@ -54,6 +54,44 @@
           .note-editable{
             background-color: #fff
           } 
+
+          .sortable-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+          }
+          .sortable-list .list-group-item {
+              cursor: move;
+              margin: 5px 0;
+              background: #f8f9fa;
+              border: 1px solid #dee2e6;
+              padding: 15px;
+              border-radius: 8px;
+              position: relative;
+              transition: all 0.2s ease;
+          }
+          .sortable-list .list-group-item:hover {
+              background: #e9ecef;
+              border-color: #adb5bd;
+          }
+          .handle {
+              margin-right: 15px;
+              cursor: move;
+              color: #6c757d;
+              font-size: 18px;
+          }
+          .sortable-ghost {
+              opacity: 0.4;
+          }
+          .sortable-chosen {
+              background-color: #e3f2fd !important;
+              border-color: #2196f3 !important;
+          }
+          .sortable-drag {
+              background-color: #fff3cd !important;
+              border-color: #ffc107 !important;
+              box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          }
           
           @keyframes shimmer {
               0% { background-position: -200% 0; }
@@ -109,7 +147,9 @@
         <!-- Summernote JavaScript -->
         <script src="/assets/admin/vendors/summernote/summernote-lite.min.js"></script>
         <!-- Flatpickr JavaScript -->
-        <script src="/assets/admin/vendors/flatpickr/flatpickr.min.js"></script>
+        <script src="/assets/admin/vendors/flatpickr/flatpickr.min.js"></script>   
+        <!-- Sortable JavaScript -->
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
         <!-- Metronic Layout Scripts -->
         <script src="/assets/admin/js/widgets/general.js"></script>
     </body>
