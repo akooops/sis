@@ -4,29 +4,29 @@
     import { router } from '@inertiajs/svelte';
 
     // Props from the server
-    export let media;
+    export let documentItem;
     export let languages;
     export let translations;
 
-    // Define breadcrumbs for this media
+    // Define breadcrumbs for this document
     const breadcrumbs = [
         {
-            title: 'Media',
-            url: route('admin.media.index'),
+            title: 'Documents',
+            url: route('admin.documents.index'),
             active: false
         },
         {
             title: 'Edit',
-            url: route('admin.media.edit', { media: media?.id }),
+            url: route('admin.documents.edit', { document: documentItem?.id }),
             active: true
         }
     ];
     
-    const pageTitle = 'Edit Media';
+    const pageTitle = 'Edit Document';
 
-    // Form data for basic media info
+    // Form data for basic document info
     let form = {
-        name: media?.name || '',
+        name: documentItem?.name || '',
         file: null,
     };
 
@@ -41,16 +41,14 @@
     let translationErrors = {};
     let translationLoading = {};
 
-    // Initialize translation forms immediately to prevent undefined errors
+    // Initialize translation forms imdocumenttely to prevent undefined errors
     if (languages && Array.isArray(languages)) {
         languages.forEach(language => {
             // Get translation data - now always has values (either translation or fallback)
             const title = translations?.title?.[language.code] || '';
-            const description = translations?.description?.[language.code] || '';
             
             translationForms[language.code] = {
-                title: title,
-                description: description,
+                title: title
             };
             translationErrors[language.code] = {};
             translationLoading[language.code] = false;
@@ -72,7 +70,6 @@
         const formData = new FormData();
 
         // Add method override for PATCH
-        formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
         formData.append('_method', 'PATCH');
         formData.append('name', form.name);
         
@@ -81,7 +78,7 @@
             formData.append('file', form.file);
         }
 
-        router.post(route('admin.media.update', { media: media.id }), formData, {
+        router.post(route('admin.documents.update', { document: documentItem.id }), formData, {
             onError: (err) => {
                 errors = err;
                 loading = false;
@@ -99,14 +96,15 @@
 
         // Get form data
         const formData = new FormData();
+
         formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
         formData.append('_method', 'PATCH');
+
         formData.append('language_id', languageId);
         formData.append('title', translationForms[languageCode].title);
-        formData.append('description', translationForms[languageCode].description);
 
         // Send AJAX request
-        fetch(route('admin.media.update-translation', { media: media.id }), {
+        fetch(route('admin.documents.update-translation', { document: documentItem.id }), {
             method: 'POST',
             body: formData,
             headers: {
@@ -158,18 +156,18 @@
     <!-- Container -->
     <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
-            <!-- Media Header -->
+            <!-- Document Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Edit Media</h1>
+                    <h1 class="text-2xl font-bold text-mono">Edit Document</h1>
                     <p class="text-sm text-secondary-foreground">
-                        Update media information and content
+                        Update document information and content
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="{route('admin.media.index')}" class="kt-btn kt-btn-outline">
+                    <a href="{route('admin.documents.index')}" class="kt-btn kt-btn-outline">
                         <i class="ki-filled ki-arrow-left text-base"></i>
-                        Back to Media
+                        Back to Document
                     </a>
                 </div>
             </div>
@@ -182,10 +180,10 @@
                         <div class="flex items-center gap-5">
                             <button 
                                 class="kt-tab-toggle py-3 active" 
-                                data-kt-tab-toggle="#media_form_tab"
+                                data-kt-tab-toggle="#document_form_tab"
                             >
                                 <i class="ki-filled ki-document text-base me-2"></i>
-                                Edit media
+                                Edit document
                             </button>
                             <button 
                                 class="kt-tab-toggle py-3" 
@@ -198,65 +196,60 @@
                     </div>
 
                     <!-- Tab Content -->
-                    <!-- Media Form Tab -->
-                    <div class="grow flex flex-col" id="media_form_tab">
+                    <!-- Document Form Tab -->
+                    <div class="grow flex flex-col" id="document_form_tab">
                         <div class="grid gap-5 lg:gap-7.5 w-full py-4">
                             <!-- Basic Info Form -->
                             <form on:submit|preventDefault={handleSubmit} class="kt-card">
-                                <div class="kt-card-header">
-                                    <h4 class="kt-card-title">Basic Information</h4>
-                                </div>
-                                <div class="kt-card-content">
-                                    <div class="grid gap-4">
-                                        <!-- Media Name -->
-                                        <div class="flex flex-col gap-2">
-                                            <label class="text-sm font-medium text-mono" for="name">
-                                                Media Name <span class="text-destructive">*</span>
-                                            </label>
-                                            <input
-                                                id="name"
-                                                type="text"
-                                                class="kt-input {errors.name ? 'kt-input-error' : ''}"
-                                                placeholder="Enter media name"
-                                                bind:value={form.name}
-                                            />
-                                            {#if errors.name}
-                                                <p class="text-sm text-destructive">{errors.name}</p>
-                                            {/if}
+                                <!-- Basic Info Card -->
+                                <div class="kt-card">
+                                    <div class="kt-card-header">
+                                        <h4 class="kt-card-title">Basic Information</h4>
+                                    </div>
+                                    <div class="kt-card-content">
+                                        <div class="grid gap-4">
+                                            <!-- Document Name -->
+                                            <div class="flex flex-col gap-2">
+                                                <label class="text-sm font-medium text-mono" for="name">
+                                                    Document Name <span class="text-destructive">*</span>
+                                                </label>
+                                                <input
+                                                    id="name"
+                                                    type="text"
+                                                    class="kt-input {errors.name ? 'kt-input-error' : ''}"
+                                                    placeholder="Enter document name"
+                                                    bind:value={form.name}
+                                                />
+                                                {#if errors.name}
+                                                    <p class="text-sm text-destructive">{errors.name}</p>
+                                                {/if}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </form>
 
-                            <!-- Media File Card -->
+                            <!-- Document Selection Card -->
                             <div class="kt-card">
                                 <div class="kt-card-header">
-                                    <h4 class="kt-card-title">Media File</h4>
+                                    <h4 class="kt-card-title">Document file</h4>
                                 </div>
                                 <div class="kt-card-content">
                                     <div class="grid gap-4">
                                         <!-- Current File Display -->
-                                        {#if media?.mediaUrl}
+                                        {#if documentItem?.documentUrl}
                                             <div class="flex flex-col gap-2">
                                                 <label class="text-sm font-medium text-mono">Current File</label>
                                                 <div class="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                                                     <div class="flex-shrink-0">
-                                                        {#if media.type === 'image'}
-                                                            <img 
-                                                                src={media.mediaUrl} 
-                                                                alt="Current media file"
-                                                                class="w-16 h-16 object-cover rounded-lg" 
-                                                            />
-                                                        {:else}
-                                                            <div class="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center">
-                                                                <i class="ki-filled ki-file text-2xl text-primary"></i>
-                                                            </div>
-                                                        {/if}
+                                                        <div class="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center">
+                                                            <i class="ki-filled ki-file text-2xl text-primary"></i>
+                                                        </div>
                                                     </div>
                                                     <div class="flex flex-col gap-1">
-                                                        <span class="text-sm font-medium text-mono">{media.name}</span>
-                                                        <span class="text-xs text-secondary-foreground">{media.type}</span>
-                                                        <a href={media.mediaUrl} target="_blank" class="text-xs text-primary hover:underline">
+                                                        <span class="text-sm font-medium text-mono">{documentItem.name}</span>
+                                                        <span class="text-xs text-secondary-foreground">Document</span>
+                                                        <a href={documentItem.documentUrl} target="_blank" class="text-xs text-primary hover:underline">
                                                             View File <i class="ki-filled ki-arrow-up-right"></i>
                                                         </a>
                                                     </div>
@@ -289,7 +282,7 @@
 
                             <!-- Form Actions -->
                             <div class="flex items-center justify-end gap-3">
-                                <a href="{route('admin.media.index')}" class="kt-btn kt-btn-outline">
+                                <a href="{route('admin.documents.index')}" class="kt-btn kt-btn-outline">
                                     Cancel
                                 </a>
                                 <button
@@ -303,7 +296,7 @@
                                         Updating...
                                     {:else}
                                         <i class="ki-filled ki-check text-base"></i>
-                                        Update Media
+                                        Update Document
                                     {/if}
                                 </button>
                             </div>
@@ -338,7 +331,7 @@
                                         on:submit|preventDefault={() => handleTranslationSubmit(language.code, language.id)}
                                         class="grid gap-4"
                                     >
-                                        <!-- Media Title -->
+                                        <!-- Document Title -->
                                         <div class="flex flex-col gap-2">
                                             <label class="text-sm font-medium text-mono" for="title-{language.id}">
                                                 Title <span class="text-destructive">*</span>
@@ -347,28 +340,11 @@
                                                 id="title-{language.id}"
                                                 type="text"
                                                 class="kt-input {translationErrors[language.code]?.title ? 'kt-input-error' : ''}"
-                                                placeholder="Enter media title"
+                                                placeholder="Enter document title"
                                                 bind:value={translationForms[language.code].title}
                                             />
                                             {#if translationErrors[language.code]?.title}
                                                 <p class="text-sm text-destructive">{translationErrors[language.code].title[0]}</p>
-                                            {/if}
-                                        </div>
-
-                                        <!-- Media Description -->
-                                        <div class="flex flex-col gap-2">
-                                            <label class="text-sm font-medium text-mono" for="description-{language.id}">
-                                                Description <span class="text-destructive">*</span>
-                                            </label>
-                                            <textarea
-                                                id="description-{language.id}"
-                                                class="kt-textarea {translationErrors[language.code]?.description ? 'kt-textarea-error' : ''}"
-                                                placeholder="Enter media description"
-                                                rows="3"
-                                                bind:value={translationForms[language.code].description}
-                                            ></textarea>
-                                            {#if translationErrors[language.code]?.description}
-                                                <p class="text-sm text-destructive">{translationErrors[language.code].description[0]}</p>
                                             {/if}
                                         </div>
 

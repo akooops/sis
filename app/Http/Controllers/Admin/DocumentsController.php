@@ -38,10 +38,14 @@ class DocumentsController extends Controller
 
         $documents = $documents->paginate($perPage, ['*'], 'document', $page);
 
-        return view('admin.documents.index', [
-            'documents' => $documents,
-            'pagination' => $this->indexService->handlePagination($documents)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'documents' => $documents->items(),
+                'pagination' => $this->indexService->handlePagination($documents)
+            ]);
+        }
+
+        return inertia('Documents/Index');
     }
     
     /**
@@ -55,8 +59,7 @@ class DocumentsController extends Controller
             'is_default' => true,
         ])->first();
 
-        $medias = Media::where('type', 'image')->get();
-        return view('admin.documents.create', compact('defaultLanguage', 'medias'));
+        return inertia('Documents/Create', compact('defaultLanguage'));
     }
     
     /**
@@ -111,8 +114,9 @@ class DocumentsController extends Controller
     
         $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Document', $document->id, true);
 
-        return redirect()->route('admin.documents.index')
-                        ->with('success','Document created successfully');
+        return inertia('Documents/Index', [
+            'success' => 'Document created successfully!'
+        ]);
     }
 
     /**
@@ -124,8 +128,13 @@ class DocumentsController extends Controller
     public function show(Document $document)
     {    
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $document->getTranslatableFieldsByLanguages();
 
-        return view('admin.documents.show', compact('document', 'languages'));
+        return inertia('Documents/Show', [
+            'document' => $document,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -134,12 +143,16 @@ class DocumentsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Document $document)
+    public function edit(Document $document)    
     {
         $languages = Language::orderBy('is_default', 'DESC')->get();
-        $medias = Media::where('type', 'image')->get();
+        $translations = $document->getTranslatableFieldsByLanguages();
 
-        return view('admin.documents.edit', compact('document', 'languages', 'medias'));
+        return inertia('Documents/Edit', [
+            'documentItem' => $document,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -182,8 +195,9 @@ class DocumentsController extends Controller
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Document', $document->id, true);
         }
 
-        return redirect()->route('admin.documents.index')
-                        ->with('success','Document updated successfully');
+        return inertia('Documents/Index', [
+            'success' => 'Document updated successfully!'
+        ]);
     }
 
     public function updateTranslation(Document $document, UpdateDocumentTranslationRequest $request){
