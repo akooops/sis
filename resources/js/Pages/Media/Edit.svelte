@@ -2,14 +2,11 @@
     import AdminLayout from '../Layouts/AdminLayout.svelte';
     import { onMount, tick } from 'svelte';
     import { router } from '@inertiajs/svelte';
-    import Select2 from '../Components/Forms/Select2.svelte';
-    import Summernote from '../Components/Forms/Summernote.svelte';
 
     // Props from the server
     export let media;
     export let languages;
     export let translations;
-    export let medias;
 
     // Define breadcrumbs for this media
     const breadcrumbs = [
@@ -30,41 +27,18 @@
     // Form data for basic media info
     let form = {
         name: media?.name || '',
-        slug: media?.slug || '',
-        status: media?.status || 'draft',
-        media_option: 'upload',
-        file: null,
-        media_id: ''
     };
 
     // Form errors
     let errors = {};
 
-    // File preview
-    let filePreview = null;
-
     // Loading state
     let loading = false;
-
-    // Slug generation flag
-    let slugManuallyEdited = false;
-
-    // Dynamic data for selects
-    let selectedMedia = null;
-    let selectedMenu = null;
-
-    // Select2 component references
-    let mediaSelectComponent;
 
     // Translation form data
     let translationForms = {};
     let translationErrors = {};
     let translationLoading = {};
-
-    // Media files state
-    let mediaFiles = [];
-    let uploadingFiles = false;
-    let fileUploadProgress = {};
 
     // Initialize translation forms immediately to prevent undefined errors
     if (languages && Array.isArray(languages)) {
@@ -82,188 +56,21 @@
         });
     }
 
-    // Initialize media files from existing data
-    if (media?.files && Array.isArray(media.files)) {
-        mediaFiles = media.files.map(file => ({
-            id: file.id,
-            name: file.original_name || 'File',
-            url: file.url,
-            type: file.type.startsWith('image/') ? 'image' : 'video',
-            size: file.size
-        }));
-    }
-
-    // Function to convert string to slug
-    function stringToSlug(str) {
-        return str
-            .toLowerCase()
-            .replace(/[^\w\s-]/g, '') // Remove special characters
-            .replace(/\s+/g, '-')     // Replace spaces with hyphens
-            .replace(/-+/g, '-')      // Replace multiple hyphens with single hyphen
-            .trim();                  // Trim leading/trailing spaces
-    }
-
-    // Handle name input change
-    function handleNameChange() {
-        if (!slugManuallyEdited) {
-            form.slug = stringToSlug(form.name);
-        }
-    }
-
-    // Handle slug input change
-    function handleSlugChange() {
-        slugManuallyEdited = true;
-    }
-
-    // Handle file input change
-    function handleFileChange(event) {
-        const file = event.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-            form.file = file;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                filePreview = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    // Handle media option change
-    function handleMediaOptionChange() {
-        if (form.media_option === 'upload') {
-            form.media_id = '';
-            selectedMedia = null;
-        } else {
-            form.file = null;
-            filePreview = null;
-        }
-    }
-
-    // Handle media selection
-    function handleMediaSelect(event) {
-        form.media_id = event.detail.value;
-        // Update selected media for preview
-        if (event.detail.data) {
-            selectedMedia = {
-                id: event.detail.data.id,
-                name: event.detail.data.text,
-                file: { url: event.detail.data.mediaUrl }
-            };
-        }
-    }
-
-    // Handle media clear
-    function handleMediaClear() {
-        form.media_id = '';
-        selectedMedia = null;
-    }
-
-    // Handle file upload for media files
-    async function handleMediaFileUpload(event) {
-        const files = Array.from(event.target.files);
-        uploadingFiles = true;
-        
-        for (const file of files) {
-            // Check if file is image or video
-            if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-                continue;
-            }
-            
-            const fileId = Date.now() + Math.random();
-            fileUploadProgress[fileId] = 0;
-            
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            try {
-                const response = await fetch(route('admin.files.upload'), {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-                    }
-                });
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    if (result.status === 'success' && result.data && result.data.file) {
-                        const uploadedFile = result.data.file;
-
-                        // Add to media files array (use assignment for reactivity)
-                        mediaFiles = [...mediaFiles, {
-                            id: uploadedFile.id,
-                            name: uploadedFile.original_name || file.name,
-                            url: uploadedFile.url,
-                            type: uploadedFile.type.startsWith('image/') ? 'image' : 'video',
-                            size: uploadedFile.size
-                        }];
-                    }
-                }
-            } catch (error) {
-                console.error('Error uploading file:', error);
-            } finally {
-                delete fileUploadProgress[fileId];
-            }
-        }
-        
-        uploadingFiles = false;
-        event.target.value = ''; // Clear input
-    }
-
-    // Remove media file
-    function removeMediaFile(fileId, index) {
-        if (confirm('Are you sure you want to remove this file?')) {
-            // Remove from media files array (use assignment for reactivity)
-            mediaFiles = mediaFiles.filter((_, i) => i !== index);
-        }
-    }
-
-    // Format file size
-    function formatFileSize(bytes) {
-        if (!bytes) return '';
-        
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        if (bytes === 0) return '0 Bytes';
-        
-        const i = Math.floor(Math.log(bytes) / Math.log(1024));
-        return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
-    }
-
     // Handle basic form submission
     function handleSubmit() {
         loading = true;
         
         const formData = new FormData();
-        
-        // Add form fields
-        Object.keys(form).forEach(key => {
-            if (form[key] !== null && form[key] !== '') {
-                if (key === 'file' && form.file) {
-                    formData.append(key, form.file);
-                } else if (key !== 'file') {
-                    formData.append(key, form[key]);
-                }
-            }
-        });
-
-        // Add media files
-        mediaFiles.forEach(file => {
-            formData.append('files[]', file.id);
-        });
 
         // Add method override for PATCH
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
         formData.append('_method', 'PATCH');
+        formData.append('name', form.name);
 
         router.post(route('admin.media.update', { media: media.id }), formData, {
             onError: (err) => {
                 errors = err;
                 loading = false;
-                
-                // Apply error styling to Select2 components
-                if (errors.media_id && mediaSelectComponent) {
-                    mediaSelectComponent.setError(true);
-                }
             },
             onFinish: () => {
                 loading = false;
@@ -326,11 +133,6 @@
     // Initialize components after mount
     onMount(async () => {
         await tick();
-        
-        // Set slug manually edited flag if slug was pre-populated
-        if (media?.slug) {
-            slugManuallyEdited = true;
-        }
     });
 </script>
 
@@ -403,318 +205,14 @@
                                                 class="kt-input {errors.name ? 'kt-input-error' : ''}"
                                                 placeholder="Enter media name"
                                                 bind:value={form.name}
-                                                on:input={handleNameChange}
                                             />
                                             {#if errors.name}
                                                 <p class="text-sm text-destructive">{errors.name}</p>
                                             {/if}
                                         </div>
-
-                                        <!-- Media Slug -->
-                                        <div class="flex flex-col gap-2">
-                                            <label class="text-sm font-medium text-mono" for="slug">
-                                                Media Slug <span class="text-destructive">*</span>
-                                            </label>
-                                            <input
-                                                id="slug"
-                                                type="text"
-                                                class="kt-input {errors.slug ? 'kt-input-error' : ''}"
-                                                placeholder="Enter media slug"
-                                                bind:value={form.slug}
-                                                on:input={handleSlugChange}
-                                                disabled={media?.is_system_media}
-                                            />
-                                            {#if media?.is_system_media}
-                                                <p class="text-sm text-muted-foreground">System media cannot have their slug changed</p>
-                                            {/if}
-                                            {#if errors.slug}
-                                                <p class="text-sm text-destructive">{errors.slug}</p>
-                                            {/if}
-                                        </div>
-
-                                        <!-- Media Status -->
-                                        <div class="flex flex-col gap-2">
-                                            <label class="text-sm font-medium text-mono" for="status">
-                                                Media Status <span class="text-destructive">*</span>
-                                            </label>
-                                            <select
-                                                id="status"
-                                                class="kt-select"
-                                                bind:value={form.status}
-                                            >
-                                                <option value="draft">Draft</option>
-                                                <option value="hidden">Hidden</option>
-                                                <option value="published">Published</option>
-                                            </select>
-                                            {#if errors.status}
-                                                <p class="text-sm text-destructive">{errors.status}</p>
-                                            {/if}
-                                        </div>
                                     </div>
                                 </div>
                             </form>
-
-                            <!-- Media Thumbnail Card -->
-                            <div class="kt-card">
-                                <div class="kt-card-header">
-                                    <h4 class="kt-card-title">Media Thumbnail</h4>
-                                </div>
-                                <div class="kt-card-content">
-                                    <div class="grid gap-4">
-                                        <!-- Current Thumbnail Display -->
-                                        {#if media?.thumbnailUrl}
-                                            <div class="flex flex-col gap-2">
-                                                <label class="text-sm font-medium text-mono">Current Thumbnail</label>
-                                                <div class="relative inline-block">
-                                                    <div class="p-2 border-2 border-primary/20 bg-primary/5 rounded-lg">
-                                                        <img 
-                                                            src={media.thumbnailUrl} 
-                                                            alt="Current media thumbnail"
-                                                            class="w-32 h-32 object-cover rounded-lg" 
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {/if}
-
-                                        <!-- Media Option Selection -->
-                                        <div class="flex items-center gap-2">
-                                            <input 
-                                                class="kt-switch" 
-                                                type="checkbox" 
-                                                id="media-switch" 
-                                                checked={form.media_option === 'select'}
-                                                on:change={(e) => {
-                                                    form.media_option = e.target.checked ? 'select' : 'upload';
-                                                    handleMediaOptionChange();
-                                                }}
-                                            />
-                                            <label class="kt-label" for="media-switch">
-                                                Select from Media Library
-                                            </label>
-                                        </div>
-
-                                        <!-- File Upload Section -->
-                                        {#if form.media_option === 'upload'}
-                                            <div class="flex flex-col gap-2">
-                                                <label class="text-sm font-medium text-mono" for="file">
-                                                    Upload Image
-                                                </label>
-                                                <input
-                                                    id="file"
-                                                    type="file"
-                                                    class="kt-input"
-                                                    accept="image/*"
-                                                    on:change={handleFileChange}
-                                                />
-                                                {#if filePreview}
-                                                    <div class="mt-2">
-                                                        <img 
-                                                            src={filePreview} 
-                                                            alt="Preview"
-                                                            class="w-32 h-32 object-cover rounded-lg border" 
-                                                        />
-                                                    </div>
-                                                {/if}
-                                                {#if errors.file}
-                                                    <p class="text-sm text-destructive">{errors.file}</p>
-                                                {/if}
-                                            </div>
-                                        {/if}
-
-                                        <!-- Media Select Section -->
-                                        {#if form.media_option === 'select'}
-                                            <div class="flex flex-col gap-2">
-                                                <label class="text-sm font-medium text-mono" for="media-select">
-                                                    Select Media
-                                                </label>
-                                                <Select2
-                                                    bind:this={mediaSelectComponent}
-                                                    id="media-select"
-                                                    placeholder="Select media..."
-                                                    bind:value={form.media_id}
-                                                    on:select={handleMediaSelect}
-                                                    on:clear={handleMediaClear}
-                                                    ajax={{
-                                                        url: route('admin.media.index'),
-                                                        dataType: 'json',
-                                                        delay: 300,
-                                                        data: function(params) {
-                                                            return {
-                                                                search: params.term,
-                                                                type: 'image',
-                                                                perPage: 10
-                                                            };
-                                                        },
-                                                        processResults: function(data) {
-                                                            return {
-                                                                results: data.medias.map(media => ({
-                                                                    id: media.id,
-                                                                    text: media.name,
-                                                                    mediaUrl: media.file?.url || ''
-                                                                }))
-                                                            };
-                                                        },
-                                                        cache: true
-                                                    }}
-                                                    templateResult={function(data) {
-                                                        if (data.loading) return data.text;
-                                                        if (!data.id) return data.text;
-                                                        
-                                                        return globalThis.$('<div class="d-flex align-items-center">' +
-                                                            '<img src="' + data.mediaUrl + '" class="me-2" style="width: 30px; height: 30px; object-fit: cover; border-radius: 4px;">' +
-                                                            '<span>' + data.text + '</span>' +
-                                                            '</div>');
-                                                    }}
-                                                    templateSelection={function(data) {
-                                                        if (!data.id) return data.text;
-                                                        
-                                                        return globalThis.$('<div class="d-flex flex-column align-items-center">' +
-                                                            '<img src="' + data.mediaUrl + '" class="me-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 3px;">' +
-                                                            '<span>' + data.text + '</span>' +
-                                                            '</div>');
-                                                    }}
-                                                />
-                                                
-                                                <!-- Media Preview -->
-                                                {#if form.media_id && selectedMedia}
-                                                    <div class="mt-2">
-                                                        <img 
-                                                            src={selectedMedia.file?.url} 
-                                                            alt={selectedMedia.name}
-                                                            class="w-32 h-32 object-cover rounded-lg border" 
-                                                        />
-                                                    </div>
-                                                {/if}
-                                                
-                                                {#if errors.media_id}
-                                                    <p class="text-sm text-destructive">{errors.media_id}</p>
-                                                {/if}
-                                            </div>
-                                        {/if}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Media Files Card -->
-                            <div class="kt-card">
-                                <div class="kt-card-header">
-                                    <h4 class="kt-card-title">Media Files</h4>
-                                    <p class="text-sm text-secondary-foreground">
-                                        Upload images and videos for this media
-                                    </p>
-                                </div>
-                                <div class="kt-card-content">
-                                    <div class="grid gap-4">
-                                        <!-- File Upload Section -->
-                                        <div class="flex flex-col gap-2">
-                                            <label class="text-sm font-medium text-mono" for="media-files">
-                                                Upload Files
-                                            </label>
-                                            <input
-                                                id="media-files"
-                                                type="file"
-                                                class="kt-input"
-                                                accept="image/*,video/*"
-                                                multiple
-                                                on:change={handleMediaFileUpload}
-                                                disabled={uploadingFiles}
-                                            />
-                                            <p class="text-xs text-secondary-foreground">
-                                                Supported formats: Images (JPG, PNG, GIF, etc.) and Videos (MP4, AVI, MOV, etc.)
-                                            </p>
-                                            {#if uploadingFiles}
-                                                <div class="flex items-center gap-2 text-sm text-primary">
-                                                    <i class="ki-outline ki-loading text-base animate-spin"></i>
-                                                    Uploading files...
-                                                </div>
-                                            {/if}
-                                        </div>
-
-                                        <!-- Uploaded Files Preview -->
-                                        {#if mediaFiles.length > 0}
-                                            <div class="flex flex-col gap-3">
-                                                <div class="flex items-center justify-between">
-                                                    <label class="text-sm font-medium text-mono">Media Files ({mediaFiles.length})</label>
-                                                    <button
-                                                        type="button"
-                                                        class="kt-btn kt-btn-sm kt-btn-outline kt-btn-destructive"
-                                                        on:click={() => {
-                                                            if (confirm('Are you sure you want to remove all files?')) {
-                                                                mediaFiles = [];
-                                                            }
-                                                        }}
-                                                    >
-                                                        <i class="ki-filled ki-trash text-xs"></i>
-                                                        Clear All
-                                                    </button>
-                                                </div>
-                                                <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                                                    {#each mediaFiles as file, index}
-                                                        <div class="relative group">
-                                                            <div class="relative overflow-hidden rounded-lg border bg-muted w-40 h-40">
-                                                                {#if file.type === 'image'}
-                                                                    <img 
-                                                                        src={file.url} 
-                                                                        alt={file.name}
-                                                                        class="w-full h-full object-cover"
-                                                                    />
-                                                                {:else}
-                                                                    <video 
-                                                                        src={file.url}
-                                                                        class="w-full h-full object-cover"
-                                                                        controls
-                                                                        preload="metadata"
-                                                                        muted
-                                                                    >
-                                                                        <source src={file.url} type={file.type}>
-                                                                        Your browser does not support the video tag.
-                                                                    </video>
-                                                                {/if}
-                                                                
-                                                                <!-- Delete button -->
-                                                                <button
-                                                                    type="button"
-                                                                    class="absolute bg-destructive text-white rounded-full flex items-center justify-center hover:bg-destructive/80 transition-colors shadow-sm"
-                                                                    style="right: 0.5rem; top: 0.5rem; width: 20px; height: 20px; cursor: pointer;"
-                                                                    on:click={() => removeMediaFile(file.id, index)}
-                                                                    title="Remove file"
-                                                                >
-                                                                    <i class="ki-filled ki-cross text-xs"></i>
-                                                                </button>
-                                                                
-                                                                <!-- File type indicator -->
-                                                                <div class="absolute bottom-0.5 left-0.5">
-                                                                    {#if file.type === 'image'}
-                                                                        <span class="kt-badge kt-badge-xs kt-badge-primary">IMG</span>
-                                                                    {:else}
-                                                                        <span class="kt-badge kt-badge-xs kt-badge-success">VID</span>
-                                                                    {/if}
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            <!-- File name -->
-                                                            <p class="text-xs text-secondary-foreground mt-1 truncate" title={file.name}>
-                                                                {file.name}
-                                                            </p>
-                                                            
-                                                            <!-- File size -->
-                                                            <p class="text-xs text-secondary-foreground">
-                                                                {file.size ? formatFileSize(file.size) : ''}
-                                                            </p>
-                                                        </div>
-                                                    {/each}
-                                                </div>
-                                            </div>
-                                        {:else}
-                                            <div class="text-center py-8">
-                                                <i class="ki-filled ki-folder text-4xl text-secondary-foreground mb-4"></i>
-                                                <p class="text-sm text-secondary-foreground">No files uploaded to this media yet.</p>
-                                            </div>
-                                        {/if}
-                                    </div>
-                                </div>
-                            </div>
 
                             <!-- Form Actions -->
                             <div class="flex items-center justify-end gap-3">
