@@ -142,7 +142,7 @@ class PagesController extends Controller
         $languages = Language::orderBy('is_default', 'DESC')->get();
         $translations = $page->getTranslatableFieldsByLanguages();
 
-        return Inertia::render('Pages/Show', [
+        return inertia('Pages/Show', [
             'page' => $page,
             'languages' => $languages,
             'translations' => $translations

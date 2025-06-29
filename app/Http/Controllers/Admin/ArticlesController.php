@@ -38,10 +38,14 @@ class ArticlesController extends Controller
 
         $articles = $articles->paginate($perPage, ['*'], 'article', $page);
 
-        return view('admin.articles.index', [
-            'articles' => $articles,
-            'pagination' => $this->indexService->handlePagination($articles)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'articles' => $articles->items(),
+                'pagination' => $this->indexService->handlePagination($articles)
+            ]);
+        }
+
+        return inertia('Articles/Index');
     }
     
     /**
@@ -55,8 +59,7 @@ class ArticlesController extends Controller
             'is_default' => true,
         ])->first();
 
-        $medias = Media::where('type', 'image')->get();
-        return view('admin.articles.create', compact('defaultLanguage', 'medias'));
+        return inertia('Articles/Create', compact('defaultLanguage'));
     }
     
     /**
@@ -118,8 +121,9 @@ class ArticlesController extends Controller
     
         $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Article', $article->id, true);
 
-        return redirect()->route('admin.articles.index')
-                        ->with('success','Article created successfully');
+        return inertia('Articles/Index', [
+            'success' => 'Article created successfully!'
+        ]);
     }
 
     /**
@@ -131,8 +135,13 @@ class ArticlesController extends Controller
     public function show(Article $article)
     {    
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $article->getTranslatableFieldsByLanguages();
 
-        return view('admin.articles.show', compact('article', 'languages'));
+        return inertia('Articles/Show', [
+            'article' => $article,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -142,11 +151,11 @@ class ArticlesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit(Article $article)
-    {
+    {    
         $languages = Language::orderBy('is_default', 'DESC')->get();
-        $medias = Media::where('type', 'image')->get();
+        $translations = $article->getTranslatableFieldsByLanguages();
 
-        return view('admin.articles.edit', compact('article', 'languages', 'medias'));
+        return inertia('Articles/Edit', compact('article', 'languages', 'translations'));
     }
     
     /**
@@ -165,7 +174,7 @@ class ArticlesController extends Controller
             ]
         ));
     
-                $media = null;
+        $media = null;
 
         if ($request->hasFile('file')) {
             // Get MIME type
@@ -196,8 +205,9 @@ class ArticlesController extends Controller
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Article', $article->id, true);
         }
 
-        return redirect()->route('admin.articles.index')
-                        ->with('success','Article updated successfully');
+        return inertia('Articles/Index', [
+            'success' => 'Article updated successfully!'
+        ]);
     }
 
     public function updateTranslation(Article $article, UpdateArticleTranslationRequest $request){
@@ -223,7 +233,16 @@ class ArticlesController extends Controller
     {
         $article->delete();
 
-        return redirect()->route('admin.articles.index')
-                        ->with('success','Article deleted successfully');
+        if (request()->expectsJson() || request()->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Article deleted successfully',
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Article deleted successfully',
+        ]);
     }
 }

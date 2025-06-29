@@ -6,34 +6,32 @@
     import Summernote from '../Components/Forms/Summernote.svelte';
 
     // Props from the server
-    export let page;
+    export let article;
     export let languages;
     export let translations;
     export let medias;
-    export let menus;
 
-    // Define breadcrumbs for this page
+    // Define breadcrumbs for this article
     const breadcrumbs = [
         {
-            title: 'Pages',
-            url: route('admin.pages.index'),
+            title: 'Articles',
+            url: route('admin.articles.index'),
             active: false
         },
         {
             title: 'Edit',
-            url: route('admin.pages.edit', { page: page?.id }),
+            url: route('admin.articles.edit', { article: article?.id }),
             active: true
         }
     ];
     
-    const pageTitle = 'Edit Page';
+    const pageTitle = 'Edit Article';
 
-    // Form data for basic page info
+    // Form data for basic article info
     let form = {
-        name: page?.name || '',
-        slug: page?.slug || '',
-        status: page?.status || 'draft',
-        menu_id: page?.menu_id || '',
+        name: article?.name || '',
+        slug: article?.slug || '',
+        status: article?.status || 'draft',
         media_option: 'upload',
         file: null,
         media_id: ''
@@ -56,7 +54,6 @@
     let selectedMenu = null;
 
     // Select2 component references
-    let menuSelectComponent;
     let mediaSelectComponent;
 
     // Translation form data
@@ -131,12 +128,6 @@
         }
     }
 
-    // Handle menu selection
-    function handleMenuSelect(event) {
-        form.menu_id = event.detail.value;
-        selectedMenu = event.detail.data;
-    }
-
     // Handle media selection
     function handleMediaSelect(event) {
         form.media_id = event.detail.value;
@@ -148,12 +139,6 @@
                 file: { url: event.detail.data.mediaUrl }
             };
         }
-    }
-
-    // Handle menu clear
-    function handleMenuClear() {
-        form.menu_id = '';
-        selectedMenu = null;
     }
 
     // Handle media clear
@@ -182,15 +167,12 @@
         // Add method override for PATCH
         formData.append('_method', 'PATCH');
 
-        router.post(route('admin.pages.update', { page: page.id }), formData, {
+        router.post(route('admin.articles.update', { article: article.id }), formData, {
             onError: (err) => {
                 errors = err;
                 loading = false;
                 
                 // Apply error styling to Select2 components
-                if (errors.menu_id && menuSelectComponent) {
-                    menuSelectComponent.setError(true);
-                }
                 if (errors.media_id && mediaSelectComponent) {
                     mediaSelectComponent.setError(true);
                 }
@@ -219,7 +201,7 @@
         formData.append('content', summernoteContent);
 
         // Send AJAX request
-        fetch(route('admin.pages.update-translation', { page: page.id }), {
+        fetch(route('admin.articles.update-translation', { article: article.id }), {
             method: 'POST',
             body: formData,
             headers: {
@@ -262,16 +244,8 @@
         await tick();
         
         // Set slug manually edited flag if slug was pre-populated
-        if (page?.slug) {
+        if (article?.slug) {
             slugManuallyEdited = true;
-        }
-
-        // Set selected menu if exists
-        if (page?.menu) {
-            selectedMenu = {
-                id: page.menu.id,
-                text: page.menu.name
-            };
         }
     });
 </script>
@@ -284,18 +258,18 @@
     <!-- Container -->
     <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
-            <!-- Page Header -->
+            <!-- Article Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Edit Page</h1>
+                    <h1 class="text-2xl font-bold text-mono">Edit Article</h1>
                     <p class="text-sm text-secondary-foreground">
-                        Update page information and content
+                        Update article information and content
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="{route('admin.pages.index')}" class="kt-btn kt-btn-outline">
+                    <a href="{route('admin.articles.index')}" class="kt-btn kt-btn-outline">
                         <i class="ki-filled ki-arrow-left text-base"></i>
-                        Back to Pages
+                        Back to Articles
                     </a>
                 </div>
             </div>
@@ -308,10 +282,10 @@
                         <div class="flex items-center gap-5">
                             <button 
                                 class="kt-tab-toggle py-3 active" 
-                                data-kt-tab-toggle="#page_form_tab"
+                                data-kt-tab-toggle="#article_form_tab"
                             >
                                 <i class="ki-filled ki-document text-base me-2"></i>
-                                Edit page
+                                Edit article
                             </button>
                             <button 
                                 class="kt-tab-toggle py-3" 
@@ -324,8 +298,8 @@
                     </div>
 
                     <!-- Tab Content -->
-                    <!-- Page Form Tab -->
-                    <div class="grow flex flex-col" id="page_form_tab">
+                    <!-- Article Form Tab -->
+                    <div class="grow flex flex-col" id="article_form_tab">
                         <div class="grid gap-5 lg:gap-7.5 w-full py-4">
                             <!-- Basic Info Form -->
                             <form on:submit|preventDefault={handleSubmit} class="kt-card">
@@ -334,16 +308,16 @@
                                 </div>
                                 <div class="kt-card-content">
                                     <div class="grid gap-4">
-                                        <!-- Page Name -->
+                                        <!-- Article Name -->
                                         <div class="flex flex-col gap-2">
                                             <label class="text-sm font-medium text-mono" for="name">
-                                                Page Name <span class="text-destructive">*</span>
+                                                Article Name <span class="text-destructive">*</span>
                                             </label>
                                             <input
                                                 id="name"
                                                 type="text"
                                                 class="kt-input {errors.name ? 'kt-input-error' : ''}"
-                                                placeholder="Enter page name"
+                                                placeholder="Enter article name"
                                                 bind:value={form.name}
                                                 on:input={handleNameChange}
                                             />
@@ -352,32 +326,32 @@
                                             {/if}
                                         </div>
 
-                                        <!-- Page Slug -->
+                                        <!-- Article Slug -->
                                         <div class="flex flex-col gap-2">
                                             <label class="text-sm font-medium text-mono" for="slug">
-                                                Page Slug <span class="text-destructive">*</span>
+                                                Article Slug <span class="text-destructive">*</span>
                                             </label>
                                             <input
                                                 id="slug"
                                                 type="text"
                                                 class="kt-input {errors.slug ? 'kt-input-error' : ''}"
-                                                placeholder="Enter page slug"
+                                                placeholder="Enter article slug"
                                                 bind:value={form.slug}
                                                 on:input={handleSlugChange}
-                                                disabled={page?.is_system_page}
+                                                disabled={article?.is_system_article}
                                             />
-                                            {#if page?.is_system_page}
-                                                <p class="text-sm text-muted-foreground">System pages cannot have their slug changed</p>
+                                            {#if article?.is_system_article}
+                                                <p class="text-sm text-muted-foreground">System articles cannot have their slug changed</p>
                                             {/if}
                                             {#if errors.slug}
                                                 <p class="text-sm text-destructive">{errors.slug}</p>
                                             {/if}
                                         </div>
 
-                                        <!-- Page Status -->
+                                        <!-- Article Status -->
                                         <div class="flex flex-col gap-2">
                                             <label class="text-sm font-medium text-mono" for="status">
-                                                Page Status <span class="text-destructive">*</span>
+                                                Article Status <span class="text-destructive">*</span>
                                             </label>
                                             <select
                                                 id="status"
@@ -392,75 +366,26 @@
                                                 <p class="text-sm text-destructive">{errors.status}</p>
                                             {/if}
                                         </div>
-
-                                        <!-- Menu Selection -->
-                                        <div class="flex flex-col gap-2">
-                                            <label class="text-sm font-medium text-mono" for="menu-select">
-                                                Add Menu to Page
-                                            </label>
-                                            
-                                            <!-- Current Menu Badge -->
-                                            {#if selectedMenu}
-                                                <div class="flex items-center gap-2 mb-2">
-                                                    <span class="kt-badge kt-badge-primary">
-                                                        <i class="ki-filled ki-menu text-xs"></i>
-                                                        Last selected Menu: {selectedMenu.text}
-                                                    </span>
-                                                </div>
-                                            {/if}
-                                            
-                                            <Select2
-                                                bind:this={menuSelectComponent}
-                                                id="menu-select"
-                                                placeholder="Select menu..."
-                                                bind:value={form.menu_id}
-                                                on:select={handleMenuSelect}
-                                                on:clear={handleMenuClear}
-                                                ajax={{
-                                                    url: route('admin.menus.index'),
-                                                    dataType: 'json',
-                                                    delay: 300,
-                                                    data: function(params) {
-                                                        return {
-                                                            search: params.term,
-                                                            perPage: 10
-                                                        };
-                                                    },
-                                                    processResults: function(data) {
-                                                        return {
-                                                            results: data.menus.map(menu => ({
-                                                                id: menu.id,
-                                                                text: menu.name
-                                                            }))
-                                                        };
-                                                    },
-                                                    cache: true
-                                                }}
-                                            />
-                                            {#if errors.menu_id}
-                                                <p class="text-sm text-destructive">{errors.menu_id}</p>
-                                            {/if}
-                                        </div>
                                     </div>
                                 </div>
                             </form>
 
-                            <!-- Page Thumbnail Card -->
+                            <!-- Article Thumbnail Card -->
                             <div class="kt-card">
                                 <div class="kt-card-header">
-                                    <h4 class="kt-card-title">Page Thumbnail</h4>
+                                    <h4 class="kt-card-title">Article Thumbnail</h4>
                                 </div>
                                 <div class="kt-card-content">
                                     <div class="grid gap-4">
                                         <!-- Current Thumbnail Display -->
-                                        {#if page?.thumbnailUrl}
+                                        {#if article?.thumbnailUrl}
                                             <div class="flex flex-col gap-2">
                                                 <label class="text-sm font-medium text-mono">Current Thumbnail</label>
                                                 <div class="relative inline-block">
                                                     <div class="p-2 border-2 border-primary/20 bg-primary/5 rounded-lg">
                                                         <img 
-                                                            src={page.thumbnailUrl} 
-                                                            alt="Current page thumbnail"
+                                                            src={article.thumbnailUrl} 
+                                                            alt="Current article thumbnail"
                                                             class="w-32 h-32 object-cover rounded-lg" 
                                                         />
                                                     </div>
@@ -589,7 +514,7 @@
 
                             <!-- Form Actions -->
                             <div class="flex items-center justify-end gap-3">
-                                <a href="{route('admin.pages.index')}" class="kt-btn kt-btn-outline">
+                                <a href="{route('admin.articles.index')}" class="kt-btn kt-btn-outline">
                                     Cancel
                                 </a>
                                 <button
@@ -603,7 +528,7 @@
                                         Updating...
                                     {:else}
                                         <i class="ki-filled ki-check text-base"></i>
-                                        Update Page
+                                        Update Article
                                     {/if}
                                 </button>
                             </div>
@@ -638,7 +563,7 @@
                                         on:submit|preventDefault={() => handleTranslationSubmit(language.code, language.id)}
                                         class="grid gap-4"
                                     >
-                                        <!-- Page Title -->
+                                        <!-- Article Title -->
                                         <div class="flex flex-col gap-2">
                                             <label class="text-sm font-medium text-mono" for="title-{language.id}">
                                                 Title <span class="text-destructive">*</span>
@@ -647,7 +572,7 @@
                                                 id="title-{language.id}"
                                                 type="text"
                                                 class="kt-input {translationErrors[language.code]?.title ? 'kt-input-error' : ''}"
-                                                placeholder="Enter page title"
+                                                placeholder="Enter article title"
                                                 bind:value={translationForms[language.code].title}
                                             />
                                             {#if translationErrors[language.code]?.title}
@@ -655,7 +580,7 @@
                                             {/if}
                                         </div>
 
-                                        <!-- Page Description -->
+                                        <!-- Article Description -->
                                         <div class="flex flex-col gap-2">
                                             <label class="text-sm font-medium text-mono" for="description-{language.id}">
                                                 Description <span class="text-destructive">*</span>
@@ -663,7 +588,7 @@
                                             <textarea
                                                 id="description-{language.id}"
                                                 class="kt-textarea {translationErrors[language.code]?.description ? 'kt-textarea-error' : ''}"
-                                                placeholder="Enter page description"
+                                                placeholder="Enter article description"
                                                 rows="3"
                                                 bind:value={translationForms[language.code].description}
                                             ></textarea>
@@ -672,7 +597,7 @@
                                             {/if}
                                         </div>
 
-                                        <!-- Page Content -->
+                                        <!-- Article Content -->
                                         <div class="flex flex-col gap-2">
                                             <label class="text-sm font-medium text-mono" for="content-{language.id}">
                                                 Content <span class="text-destructive">*</span>
@@ -681,7 +606,7 @@
                                                 bind:this={summernoteEditors[language.code]}
                                                 id="content-{language.id}"
                                                 bind:value={translationForms[language.code].content}
-                                                placeholder="Enter page content"
+                                                placeholder="Enter article content"
                                                 height={400}
                                                 minHeight={300}
                                                 maxHeight={600}

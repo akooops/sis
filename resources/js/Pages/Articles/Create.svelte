@@ -8,28 +8,27 @@
     // Props from the server
     export let defaultLanguage;
 
-    // Define breadcrumbs for this page
+    // Define breadcrumbs for this article
     const breadcrumbs = [
         {
-            title: 'Pages',
-            url: route('admin.pages.index'),
+            title: 'Articles',
+            url: route('admin.articles.index'),
             active: false
         },
         {
             title: 'Create',
-            url: route('admin.pages.create'),
+            url: route('admin.articles.create'),
             active: true
         }
     ];
     
-    const pageTitle = 'Create Page';
+    const pageTitle = 'Create Article';
 
     // Form data
     let form = {
         name: '',
         slug: '',
         status: 'draft',
-        menu_id: '',
         media_option: 'upload',
         file: null,
         media_id: '',
@@ -54,7 +53,6 @@
     let selectedMedia = null;
 
     // Select2 component references
-    let menuSelectComponent;
     let mediaSelectComponent;
     let summernoteComponent;
 
@@ -104,11 +102,6 @@
         }
     }
 
-    // Handle menu selection
-    function handleMenuSelect(event) {
-        form.menu_id = event.detail.value;
-    }
-
     // Handle media selection
     function handleMediaSelect(event) {
         form.media_id = event.detail.value;
@@ -120,11 +113,6 @@
                 file: { url: event.detail.data.mediaUrl }
             };
         }
-    }
-
-    // Handle menu clear
-    function handleMenuClear() {
-        form.menu_id = '';
     }
 
     // Handle media clear
@@ -155,15 +143,12 @@
             }
         });
 
-        router.post(route('admin.pages.store'), formData, {
+        router.post(route('admin.articles.store'), formData, {
             onError: (err) => {
                 errors = err;
                 loading = false;
                 
                 // Apply error styling to Select2 components
-                if (errors.menu_id && menuSelectComponent) {
-                    menuSelectComponent.setError(true);
-                }
                 if (errors.media_id && mediaSelectComponent) {
                     mediaSelectComponent.setError(true);
                 }
@@ -191,18 +176,18 @@
     <!-- Container -->
     <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
-            <!-- Page Header -->
+            <!-- Article Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Create New Page</h1>
+                    <h1 class="text-2xl font-bold text-mono">Create New Article</h1>
                     <p class="text-sm text-secondary-foreground">
-                        Add a new page to your website
+                        Add a new article to your website
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="{route('admin.pages.index')}" class="kt-btn kt-btn-outline">
+                    <a href="{route('admin.articles.index')}" class="kt-btn kt-btn-outline">
                         <i class="ki-filled ki-arrow-left text-base"></i>
-                        Back to Pages
+                        Back to Articles
                     </a>
                 </div>
             </div>
@@ -216,16 +201,16 @@
                     </div>
                     <div class="kt-card-content">
                         <div class="grid gap-4">
-                            <!-- Page Name -->
+                            <!-- Article Name -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono" for="name">
-                                    Page Name <span class="text-destructive">*</span>
+                                    Article Name <span class="text-destructive">*</span>
                                 </label>
                                 <input
                                     id="name"
                                     type="text"
                                     class="kt-input {errors.name ? 'kt-input-error' : ''}"
-                                    placeholder="Enter page name"
+                                    placeholder="Enter article name"
                                     bind:value={form.name}
                                     on:input={handleNameChange}
                                 />
@@ -234,16 +219,16 @@
                                 {/if}
                             </div>
 
-                            <!-- Page Slug -->
+                            <!-- Article Slug -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono" for="slug">
-                                    Page Slug <span class="text-destructive">*</span>
+                                    Article Slug <span class="text-destructive">*</span>
                                 </label>
                                 <input
                                     id="slug"
                                     type="text"
                                     class="kt-input {errors.slug ? 'kt-input-error' : ''}"
-                                    placeholder="Enter page slug"
+                                    placeholder="Enter article slug"
                                     bind:value={form.slug}
                                     on:input={handleSlugChange}
                                 />
@@ -252,10 +237,10 @@
                                 {/if}
                             </div>
 
-                            <!-- Page Status -->
+                            <!-- Article Status -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono" for="status">
-                                    Page Status <span class="text-destructive">*</span>
+                                    Article Status <span class="text-destructive">*</span>
                                 </label>
                                 <select
                                     id="status"
@@ -270,44 +255,6 @@
                                     <p class="text-sm text-destructive">{errors.status}</p>
                                 {/if}
                             </div>
-
-                            <!-- Menu Selection -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="menu-select">
-                                    Add Menu to Page
-                                </label>
-                                <Select2
-                                    bind:this={menuSelectComponent}
-                                    id="menu-select"
-                                    placeholder="Select menu..."
-                                    bind:value={form.menu_id}
-                                    on:select={handleMenuSelect}
-                                    on:clear={handleMenuClear}
-                                    ajax={{
-                                        url: route('admin.menus.index'),
-                                        dataType: 'json',
-                                        delay: 300,
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                perPage: 10
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.menus.map(menu => ({
-                                                    id: menu.id,
-                                                    text: menu.name
-                                                }))
-                                            };
-                                        },
-                                        cache: true
-                                    }}
-                                />
-                                {#if errors.menu_id}
-                                    <p class="text-sm text-destructive">{errors.menu_id}</p>
-                                {/if}
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -315,7 +262,7 @@
                 <!-- Media Selection Card -->
                 <div class="kt-card">
                     <div class="kt-card-header">
-                        <h4 class="kt-card-title">Page Thumbnail</h4>
+                        <h4 class="kt-card-title">Article Thumbnail</h4>
                     </div>
                     <div class="kt-card-content">
                         <div class="grid gap-4">
@@ -437,20 +384,20 @@
                 <!-- Content Card -->
                 <div class="kt-card">
                     <div class="kt-card-header">
-                        <h4 class="kt-card-title">Page Content ({defaultLanguage.name})</h4>
+                        <h4 class="kt-card-title">Article Content ({defaultLanguage.name})</h4>
                     </div>
                     <div class="kt-card-content">
                         <div class="grid gap-4">
-                            <!-- Page Title -->
+                            <!-- Article Title -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono" for="title">
-                                    Page Title <span class="text-destructive">*</span>
+                                    Article Title <span class="text-destructive">*</span>
                                 </label>
                                 <input
                                     id="title"
                                     type="text"
                                     class="kt-input {errors.title ? 'kt-input-error' : ''}"
-                                    placeholder="Enter page title"
+                                    placeholder="Enter article title"
                                     bind:value={form.title}
                                 />
                                 {#if errors.title}
@@ -458,15 +405,15 @@
                                 {/if}
                             </div>
 
-                            <!-- Page Description -->
+                            <!-- Article Description -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono" for="description">
-                                    Page Description <span class="text-destructive">*</span>
+                                    Article Description <span class="text-destructive">*</span>
                                 </label>
                                 <textarea
                                     id="description"
                                     class="kt-textarea {errors.description ? 'kt-textarea-error' : ''}"
-                                    placeholder="Enter page description"
+                                    placeholder="Enter article description"
                                     rows="3"
                                     bind:value={form.description}
                                 ></textarea>
@@ -475,16 +422,16 @@
                                 {/if}
                             </div>
 
-                            <!-- Page Content -->
+                            <!-- Article Content -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono" for="summernote-editor">
-                                    Page Content <span class="text-destructive">*</span>
+                                    Article Content <span class="text-destructive">*</span>
                                 </label>
                                 <Summernote
                                     bind:this={summernoteComponent}
                                     id="summernote-editor"
                                     bind:value={form.content}
-                                    placeholder="Enter page content"
+                                    placeholder="Enter article content"
                                     height={400}
                                     minHeight={300}
                                     maxHeight={600}
@@ -502,7 +449,7 @@
 
                 <!-- Form Actions -->
                 <div class="flex items-center justify-end gap-3">
-                    <a href="{route('admin.pages.index')}" class="kt-btn kt-btn-outline">
+                    <a href="{route('admin.articles.index')}" class="kt-btn kt-btn-outline">
                         Cancel
                     </a>
                     <button
@@ -515,7 +462,7 @@
                             Creating...
                         {:else}
                             <i class="ki-filled ki-plus text-base"></i>
-                            Create Page
+                            Create Article
                         {/if}
                     </button>
                 </div>
