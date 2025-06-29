@@ -50,10 +50,7 @@ class MediaController extends Controller
             ]);
         }
 
-        return inertia('Media/Index', [
-            'medias' => $media->items(), 
-            'pagination' => $this->indexService->handlePagination($media)
-        ]);
+        return inertia('Media/Index');
     }
     
     /**
@@ -67,7 +64,7 @@ class MediaController extends Controller
             'is_default' => true,
         ])->first();
 
-        return view('admin.media.create', compact('defaultLanguage'));
+        return inertia('Media/Create', compact('defaultLanguage'));
     }
     
     /**
@@ -110,8 +107,9 @@ class MediaController extends Controller
             $media->setTranslation($field, $defaultLanguage->code, $request->input($field));    
         }
     
-        return redirect()->route('admin.media.index')
-                        ->with('success','Media created successfully');
+        return inertia('Media/Index', [
+            'success' => 'Media created successfully!'
+        ]);
     }
 
     /**
@@ -123,8 +121,13 @@ class MediaController extends Controller
     public function show(Media $media)
     {    
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $media->getTranslatableFieldsByLanguages();
 
-        return view('admin.media.show', compact('media', 'languages'));
+        return inertia('Media/Show', [
+            'media' => $media,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -136,8 +139,9 @@ class MediaController extends Controller
     public function edit(Media $media)
     {
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $media->getTranslatableFieldsByLanguages();
 
-        return view('admin.media.edit', compact('media', 'languages'));
+        return inertia('Media/Edit', compact('media', 'languages', 'translations'));
     }
     
     /**
@@ -151,8 +155,9 @@ class MediaController extends Controller
     {
         $media->update($request->validated());
     
-        return redirect()->route('admin.media.index')
-                        ->with('success','Media updated successfully');
+        return inertia('Media/Index', [
+            'success' => 'Media updated successfully!'
+        ]);
     }
 
     public function updateTranslation(Media $media, UpdateMediaTranslationRequest $request){
