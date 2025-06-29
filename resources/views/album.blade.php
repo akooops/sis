@@ -81,14 +81,48 @@
 
         <div class="row mt-5 gx-md-6 gy-6" data-aos="fade-up" data-aos-duration="2000">
             @foreach ($album->files as $file)
-                <div class="item col-12 col-sm-6 col-md-4">
-                    <figure class="hover-scale rounded cursor-dark">
-                        <a href="{{$file->url}}" data-glightbox="" data-gallery="project-1">
-                            <img src="{{$file->url}}" alt="">
-                        </a>
-                    </figure>
-                </div>
-                <!--/column -->
+                @if(!str_starts_with($file->type, 'video/'))
+                    <div class="item col-12 col-sm-6 col-md-4">
+                        <figure class="hover-scale rounded cursor-dark">
+                            <!-- Image file -->
+                            <a href="{{$file->url}}" data-glightbox="" data-gallery="project-1">
+                                <img src="{{$file->url}}" alt="" class="w-100 h-100 object-cover rounded" style="width: 100%; height: 250px; object-fit: cover;">
+                            </a>
+                        </figure>
+                    </div>
+                    <!--/column -->
+                @endif
+            @endforeach
+        </div>
+
+        <div class="row mt-5 gx-md-6 gy-6" data-aos="fade-up" data-aos-duration="2000">
+            <hr class="mt-2 mb-4" data-aos="fade-up" data-aos-duration="2000">
+
+            <div class="col-12">
+                <h2>
+                    {{getLanguageKeyLocalTranslation('albums_videos_title')}}
+                </h2>
+            </div>
+
+            @foreach ($album->files as $file)
+                @if(str_starts_with($file->type, 'video/'))
+                    <div class="item col-12 col-sm-6 col-md-4">
+                        <figure class="hover-scale rounded cursor-dark">
+                            <!-- Video file with simple player -->
+                            <video 
+                                src="{{$file->url}}" 
+                                controls
+                                class="w-100 h-100 object-cover rounded"
+                                style="width: 100%; height: 250px; object-fit: cover;"
+                                preload="metadata"
+                            >
+                                <source src="{{$file->url}}" type="{{$file->type}}">
+                                Your browser does not support the video tag.
+                            </video>
+                        </figure>
+                    </div>
+                    <!--/column -->
+                @endif
             @endforeach
         </div>
     </div>

@@ -24,6 +24,10 @@ class LanguageTranslationSeeder extends Seeder
 
         // Complete translation keys and values (alphabetically ordered)
         $keys = [
+            'albums_videos_title' => [
+                'en' => 'Videos',
+                'ar' => 'الفيديوهات'
+            ],
             'breadcrumbs_albums_page_title' => [
                 'en' => 'Albums',
                 'ar' => 'الألبومات'

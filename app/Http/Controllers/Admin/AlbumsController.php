@@ -40,10 +40,14 @@ class AlbumsController extends Controller
 
         $albums = $albums->paginate($perPage, ['*'], 'album', $page);
 
-        return view('admin.albums.index', [
-            'albums' => $albums,
-            'pagination' => $this->indexService->handlePagination($albums)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'albums' => $albums->items(),
+                'pagination' => $this->indexService->handlePagination($albums)
+            ]);
+        }
+
+        return inertia('Albums/Index');
     }
     
     /**
@@ -57,9 +61,7 @@ class AlbumsController extends Controller
             'is_default' => true,
         ])->first();
 
-        $medias = Media::where('type', 'image')->get();
-
-        return view('admin.albums.create', compact('defaultLanguage', 'medias'));
+        return inertia('Albums/Create', compact('defaultLanguage'));
     }
     
     /**
@@ -133,13 +135,14 @@ class AlbumsController extends Controller
                         default => 'document',
                     };
 
-                    if($type == 'image') $file->attach($album);
+                    if($type == 'image' || $type == 'video') $file->attach($album);
                 }
             }
         }
 
-        return redirect()->route('admin.albums.index')
-                        ->with('success','Album created successfully');
+        return inertia('Albums/Index', [
+            'success' => 'Album created successfully!'
+        ]);
     }
 
     /**
@@ -150,9 +153,16 @@ class AlbumsController extends Controller
      */
     public function show(Album $album)
     {    
-        $languages = Language::orderBy('is_default', 'DESC')->get();
+        $album->load('files');
 
-        return view('admin.albums.show', compact('album', 'languages'));
+        $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $album->getTranslatableFieldsByLanguages();
+
+        return inertia('Albums/Show', [
+            'album' => $album,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -163,10 +173,12 @@ class AlbumsController extends Controller
      */
     public function edit(Album $album)
     {
-        $languages = Language::orderBy('is_default', 'DESC')->get();
-        $medias = Media::where('type', 'image')->get();
+        $album->load('files');
 
-        return view('admin.albums.edit', compact('album', 'languages', 'medias'));
+        $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $album->getTranslatableFieldsByLanguages();
+
+        return inertia('Albums/Edit', compact('album', 'languages', 'translations'));
     }
     
     /**
@@ -234,13 +246,14 @@ class AlbumsController extends Controller
                         default => 'document',
                     };
 
-                    if($type == 'image') $file->attach($album);
+                    if($type == 'image' || $type == 'video') $file->attach($album);
                 }
             }
         }
 
-        return redirect()->route('admin.albums.index')
-                        ->with('success','Album updated successfully');
+        return inertia('Albums/Index', [
+            'success' => 'Album updated successfully!'
+        ]);
     }
 
     public function updateTranslation(Album $album, UpdateAlbumTranslationRequest $request){
