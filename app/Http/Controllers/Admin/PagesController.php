@@ -124,8 +124,9 @@ class PagesController extends Controller
     
         $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Page', $page->id, true);
     
-        return redirect()->route('admin.pages.index')
-                        ->with('success','Page created successfully');
+        return inertia('Pages/Index', [
+            'success' => 'Page created successfully!'
+        ]);
     }
 
     /**

@@ -11,12 +11,12 @@
     const breadcrumbs = [
         {
             title: 'Pages',
-            url: '/admin/pages',
+            url: route('admin.pages.index'),
             active: false
         },
         {
             title: page?.name || 'Page Details',
-            url: `/admin/pages/${page?.id}`,
+            url: route('admin.pages.show', { page: page?.id }),
             active: true
         }
     ];

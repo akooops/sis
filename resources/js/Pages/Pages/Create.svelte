@@ -3,6 +3,7 @@
     import { onMount, tick } from 'svelte';
     import { router } from '@inertiajs/svelte';
     import Select2 from '../Components/Forms/Select2.svelte';
+    import Summernote from '../Components/Forms/Summernote.svelte';
 
     // Props from the server
     export let defaultLanguage;
@@ -11,12 +12,12 @@
     const breadcrumbs = [
         {
             title: 'Pages',
-            url: '/admin/pages',
+            url: route('admin.pages.index'),
             active: false
         },
         {
             title: 'Create',
-            url: '/admin/pages/create',
+            url: route('admin.pages.create'),
             active: true
         }
     ];
@@ -55,6 +56,7 @@
     // Select2 component references
     let menuSelectComponent;
     let mediaSelectComponent;
+    let summernoteComponent;
 
     // Function to convert string to slug
     function stringToSlug(str) {
@@ -134,6 +136,11 @@
     // Handle form submission
     function handleSubmit() {
         loading = true;
+
+        // Ensure form.content is up-to-date from Summernote
+        if (summernoteComponent && summernoteComponent.getValue) {
+            form.content = summernoteComponent.getValue();
+        }
         
         const formData = new FormData();
         
@@ -148,10 +155,7 @@
             }
         });
 
-        router.post('/admin/pages', formData, {
-            onSuccess: () => {
-                loading = false;
-            },
+        router.post(route('admin.pages.store'), formData, {
             onError: (err) => {
                 errors = err;
                 loading = false;
@@ -163,6 +167,12 @@
                 if (errors.media_id && mediaSelectComponent) {
                     mediaSelectComponent.setError(true);
                 }
+                if (errors.content && summernoteComponent) {
+                    summernoteComponent.setError(true);
+                }
+            },
+            onFinish: () => {
+                loading = false;
             }
         });
     }
@@ -170,24 +180,6 @@
     // Initialize components after mount
     onMount(async () => {
         await tick();
-        
-        // Initialize Summernote editor
-        if (globalThis.$ && globalThis.$.fn.summernote) {
-            globalThis.$('#summernote-editor').summernote({
-                height: 400,
-                minHeight: 300,
-                maxHeight: 600,
-                focus: false,
-                codeviewFilter: false,
-                codeviewIframeFilter: false,
-                disableDragAndDrop: false,
-                callbacks: {
-                    onChange: function(contents, $editable) {
-                        form.content = contents;
-                    }
-                }
-            });
-        }
     });
 </script>
 
@@ -208,7 +200,7 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="/admin/pages" class="kt-btn kt-btn-outline">
+                    <a href="{route('admin.pages.index')}" class="kt-btn kt-btn-outline">
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Pages
                     </a>
@@ -488,12 +480,18 @@
                                 <label class="text-sm font-medium text-mono" for="summernote-editor">
                                     Page Content <span class="text-destructive">*</span>
                                 </label>
-                                <textarea
+                                <Summernote
+                                    bind:this={summernoteComponent}
                                     id="summernote-editor"
-                                    class="kt-textarea {errors.content ? 'kt-textarea-error' : ''}"
-                                    placeholder="Enter page content"
                                     bind:value={form.content}
-                                ></textarea>
+                                    placeholder="Enter page content"
+                                    height={400}
+                                    minHeight={300}
+                                    maxHeight={600}
+                                    on:change={(event) => {
+                                        form.content = event.detail.contents;
+                                    }}
+                                />
                                 {#if errors.content}
                                     <p class="text-sm text-destructive">{errors.content}</p>
                                 {/if}
@@ -504,7 +502,7 @@
 
                 <!-- Form Actions -->
                 <div class="flex items-center justify-end gap-3">
-                    <a href="/admin/pages" class="kt-btn kt-btn-outline">
+                    <a href="{route('admin.pages.index')}" class="kt-btn kt-btn-outline">
                         Cancel
                     </a>
                     <button

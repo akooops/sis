@@ -50,7 +50,7 @@ class MediaController extends Controller
             ]);
         }
 
-        return view('admin.media.index', [
+        return inertia('Media/Index', [
             'medias' => $media->items(), 
             'pagination' => $this->indexService->handlePagination($media)
         ]);

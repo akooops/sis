@@ -14,6 +14,9 @@
         <link href="/assets/admin/css/styles.css" rel="stylesheet"/>
         <!-- Select2 CSS -->
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <!-- Summernote CSS -->
+        <link href="/assets/admin/vendors/summernote/summernote-lite.min.css" rel="stylesheet" type="text/css" />
+
         @routes
         @vite('resources/js/app.js')
         @inertiaHead
@@ -45,6 +48,10 @@
           .select2-container .select2-selection--single .select2-selection__clear{
               cursor: pointer !important;
           }
+          
+          .note-editable{
+            background-color: #fff
+          } 
           
           @keyframes shimmer {
               0% { background-position: -200% 0; }
@@ -93,10 +100,12 @@
         <script src="/assets/admin/vendors/clipboard/clipboard.min.js"></script>
         <script src="/assets/admin/vendors/prismjs/prismjs.min.js"></script>
         <script src="/assets/admin/vendors/@form-validation/form-validation.bundle.js"></script>
-        <!-- jQuery (required for Select2) -->
+        <!-- jQuery -->
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <!-- Select2 JavaScript -->
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <!-- Summernote JavaScript -->
+        <script src="/assets/admin/vendors/summernote/summernote-lite.min.js"></script>
         <!-- Metronic Layout Scripts -->
         <script src="/assets/admin/js/widgets/general.js"></script>
     </body>
