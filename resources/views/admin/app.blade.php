@@ -16,6 +16,8 @@
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
         <!-- Summernote CSS -->
         <link href="/assets/admin/vendors/summernote/summernote-lite.min.css" rel="stylesheet" type="text/css" />
+        <!-- Flatpickr CSS -->
+        <link href="/assets/admin/vendors/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
 
         @routes
         @vite('resources/js/app.js')
@@ -106,6 +108,8 @@
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <!-- Summernote JavaScript -->
         <script src="/assets/admin/vendors/summernote/summernote-lite.min.js"></script>
+        <!-- Flatpickr JavaScript -->
+        <script src="/assets/admin/vendors/flatpickr/flatpickr.min.js"></script>
         <!-- Metronic Layout Scripts -->
         <script src="/assets/admin/js/widgets/general.js"></script>
     </body>

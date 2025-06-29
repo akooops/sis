@@ -40,10 +40,14 @@ class EventsController extends Controller
 
         $events = $events->paginate($perPage, ['*'], 'event', $page);
 
-        return view('admin.events.index', [
-            'events' => $events,
-            'pagination' => $this->indexService->handlePagination($events)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'events' => $events->items(),
+                'pagination' => $this->indexService->handlePagination($events)
+            ]);
+        }
+
+        return inertia('Events/Index');
     }
     
     /**
@@ -57,9 +61,7 @@ class EventsController extends Controller
             'is_default' => true,
         ])->first();
 
-        $medias = Media::where('type', 'image')->get();
-
-        return view('admin.events.create', compact('defaultLanguage', 'medias'));
+        return inertia('Events/Create', compact('defaultLanguage'));
     }
     
     /**
@@ -138,8 +140,10 @@ class EventsController extends Controller
             }
         }
 
-        return redirect()->route('admin.events.index')
-                        ->with('success','Event created successfully');
+
+        return inertia('Events/Index', [
+            'success' => 'Event created successfully!'
+        ]);
     }
 
     /**
@@ -151,8 +155,13 @@ class EventsController extends Controller
     public function show(Event $event)
     {    
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $event->getTranslatableFieldsByLanguages();
 
-        return view('admin.events.show', compact('event', 'languages'));
+        return inertia('Events/Show', [
+            'event' => $event,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -164,9 +173,9 @@ class EventsController extends Controller
     public function edit(Event $event)
     {
         $languages = Language::orderBy('is_default', 'DESC')->get();
-        $medias = Media::where('type', 'image')->get();
+        $translations = $event->getTranslatableFieldsByLanguages();
 
-        return view('admin.events.edit', compact('event', 'languages', 'medias'));
+        return inertia('Events/Edit', compact('event', 'languages', 'translations'));
     }
     
     /**
@@ -239,8 +248,9 @@ class EventsController extends Controller
             }
         }
 
-        return redirect()->route('admin.events.index')
-                        ->with('success','Event updated successfully');
+        return inertia('Events/Index', [
+            'success' => 'Event updated successfully!'
+        ]);
     }
 
     public function updateTranslation(Event $event, UpdateEventTranslationRequest $request){
