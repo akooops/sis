@@ -29,7 +29,7 @@ class BannersController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $banners = Banner::latest();
+        $banners = Banner::with('page')->latest();
 
         if ($search) {
             $banners->where(function($query) use ($search) {
@@ -40,10 +40,14 @@ class BannersController extends Controller
 
         $banners = $banners->paginate($perPage, ['*'], 'banner', $page);
 
-        return view('admin.banners.index', [
-            'banners' => $banners,
-            'pagination' => $this->indexService->handlePagination($banners)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'banners' => $banners->items(),
+                'pagination' => $this->indexService->handlePagination($banners)
+            ]);
+        }
+
+        return inertia('Banners/Index');    
     }
     
     /**
@@ -57,10 +61,7 @@ class BannersController extends Controller
             'is_default' => true,
         ])->first();
 
-        $medias = Media::where('type', 'image')->get();
-        $pages = Page::get();
-
-        return view('admin.banners.create', compact('defaultLanguage', 'medias', 'pages'));
+        return inertia('Banners/Create', compact('defaultLanguage'));
     }
     
     /**
@@ -118,8 +119,9 @@ class BannersController extends Controller
             $video = $this->fileService->upload($request->file('video'), 'App\\Models\\Banner', $banner->id, false);
         }
 
-        return redirect()->route('admin.banners.index')
-                        ->with('success','Banner created successfully');
+        return inertia('Banners/Index', [
+            'success' => 'Banner created successfully!'
+        ]);
     }
 
     /**
@@ -130,9 +132,17 @@ class BannersController extends Controller
      */
     public function show(Banner $banner)
     {    
-        $languages = Language::orderBy('is_default', 'DESC')->get();
+        $banner->load('video');
+        $banner->load('page');
 
-        return view('admin.banners.show', compact('banner', 'languages'));
+        $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $banner->getTranslatableFieldsByLanguages();
+
+        return inertia('Banners/Show', [
+            'banner' => $banner,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -143,11 +153,13 @@ class BannersController extends Controller
      */
     public function edit(Banner $banner)
     {
-        $languages = Language::orderBy('is_default', 'DESC')->get();
-        $medias = Media::where('type', 'image')->get();
-        $pages = Page::get();
+        $banner->load('video');
+        $banner->load('page');
 
-        return view('admin.banners.edit', compact('banner', 'languages', 'medias', 'pages'));
+        $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $banner->getTranslatableFieldsByLanguages();
+
+        return inertia('Banners/Edit', compact('banner', 'languages', 'translations'));
     }
     
     /**
@@ -189,14 +201,17 @@ class BannersController extends Controller
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Banner', $banner->id, true);
         }
 
+        if($banner->video) $banner->video->detach();
+
         if ($request->hasFile('video')) {
             if($banner->video) $banner->video->detach();
 
             $video = $this->fileService->upload($request->file('video'), 'App\\Models\\Banner', $banner->id, false);
         }
 
-        return redirect()->route('admin.banners.index')
-                        ->with('success','Banner updated successfully');
+        return inertia('Banners/Index', [
+            'success' => 'Banner updated successfully!'
+        ]);
     }
 
     public function updateTranslation(Banner $banner, UpdateBannerTranslationRequest $request){
