@@ -61,10 +61,7 @@ class PagesController extends Controller
             'is_default' => true,
         ])->first();
 
-        $medias = Media::where('type', 'image')->get();
-        $menus = Menu::get();
-
-        return view('admin.pages.create', compact('defaultLanguage', 'medias', 'menus'));
+        return inertia('Pages/Create', compact('defaultLanguage'));
     }
     
     /**

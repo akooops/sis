@@ -6,6 +6,7 @@ use App\Traits\HasFiles;
 use App\Traits\Translatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
 
 class Media extends Model
 {
@@ -13,6 +14,8 @@ class Media extends Model
 
     //Properties
     protected $guarded = ['id'];
+
+    protected $appends = ['mediaUrl'];
 
     protected $casts = [
         'is_main' => 'boolean',
@@ -29,7 +32,12 @@ class Media extends Model
         return $this->morphTo();
     }
         
-    //Accessors & Mutators
+    //Accessors & Mutators   
+    public function getMediaUrlAttribute()
+    {
+        return ($this->file) ? $this->file->url : URL::to('assets/admin/images/default-thumbnail.jpg');
+    }
+
     public function getTranslatableFields(): array
     {
         return ['title', 'description'];

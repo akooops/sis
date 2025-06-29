@@ -43,8 +43,15 @@ class MediaController extends Controller
 
         $media = $media->paginate($perPage, ['*'], 'page', $page);
 
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'medias' => $media->items(), 
+                'pagination' => $this->indexService->handlePagination($media)
+            ]);
+        }
+
         return view('admin.media.index', [
-            'medias' => $media,
+            'medias' => $media->items(), 
             'pagination' => $this->indexService->handlePagination($media)
         ]);
     }

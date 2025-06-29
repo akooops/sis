@@ -8,12 +8,12 @@
         <title>Saud international schools - Admin panel</title>
         <!-- Favicon -->
         <link href="/assets/admin/images/logo.png" rel="shortcut icon"/>
-        <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
         <!-- Metronic CSS -->
         <link href="/assets/admin/vendors/apexcharts/apexcharts.css" rel="stylesheet"/>
         <link href="/assets/admin/vendors/keenicons/styles.bundle.css" rel="stylesheet"/>
         <link href="/assets/admin/css/styles.css" rel="stylesheet"/>
+        <!-- Select2 CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
         @routes
         @vite('resources/js/app.js')
         @inertiaHead
@@ -28,6 +28,22 @@
               background-size: 200% 100%;
               animation: shimmer 1.5s infinite;
               border-radius: 4px;
+          }
+
+          .select2{
+            width: 100% !important;
+          }
+
+          .select2-selection--single{
+              display: flex !important;
+          }
+          
+          .select2-container .select2-selection--single .select2-selection__rendered{
+              padding-left: 0 !important;
+          }
+
+          .select2-container .select2-selection--single .select2-selection__clear{
+              cursor: pointer !important;
           }
           
           @keyframes shimmer {
@@ -77,6 +93,10 @@
         <script src="/assets/admin/vendors/clipboard/clipboard.min.js"></script>
         <script src="/assets/admin/vendors/prismjs/prismjs.min.js"></script>
         <script src="/assets/admin/vendors/@form-validation/form-validation.bundle.js"></script>
+        <!-- jQuery (required for Select2) -->
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <!-- Select2 JavaScript -->
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <!-- Metronic Layout Scripts -->
         <script src="/assets/admin/js/widgets/general.js"></script>
     </body>

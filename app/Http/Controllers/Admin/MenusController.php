@@ -34,10 +34,14 @@ class MenusController extends Controller
 
         $menus = $menus->paginate($perPage, ['*'], 'page', $page);
 
-        return view('admin.menus.index', [
-            'menus' => $menus,
-            'pagination' => $this->indexService->handlePagination($menus)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'menus' => $menus->items(), 
+                'pagination' => $this->indexService->handlePagination($menus)
+            ]);
+        }
+
+        return inertia('Menus/Index');
     }
     
     /**

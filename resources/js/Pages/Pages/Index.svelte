@@ -38,7 +38,11 @@
                 search: search
             });
             
-            const response = await fetch(`/admin/pages?${params}`, {
+            const response = await fetch(route('admin.pages.index', {
+                page: currentPage,
+                perPage: perPage,
+                search: search
+            }), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
