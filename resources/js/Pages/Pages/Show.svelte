@@ -81,10 +81,12 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back
                     </a>
-                    <a href={route('admin.pages.edit', { page: page?.id })} class="kt-btn kt-btn-primary">
-                        <i class="ki-filled ki-pencil text-base"></i>
-                        Edit Page
-                    </a>
+                    {#if hasPermission('admin.pages.update')}
+                        <a href={route('admin.pages.edit', { page: page?.id })} class="kt-btn kt-btn-primary">
+                            <i class="ki-filled ki-pencil text-base"></i>
+                            Edit Page
+                        </a>
+                    {/if}
                 </div>
             </div>
 

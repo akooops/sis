@@ -215,10 +215,12 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
+                    {#if hasPermission('admin.pages.store')}
                     <a href="{route('admin.pages.create')}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-plus text-base"></i>
                         Add New Page
                     </a>
+                    {/if}
                 </div>
             </div>
 
@@ -325,10 +327,12 @@
                                                 <p class="text-sm text-secondary-foreground mb-4">
                                                     {search ? 'No pages match your search criteria.' : 'Get started by creating your first page.'}
                                                 </p>
+                                                {#if hasPermission('admin.pages.store')}
                                                 <a href="{route('admin.pages.create')}" class="kt-btn kt-btn-primary">
                                                     <i class="ki-filled ki-plus text-base"></i>
                                                     Create First Page
                                                 </a>
+                                                {/if}
                                             </div>
                                         </td>
                                     </tr>
@@ -382,6 +386,7 @@
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
+                                                            {#if hasPermission('admin.pages.show')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.pages.show', { page: page.id })}>
                                                                     <span class="kt-menu-icon">
@@ -390,6 +395,8 @@
                                                                     <span class="kt-menu-title">View</span>
                                                                 </a>
                                                             </div>
+                                                            {/if}
+                                                            {#if hasPermission('admin.pages.update')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.pages.edit', { page: page.id })}>
                                                                     <span class="kt-menu-icon">
@@ -398,7 +405,8 @@
                                                                     <span class="kt-menu-title">Edit</span>
                                                                 </a>
                                                             </div>
-                                                            {#if !page.is_system_page}
+                                                            {/if}
+                                                            {#if hasPermission('admin.pages.destroy') && !page.is_system_page}
                                                                 <div class="kt-menu-separator"></div>
                                                                 <div class="kt-menu-item">
                                                                     <button class="kt-menu-link" on:click={() => deletePage(page.id)}>

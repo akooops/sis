@@ -1,4 +1,5 @@
 <script>
+  import { page } from '@inertiajs/svelte';
   import Sidebar from '../Components/Sidebar.svelte';
   import Topbar from '../Components/Topbar.svelte';
   import Breadcrumbs from '../Components/Breadcrumbs.svelte';
@@ -6,6 +7,20 @@
   // Props for the layout
   export let breadcrumbs = [];
   export let pageTitle = 'Dashboard';
+
+  // Global utility functions for admin components
+  function hasPermission(permission) {
+    if (!$page.props.auth.permissions) return false;
+    return $page.props.auth.permissions.some(p => p === permission);
+  }
+
+  function isActiveRoute(routePattern) {
+    return $page.url.startsWith(route(routePattern));
+  }
+
+  // Make functions globally available for child components
+  window.hasPermission = hasPermission;
+  window.isActiveRoute = isActiveRoute;
 </script>
 
 <div class="flex grow">

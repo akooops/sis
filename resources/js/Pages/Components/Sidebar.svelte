@@ -22,17 +22,6 @@
         document.body.appendChild(form);
         form.submit();
     }
-
-    // Helper function to check if user has permission
-    function hasPermission(permission) {
-        if (!$page.props.auth.permissions) return false;
-        return $page.props.auth.permissions.some(p => p === permission);
-    }
-
-    // Helper function to check if current route matches
-    function isActiveRoute(routePattern) {
-        return $page.url.startsWith(route(routePattern));
-    }
 </script>
 
 <!-- Sidebar -->
