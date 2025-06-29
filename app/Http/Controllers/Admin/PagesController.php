@@ -157,11 +157,11 @@ class PagesController extends Controller
      */
     public function edit(Page $page)
     {
+        $page->load('menu');
+    
         $languages = Language::orderBy('is_default', 'DESC')->get();
-        $medias = Media::where('type', 'image')->get();
-        $menus = Menu::get();
-
-        return view('admin.pages.edit', compact('page', 'languages', 'medias', 'menus'));
+        $translations = $page->getTranslatableFieldsByLanguages();
+        return inertia('Pages/Edit', compact('page', 'languages', 'translations'));
     }
     
     /**
@@ -213,9 +213,10 @@ class PagesController extends Controller
         }
     
         cache()->forget("page-{$page->id}");
-
-        return redirect()->route('admin.pages.index')
-                        ->with('success','Page updated successfully');
+        
+        return inertia('Pages/Index', [
+            'success' => 'Page updated successfully!'
+        ]);
     }
 
     public function updateTranslation(Page $page, UpdatePageTranslationRequest $request){

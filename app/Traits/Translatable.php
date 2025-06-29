@@ -113,10 +113,19 @@ trait Translatable
     public function getTranslatableFieldsByLanguages(): array
     {
         $translatableFields = $this->getTranslatableFields();
+        $languages = Language::orderBy('is_default', 'DESC')->get();
         $result = [];
 
         foreach ($translatableFields as $field) {
-            $result[$field] = $this->getTranslations($field);
+            $result[$field] = [];
+            foreach ($languages as $language) {
+                $translation = $this->translations()
+                    ->where('field', $field)
+                    ->where('language_id', $language->id)
+                    ->value('value');
+                
+                $result[$field][$language->code] = $translation ?: "{$field}.{$language->code}";
+            }
         }
 
         return $result;
