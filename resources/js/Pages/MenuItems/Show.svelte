@@ -3,52 +3,47 @@
     import { onMount } from 'svelte';
 
     // Props
-    export let event;
+    export let menuItem;
+    export let menu;
     export let languages;
     export let translations;
 
-    // Define breadcrumbs for this event
+    // Define breadcrumbs for this menu item
     const breadcrumbs = [
         {
-            title: 'Events',
-            url: route('admin.events.index'),
+            title: 'Menus Management',
+            url: route('admin.menus.index'),
             active: false
         },
         {
-            title: event?.name || 'Event Details',
-            url: route('admin.events.show', { event: event?.id }),
+            title: menuItem?.menu?.name || 'Menu',
+            url: route('admin.menu-items.index', { menu: menuItem?.menu.id }),
+            active: false
+        },
+        {
+            title: menuItem?.name || 'Menu Item Details',
+            url: route('admin.menu-items.show', { menuItem: menuItem?.id }),
             active: true
         }
     ];
     
-    const pageTitle = 'Event Details';
+    const pageTitle = 'Menu Item Details';
 
-    // Get status badge class
-    function getStatusBadgeClass(status) {
-        switch (status) {
-            case 'published':
-                return 'kt-badge-success';
-            case 'draft':
-                return 'kt-badge-info';
-            case 'hidden':
-                return 'kt-badge-primary';
-            default:
-                return 'kt-badge-secondary';
-        }
-    }
-
-    // Get status text
-    function getStatusText(status) {
-        switch (status) {
-            case 'published':
-                return 'Published';
-            case 'draft':
-                return 'Draft';
-            case 'hidden':
-                return 'Hidden';
-            default:
-                return status;
-        }
+    // Get linkable type display name
+    function getLinkableTypeDisplay(type) {
+        if (!type) return 'N/A';
+        
+        const typeMap = {
+            'App\\Models\\Page': 'Page',
+            'App\\Models\\Program': 'Program',
+            'App\\Models\\Article': 'Article',
+            'App\\Models\\Album': 'Album',
+            'App\\Models\\Event': 'Event',
+            'App\\Models\\Grade': 'Grade',
+            'App\\Models\\JobPosting': 'Job'
+        };
+        
+        return typeMap[type] || type;
     }
 
     // Get translation for a field and language
@@ -66,129 +61,116 @@
 
 <AdminLayout {breadcrumbs} {pageTitle}>
     <!-- Container -->
-    <div class="kt-container-fluid">
-        <div class="grid gap-5 lg:gap-7.5 w-full">
-            <!-- Event Header -->
+    <div class="kt-container-fixed">
+        <div class="grid gap-5 lg:gap-7.5">
+            <!-- Menu Item Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Event Information</h1>
+                    <h1 class="text-2xl font-bold text-mono">Menu Item Information</h1>
                     <p class="text-sm text-secondary-foreground">
-                        View event details and translations
+                        View menu item details and translations
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="{route('admin.events.index')}" class="kt-btn kt-btn-outline">
+                    <a href="{route('admin.menu-items.index', { menu: menuItem?.menu.id })}" class="kt-btn kt-btn-outline">
                         <i class="ki-filled ki-arrow-left text-base"></i>
-                        Back
+                        Back to Menu Items
                     </a>
-                    {#if hasPermission('admin.events.update')}
-                        <a href={route('admin.events.edit', { event: event?.id })} class="kt-btn kt-btn-primary">
+                    {#if hasPermission('admin.menu-items.update')}
+                        <a href={route('admin.menu-items.edit', { menuItem: menuItem?.id })} class="kt-btn kt-btn-primary">
                             <i class="ki-filled ki-pencil text-base"></i>
-                            Edit Event
+                            Edit Menu Item
                         </a>
                     {/if}
                 </div>
             </div>
 
-            <!-- Event Information Card -->
-            <div class="kt-card w-full">
+            <!-- Menu Item Information Card -->
+            <div class="kt-card">
                 <div class="kt-card-header">
-                    <h4 class="kt-card-title">Event Information</h4>
+                    <h4 class="kt-card-title">Menu Item Information</h4>
                 </div>
                 <div class="kt-card-content">
-                    <div class="flex flex-col lg:flex-row gap-6 w-full">
-                        
-                        
-                        <!-- Event Details -->
-                        <div class="grid gap-4 w-full">
-                            <!-- Event Thumbnail -->
-                            <div class="flex">
-                                <figure class="figure">
-                                    <img 
-                                        src={event?.thumbnailUrl} 
-                                        alt={event?.name}
-                                        class="rounded-lg w-32 h-32 object-cover"
-                                    />
-                                </figure>
-                            </div>
+                    <div class="grid gap-4">
+                        <!-- Menu Item Name -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Menu Item Name</h4>
+                            <p class="text-sm text-secondary-foreground">{menuItem?.name}</p>
+                        </div>
 
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Event Name</h4>
-                                <p class="text-sm text-secondary-foreground">{event?.name}</p>
-                            </div>
+                        <!-- External/Internal Link -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Linkable</h4>
+                            {#if menuItem.linkable_id && menuItem.linkable_type}
+                                <span class="kt-badge kt-badge-success w-fit">
+                                    <i class="ki-filled ki-check text-xs"></i>
+                                    Yes ({menuItem.linkable_type})
+                                </span>
+                            {:else}
+                                <span class="kt-badge kt-badge-secondary w-fit">
+                                    <i class="ki-filled ki-cross text-xs"></i>
+                                    No
+                                </span>
+                            {/if}
+                        </div>
 
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Event Slug</h4>
+                        <!-- Url -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Url / Link</h4>
+                            {#if menuItem.linkable_id && menuItem.linkable_type}
                                 <span class="kt-badge kt-badge-outline kt-badge-primary w-fit">
-                                    {event?.slug}
+                                    Link: <a href={menuItem.url} target="_blank">
+                                        Open <i class="ki-filled ki-arrow-up-right"></i> 
+                                    </a>
                                 </span>
-                            </div>
-                            
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Event Starts at</h4>
-                                <p class="text-sm text-secondary-foreground">
-                                    {event?.starts_at ? new Date(event.starts_at).toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    }) : 'N/A'}
-                                </p>
-                            </div>
-
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Event Ends at</h4>
-                                <p class="text-sm text-secondary-foreground">
-                                    {event?.ends_at ? new Date(event.ends_at).toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    }) : 'N/A'}
-                                </p>
-                            </div>
-
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Event Status</h4>
-                                <span class="kt-badge {getStatusBadgeClass(event?.status)} w-fit">
-                                    {getStatusText(event?.status)}
+                            {:else}
+                                <span class="kt-badge kt-badge-outline kt-badge-primary w-fit">
+                                    Link: <a href={menuItem.url} target="_blank">
+                                        Open <i class="ki-filled ki-arrow-up-right"></i> 
+                                    </a>
                                 </span>
-                            </div>
+                            {/if}
+                        </div>
 
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Created At</h4>
-                                <p class="text-sm text-secondary-foreground">
-                                    {event?.created_at ? new Date(event.created_at).toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    }) : 'N/A'}
-                                </p>
-                            </div>
+                        <!-- Created At -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Created At</h4>
+                            <p class="text-sm text-secondary-foreground">
+                                {menuItem?.created_at ? new Date(menuItem.created_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) : 'N/A'}
+                            </p>
+                        </div>
 
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Updated At</h4>
-                                <p class="text-sm text-secondary-foreground">
-                                    {event?.updated_at ? new Date(event.updated_at).toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    }) : 'N/A'}
-                                </p>
-                            </div>
+                        <!-- Updated At -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Updated At</h4>
+                            <p class="text-sm text-secondary-foreground">
+                                {menuItem?.updated_at ? new Date(menuItem.updated_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) : 'N/A'}
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Translations Card -->
-            <div class="kt-card w-full">
+            <div class="kt-card">
+                <div class="kt-card-header">
+                    <h4 class="kt-card-title">Translations</h4>
+                    <p class="text-sm text-secondary-foreground">
+                        Menu item title translations
+                    </p>
+                </div>
                 <div class="kt-card-content">
                     <!-- Language Tabs -->
                     <div class="kt-tabs kt-tabs-line justify-between mb-6" data-kt-tabs="true">
@@ -215,31 +197,11 @@
                                 <!-- Title Translation -->
                                 <div class="flex flex-col gap-2">
                                     <h4 class="text-sm font-semibold text-mono">
-                                        Event {language.name} Title
+                                        Menu Item {language.name} Title
                                     </h4>
                                     <p class="text-sm text-secondary-foreground p-3 bg-muted/50 rounded-lg">
                                         {getTranslation('title', language.code)}
                                     </p>
-                                </div>
-
-                                <!-- Description Translation -->
-                                <div class="flex flex-col gap-2">
-                                    <h4 class="text-sm font-semibold text-mono">
-                                        Event {language.name} Description
-                                    </h4>
-                                    <p class="text-sm text-secondary-foreground p-3 bg-muted/50 rounded-lg">
-                                        {getTranslation('description', language.code)}
-                                    </p>
-                                </div>
-
-                                <!-- Content Translation -->
-                                <div class="flex flex-col gap-2">
-                                    <h4 class="text-sm font-semibold text-mono">
-                                        Event {language.name} Content
-                                    </h4>
-                                    <div class="text-sm text-secondary-foreground p-3 bg-muted/50 rounded-lg">
-                                        {@html getTranslation('content', language.code)}
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -248,5 +210,4 @@
             </div>
         </div>
     </div>
-    <!-- End of Container -->
 </AdminLayout> 

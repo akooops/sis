@@ -124,11 +124,14 @@ class MenuItemsController extends Controller
      */
     public function show(MenuItem $menuItem)
     {    
+        $menuItem->load('menu');
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $menuItem->getTranslatableFieldsByLanguages();
 
         return inertia('MenuItems/Show', [
             'menuItem' => $menuItem,
             'languages' => $languages,
+            'translations' => $translations
         ]);
     }
     
@@ -140,11 +143,14 @@ class MenuItemsController extends Controller
      */
     public function edit(MenuItem $menuItem)
     {
+        $menuItem->load('menu');
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $menuItem->getTranslatableFieldsByLanguages();
 
         return inertia('MenuItems/Edit', [
             'menuItem' => $menuItem,
             'languages' => $languages,
+            'translations' => $translations
         ]);
     }
     
@@ -181,9 +187,9 @@ class MenuItemsController extends Controller
             $menuItem->setTranslation($field, $language->code, $request->input($field));    
         }
 
-        return inertia('MenuItems/Index', [
-            'success' => 'Menu item updated successfully!',
-            'menu' => $menuItem->menu,
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Menu item updated successfully',
         ]);
     }
 

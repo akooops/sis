@@ -309,6 +309,16 @@
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
+                                                            {#if hasPermission('admin.menu-items.index')}
+                                                            <div class="kt-menu-item">
+                                                                <a class="kt-menu-link" href={route('admin.menu-items.index', { menu: menu.id })}>
+                                                                    <span class="kt-menu-icon">
+                                                                        <i class="ki-filled ki-abstract-26"></i>
+                                                                    </span>
+                                                                    <span class="kt-menu-title">Menu Items</span>
+                                                                </a>
+                                                            </div>
+                                                            {/if}
                                                             {#if hasPermission('admin.menus.show')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.menus.show', { menu: menu.id })}>
