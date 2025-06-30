@@ -65,7 +65,7 @@
 @endsection
 @section('script')
 <!-- particles js -->
-<script src="{{ URL::asset('assets/admin/libs/particles.js/particles.js.min.js') }}"></script>
+<script src="{{ URL::asset('assets/old-admin/libs/particles.js/particles.js.min.js') }}"></script>
 <!-- particles app js -->
 <script src="{{ URL::asset('assets/admin/js/pages/particles.app.js') }}"></script>
 @endsection

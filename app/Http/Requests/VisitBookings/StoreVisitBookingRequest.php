@@ -67,20 +67,12 @@ class StoreVisitBookingRequest extends FormRequest
                         $fail('The selected time slot is in the past.');
                         return;
                     }
-                    
-                    $remainingCapacity = $timeSlot->remaining_capacity;
-                    $requestedVisitors = $this->input('visitors_count');
-                    
-                    // Check if requested visitors exceed remaining capacity
-                    if ($requestedVisitors > $remainingCapacity) {
-                        if ($remainingCapacity <= 0) {
-                            $fail('The selected time slot is fully booked. Please choose another time slot.');
-                        } else {
-                            $fail("Only {$remainingCapacity} spot(s) remaining in this time slot. You requested {$requestedVisitors} visitors.");
-                        }
-                        return;
+                            
+                    // Check if there still a booking left in this time slot
+                    if ($timeSlot->reserved) {
+                        $fail('The selected time slot is fully booked. Please choose another time slot.');
                     }
-                },
+                }
             ],
         ];
     }

@@ -1,8 +1,8 @@
 @extends('admin.layouts.master')
 @section('title') Job Postings @endsection
 @section('css')
-<link href="{{ URL::asset('assets/admin/libs/flatpickr/flatpickr.min.css')}}" rel="stylesheet" type="text/css" />
-<link href="{{ URL::asset('assets/admin/libs/summernote/summernote-lite.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/old-admin/libs/flatpickr/flatpickr.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/old-admin/libs/summernote/summernote-lite.min.css')}}" rel="stylesheet" type="text/css" />
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <style>
@@ -295,9 +295,9 @@
 
 @endsection
 @section('script')
-<script src="{{ URL::asset('assets/admin/libs/flatpickr/flatpickr.min.js')}}"></script>
+<script src="{{ URL::asset('assets/old-admin/libs/flatpickr/flatpickr.min.js')}}"></script>
 <script src="{{ URL::asset('/assets/admin/js/app.min.js') }}"></script>
-<script src="{{ URL::asset('assets/admin/libs/summernote/summernote-lite.min.js')}}"></script>
+<script src="{{ URL::asset('assets/old-admin/libs/summernote/summernote-lite.min.js')}}"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

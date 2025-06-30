@@ -1,7 +1,7 @@
 @extends('admin.layouts.master')
 @section('title') Visit Time Slots @endsection
 @section('css')
-<link href="{{ URL::asset('assets/admin/libs/flatpickr/flatpickr.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/old-admin/libs/flatpickr/flatpickr.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
 @component('admin.components.breadcrumb')
@@ -85,6 +85,6 @@
 
 @endsection
 @section('script')
-<script src="{{ URL::asset('assets/admin/libs/flatpickr/flatpickr.min.js')}}"></script>
+<script src="{{ URL::asset('assets/old-admin/libs/flatpickr/flatpickr.min.js')}}"></script>
 <script src="{{ URL::asset('/assets/admin/js/app.min.js') }}"></script>
 @endsection

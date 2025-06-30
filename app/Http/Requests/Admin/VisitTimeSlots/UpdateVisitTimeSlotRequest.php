@@ -32,7 +32,7 @@ class UpdateVisitTimeSlotRequest extends FormRequest
         $visitTimeSlot = $this->route('visitTimeSlot');
 
         $validator->after(function ($validator) use ($visitTimeSlot){
-            if ($visitTimeSlot->visitBookings()->sum('visitors_count') > $this->input('capacity')) {
+            if ($visitTimeSlot->visitBookings()->count() > $this->input('capacity')) {
                 $validator->errors()->add('capacity', 'This time slot bookings visitor count exceeds the new capacity');
 
                 return;

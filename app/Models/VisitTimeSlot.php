@@ -28,7 +28,12 @@ class VisitTimeSlot extends Model
     //Accessors
     public function getRemainingCapacityAttribute()
     {
-        $currentBookings = $this->visitBookings()->sum('visitors_count');
+        $currentBookings = $this->visitBookings()->count();
         return  $this->capacity - $currentBookings;
+    }
+
+    public function getReservedAttribute()
+    {
+        return $this->visitBookings()->count() >= $this->capacity ? true : false;
     }
 }

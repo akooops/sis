@@ -1,7 +1,7 @@
 @extends('admin.layouts.master')
 @section('title') Albums @endsection
 @section('css')
-<link href="{{ URL::asset('assets/admin/libs/dropzone/dropzone.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/old-admin/libs/dropzone/dropzone.min.css')}}" rel="stylesheet" type="text/css" />
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -223,12 +223,12 @@
 
 @endsection
 @section('script')
-<script src="{{ URL::asset('assets/admin/libs/dropzone/dropzone.min.js') }}"></script>
-<script src="{{ URL::asset('assets/admin/libs/filepond/filepond.min.js') }}"></script>
-<script src="{{ URL::asset('assets/admin/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js') }}"></script>
-<script src="{{ URL::asset('assets/admin/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js') }}"></script>
-<script src="{{ URL::asset('assets/admin/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js') }}"></script>
-<script src="{{ URL::asset('assets/admin/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
+<script src="{{ URL::asset('assets/old-admin/libs/dropzone/dropzone.min.js') }}"></script>
+<script src="{{ URL::asset('assets/old-admin/libs/filepond/filepond.min.js') }}"></script>
+<script src="{{ URL::asset('assets/old-admin/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js') }}"></script>
+<script src="{{ URL::asset('assets/old-admin/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js') }}"></script>
+<script src="{{ URL::asset('assets/old-admin/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js') }}"></script>
+<script src="{{ URL::asset('assets/old-admin/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
 
 <script src="{{ URL::asset('/assets/admin/js/app.min.js') }}"></script>
 

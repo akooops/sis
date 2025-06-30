@@ -1,8 +1,8 @@
 @extends('admin.layouts.master')
 @section('title') Dashboard @endsection
 @section('css')
-<link href="{{ URL::asset('assets/admin/libs/jsvectormap/jsvectormap.min.css')}}" rel="stylesheet" type="text/css" />
-<link href="{{ URL::asset('assets/admin/libs/swiper/swiper.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/old-admin/libsjsvectormap/jsvectormap.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/old-admin/libs/swiper/swiper.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
 @component('admin.components.breadcrumb')
@@ -32,9 +32,9 @@
 @endsection
 @section('script')
 <!-- apexcharts -->
-<script src="{{ URL::asset('/assets/admin/libs/apexcharts/apexcharts.min.js') }}"></script>
-<script src="{{ URL::asset('/assets/admin/libs/jsvectormap/jsvectormap.min.js') }}"></script>
-<script src="{{ URL::asset('/assets/admin/libs/swiper/swiper.min.js')}}"></script>
+<script src="{{ URL::asset('/assets/old-admin/libs/apexcharts/apexcharts.min.js') }}"></script>
+<script src="{{ URL::asset('/assets/old-admin/libs/jsvectormap/jsvectormap.min.js') }}"></script>
+<script src="{{ URL::asset('/assets/old-admin/libs/swiper/swiper.min.js')}}"></script>
 <!-- dashboard init -->
 <script src="{{ URL::asset('/assets/admin/js/app.min.js') }}"></script>
 @endsection
