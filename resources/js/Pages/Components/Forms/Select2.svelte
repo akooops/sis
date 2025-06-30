@@ -135,6 +135,83 @@
                 globalThis.$(selectElement).prop('disabled', false).trigger('change');
             }
         }
+
+        // Handle AJAX configuration changes
+        $: if (select2Instance && ajax) {
+            // Destroy and recreate Select2 when AJAX config changes
+            globalThis.$(selectElement).select2('destroy');
+            
+            // Reinitialize with new AJAX config
+            const options = {
+                theme: theme,
+                placeholder: placeholder,
+                allowClear: allowClear,
+                disabled: disabled,
+                minimumInputLength: minimumInputLength,
+                delay: delay,
+                cache: cache,
+                closeOnSelect: closeOnSelect,
+                tags: tags,
+                tokenSeparators: tokenSeparators,
+                selectOnClose: selectOnClose,
+                width: width,
+                dropdownCssClass: dropdownCssClass,
+                containerCssClass: containerCssClass,
+                ajax: ajax
+            };
+
+            // Add optional properties if provided
+            if (maximumSelectionLength) options.maximumSelectionLength = maximumSelectionLength;
+            if (minimumResultsForSearch !== 0) options.minimumResultsForSearch = minimumResultsForSearch;
+            if (maximumResultsForSearch) options.maximumResultsForSearch = maximumResultsForSearch;
+
+            // Add custom templates if provided
+            if (templateResult) {
+                options.templateResult = templateResult;
+            }
+            if (templateSelection) {
+                options.templateSelection = templateSelection;
+            }
+
+            select2Instance = globalThis.$(selectElement).select2(options);
+
+            // Reapply styling
+            globalThis.$(selectElement).next('.select2-container').find('.select2-selection').addClass('kt-input');
+            globalThis.$(selectElement).next('.select2-container').find('.select2-selection--single').css({
+                'height': 'auto',
+                'min-height': '32px',
+                'border': '1px solid #e2e8f0',
+                'border-radius': '0.5rem',
+                'background-color': '#ffffff',
+                'padding': '0.5rem 0.75rem'
+            });
+
+            // Reattach event handlers
+            globalThis.$(selectElement).off('select2:select select2:clear select2:unselect');
+            
+            globalThis.$(selectElement).on('select2:select', function(e) {
+                const selectedData = e.params.data;
+                value = multiple ? globalThis.$(selectElement).val() : selectedData.id;
+                dispatch('select', { value: value, data: selectedData });
+                dispatch('change', { value: value, data: selectedData });
+                
+                // Remove error styling when user selects something
+                globalThis.$(selectElement).next('.select2-container').removeClass('kt-input-error');
+            });
+
+            globalThis.$(selectElement).on('select2:clear', function(e) {
+                value = multiple ? [] : '';
+                dispatch('clear');
+                dispatch('change', { value: value, data: null });
+            });
+
+            globalThis.$(selectElement).on('select2:unselect', function(e) {
+                if (multiple) {
+                    value = globalThis.$(selectElement).val();
+                    dispatch('change', { value: value, data: e.params.data });
+                }
+            });
+        }
     });
 
     onDestroy(() => {

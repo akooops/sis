@@ -45,11 +45,16 @@ class MenuItemsController extends Controller
 
         $menuItems = $menuItems->paginate($perPage, ['*'], 'menuItem', $page);
 
-        return view('admin.menu-items.index', [
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'menuItems' => $menuItems->items(),
+                'pagination' => $this->indexService->handlePagination($menuItems)
+            ]);
+        }
+
+        return inertia('MenuItems/Index', [
             'menu' => $menu,
-            'menuItems' => $menuItems,
-            'pagination' => $this->indexService->handlePagination($menuItems)
-        ]);
+        ]); 
     }
     
     /**
@@ -59,11 +64,14 @@ class MenuItemsController extends Controller
      */
     public function create(Menu $menu)
     {
-        $defaultLanguage = Language::where('is_default', true)->first();
+        $defaultLanguage = Language::where([
+            'is_default' => true,
+        ])->first();
 
-        $linkableItems = $this->getLinkableItems();
-
-        return view('admin.menu-items.create', compact('defaultLanguage', 'menu', 'linkableItems'));
+        return inertia('MenuItems/Create', [
+            'defaultLanguage' => $defaultLanguage,
+            'menu' => $menu
+        ]);
     }
 
     /**
@@ -102,8 +110,10 @@ class MenuItemsController extends Controller
             $menuItem->setTranslation($field, $defaultLanguage->code, $request->input($field));    
         }
 
-        return redirect()->route('admin.menu-items.index', ['menu' => $menu->id])
-                        ->with('success','MenuItem created successfully');
+        return inertia('MenuItems/Index', [
+            'success' => 'Menu item created successfully!',
+            'menu' => $menu,
+        ]);
     }
 
     /**
@@ -116,7 +126,10 @@ class MenuItemsController extends Controller
     {    
         $languages = Language::orderBy('is_default', 'DESC')->get();
 
-        return view('admin.menu-items.show', compact('menuItem', 'languages'));
+        return inertia('MenuItems/Show', [
+            'menuItem' => $menuItem,
+            'languages' => $languages,
+        ]);
     }
     
     /**
@@ -128,9 +141,11 @@ class MenuItemsController extends Controller
     public function edit(MenuItem $menuItem)
     {
         $languages = Language::orderBy('is_default', 'DESC')->get();
-        $linkableItems = $this->getLinkableItems();
 
-        return view('admin.menu-items.edit', compact('menuItem', 'languages', 'linkableItems'));
+        return inertia('MenuItems/Edit', [
+            'menuItem' => $menuItem,
+            'languages' => $languages,
+        ]);
     }
     
     /**
@@ -153,8 +168,10 @@ class MenuItemsController extends Controller
 
         $menuItem->update($validatedData);
 
-        return redirect()->route('admin.menu-items.index', ['menu' => $menuItem->menu_id])
-                        ->with('success','MenuItem updated successfully');
+        return inertia('MenuItems/Index', [
+            'success' => 'Menu item updated successfully!',
+            'menu' => $menuItem->menu,
+        ]);
     }
 
     public function updateTranslation(MenuItem $menuItem, UpdateMenuItemTranslationRequest $request){
@@ -164,9 +181,9 @@ class MenuItemsController extends Controller
             $menuItem->setTranslation($field, $language->code, $request->input($field));    
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'MenuItem updated successfully',
+        return inertia('MenuItems/Index', [
+            'success' => 'Menu item updated successfully!',
+            'menu' => $menuItem->menu,
         ]);
     }
 
@@ -188,7 +205,10 @@ class MenuItemsController extends Controller
     {
         $menuItems = $menu->items;
 
-        return view('admin.menu-items.order', compact('menu', 'menuItems'));
+        return inertia('MenuItems/Order', [
+            'menu' => $menu,
+            'menuItems' => $menuItems,
+        ]);
     }
 
     public function order(OrderMenuItemsRequest $request, Menu $menu)
@@ -201,21 +221,9 @@ class MenuItemsController extends Controller
             ]);
         }
             
-        return response()->json([
-            'status' => 'success',
+        return inertia('MenuItems/Index', [
+            'success' => 'Menu item ordered successfully!',
+            'menu' => $menu,
         ]);
-    }
-
-    private function getLinkableItems()
-    {
-        return [
-            'Page' => Page::get(),
-            'Program' => Program::get(),
-            'Article' => Article::get(),
-            'Album' => Album::get(),
-            'Event' => Event::get(),
-            'Grade' => Grade::get(),
-            'JobPosting' => JobPosting::get(),
-        ];
     }
 }
