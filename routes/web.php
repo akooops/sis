@@ -147,6 +147,9 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::delete('articles/{article}', [ArticlesController::class, 'destroy'])->middleware('check.permission:admin.articles.destroy')->name('admin.articles.destroy');
 
     // Program
+    Route::get('programs/order', [ProgramsController::class, 'orderPage'])->middleware('check.permission:admin.programs.order')->name('admin.programs.order-page');
+    Route::post('programs/order', [ProgramsController::class, 'order'])->middleware('check.permission:admin.programs.order')->name('admin.programs.order');
+
     Route::get('programs', [ProgramsController::class, 'index'])->middleware('check.permission:admin.programs.index')->name('admin.programs.index');
     Route::get('programs/create', [ProgramsController::class, 'create'])->middleware('check.permission:admin.programs.store')->name('admin.programs.create');
     Route::post('programs', [ProgramsController::class, 'store'])->middleware('check.permission:admin.programs.store')->name('admin.programs.store');
@@ -157,6 +160,9 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::delete('programs/{program}', [ProgramsController::class, 'destroy'])->middleware('check.permission:admin.programs.destroy')->name('admin.programs.destroy');
 
     // Grades
+    Route::get('grades/order', [GradesController::class, 'orderPage'])->middleware('check.permission:admin.grades.order')->name('admin.grades.order-page');
+    Route::post('grades/order', [GradesController::class, 'order'])->middleware('check.permission:admin.grades.order')->name('admin.grades.order');
+
     Route::get('grades', [GradesController::class, 'index'])->middleware('check.permission:admin.grades.index')->name('admin.grades.index');
     Route::get('grades/create', [GradesController::class, 'create'])->middleware('check.permission:admin.grades.store')->name('admin.grades.create');
     Route::post('grades', [GradesController::class, 'store'])->middleware('check.permission:admin.grades.store')->name('admin.grades.store');

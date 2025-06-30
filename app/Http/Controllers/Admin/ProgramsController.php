@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\Admin\Programs\DeleteProgramRequest;
+use App\Http\Requests\Admin\Programs\OrderProgramsRequest;
 use App\Http\Requests\Admin\Programs\StoreProgramRequest;
 use App\Http\Requests\Admin\Programs\UpdateProgramRequest;
 use App\Http\Requests\Admin\Programs\UpdateProgramTranslationRequest;
@@ -38,10 +39,14 @@ class ProgramsController extends Controller
 
         $programs = $programs->paginate($perPage, ['*'], 'program', $page);
 
-        return view('admin.programs.index', [
-            'programs' => $programs,
-            'pagination' => $this->indexService->handlePagination($programs)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'programs' => $programs->items(),
+                'pagination' => $this->indexService->handlePagination($programs)
+            ]);
+        }
+
+        return inertia('Programs/Index');    
     }
     
     /**
@@ -55,8 +60,7 @@ class ProgramsController extends Controller
             'is_default' => true,
         ])->first();
 
-        $medias = Media::where('type', 'image')->get();
-        return view('admin.programs.create', compact('defaultLanguage', 'medias'));
+        return inertia('Programs/Create', compact('defaultLanguage'));
     }
     
     /**
@@ -120,8 +124,9 @@ class ProgramsController extends Controller
 
         cache()->forget("all-programs");
 
-        return redirect()->route('admin.programs.index')
-                        ->with('success','Program created successfully');
+        return inertia('Programs/Index', [
+            'success' => 'Program created successfully!'
+        ]);
     }
 
     /**
@@ -133,8 +138,13 @@ class ProgramsController extends Controller
     public function show(Program $program)
     {    
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $program->getTranslatableFieldsByLanguages();
 
-        return view('admin.programs.show', compact('program', 'languages'));
+        return inertia('Programs/Show', [
+            'program' => $program,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -146,9 +156,13 @@ class ProgramsController extends Controller
     public function edit(Program $program)
     {
         $languages = Language::orderBy('is_default', 'DESC')->get();
-        $medias = Media::where('type', 'image')->get();
+        $translations = $program->getTranslatableFieldsByLanguages();
 
-        return view('admin.programs.edit', compact('program', 'languages', 'medias'));
+        return inertia('Programs/Edit', [
+            'program' => $program,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -200,8 +214,9 @@ class ProgramsController extends Controller
 
         cache()->forget("all-programs");
 
-        return redirect()->route('admin.programs.index')
-                        ->with('success','Program updated successfully');
+        return inertia('Programs/Index', [
+            'success' => 'Program updated successfully!'
+        ]);
     }
 
     public function updateTranslation(Program $program, UpdateProgramTranslationRequest $request){
@@ -231,5 +246,29 @@ class ProgramsController extends Controller
         
         return redirect()->route('admin.programs.index')
                         ->with('success','Program deleted successfully');
+    }
+
+    public function orderPage()
+    {
+        $programs = Program::orderBy('order')->get();
+
+        return inertia('Programs/Order', compact('programs'));
+    }
+
+    public function order(OrderProgramsRequest $request)
+    {
+        foreach ($request->order as $item) {
+            Program::where('id', $item['id'])
+                ->update([
+                    'order' => $item['order']
+            ]);
+        }
+
+        cache()->forget("all-programs");
+            
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Program ordered successfully',
+        ]);
     }
 }

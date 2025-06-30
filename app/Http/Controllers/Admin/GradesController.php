@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\Admin\Grades\DeleteGradeRequest;
+use App\Http\Requests\Admin\Grades\OrderGradesRequest;
 use App\Http\Requests\Admin\Grades\StoreGradeRequest;
 use App\Http\Requests\Admin\Grades\UpdateGradeRequest;
 use App\Http\Requests\Admin\Grades\UpdateGradeTranslationRequest;
@@ -262,5 +263,27 @@ class GradesController extends Controller
 
         return redirect()->route('admin.grades.index')
                         ->with('success','Grade deleted successfully');
+    }
+
+    public function orderPage()
+    {
+        $grades = Grade::orderBy('order')->get();
+
+        return inertia('Grades/Order', compact('grades'));
+    }
+
+    public function order(OrderGradesRequest $request)
+    {
+        foreach ($request->order as $item) {
+            Grade::where('id', $item['id'])
+                ->update([
+                    'order' => $item['order']
+            ]);
+        }
+            
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Grade ordered successfully',
+        ]);
     }
 }

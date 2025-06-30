@@ -26,7 +26,7 @@ function getLanguages() {
 
 function getPrograms() {
     return cache()->remember('all-programs', 3600, function() {
-        return Program::latest()->get();
+        return Program::orderBy('order')->get();
     });
 }
 

@@ -73,13 +73,15 @@ class PermissionsSeeder extends Seeder
             'admin.programs.show',
             'admin.programs.update',
             'admin.programs.destroy',
-            
+            'admin.programs.order',
+
             // Grades Management
             'admin.grades.index',
             'admin.grades.store',
             'admin.grades.show',
             'admin.grades.update',
             'admin.grades.destroy',
+            'admin.grades.order',
             
             // Albums Management
             'admin.albums.index',
