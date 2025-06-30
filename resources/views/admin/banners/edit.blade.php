@@ -261,7 +261,7 @@
 
 @endsection
 @section('script')
-<script src="{{ URL::asset('/assets/admin/js/app.min.js') }}"></script>
+<script src="{{ URL::asset('/assets/old-admin/js/app.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {

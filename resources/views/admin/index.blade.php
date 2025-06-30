@@ -36,5 +36,5 @@
 <script src="{{ URL::asset('/assets/old-admin/libs/jsvectormap/jsvectormap.min.js') }}"></script>
 <script src="{{ URL::asset('/assets/old-admin/libs/swiper/swiper.min.js')}}"></script>
 <!-- dashboard init -->
-<script src="{{ URL::asset('/assets/admin/js/app.min.js') }}"></script>
+<script src="{{ URL::asset('/assets/old-admin/js/app.min.js') }}"></script>
 @endsection

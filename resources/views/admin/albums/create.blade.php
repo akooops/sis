@@ -230,7 +230,7 @@
 <script src="{{ URL::asset('assets/old-admin/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js') }}"></script>
 <script src="{{ URL::asset('assets/old-admin/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
 
-<script src="{{ URL::asset('/assets/admin/js/app.min.js') }}"></script>
+<script src="{{ URL::asset('/assets/old-admin/js/app.min.js') }}"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
