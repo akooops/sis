@@ -209,7 +209,14 @@ class MenuItemsController extends Controller
 
     public function orderPage(Menu $menu)
     {
-        $menuItems = $menu->items;
+        // Get hierarchical menu items with nested children
+        $menuItems = $menu->items()->with(['children' => function($query) {
+            $query->with(['children' => function($query) {
+                $query->with(['children' => function($query) {
+                    $query->orderBy('order');
+                }])->orderBy('order');
+            }])->orderBy('order');
+        }])->orderBy('order')->get();
 
         return inertia('MenuItems/Order', [
             'menu' => $menu,
@@ -227,9 +234,9 @@ class MenuItemsController extends Controller
             ]);
         }
             
-        return inertia('MenuItems/Index', [
-            'success' => 'Menu item ordered successfully!',
-            'menu' => $menu,
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Menu item ordered successfully',
         ]);
     }
 }

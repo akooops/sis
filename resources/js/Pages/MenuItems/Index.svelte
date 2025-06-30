@@ -189,6 +189,11 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Menus
                     </a>
+                    {#if hasPermission('admin.menu-items.order')}
+                    <a href="{route('admin.menu-items.order-page', { menu: menu?.id })}" class="kt-btn kt-btn-outline">
+                        Order Menu Items
+                    </a>
+                    {/if}
                     {#if hasPermission('admin.menu-items.store')}
                     <a href="{route('admin.menu-items.create', { menu: menu?.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-plus text-base"></i>

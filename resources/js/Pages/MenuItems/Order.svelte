@@ -30,43 +30,9 @@
 
     // Loading state
     let loading = false;
-    let sortableContainer;
+    let sortableList;
 
-    // Recursive component for nested menu items
-    function createNestedItem(item) {
-        return {
-            ...item,
-            children: item.children || []
-        };
-    }
-
-    // Initialize sortable functionality
-    function initSortable() {
-        // Get all nested sortable elements
-        const nestedSortables = document.querySelectorAll('.sortable-list');
-        
-        // Loop through each nested sortable element
-        for (let i = 0; i < nestedSortables.length; i++) {
-            new Sortable(nestedSortables[i], {
-                group: 'nested',
-                animation: 150,
-                fallbackOnBody: true,
-                swapThreshold: 0.65,
-                handle: '.handle',
-                ghostClass: 'sortable-ghost',
-                chosenClass: 'sortable-chosen',
-                dragClass: 'sortable-drag',
-                emptyInsertThreshold: 5,
-                onEnd: function(evt) {
-                    // Re-initialize sortables for any new nested lists
-                    setTimeout(initSortable, 100);
-                    updateOrder();
-                }
-            });
-        }
-    }
-
-    // Handle order update with nested support
+    // Handle order update with nested structure
     async function updateOrder() {
         loading = true;
         
@@ -93,8 +59,9 @@
             });
         }
 
-        const rootList = document.getElementById('sortable');
-        processList(rootList);
+        processList(sortableList);
+        
+        console.log('Items to update:', items);
         
         try {
             const response = await fetch(route('admin.menu-items.order', { menu: menu.id }), {
@@ -134,19 +101,86 @@
         }
     }
 
+    // Get Sortable constructor
+    function getSortable() {
+        if (typeof window.Sortable !== 'undefined') {
+            return window.Sortable;
+        } else if (typeof Sortable !== 'undefined') {
+            return Sortable;
+        }
+        return null;
+    }
+
+    // Initialize sortable with nested support
+    function initSortable() {
+        const Sortable = getSortable();
+        if (!Sortable) {
+            console.error('SortableJS not available');
+            return;
+        }
+
+        // Get all nested sortable elements
+        const nestedSortables = document.querySelectorAll('.sortable-list');
+        
+        console.log('Found sortable lists:', nestedSortables.length);
+        
+        // Loop through each nested sortable element
+        for (let i = 0; i < nestedSortables.length; i++) {
+            const sortableEl = nestedSortables[i];
+            
+            // Check if Sortable is already initialized on this element
+            if (sortableEl.sortable) {
+                sortableEl.sortable.destroy();
+            }
+            
+            try {
+                sortableEl.sortable = new Sortable(sortableEl, {
+                    group: 'nested',
+                    animation: 150,
+                    fallbackOnBody: true,
+                    swapThreshold: 0.65,
+                    handle: '.handle',
+                    ghostClass: 'sortable-ghost',
+                    chosenClass: 'sortable-chosen',
+                    dragClass: 'sortable-drag',
+                    emptyInsertThreshold: 5,
+                    onStart: function(evt) {
+                        console.log('Sort started');
+                    },
+                    onEnd: function(evt) {
+                        console.log('Sort ended, updating order...');
+                        // Re-initialize sortables for any new nested lists
+                        setTimeout(initSortable, 100);
+                        updateOrder();
+                    }
+                });
+                console.log(`Initialized sortable for element ${i}`);
+            } catch (error) {
+                console.error(`Error initializing sortable for element ${i}:`, error);
+            }
+        }
+    }
+
     // Initialize sortable after mount
     onMount(async () => {
         await tick();
         
-        // Wait a bit more to ensure DOM is fully ready
-        setTimeout(() => {
-            // Check if Sortable is available
-            if (typeof window.Sortable !== 'undefined') {
+        // Wait for SortableJS to be available
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        const tryInit = () => {
+            attempts++;
+            console.log(`Attempt ${attempts} to initialize SortableJS...`);
+            
+            if (getSortable()) {
+                console.log('SortableJS found, initializing...');
                 initSortable();
-            } else if (typeof Sortable !== 'undefined') {
-                initSortable();
+            } else if (attempts < maxAttempts) {
+                console.log('SortableJS not found, retrying...');
+                setTimeout(tryInit, 200);
             } else {
-                console.error('SortableJS not loaded. Please ensure SortableJS is included in your app.blade.php');
+                console.error('SortableJS not loaded after multiple attempts');
                 // Show error message to user
                 KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
@@ -155,7 +189,9 @@
                     position: "bottom-right",
                 });
             }
-        }, 100);
+        };
+        
+        tryInit();
     });
 </script>
 
@@ -185,29 +221,18 @@
 
             <!-- Main Content -->
             <div class="kt-card w-full">
-                <div class="kt-card-content">
-                    <!-- Info Alert -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                        <div class="flex">
-                            <i class="ki-filled ki-information text-blue-600 mr-2"></i>
-                            <p class="text-sm text-blue-800">
-                                Drag and drop items to reorder. Drop items onto other items to create submenus.
-                            </p>
-                        </div>
-                    </div>
-
+                <div class="kt-card-content">                    
                     <!-- Sortable List -->
                     <div class="w-full">
                         {#if menuItems && menuItems.length > 0}
-                            <ul id="sortable" class="sortable-list">
+                            <ul bind:this={sortableList} class="sortable-list">
                                 {#each menuItems as item}
-                                    {@const nestedItem = createNestedItem(item)}
-                                    <li class="list-group-item" data-id={nestedItem.id}>
+                                    <li class="list-group-item" data-id={item.id}>
                                         <div class="flex items-center">
-                                            <i class="ki-filled ki-arrows-move handle"></i>
+                                            <i class="ki-filled ki-arrow-up-down handle"></i>
                                             <div class="flex-1">
-                                                <span class="font-medium text-mono">{nestedItem.name}</span>
-                                                <small class="text-secondary-foreground ml-2">(ID: {nestedItem.id})</small>
+                                                <span class="font-medium text-mono">{item.name}</span>
+                                                <small class="text-secondary-foreground ml-2">(ID: {item.id})</small>
                                             </div>
                                             {#if loading}
                                                 <div class="ml-3">
@@ -218,32 +243,61 @@
                                         
                                         <!-- Always create a nested list, even if empty -->
                                         <ul class="sortable-list">
-                                            {#if nestedItem.children && nestedItem.children.length > 0}
-                                                {#each nestedItem.children as child}
-                                                    {@const nestedChild = createNestedItem(child)}
-                                                    <li class="list-group-item" data-id={nestedChild.id}>
+                                            {#if item.children && item.children.length > 0}
+                                                {#each item.children as child}
+                                                    <li class="list-group-item" data-id={child.id}>
                                                         <div class="flex items-center">
-                                                            <i class="ki-filled ki-arrows-move handle"></i>
+                                                            <i class="ki-filled ki-arrow-up-down handle"></i>
                                                             <div class="flex-1">
-                                                                <span class="font-medium text-mono">{nestedChild.name}</span>
-                                                                <small class="text-secondary-foreground ml-2">(ID: {nestedChild.id})</small>
+                                                                <span class="font-medium text-mono">{child.name}</span>
+                                                                <small class="text-secondary-foreground ml-2">(ID: {child.id})</small>
                                                             </div>
+                                                            {#if loading}
+                                                                <div class="ml-3">
+                                                                    <i class="ki-outline ki-loading text-base animate-spin text-primary"></i>
+                                                                </div>
+                                                            {/if}
                                                         </div>
                                                         
-                                                        <!-- Nested children (you can extend this for deeper nesting) -->
+                                                        <!-- Recursive nested list for deeper levels -->
                                                         <ul class="sortable-list">
-                                                            {#if nestedChild.children && nestedChild.children.length > 0}
-                                                                {#each nestedChild.children as grandchild}
-                                                                    {@const nestedGrandchild = createNestedItem(grandchild)}
-                                                                    <li class="list-group-item" data-id={nestedGrandchild.id}>
+                                                            {#if child.children && child.children.length > 0}
+                                                                {#each child.children as grandChild}
+                                                                    <li class="list-group-item" data-id={grandChild.id}>
                                                                         <div class="flex items-center">
-                                                                            <i class="ki-filled ki-arrows-move handle"></i>
+                                                                            <i class="ki-filled ki-arrow-up-down handle"></i>
                                                                             <div class="flex-1">
-                                                                                <span class="font-medium text-mono">{nestedGrandchild.name}</span>
-                                                                                <small class="text-secondary-foreground ml-2">(ID: {nestedGrandchild.id})</small>
+                                                                                <span class="font-medium text-mono">{grandChild.name}</span>
+                                                                                <small class="text-secondary-foreground ml-2">(ID: {grandChild.id})</small>
                                                                             </div>
+                                                                            {#if loading}
+                                                                                <div class="ml-3">
+                                                                                    <i class="ki-outline ki-loading text-base animate-spin text-primary"></i>
+                                                                                </div>
+                                                                            {/if}
                                                                         </div>
-                                                                        <ul class="sortable-list"></ul>
+                                                                        
+                                                                        <!-- Continue recursion for deeper levels -->
+                                                                        <ul class="sortable-list">
+                                                                            {#if grandChild.children && grandChild.children.length > 0}
+                                                                                {#each grandChild.children as greatGrandChild}
+                                                                                    <li class="list-group-item" data-id={greatGrandChild.id}>
+                                                                                        <div class="flex items-center">
+                                                                                            <i class="ki-filled ki-arrow-up-down handle"></i>
+                                                                                            <div class="flex-1">
+                                                                                                <span class="font-medium text-mono">{greatGrandChild.name}</span>
+                                                                                                <small class="text-secondary-foreground ml-2">(ID: {greatGrandChild.id})</small>
+                                                                                            </div>
+                                                                                            {#if loading}
+                                                                                                <div class="ml-3">
+                                                                                                    <i class="ki-outline ki-loading text-base animate-spin text-primary"></i>
+                                                                                                </div>
+                                                                                            {/if}
+                                                                                        </div>
+                                                                                    </li>
+                                                                                {/each}
+                                                                            {/if}
+                                                                        </ul>
                                                                     </li>
                                                                 {/each}
                                                             {/if}
@@ -314,4 +368,4 @@
     .sortable-drag {
         background-color: #fff3cd;
     }
-</style>
+</style> 
