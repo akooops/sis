@@ -221,7 +221,7 @@ class EventsController extends Controller
         }
     
         if($media){
-            $event->file->detach();
+            if($event->file) $event->file->detach();
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Event', $event->id, true);
         }
 
@@ -269,7 +269,7 @@ class EventsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int  $id 
      * @return \Illuminate\Http\Response
      */
     public function destroy(Event $event)

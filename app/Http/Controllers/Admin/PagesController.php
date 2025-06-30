@@ -208,7 +208,7 @@ class PagesController extends Controller
         }
     
         if($media){
-            $page->file->detach();
+            if($page->file) $page->file->detach();
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Page', $page->id, true);
         }
     

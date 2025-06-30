@@ -215,7 +215,7 @@ class GradesController extends Controller
         }
     
         if($media){
-            $grade->file->detach();
+            if($grade->file) $grade->file->detach();
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Grade', $grade->id, true);
         }
 

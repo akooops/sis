@@ -201,7 +201,7 @@ class ArticlesController extends Controller
         }
     
         if($media){
-            $article->file->detach();
+            if($article->file) $article->file->detach();
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Article', $article->id, true);
         }
 

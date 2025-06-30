@@ -194,7 +194,7 @@ class ProgramsController extends Controller
         }
     
         if($media){
-            $program->file->detach();
+            if($program->file) $program->file->detach();
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Program', $program->id, true);
         }
 

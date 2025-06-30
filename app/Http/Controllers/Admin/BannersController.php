@@ -197,7 +197,7 @@ class BannersController extends Controller
         }
     
         if($media){
-            $banner->file->detach();
+            if($banner->file) $banner->file->detach();
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Banner', $banner->id, true);
         }
 

@@ -224,7 +224,7 @@ class AlbumsController extends Controller
         }
     
         if($media){
-            $album->file->detach();
+            if($album->file) $album->file->detach();
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Album', $album->id, true);
         }
 

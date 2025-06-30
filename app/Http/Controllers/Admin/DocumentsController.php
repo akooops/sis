@@ -191,7 +191,7 @@ class DocumentsController extends Controller
         }
     
         if($media){
-            $document->file->detach();
+            if($document->file) $document->file->detach();
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Document', $document->id, true);
         }
 

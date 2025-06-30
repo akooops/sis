@@ -161,7 +161,7 @@ class VisitServicesController extends Controller
         }
     
         if($media){
-            $visitService->file->detach();
+            if($visitService->file) $visitService->file->detach();
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\VisitService', $visitService->id, true);
         }
 
