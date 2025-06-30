@@ -32,8 +32,7 @@ class GradesController extends Controller
 
         $program_id = $this->indexService->checkIfSearchEmpty($request->query('program_id'));
 
-        $grades = Grade::latest();
-        $programs = Program::get();
+        $grades = Grade::with('program')->latest();
 
         if($program_id){
             $grades->where('program_id', $program_id);
@@ -48,11 +47,14 @@ class GradesController extends Controller
 
         $grades = $grades->paginate($perPage, ['*'], 'grade', $page);
 
-        return view('admin.grades.index', [
-            'grades' => $grades,
-            'programs' => $programs,
-            'pagination' => $this->indexService->handlePagination($grades)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'grades' => $grades->items(),
+                'pagination' => $this->indexService->handlePagination($grades)
+            ]);
+        }
+
+        return inertia('Grades/Index');   
     }
     
     /**
@@ -66,11 +68,7 @@ class GradesController extends Controller
             'is_default' => true,
         ])->first();
 
-        $programs = Program::get();
-        $medias = Media::where('type', 'image')->get();
-
-
-        return view('admin.grades.create', compact('defaultLanguage', 'medias', 'programs'));
+        return inertia('Grades/Create', compact('defaultLanguage'));
     }
     
     /**
@@ -141,8 +139,9 @@ class GradesController extends Controller
             }
         }
 
-        return redirect()->route('admin.grades.index')
-                        ->with('success','Grade created successfully');
+        return inertia('Grades/Index', [
+            'success' => 'Grade created successfully!'
+        ]);
     }
 
     /**
@@ -153,9 +152,17 @@ class GradesController extends Controller
      */
     public function show(Grade $grade)
     {    
-        $languages = Language::orderBy('is_default', 'DESC')->get();
+        $grade->load('files');
+        $grade->load('program');
 
-        return view('admin.grades.show', compact('grade', 'languages'));
+        $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $grade->getTranslatableFieldsByLanguages();
+
+        return inertia('Grades/Show', [
+            'grade' => $grade,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -166,11 +173,17 @@ class GradesController extends Controller
      */
     public function edit(Grade $grade)
     {
-        $languages = Language::orderBy('is_default', 'DESC')->get();
-        $medias = Media::where('type', 'image')->get();
-        $programs = Program::get();
+        $grade->load('files');
+        $grade->load('program');
 
-        return view('admin.grades.edit', compact('grade', 'languages', 'medias', 'programs'));
+        $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $grade->getTranslatableFieldsByLanguages();
+
+        return inertia('Grades/Edit', [
+            'grade' => $grade,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -234,8 +247,9 @@ class GradesController extends Controller
             }
         }
 
-        return redirect()->route('admin.grades.index')
-                        ->with('success','Grade updated successfully');
+        return inertia('Grades/Index', [
+            'success' => 'Grade updated successfully!'
+        ]);
     }
 
     public function updateTranslation(Grade $grade, UpdateGradeTranslationRequest $request){

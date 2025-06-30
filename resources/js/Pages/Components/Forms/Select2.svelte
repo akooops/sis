@@ -1,5 +1,5 @@
 <script>
-    import { onMount, onDestroy } from 'svelte';
+    import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 
     export let id = '';
     export let placeholder = 'Select...';
@@ -29,27 +29,7 @@
     let selectElement;
     let select2Instance;
 
-    // Create event dispatcher
-    function createEventDispatcher() {
-        return {
-            select: (data) => {
-                if (typeof window !== 'undefined' && window.dispatchEvent) {
-                    window.dispatchEvent(new CustomEvent('select2:select', { detail: data }));
-                }
-            },
-            clear: () => {
-                if (typeof window !== 'undefined' && window.dispatchEvent) {
-                    window.dispatchEvent(new CustomEvent('select2:clear'));
-                }
-            },
-            change: (data) => {
-                if (typeof window !== 'undefined' && window.dispatchEvent) {
-                    window.dispatchEvent(new CustomEvent('select2:change', { detail: data }));
-                }
-            }
-        };
-    }
-
+    // Create Svelte event dispatcher
     const dispatch = createEventDispatcher();
 
     onMount(() => {
@@ -119,8 +99,8 @@
         globalThis.$(selectElement).on('select2:select', function(e) {
             const selectedData = e.params.data;
             value = multiple ? globalThis.$(selectElement).val() : selectedData.id;
-            dispatch.select(selectedData);
-            dispatch.change({ value: value, data: selectedData });
+            dispatch('select', { value: value, data: selectedData });
+            dispatch('change', { value: value, data: selectedData });
             
             // Remove error styling when user selects something
             globalThis.$(selectElement).next('.select2-container').removeClass('kt-input-error');
@@ -128,14 +108,14 @@
 
         globalThis.$(selectElement).on('select2:clear', function(e) {
             value = multiple ? [] : '';
-            dispatch.clear();
-            dispatch.change({ value: value, data: null });
+            dispatch('clear');
+            dispatch('change', { value: value, data: null });
         });
 
         globalThis.$(selectElement).on('select2:unselect', function(e) {
             if (multiple) {
                 value = globalThis.$(selectElement).val();
-                dispatch.change({ value: value, data: e.params.data });
+                dispatch('change', { value: value, data: e.params.data });
             }
         });
 
@@ -170,6 +150,10 @@
 
     export function setValue(newValue) {
         globalThis.$(selectElement).val(newValue).trigger('change');
+    }
+
+    export function setData(data) {
+        globalThis.$(selectElement).val(data).trigger('change');
     }
 
     export function open() {
