@@ -24,7 +24,7 @@ class Program extends Model
     }
 
     public function grades(){
-        return $this->hasMany(Grade::class, 'program_id', 'id');
+        return $this->hasMany(Grade::class, 'program_id', 'id')->orderBy('order');;
     }
 
     //Accessors & Mutators

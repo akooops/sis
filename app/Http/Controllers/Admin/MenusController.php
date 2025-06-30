@@ -51,7 +51,7 @@ class MenusController extends Controller
      */
     public function create()
     {
-        return view('admin.menus.create');
+        return inertia('Menus/Create');
     }
     
     /**
@@ -64,8 +64,9 @@ class MenusController extends Controller
     {
         $menu = Menu::create($request->validated());
     
-        return redirect()->route('admin.menus.index')
-                        ->with('success','Menu created successfully');
+        return inertia('Menus/Index', [
+            'success' => 'Menu created successfully!'
+        ]);
     }
 
     /**
@@ -76,7 +77,7 @@ class MenusController extends Controller
      */
     public function show(Menu $menu)
     {    
-        return view('admin.menus.show', compact('menu'));
+        return inertia('Menus/Show', compact('menu'));
     }
     
     /**
@@ -87,7 +88,7 @@ class MenusController extends Controller
      */
     public function edit(Menu $menu)
     {
-        return view('admin.menus.edit', compact('menu'));
+        return inertia('Menus/Edit', compact('menu'));
     }
     
     /**
@@ -103,8 +104,9 @@ class MenusController extends Controller
     
         cache()->forget("menu-{$menu->name}");
 
-        return redirect()->route('admin.menus.index')
-                        ->with('success','Menu updated successfully');
+        return inertia('Menus/Index', [
+            'success' => 'Menu updated successfully!'
+        ]);
     }
 
     /**
