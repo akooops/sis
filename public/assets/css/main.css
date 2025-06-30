@@ -94,7 +94,7 @@ p {
 
 .navbar.navbar-scrolled {
     height: 88px;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(15px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     position: fixed !important;

@@ -12,8 +12,8 @@
                 <div class="col-lg-4 d-none d-lg-flex">
                     <ul class="navbar-nav rounded bg-white">
                         <li class="nav-item dropdown">
-                            <a class="nav-link py-2" href="#" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" role="button">
-                                {{$currentLanguage->name}}
+                            <a class="nav-link py-2 text-primary" href="#" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" role="button">
+                                <i class="uil uil-globe"></i>
                             </a>
 
                             <ul class="languages-dropdown dropdown-menu mt-2">
@@ -33,7 +33,7 @@
 
                 <div class="navbar-brand d-flex col-6 col-lg-4 justify-content-start justify-content-lg-center pe-0 pe-lg-14 py-0">
                     <a href="{{route('index')}}">
-                        <img class="logo" src="{{ URL::asset('assets/img/logo.png')}}" alt="{{getLanguageKeyLocalTranslation('website_title')}}">                
+                        <img class="logo" src="{{ URL::asset('assets/img/complete-logo.png')}}" alt="{{getLanguageKeyLocalTranslation('website_title')}}">                
                     </a>
                 </div>
 

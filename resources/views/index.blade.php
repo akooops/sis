@@ -25,7 +25,8 @@
         data-autoplaytime="7000" 
         data-nav="true" 
         data-dots="true" 
-        data-items="1">
+        data-items="1"
+        data-loop="true">
         
         <div class="swiper">
             <div class="swiper-wrapper">
