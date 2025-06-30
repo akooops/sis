@@ -107,7 +107,7 @@
                 </p>
 
                 @if($firstSectionCtaPage)
-                    <a href="{{route('page', ['slug' => $firstSectionCtaPage->slug])}}" class="btn btn-primary rounded" data-aos="fade-left" data-aos-duration="2000">
+                    <a href="{{route('page', ['slug' => $firstSectionCtaPage->slug])}}" class="btn" data-aos="fade-left" data-aos-duration="1500">
                         <i class="uil uil-angle-right-b me-2"></i>
                         <span>
                             {{getLanguageKeyLocalTranslation('index_page_first_section_cta')}}
