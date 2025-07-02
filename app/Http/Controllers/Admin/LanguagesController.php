@@ -35,10 +35,14 @@ class LanguagesController extends Controller
 
         $languages = $languages->paginate($perPage, ['*'], 'page', $page);
 
-        return view('admin.languages.index', [
-            'languages' => $languages,
-            'pagination' => $this->indexService->handlePagination($languages)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'languages' => $languages->items(),
+                'pagination' => $this->indexService->handlePagination($languages)
+            ]);
+        }
+
+        return inertia('Languages/Index');
     }
     
     /**
@@ -48,7 +52,7 @@ class LanguagesController extends Controller
      */
     public function create()
     {
-        return view('admin.languages.create');
+        return inertia('Languages/Create');
     }
     
     /**
@@ -71,8 +75,9 @@ class LanguagesController extends Controller
     
         cache()->forget("all-languages");
 
-        return redirect()->route('admin.languages.index')
-                        ->with('success','Language created successfully');
+        return inertia('Languages/Index', [
+            'success' => 'Language created successfully!'
+        ]);
     }
 
     /**
@@ -83,7 +88,7 @@ class LanguagesController extends Controller
      */
     public function show(Language $language)
     {    
-        return view('admin.languages.show', compact('language'));
+        return inertia('Languages/Show', compact('language'));
     }
     
     /**
@@ -94,8 +99,8 @@ class LanguagesController extends Controller
      */
     public function edit(Language $language)
     {
-        return view('admin.languages.edit', compact('language'));
-    }
+        return inertia('Languages/Edit', compact('language'));
+    }   
     
     /**
      * Update the specified resource in storage.
@@ -106,7 +111,7 @@ class LanguagesController extends Controller
      */
     public function update(Language $language, UpdateLanguageRequest $request)
     {
-        if($request->input('is_default') == true){
+        if($request->input('is_default') == true && $language->is_default == false){
             $defaultLanguage = Language::where([
                 'is_default' => true,
             ])->update([
@@ -118,8 +123,9 @@ class LanguagesController extends Controller
         
         cache()->forget("all-languages");
 
-        return redirect()->route('admin.languages.index')
-                        ->with('success','Language updated successfully');
+        return inertia('Languages/Index', [
+            'success' => 'Language updated successfully!'
+        ]);
     }
 
     /**

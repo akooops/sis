@@ -21,7 +21,6 @@ class StoreLanguageRequest extends FormRequest
      */
     public function rules(): array
     {
-
         return [
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:255|regex:/^[a-z]{2}(-[A-Z]{2})?$/|unique:languages,code',
