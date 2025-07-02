@@ -32,10 +32,14 @@ class InquiriesController extends Controller
 
         $inquiries = $inquiries->paginate($perPage, ['*'], 'inquiry', $page);
 
-        return view('admin.inquiries.index', [
-            'inquiries' => $inquiries,
-            'pagination' => $this->indexService->handlePagination($inquiries)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'inquiries' => $inquiries->items(),
+                'pagination' => $this->indexService->handlePagination($inquiries)
+            ]);
+        }
+
+        return inertia('Inquiries/Index');
     }
 
     /**
@@ -46,7 +50,7 @@ class InquiriesController extends Controller
      */
     public function show(Inquiry $inquiry)
     {    
-        return view('admin.inquiries.show', compact('inquiry'));
+        return inertia('Inquiries/Show', compact('inquiry'));
     }
     
     /**

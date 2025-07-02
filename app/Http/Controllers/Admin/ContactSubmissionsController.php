@@ -29,10 +29,14 @@ class ContactSubmissionsController extends Controller
 
         $contactSubmissions = $contactSubmissions->paginate($perPage, ['*'], 'contactSubmission', $page);
 
-        return view('admin.contact-submissions.index', [
-            'contactSubmissions' => $contactSubmissions,
-            'pagination' => $this->indexService->handlePagination($contactSubmissions)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'contactSubmissions' => $contactSubmissions->items(),
+                'pagination' => $this->indexService->handlePagination($contactSubmissions)
+            ]);
+        }
+
+        return inertia('ContactSubmissions/Index');
     }
 
     /**
@@ -43,7 +47,7 @@ class ContactSubmissionsController extends Controller
      */
     public function show(ContactSubmission $contactSubmission)
     {    
-        return view('admin.contact-submissions.show', compact('contactSubmission'));
+        return inertia('ContactSubmissions/Show', compact('contactSubmission'));
     }
     
     /**
