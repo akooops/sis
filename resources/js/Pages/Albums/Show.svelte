@@ -108,8 +108,6 @@
                 </div>
                 <div class="kt-card-content">
                     <div class="flex flex-col lg:flex-row gap-6 w-full">
-                        
-                        
                         <!-- Album Details -->
                         <div class="grid gap-4 w-full">
                             <!-- Album Thumbnail -->

@@ -33,10 +33,14 @@ class RolesController extends Controller
 
         $roles = $roles->paginate($perPage, ['*'], 'page', $page);
 
-        return view('admin.roles.index', [
-            'roles' => $roles,
-            'pagination' => $this->indexService->handlePagination($roles)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'roles' => $roles->items(),
+                'pagination' => $this->indexService->handlePagination($roles)
+            ]);
+        }
+
+        return inertia('Roles/Index');
     }
     
     /**
@@ -47,7 +51,8 @@ class RolesController extends Controller
     public function create()
     {
         $permissions = Permission::get();
-        return view('admin.roles.create', compact('permissions'));
+
+        return inertia('Roles/Create', compact('permissions'));
     }
     
     /**
@@ -61,8 +66,9 @@ class RolesController extends Controller
         $role = Role::create($request->validated());
         $role->permissions()->syncWithoutDetaching($request->input('permissions'));
     
-        return redirect()->route('admin.roles.index')
-                        ->with('success','Role created successfully');
+        return inertia('Roles/Index', [
+            'success' => 'Role created successfully!'
+        ]);
     }
 
     /**
@@ -73,7 +79,8 @@ class RolesController extends Controller
      */
     public function show(Role $role)
     {    
-        return view('admin.roles.show', compact('role'));
+        $role->load('permissions');
+        return inertia('Roles/Show', compact('role'));
     }
     
     /**
@@ -84,9 +91,10 @@ class RolesController extends Controller
      */
     public function edit(Role $role)
     {
-        $permissions = Permission::get();
+        $role->load('permissions');
 
-        return view('admin.roles.edit', compact('role', 'permissions'));
+        $permissions = Permission::get();
+        return inertia('Roles/Edit', compact('role', 'permissions'));
     }
     
     /**
@@ -103,8 +111,9 @@ class RolesController extends Controller
         if($request->has('permissions'))
             $role->permissions()->sync($request->input('permissions'));
     
-        return redirect()->route('admin.roles.index')
-                        ->with('success','Role updated successfully');
+        return inertia('Roles/Index', [
+            'success' => 'Role updated successfully!'
+        ]);
     }
 
     /**
