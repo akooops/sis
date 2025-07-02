@@ -29,22 +29,14 @@ class PermissionsController extends Controller
         }
 
         $permissions = $permissions->orderBy('name')->paginate($perPage, ['*'], 'page', $page);
+        
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'permissions' => $permissions->items(),
+                'pagination' => $this->indexService->handlePagination($permissions)
+            ]);
+        }
 
-        return view('admin.permissions.index', [
-            'permissions' => $permissions,
-            'pagination' => $this->indexService->handlePagination($permissions)
-        ]);
+        return inertia('Permissions/Index');
     }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Permission $permission)
-    {    
-        return view('admin.permissions.show', compact('permission'));
-    }
-    
 }

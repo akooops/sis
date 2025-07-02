@@ -74,7 +74,6 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
 
     // Permissions
     Route::get('permissions', [PermissionsController::class, 'index'])->middleware('check.permission:admin.permissions.index')->name('admin.permissions.index');
-    Route::get('permissions/{permission}', [PermissionsController::class, 'show'])->middleware('check.permission:admin.permissions.show')->name('admin.permissions.show');
 
     // Roles
     Route::get('roles', [RolesController::class, 'index'])->middleware('check.permission:admin.roles.index')->name('admin.roles.index');
