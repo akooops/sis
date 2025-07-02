@@ -36,10 +36,14 @@ class UsersController extends Controller
 
         $users = $users->paginate($perPage, ['*'], 'page', $page);
 
-        return view('admin.users.index', [
-            'users' => $users,
-            'pagination' => $this->indexService->handlePagination($users)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'users' => $users->items(),
+                'pagination' => $this->indexService->handlePagination($users)
+            ]);
+        }
+
+        return inertia('Users/Index');
     }
     
     /**
@@ -50,7 +54,8 @@ class UsersController extends Controller
     public function create()
     {
         $roles = Role::get();
-        return view('admin.users.create', compact('roles'));
+
+        return inertia('Users/Create', compact('roles'));
     }
     
     /**
@@ -68,8 +73,9 @@ class UsersController extends Controller
             $file = $this->fileService->upload($request->file('file'), 'App\\Models\\User', $user->id);
         }
 
-        return redirect()->route('users.index')
-                        ->with('success','User created successfully');
+        return inertia('Users/Index', [
+            'success' => 'User created successfully!'
+        ]);
     }
 
     /**
@@ -80,7 +86,8 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {    
-        return view('admin.users.show', compact('user'));
+        $user->load('roles');
+        return inertia('Users/Show', compact('user'));
     }
     
     /**
@@ -91,9 +98,10 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
+        $user->load('roles');
         $roles = Role::get();
 
-        return view('admin.users.edit', compact('user', 'roles'));
+        return inertia('Users/Edit', compact('user', 'roles'));
     }
     
     /**
@@ -121,13 +129,14 @@ class UsersController extends Controller
         $user->roles()->sync($request->input('roles'));
 
         if($request->has('file')){
-            if($user->avatar) $user->avatar->detach();
+            if($user->file) $user->file->detach();
 
             $file = $this->fileService->upload($request->file('file'), 'App\\Models\\User', $user->id);
         }
     
-        return redirect()->route('admin.users.index')
-                        ->with('success','User updated successfully');
+        return inertia('Users/Index', [
+            'success' => 'User updated successfully!'
+        ]);
     }
 
     /**
