@@ -41,10 +41,7 @@ class PermissionsSeeder extends Seeder
             
             // Language Keys Management
             'admin.language-keys.index',
-            'admin.language-keys.store',
-            'admin.language-keys.show',
-            'admin.language-keys.update',
-            'admin.language-keys.destroy',
+            'admin.language-keys.update-translation',
             
             // Media Management
             'admin.media.index',

@@ -105,13 +105,7 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
 
     // Language keys
     Route::get('language-keys', [LanguagesKeysController::class, 'index'])->middleware('check.permission:admin.language-keys.index')->name('admin.language-keys.index');
-    Route::get('language-keys/create', [LanguagesKeysController::class, 'create'])->middleware('check.permission:admin.language-keys.store')->name('admin.language-keys.create');
-    Route::post('language-keys', [LanguagesKeysController::class, 'store'])->middleware('check.permission:admin.language-keys.store')->name('admin.language-keys.store');
-    Route::get('language-keys/{languageKey}', [LanguagesKeysController::class, 'show'])->middleware('check.permission:admin.language-keys.show')->name('admin.language-keys.show');
-    Route::get('language-keys/{languageKey}/edit', [LanguagesKeysController::class, 'edit'])->middleware('check.permission:admin.language-keys.update')->name('admin.language-keys.edit');
-    Route::patch('language-keys/{languageKey}/update-translation', [LanguagesKeysController::class, 'updateTranslation'])->middleware('check.permission:admin.language-keys.update')->name('admin.language-keys.update-translation');
-    Route::patch('language-keys/{languageKey}', [LanguagesKeysController::class, 'update'])->middleware('check.permission:admin.language-keys.update')->name('admin.language-keys.update');
-    Route::delete('language-keys/{languageKey}', [LanguagesKeysController::class, 'destroy'])->middleware('check.permission:admin.language-keys.destroy')->name('admin.language-keys.destroy');
+    Route::post('language-keys/{languageKey}/update-translation', [LanguagesKeysController::class, 'updateTranslation'])->middleware('check.permission:admin.language-keys.update')->name('admin.language-keys.update-translation');
 
     // Media
     Route::get('media', [MediaController::class, 'index'])->middleware('check.permission:admin.media.index')->name('admin.media.index');
