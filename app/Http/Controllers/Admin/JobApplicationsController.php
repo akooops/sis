@@ -15,10 +15,10 @@ class JobApplicationsController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $applications = JobApplication::where('job_posting_id', $jobPosting->id)->latest();
+        $jobApplications = JobApplication::where('job_posting_id', $jobPosting->id)->latest();
 
         if ($search) {
-            $applications->where(function($query) use ($search) {
+            $jobApplications->where(function($query) use ($search) {
                 $query->where('id', $search)
                       ->orWhere('first_name', 'like', '%' . $search . '%')
                       ->orWhere('last_name', 'like', '%' . $search . '%')
@@ -58,21 +58,18 @@ class JobApplicationsController extends Controller
             });
         }
 
-        if ($request->has('ai_score_min') && is_numeric($request->ai_score_min)) {
-            $applications->where('ai_score', '>=', $request->ai_score_min);
+        $jobApplications = $jobApplications->paginate($perPage, ['*'], 'application', $page);
+
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'applications' => $jobApplications->items(),
+                'pagination' => $this->indexService->handlePagination($jobApplications)
+            ]);
         }
 
-        if ($request->has('ai_score_max') && is_numeric($request->ai_score_max)) {
-            $applications->where('ai_score', '<=', $request->ai_score_max);
-        }
-
-        $applications = $applications->paginate($perPage, ['*'], 'application', $page);
-
-        return view('admin.job-applications.index', [
-            'applications' => $applications,
+        return inertia('JobApplications/Index', [
             'jobPosting' => $jobPosting,
-            'pagination' => $this->indexService->handlePagination($applications)
-        ]);
+        ]); 
     }
 
     /**
@@ -80,8 +77,11 @@ class JobApplicationsController extends Controller
      */
     public function show(JobApplication $jobApplication)
     {
-;
-        return view('admin.job-applications.show', compact('jobApplication'));
+        $jobApplication->load(['jobPosting', 'education', 'experiences', 'languages']);
+
+        return inertia('JobApplications/Show', [
+            'jobApplication' => $jobApplication,
+        ]);
     }
 
     /**
@@ -97,12 +97,12 @@ class JobApplicationsController extends Controller
 
     public function export(Request $request, JobPosting $jobPosting)
     {
-        $applications = JobApplication::where('job_posting_id', $jobPosting->id);
+        $jobApplications = JobApplication::where('job_posting_id', $jobPosting->id);
 
         $search = $request->query('search');
 
         if ($search) {
-            $applications->where(function($query) use ($search) {
+            $jobApplications->where(function($query) use ($search) {
                 $query->where('id', $search)
                       ->orWhere('first_name', 'like', '%' . $search . '%')
                       ->orWhere('last_name', 'like', '%' . $search . '%')
@@ -142,14 +142,14 @@ class JobApplicationsController extends Controller
             });
         }
 
-        $applications = $applications->get();
+        $jobApplications = $jobApplications->get();
 
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="job_applications_' . date('Y-m-d') . '.csv"',
         ];
 
-        $callback = function() use ($applications) {
+        $callback = function() use ($jobApplications) {
             $file = fopen('php://output', 'w');
             
             // CSV Headers
@@ -158,7 +158,7 @@ class JobApplicationsController extends Controller
                 'Education', 'Experience', 'Languages', 'AI Score', 'Applied Date'
             ]);
 
-            foreach ($applications as $app) {
+            foreach ($jobApplications as $app) {
                 fputcsv($file, [
                     $app->id,
                     $app->first_name . ' ' . $app->last_name,

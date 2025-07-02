@@ -4,6 +4,11 @@
     import { onMount, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
 
+    // Props from the server
+    export let jobPosting;
+    export let applications;
+    export let pagination;
+
     // Define breadcrumbs for this page
     const breadcrumbs = [
         {
@@ -12,25 +17,26 @@
             active: false
         },
         {
-            title: 'Index',
-            url: route('admin.job-postings.index'),
+            title: jobPosting?.getLocalTranslation?.('title') || jobPosting?.name || 'Job',
+            url: route('admin.job-applications.index', { jobPosting: jobPosting?.id }),
             active: true
         }
     ];
     
-    const pageTitle = 'Job Postings';
+    const pageTitle = 'Job Applications';
 
     // Reactive variables
-    let jobPostings = [];
-    let pagination = {};
-    let loading = true;
+    let applicationsList = applications || [];
+    let paginationData = pagination || {};
+    let loading = false;
     let search = '';
     let perPage = 10;
     let currentPage = 1;
     let searchTimeout;
+    let aiScoreFilter = '';
 
-    // Fetch job postings data
-    async function fetchJobPostings() {
+    // Fetch applications data
+    async function fetchApplications() {
         loading = true;
         try {
             const params = new URLSearchParams({
@@ -39,19 +45,21 @@
                 search: search
             });
             
-            const response = await fetch(route('admin.job-postings.index', {
-                page: currentPage,
-                perPage: perPage,
-                search: search
-            }), {
+            if (aiScoreFilter) {
+                params.append('ai_score_min', aiScoreFilter);
+            }
+
+            const response = await fetch(route('admin.job-applications.index', {
+                jobPosting: jobPosting.id
+            }) + '?' + params.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
             
             const data = await response.json();
-            jobPostings = data.jobPostings;
-            pagination = data.pagination;
+            applicationsList = data.applications;
+            paginationData = data.pagination;
             
             // Wait for DOM to update, then initialize menus
             await tick();
@@ -59,7 +67,7 @@
                 window.KTMenu.init();
             }
         } catch (error) {
-            console.error('Error fetching job postings:', error);
+            console.error('Error fetching applications:', error);
         } finally {
             loading = false;
         }
@@ -75,7 +83,7 @@
         // Set new timeout for 500ms
         searchTimeout = setTimeout(() => {
             currentPage = 1;
-            fetchJobPostings();
+            fetchApplications();
         }, 500);
     }
 
@@ -85,11 +93,18 @@
         handleSearch();
     }
 
+    // Handle AI score filter change
+    function handleAiScoreFilter(event) {
+        aiScoreFilter = event.target.value;
+        currentPage = 1;
+        fetchApplications();
+    }
+
     // Handle pagination
     function goToPage(page) {
         if (page && page !== currentPage) {
             currentPage = page;
-            fetchJobPostings();
+            fetchApplications();
         }
     }
 
@@ -97,68 +112,12 @@
     function handlePerPageChange(newPerPage) {
         perPage = newPerPage;
         currentPage = 1;
-        fetchJobPostings();
+        fetchApplications();
     }
 
-    // Get status badge class
-    function getStatusBadgeClass(status) {
-        switch (status) {
-            case 'published':
-                return 'kt-badge-success';
-            case 'draft':
-                return 'kt-badge-info';
-            case 'hidden':
-                return 'kt-badge-primary';
-            default:
-                return 'kt-badge-secondary';
-        }
-    }
-
-    // Get status text
-    function getStatusText(status) {
-        switch (status) {
-            case 'published':
-                return 'Published';
-            case 'draft':
-                return 'Draft';
-            case 'hidden':
-                return 'Hidden';
-            default:
-                return status;
-        }
-    }
-
-    // Get employment type badge class
-    function getEmploymentTypeBadgeClass(type) {
-        switch (type) {
-            case 'full_time':
-                return 'kt-badge-success';
-            case 'part_time':
-                return 'kt-badge-warning';
-            case 'internship':
-                return 'kt-badge-info';
-            default:
-                return 'kt-badge-secondary';
-        }
-    }
-
-    // Get employment type text
-    function getEmploymentTypeText(type) {
-        switch (type) {
-            case 'full_time':
-                return 'Full Time';
-            case 'part_time':
-                return 'Part Time';
-            case 'internship':
-                return 'Internship';
-            default:
-                return type;
-        }
-    }
-
-    // Delete job posting
-    async function deleteJobPosting(jobPostingId) {
-        if (!confirm('Are you sure you want to delete this job posting? This action cannot be undone.')) {
+    // Delete application
+    async function deleteApplication(applicationId) {
+        if (!confirm('Are you sure you want to delete this application? This action cannot be undone.')) {
             return;
         }
 
@@ -167,7 +126,7 @@
             formData.append('_method', 'DELETE');
             formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
 
-            const response = await fetch(route('admin.job-postings.destroy', { jobPosting: jobPostingId }), {
+            const response = await fetch(route('admin.job-applications.destroy', { application: applicationId }), {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -178,39 +137,56 @@
             if (response.ok) {
                 // Show success toast
                 KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Job posting deleted successfully!",
+                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20,6 9,17 4,12"/></svg>`,
+                    message: "Application deleted successfully!",
                     variant: "success",
                     position: "bottom-right",
                 });
 
-                // Refresh the job postings list
-                fetchJobPostings();
+                // Refresh the applications list
+                fetchApplications();
             } else {
                 const errorData = await response.json().catch(() => ({}));
-                const errorMessage = errorData.message || 'Error deleting job posting. Please try again.';
+                const errorMessage = errorData.message || 'Error deleting application. Please try again.';
                 
                 KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
                     message: errorMessage,
-                    variant: "destructive",
+                    variant: "error",
                     position: "bottom-right",
                 });
             }
         } catch (error) {
-            console.error('Error deleting job posting:', error);
+            console.error('Error deleting application:', error);
             
             KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Network error. Please check your connection and try again.",
-                    variant: "destructive",
-                    position: "bottom-right",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+                message: "Network error. Please check your connection and try again.",
+                variant: "error",
+                position: "bottom-right",
             });
         }
     }
 
+    // Get AI score badge class
+    function getAiScoreBadgeClass(score) {
+        if (!score) return 'kt-badge-secondary';
+        if (score >= 8) return 'kt-badge-success';
+        if (score >= 6) return 'kt-badge-warning';
+        return 'kt-badge-danger';
+    }
+
+    // Get AI score text
+    function getAiScoreText(score) {
+        if (!score) return 'Pending score';
+        return `${score}/10`;
+    }
+
     onMount(() => {
-        fetchJobPostings();
+        // If we have initial data, use it; otherwise fetch
+        if (!applications || applications.length === 0) {
+            fetchApplications();
+        }
     });
 
     // Flash message handling
@@ -218,7 +194,7 @@
 
     $: if (success) {
         KTToast.show({
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20,6 9,17 4,12"/></svg>`,
             message: success,
             variant: "success",
             position: "bottom-right",
@@ -234,37 +210,54 @@
     <!-- Container -->
     <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
-            <!-- Job Posting Header -->
+            <!-- Job Applications Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Job Postings Management</h1>
+                    <h1 class="text-2xl font-bold text-mono">Job Applications</h1>
                     <p class="text-sm text-secondary-foreground">
-                        Manage your website job postings and career opportunities
+                        Applications for: {jobPosting?.name}
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    {#if hasPermission('admin.job-postings.store')}
-                    <a href="{route('admin.job-postings.create')}" class="kt-btn kt-btn-primary">
-                        <i class="ki-filled ki-plus text-base"></i>
-                        Add New Job Posting
+                    <a href="{route('admin.job-postings.index')}" class="kt-btn kt-btn-outline">
+                        <i class="ki-filled ki-arrow-left text-base"></i>
+                        Back to Jobs
                     </a>
-                    {/if}
+
+                    <a href="{route('admin.job-applications.export', jobPosting?.id)}" class="kt-btn kt-btn-success">
+                        <i class="ki-filled ki-download text-base"></i>
+                        Export CSV
+                    </a>
                 </div>
             </div>
 
-            <!-- Job Postings Table -->
+            <!-- Job Applications Table -->
             <div class="kt-card">
                 <div class="kt-card-header">
                     <div class="kt-card-toolbar">
-                        <div class="kt-input max-w-64 w-64">
-                            <i class="ki-filled ki-magnifier"></i>
-                            <input 
-                                type="text" 
-                                class="kt-input" 
-                                placeholder="Search job postings..." 
-                                bind:value={search}
-                                on:input={handleSearchInput}
-                            />
+                        <div class="flex items-center gap-4">
+                            <div class="kt-input max-w-64 w-64">
+                                <i class="ki-filled ki-magnifier"></i>
+                                <input 
+                                    type="text" 
+                                    class="kt-input" 
+                                    placeholder="Search applications..." 
+                                    bind:value={search}
+                                    on:input={handleSearchInput}
+                                />
+                            </div>
+                            <!-- AI Score Filter -->
+                            <select 
+                                class="kt-select w-auto" 
+                                bind:value={aiScoreFilter}
+                                on:change={handleAiScoreFilter}
+                            >
+                                <option value="">All Scores</option>
+                                <option value="8">8+ Score</option>
+                                <option value="7">7+ Score</option>
+                                <option value="6">6+ Score</option>
+                                <option value="5">5+ Score</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -279,27 +272,27 @@
                                     </th>
                                     <th class="w-[80px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">ID</span>
+                                            <span class="kt-table-col-label">#</span>
                                         </span>
                                     </th>
                                     <th class="min-w-[200px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Job Posting</span>
+                                            <span class="kt-table-col-label">Applicant</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[150px]">
+                                    <th class="w-[200px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Slug</span>
+                                            <span class="kt-table-col-label">Contact</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[120px]">
+                                    <th class="w-[120px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Type</span>
+                                            <span class="kt-table-col-label">AI Score</span>
                                         </span>
                                     </th>
-                                    <th class="w-[100px]">
+                                    <th class="w-[150px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Status</span>
+                                            <span class="kt-table-col-label">Applied</span>
                                         </span>
                                     </th>
                                     <th class="w-[80px]">
@@ -322,7 +315,6 @@
                                             </td>
                                             <td class="p-4">
                                                 <div class="flex items-center gap-3">
-                                                    <div class="kt-skeleton w-10 h-10 rounded-lg"></div>
                                                     <div class="flex flex-col gap-1">
                                                         <div class="kt-skeleton w-24 h-4 rounded"></div>
                                                         <div class="kt-skeleton w-16 h-3 rounded"></div>
@@ -330,84 +322,83 @@
                                                 </div>
                                             </td>
                                             <td class="p-4">
-                                                <div class="kt-skeleton w-16 h-6 rounded"></div>
+                                                <div class="flex flex-col gap-1">
+                                                    <div class="kt-skeleton w-20 h-3 rounded"></div>
+                                                    <div class="kt-skeleton w-16 h-3 rounded"></div>
+                                                </div>
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-12 h-6 rounded"></div>
                                             </td>
                                             <td class="p-4">
-                                                <div class="kt-skeleton w-12 h-6 rounded"></div>
+                                                <div class="kt-skeleton w-16 h-3 rounded"></div>
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-8 rounded"></div>
                                             </td>
                                         </tr>
                                     {/each}
-                                {:else if jobPostings.length === 0}
+                                {:else if !applicationsList || applicationsList.length === 0}
                                     <!-- Empty state -->
                                     <tr>
-                                        <td colspan="8" class="p-10">
+                                        <td colspan="7" class="p-10">
                                             <div class="flex flex-col items-center justify-center text-center">
                                                 <div class="mb-4">
-                                                    <i class="ki-filled ki-briefcase text-4xl text-muted-foreground"></i>
+                                                    <i class="ki-filled ki-user text-4xl text-muted-foreground"></i>
                                                 </div>
-                                                <h3 class="text-lg font-semibold text-mono mb-2">No job postings found</h3>
+                                                <h3 class="text-lg font-semibold text-mono mb-2">No applications found</h3>
                                                 <p class="text-sm text-secondary-foreground mb-4">
-                                                    {search ? 'No job postings match your search criteria.' : 'Get started by creating your first job posting.'}
+                                                    {search || aiScoreFilter ? 'No applications match your search criteria.' : 'No applications have been submitted for this job posting yet.'}
                                                 </p>
-                                                {#if hasPermission('admin.job-postings.store')}
-                                                <a href="{route('admin.job-postings.create')}" class="kt-btn kt-btn-primary">
-                                                    <i class="ki-filled ki-plus text-base"></i>
-                                                    Create First Job Posting
-                                                </a>
-                                                {/if}
                                             </div>
                                         </td>
                                     </tr>
                                 {:else}
                                     <!-- Actual data rows -->
-                                    {#each jobPostings as jobPosting}
+                                    {#each applicationsList as application}
                                         <tr class="hover:bg-muted/50">
                                             <td>
-                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={jobPosting.id}/>
+                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={application.id}/>
                                             </td>
                                             <td>
-                                                <span class="text-sm font-medium text-mono">#{jobPosting.id}</span>
+                                                <a href={route('admin.job-applications.show', { jobApplication: application.id })} class="text-sm font-medium text-primary hover:text-primary-dark">
+                                                    #{application.id}
+                                                </a>
                                             </td>
                                             <td>
-                                                <div class="flex items-center gap-3">
-                                                    <div class="flex-shrink-0">
-                                                        <img 
-                                                            src={jobPosting.thumbnailUrl} 
-                                                            alt={jobPosting.name}
-                                                            class="w-10 h-10 rounded-lg object-cover"
-                                                        />
-                                                    </div>
-                                                    <div class="flex flex-col gap-1">
-                                                        <span class="text-sm font-medium text-mono hover:text-primary">
-                                                            {jobPosting.name}
-                                                        </span>
-                                                        {#if jobPosting.is_remote}
-                                                            <span class="kt-badge kt-badge-xs kt-badge-outline kt-badge-success">
-                                                                Remote
-                                                            </span>
-                                                        {/if}
-                                                    </div>
+                                                <div class="flex flex-col gap-1">
+                                                    <span class="text-sm font-medium text-mono">
+                                                        {application.first_name} {application.last_name}
+                                                    </span>
+                                                    <span class="text-xs text-secondary-foreground">
+                                                        {application.nationality}
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class="kt-badge kt-badge-outline kt-badge-primary">
-                                                    {jobPosting.slug}
+                                                <div class="flex flex-col gap-1">
+                                                    <span class="text-sm text-primary">
+                                                        {application.email}
+                                                    </span>
+                                                    <span class="text-xs text-secondary-foreground">
+                                                        {application.phone}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="kt-badge {getAiScoreBadgeClass(application.ai_score)}">
+                                                    {getAiScoreText(application.ai_score)}
                                                 </span>
                                             </td>
                                             <td>
-                                                <span class="kt-badge {getEmploymentTypeBadgeClass(jobPosting.employment_type)}">
-                                                    {getEmploymentTypeText(jobPosting.employment_type)}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="kt-badge {getStatusBadgeClass(jobPosting.status)}">
-                                                    {getStatusText(jobPosting.status)}
+                                                <span class="text-sm text-secondary-foreground">
+                                                    {application.created_at ? new Date(application.created_at).toLocaleDateString('en-US', {
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                        year: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    }) : 'N/A'}
                                                 </span>
                                             </td>
                                             <td class="text-center">
@@ -417,19 +408,9 @@
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
-                                                            {#if hasPermission('admin.job-applications.index')}
+                                                            {#if hasPermission('admin.job-applications.show')}
                                                             <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.job-applications.index', { jobPosting: jobPosting.id })}>
-                                                                    <span class="kt-menu-icon">
-                                                                        <i class="ki-filled ki-abstract-26"></i>
-                                                                    </span>
-                                                                    <span class="kt-menu-title">Job Applications</span>
-                                                                </a>
-                                                            </div>
-                                                            {/if}
-                                                            {#if hasPermission('admin.job-postings.show')}
-                                                            <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.job-postings.show', { jobPosting: jobPosting.id })}>
+                                                                <a class="kt-menu-link" href={route('admin.job-applications.show', { jobApplication: application.id })}>
                                                                     <span class="kt-menu-icon">
                                                                         <i class="ki-filled ki-search-list"></i>
                                                                     </span>
@@ -437,24 +418,24 @@
                                                                 </a>
                                                             </div>
                                                             {/if}
-                                                            {#if hasPermission('admin.job-postings.update')}
+                                                            {#if application.cv}
                                                             <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.job-postings.edit', { jobPosting: jobPosting.id })}>
+                                                                <a class="kt-menu-link" href={application.cv?.url} target="_blank">
                                                                     <span class="kt-menu-icon">
-                                                                        <i class="ki-filled ki-pencil"></i>
+                                                                        <i class="ki-filled ki-download"></i>
                                                                     </span>
-                                                                    <span class="kt-menu-title">Edit</span>
+                                                                    <span class="kt-menu-title">Download CV</span>
                                                                 </a>
                                                             </div>
                                                             {/if}
-                                                            {#if hasPermission('admin.job-postings.destroy')}
+                                                            {#if hasPermission('admin.job-applications.destroy')}
                                                                 <div class="kt-menu-separator"></div>
                                                                 <div class="kt-menu-item">
-                                                                    <button class="kt-menu-link" on:click={() => deleteJobPosting(jobPosting.id)}>
+                                                                    <button class="kt-menu-link text-danger" on:click={() => deleteApplication(application.id)}>
                                                                         <span class="kt-menu-icon">
                                                                             <i class="ki-filled ki-trash"></i>
                                                                         </span>
-                                                                        <span class="kt-menu-title">Remove</span>
+                                                                        <span class="kt-menu-title">Delete</span>
                                                                     </button>
                                                                 </div>
                                                             {/if}
@@ -470,9 +451,9 @@
                     </div>
 
                     <!-- Pagination -->
-                    {#if pagination && pagination.total > 0}
+                    {#if paginationData && paginationData.total > 0}
                         <Pagination 
-                            {pagination} 
+                            pagination={paginationData} 
                             {perPage}
                             onPageChange={goToPage} 
                             onPerPageChange={handlePerPageChange}
@@ -483,4 +464,4 @@
         </div>
     </div>
     <!-- End of Container -->
-</AdminLayout>
+</AdminLayout> 
