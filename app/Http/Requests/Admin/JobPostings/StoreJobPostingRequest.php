@@ -39,6 +39,31 @@ class StoreJobPostingRequest extends FormRequest
             'application_deadline' => 'nullable|date',
 
             'status' => 'required|string|in:draft,hidden,published',
+
+            'file' => 'nullable|file|image', 
+            'media_id' => 'nullable|exists:media,id',
         ];
+    }
+
+    
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $file = $this->file('file');
+            $mediaId = $this->input('media_id');
+
+            if (!$file && !$mediaId) {
+                $validator->errors()->add('file', 'You must provide either an image file or select an existing media.');
+                $validator->errors()->add('media_id', 'You must provide either an image file or select an existing media.');
+            }
+
+            // If media_id is provided, check if it's an image
+            if ($mediaId) {
+                $media = Media::find($mediaId);
+                if (!$media || $media->type !== 'image') {
+                    $validator->errors()->add('media_id', 'The selected media must be an image.');
+                }
+            }
+        });
     }
 }

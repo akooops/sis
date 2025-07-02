@@ -38,12 +38,16 @@ class JobPostingsController extends Controller
             });
         }
 
-        $jobPostings = $jobPostings->paginate($perPage, ['*'], 'jobPosting', $page);
+        $jobPostings = $jobPostings->paginate($perPage, ['*'], 'page', $page);
 
-        return view('admin.job-postings.index', [
-            'jobPostings' => $jobPostings,
-            'pagination' => $this->indexService->handlePagination($jobPostings)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'jobPostings' => $jobPostings->items(),
+                'pagination' => $this->indexService->handlePagination($jobPostings)
+            ]);
+        }
+
+        return inertia('JobPostings/Index');
     }
     
     /**
@@ -57,7 +61,7 @@ class JobPostingsController extends Controller
             'is_default' => true,
         ])->first();
 
-        return view('admin.job-postings.create', compact('defaultLanguage'));
+        return inertia('JobPostings/Create', compact('defaultLanguage'));
     }
     
     /**
@@ -83,8 +87,45 @@ class JobPostingsController extends Controller
             $jobPosting->setTranslation($field, $defaultLanguage->code, $request->input($field));    
         }
 
-        return redirect()->route('admin.job-postings.index')
-                        ->with('success','Job Posting created successfully');
+        $media = null;
+
+        if ($request->hasFile('file')) {
+            // Get MIME type
+            $mimeType = $request->file('file')->getMimeType();
+            
+            // Determine file category using match expression
+            $type = match (true) {
+                str_starts_with($mimeType, 'image/') => 'image',
+                str_starts_with($mimeType, 'video/') => 'video',
+                str_starts_with($mimeType, 'audio/') => 'audio',
+                default => 'document',
+            };
+
+            $media = Media::create(array_merge(
+                $request->validated(),
+                [
+                    'type' => $type
+                ]
+            ));
+
+            $defaultLanguage = Language::where([
+                'is_default' => true,
+            ])->first();
+
+            foreach($media->getTranslatableFields() as $field){
+                $media->setTranslation($field, $defaultLanguage->code, $request->input($field));    
+            }
+            
+            $file = $this->fileService->upload($request->file('file'), 'App\\Models\\Media', $media->id);
+        } else {
+            $media = Media::find($request->input('media_id'));
+        }
+    
+        $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\JobPosting', $jobPosting->id, true);
+
+        return inertia('JobPostings/Index', [
+            'success' => 'Job Posting created successfully!'
+        ]);
     }
 
     /**
@@ -96,8 +137,13 @@ class JobPostingsController extends Controller
     public function show(JobPosting $jobPosting)
     {    
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $jobPosting->getTranslatableFieldsByLanguages();
 
-        return view('admin.job-postings.show', compact('jobPosting', 'languages'));
+        return inertia('JobPostings/Show', [
+            'jobPosting' => $jobPosting,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -109,8 +155,13 @@ class JobPostingsController extends Controller
     public function edit(JobPosting $jobPosting)
     {
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $jobPosting->getTranslatableFieldsByLanguages();
 
-        return view('admin.job-postings.edit', compact('jobPosting', 'languages'));
+        return inertia('JobPostings/Edit', [
+            'jobPosting' => $jobPosting,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -128,9 +179,41 @@ class JobPostingsController extends Controller
                 'slug' => Str::slug($request->slug)
             ]
         ));
+
+        $media = null;
+
+        if ($request->hasFile('file')) {
+            // Get MIME type
+            $mimeType = $request->file('file')->getMimeType();
+            
+            // Determine file category using match expression
+            $type = match (true) {
+                str_starts_with($mimeType, 'image/') => 'image',
+                str_starts_with($mimeType, 'video/') => 'video',
+                str_starts_with($mimeType, 'audio/') => 'audio',
+                default => 'document',
+            };
+
+            $media = Media::create(array_merge(
+                $request->validated(),
+                [
+                    'type' => $type
+                ]
+            ));
+            
+            $file = $this->fileService->upload($request->file('file'), 'App\\Models\\Media', $media->id);
+        } else {
+            $media = Media::find($request->input('media_id'));
+        }
     
-        return redirect()->route('admin.job-postings.index')
-                        ->with('success','Job Posting updated successfully');
+        if($media){
+            if($jobPosting->file) $jobPosting->file->detach();
+            $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\JobPosting', $jobPosting->id, true);
+        }
+    
+        return inertia('JobPostings/Index', [
+            'success' => 'Job Posting updated successfully!'
+        ]);
     }
 
     public function updateTranslation(JobPosting $jobPosting, UpdateJobPostingTranslationRequest $request){

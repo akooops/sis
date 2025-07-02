@@ -33,6 +33,31 @@ class UpdateJobPostingRequest extends FormRequest
             'number_of_positions' => 'required|integer|min:1',
             'application_deadline' => 'nullable|date',
             'status' => 'required|string|in:draft,hidden,published',
+
+            'file' => 'nullable|file|image', 
+            'media_id' => 'nullable|exists:media,id',
         ];
+    }
+
+    
+    /**
+     * Configure the validator instance.
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $mediaId = $this->input('media_id');
+
+            // Validate media type if media_id is provided
+            if ($mediaId) {
+                $media = Media::find($mediaId);
+                
+                if (!$media) {
+                    $validator->errors()->add('media_id', 'The selected media does not exist.');
+                } elseif ($media->type !== 'image') {
+                    $validator->errors()->add('media_id', 'The selected media must be an image.');
+                }
+            }
+        });
     }
 }
