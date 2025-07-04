@@ -58,7 +58,7 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('admin')->middleware(['force.admin.english'])->group(function () {
+Route::prefix('admin')->middleware(['force.admin.english', 'handle.inertia'])->group(function () {
     Route::get('auth/login', [AuthController::class, 'showLoginForm'])->name('admin.auth.login');
     Route::post('auth/login', [AuthController::class, 'login'])->name('admin.auth.login');
     

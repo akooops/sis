@@ -13,12 +13,13 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        return view('admin.auth.login');
+        return inertia('Auth/Login');
     }
 
     public function login(LoginRequest $request)
@@ -31,7 +32,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route('admin.dashboard');
+        return Inertia::location(route('admin.dashboard'));
     }
     
     public function redirectToAzure()
