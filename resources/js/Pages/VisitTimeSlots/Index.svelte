@@ -33,7 +33,16 @@
     // Form errors
     let errors = {};
 
+    // Edit mode state
+    let isEditMode = false;
+    let editingTimeSlot = null;
+
     function openDrawer(date = null, endDate = null) {
+        // Reset to create mode
+        isEditMode = false;
+        editingTimeSlot = null;
+        errors = {};
+        
         if (date) {
             const startDate = new Date(date);
             let endDateTime;
@@ -73,26 +82,85 @@
         }
     }
 
+    function openEditDrawer(timeSlot) {
+        // Set edit mode
+        isEditMode = true;
+        editingTimeSlot = timeSlot;
+        errors = {};
+        
+        // Format dates for Flatpickr (Y-m-d H:i format)
+        const formatDateForFlatpickr = (dateString) => {
+            const date = new Date(dateString);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+        };
+        
+        formData = {
+            starts_at: formatDateForFlatpickr(timeSlot.starts_at),
+            ends_at: formatDateForFlatpickr(timeSlot.ends_at),
+            capacity: timeSlot.capacity
+        };
+        
+        // Simulate clicking the toggle button
+        const toggleButton = document.querySelector('[data-kt-drawer-toggle="#time_slot_drawer"]');
+        if (toggleButton) {
+            toggleButton.click();
+        }
+    }
+
     async function handleSubmit() {
         try {
             // Clear previous errors
             errors = {};
 
-            const response = await fetch(route('admin.visit-time-slots.store', visitService.id), {
-                method: 'POST',
-                headers: {
+            const url = isEditMode 
+                ? route('admin.visit-time-slots.update', editingTimeSlot.id)
+                : route('admin.visit-time-slots.store', visitService.id);
+            
+            const method = 'POST'; // Always POST, use _method for PATCH
+
+            // Prepare request body
+            let requestBody;
+            let headers;
+            
+            if (isEditMode) {
+                // For PATCH requests, use FormData with _method
+                const patchFormData = new FormData();
+                patchFormData.append('_method', 'PATCH');
+                patchFormData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+                patchFormData.append('starts_at', formData.starts_at);
+                patchFormData.append('ends_at', formData.ends_at);
+                patchFormData.append('capacity', formData.capacity);
+                requestBody = patchFormData;
+                headers = {
+                    'X-Requested-With': 'XMLHttpRequest'
+                };
+            } else {
+                // For POST requests, use JSON
+                requestBody = JSON.stringify(formData);
+                headers = {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(formData)
+                };
+            }
+
+            const response = await fetch(url, {
+                method: method,
+                headers: headers,
+                body: requestBody
             });
 
             if (response.ok) {
                 // Show success toast
+                const message = isEditMode ? "Time slot updated successfully!" : "Time slot created successfully!";
                 KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Time slot created successfully!",
+                    message: message,
                     variant: "success",
                     position: "bottom-right",
                 });
@@ -103,14 +171,15 @@
                     dismissButton.click();
                 }
                 
-                // Reset form data
+                // Reset form data and state
                 formData = {
                     starts_at: '',
                     ends_at: '',
                     capacity: 10
                 };
                 
-                // Clear errors
+                isEditMode = false;
+                editingTimeSlot = null;
                 errors = {};
                 
                 // Refresh calendar data with current visible date range
@@ -126,7 +195,7 @@
                 errors = errorData.errors || {};
                 
                 // Show error toast
-                const errorMessage = errorData.message || 'Error creating time slot. Please try again.';
+                const errorMessage = errorData.message || `Error ${isEditMode ? 'updating' : 'creating'} time slot. Please try again.`;
                 KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
                     message: errorMessage,
@@ -135,9 +204,72 @@
                 });
             }
         } catch (error) {
-            console.error('Error creating time slot:', error);
+            console.error(`Error ${isEditMode ? 'updating' : 'creating'} time slot:`, error);
             
             // Show network error toast
+            KTToast.show({
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+                message: "Network error. Please check your connection and try again.",
+                variant: "destructive",
+                position: "bottom-right",
+            });
+        }
+    }
+
+    async function deleteTimeSlot(timeSlot) {
+        if (!confirm('Are you sure you want to delete this time slot? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('_method', 'DELETE');
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
+
+            const response = await fetch(route('admin.visit-time-slots.destroy', { visitTimeSlot: timeSlot.id }), {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                // Show success toast
+                KTToast.show({
+                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+                    message: "Time slot deleted successfully!",
+                    variant: "success",
+                    position: "bottom-right",
+                });
+
+                // Close drawer if open
+                const dismissButton = document.querySelector('#cancel-button');
+                if (dismissButton) {
+                    dismissButton.click();
+                }
+
+                // Refresh calendar data
+                if (window.calendar) {
+                    const currentView = window.calendar.view;
+                    const startDate = currentView.currentStart.toISOString().split('T')[0];
+                    const endDate = currentView.currentEnd.toISOString().split('T')[0];
+                    fetchTimeSlots(startDate, endDate);
+                }
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.message || 'Error deleting time slot. Please try again.';
+                
+                KTToast.show({
+                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+                    message: errorMessage,
+                    variant: "destructive",
+                    position: "bottom-right",
+                });
+            }
+        } catch (error) {
+            console.error('Error deleting time slot:', error);
+            
             KTToast.show({
                 icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
                 message: "Network error. Please check your connection and try again.",
@@ -162,7 +294,8 @@
                         title: `(${slot.remaining_capacity}/${slot.capacity}) - ${slot.reserved ? 'Reserved' : 'Available'}`,
                         start: slot.starts_at,
                         end: slot.ends_at,
-                        backgroundColor: slot.reserved ? '#dc3545' : '#198754'
+                        backgroundColor: slot.reserved ? '#dc3545' : '#198754',
+                        extendedProps: { timeSlot: slot } // Store the time slot data
                     });
                 });
             }
@@ -186,8 +319,11 @@
                 openDrawer(info.start, info.end);
             },
             eventClick: function(info) {
-                // Navigate to edit page
-                window.location.href = info.event.url;
+                // Open edit drawer with time slot data
+                const timeSlot = info.event.extendedProps.timeSlot;
+                if (timeSlot) {
+                    openEditDrawer(timeSlot);
+                }
                 info.jsEvent.preventDefault();
             },
             events: [], // Will be loaded via AJAX
@@ -241,6 +377,14 @@
             background-color: #198754;
             color: #fff;
         }
+
+        .fc-daygrid-event{
+            cursor: pointer;
+        }
+
+        .fc-timegrid-event{
+            cursor: pointer;
+        }
     </style>
 </svelte:head>
 
@@ -282,7 +426,7 @@
     <!-- Time Slot Drawer -->
     <div class="hidden kt-drawer kt-drawer-end card flex-col max-w-[90%] w-[450px] top-5 bottom-5 end-5 rounded-xl border border-border" data-kt-drawer="true" data-kt-drawer-container="body" id="time_slot_drawer">
         <div class="flex items-center justify-between gap-2.5 text-sm text-mono font-semibold px-5 py-2.5 border-b border-b-border">
-            Add Time Slot
+            {isEditMode ? 'Edit Time Slot' : 'Add Time Slot'}
             <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-dim shrink-0" data-kt-drawer-dismiss="true">
                 <i class="ki-filled ki-cross"></i>
             </button>
@@ -299,7 +443,6 @@
                             enableTime: true,
                             dateFormat: 'Y-m-d H:i',
                             time_24hr: false,
-                            minDate: 'today'
                         }}
                     />
                     {#if errors.starts_at}
@@ -316,7 +459,6 @@
                             enableTime: true,
                             dateFormat: 'Y-m-d H:i',
                             time_24hr: false,
-                            minDate: formData.starts_at || 'today'
                         }}
                     />
                     {#if errors.ends_at}
@@ -342,8 +484,13 @@
                     <button id="cancel-button" type="button" class="kt-btn kt-btn-outline flex-1" data-kt-drawer-dismiss="true">
                         Cancel
                     </button>
+                    {#if isEditMode}
+                        <button type="button" class="kt-btn kt-btn-destructive flex-1" on:click={() => deleteTimeSlot(editingTimeSlot)}>
+                            Delete
+                        </button>
+                    {/if}
                     <button type="submit" class="kt-btn kt-btn-primary flex-1">
-                        Create Time Slot
+                        {isEditMode ? 'Update Time Slot' : 'Create Time Slot'}
                     </button>
                 </div>
             </form>

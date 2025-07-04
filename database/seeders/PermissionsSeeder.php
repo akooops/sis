@@ -135,7 +135,6 @@ class PermissionsSeeder extends Seeder
             // Visit Time Slots Management
             'admin.visit-time-slots.index',
             'admin.visit-time-slots.store',
-            'admin.visit-time-slots.show',
             'admin.visit-time-slots.update',
             'admin.visit-time-slots.destroy',
             

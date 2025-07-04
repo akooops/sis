@@ -70,28 +70,6 @@ class VisitTimeSlotsController extends Controller
             'message' => 'Visit Time Slot created successfully'
         ]);
     }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(VisitTimeSlot $visitTimeSlot)
-    {    
-        return view('admin.visit-time-slots.show', compact('visitTimeSlot'));
-    }
-    
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(VisitTimeSlot $visitTimeSlot)
-    {
-        return view('admin.visit-time-slots.edit', compact('visitTimeSlot'));
-    }
     
     /**
      * Update the specified resource in storage.
@@ -104,8 +82,10 @@ class VisitTimeSlotsController extends Controller
     {
         $visitTimeSlot->update($request->validated());
 
-        return redirect()->route('admin.visit-time-slots.index', $visitTimeSlot->visit_service_id)
-                        ->with('success','Visit Time Slot updated successfully');
+        return response()->json([
+            'success' => true,
+            'message' => 'Visit Time Slot updated successfully'
+        ]);
     }
 
     /**
