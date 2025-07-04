@@ -1,6 +1,10 @@
 
 @php
     $googleMapUrl = getSetting('google_maps_url');
+
+    $emails = json_decode(getSetting('emails')->value);
+    $phones = json_decode(getSetting('phones')->value);
+    $address = getSetting('address');
 @endphp
 
 @extends('layouts.master')
@@ -140,9 +144,11 @@
                             <h5 class="mb-1">
                                 {{getLanguageKeyLocalTranslation('contact_page_address_title')}}                    
                             </h5>
-                            <address>
-                                {{getLanguageKeyLocalTranslation('get_in_touch_address')}}
-                            </address>
+                            @if($address)
+                                <address>
+                                    {{$address->value}}
+                                </address>
+                            @endif
                         </div>
                     </div>
                     <!--/div -->
@@ -154,9 +160,14 @@
                             <h5 class="mb-1">
                                 {{getLanguageKeyLocalTranslation('contact_page_phone_title')}}                    
                             </h5>
-                            <p>
-                                <a href="tel:{{getLanguageKeyLocalTranslation('get_in_touch_phone')}}">{{getLanguageKeyLocalTranslation('get_in_touch_phone')}}</a> <br class="d-none d-md-block">
-                            </p>
+
+                            @if($phones && is_array($phones))
+                                @foreach ($phones as $phone)
+                                    <p>
+                                        <a href="tel:{{$phone}}">{{$phone}}</a> <br class="d-none d-md-block">
+                                    </p>
+                                @endforeach
+                            @endif
                         </div>
                     </div>
                     <!--/div -->
@@ -169,9 +180,15 @@
                                 {{getLanguageKeyLocalTranslation('contact_page_email_title')}}                 
                             </h5>
                             <p class="mb-0">
-                                <a href="mailto:{{getLanguageKeyLocalTranslation('get_in_touch_email')}}" class="link-body">
-                                    {{getLanguageKeyLocalTranslation('get_in_touch_email')}}
-                                </a>
+                                @if($emails && is_array($emails))
+                                    @foreach ($emails as $email)
+                                        <p class="my-2">
+                                            <a href="mailto:{{$email}}" class="link-body">
+                                                {{$email}}
+                                            </a>        
+                                        </p>
+                                    @endforeach
+                                @endif
                             </p>
                         </div>
                     </div>

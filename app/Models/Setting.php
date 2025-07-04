@@ -17,6 +17,12 @@ class Setting extends Model
         'options' => 'json',
     ];
 
+    //Relationships
+    public function page()
+    {
+        return $this->belongsTo(Page::class, 'value', 'id');
+    }
+
     //Boot
     protected static function boot()
     {

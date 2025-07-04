@@ -105,6 +105,35 @@ class SettingsSeeder extends Seeder
                 'is_encrypted' => false,
                 'options' => null,
             ],
+
+            // Contact Information
+            [
+                'key' => 'emails',
+                'type' => 'array',
+                'value' => json_encode(['enquiries@sis.edu.sa']),
+                'description' => 'Contact email addresses',
+                'group' => 'contact',
+                'is_encrypted' => false,
+                'options' => null,
+            ],
+            [
+                'key' => 'phones',
+                'type' => 'array',
+                'value' => json_encode(['(966) 920002877']),
+                'description' => 'Contact phone numbers',
+                'group' => 'contact',
+                'is_encrypted' => false,
+                'options' => null,
+            ],
+            [
+                'key' => 'address',
+                'type' => 'text',
+                'value' => 'Hamdan Street, Sulaimaniyah, Riyadh Kingdom of Saudi Arabia',
+                'description' => 'School physical address',
+                'group' => 'contact',
+                'is_encrypted' => false,
+                'options' => null,
+            ],
         ];
 
         foreach ($settings as $setting) {

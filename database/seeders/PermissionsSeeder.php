@@ -170,8 +170,6 @@ class PermissionsSeeder extends Seeder
             
             // Settings Management
             'admin.settings.index',
-            'admin.settings.show',
-            'admin.settings.edit',
             'admin.settings.update',
 
             // Notifications Management

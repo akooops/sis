@@ -26,7 +26,7 @@ class SettingsController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $settings = Setting::orderBy('group')->orderBy('key');
+        $settings = Setting::with('page')->orderBy('group')->orderBy('key');
 
         if ($search) {
             $settings->where(function($query) use ($search) {
@@ -37,42 +37,14 @@ class SettingsController extends Controller
 
         $settings = $settings->paginate($perPage, ['*'], 'page', $page);
 
-        return view('admin.settings.index', [
-            'settings' => $settings,
-            'pagination' => $this->indexService->handlePagination($settings)
-        ]);
-    }
-    
-        /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Setting $setting)
-    {    
-        return view('admin.settings.show', compact('setting'));
-    }
-    
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Setting $setting)
-    {
-        if($setting->type == "menu"){
-            $menus = Menu::get();            
-            
-            return view('admin.settings.edit', compact('setting', 'menus'));
-        }else if($setting->type == "page"){
-            $pages = Page::get();            
-
-            return view('admin.settings.edit', compact('setting', 'pages'));
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'settings' => $settings->items(),
+                'pagination' => $this->indexService->handlePagination($settings)
+            ]);
         }
 
-        return view('admin.settings.edit', compact('setting'));
+        return inertia('Settings/Index');
     }
     
     /**
@@ -87,7 +59,9 @@ class SettingsController extends Controller
 
         cache()->forget("setting-{$setting->key}");
 
-        return redirect()->route('admin.settings.index')
-            ->with('success','Setting updated successfully');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Setting updated successfully',
+        ]);
     }
 }

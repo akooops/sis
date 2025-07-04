@@ -234,9 +234,7 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
 
     //Settings
     Route::get('settings', [SettingsController::class, 'index'])->middleware('check.permission:admin.settings.index')->name('admin.settings.index');
-    Route::get('settings/{setting}', [SettingsController::class, 'show'])->middleware('check.permission:admin.settings.show')->name('admin.settings.show');
-    Route::get('settings/{setting}/edit', [SettingsController::class, 'edit'])->middleware('check.permission:admin.settings.edit')->name('admin.settings.edit');
-    Route::patch('settings/{setting}', [SettingsController::class, 'update'])->middleware('check.permission:admin.settings.update')->name('admin.settings.update');
+    Route::post('settings/{setting}', [SettingsController::class, 'update'])->middleware('check.permission:admin.settings.update')->name('admin.settings.update');
 
     // Visits Services
     Route::get('visit-services/order', [VisitServicesController::class, 'orderPage'])->middleware('check.permission:admin.visit-services.order')->name('admin.visit-services.order-page');

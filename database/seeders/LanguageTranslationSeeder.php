@@ -124,18 +124,6 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Follow Us',
                 'ar' => 'تابعنا'
             ],
-            'get_in_touch_address' => [
-                'en' => 'Hamdan Street, Sulaimaniyah, Riyadh Kingdom of Saudi Arabia',
-                'ar' => 'Hamdan Street, Sulaimaniyah, Riyadh Kingdom of Saudi Arabia'
-            ],
-            'get_in_touch_email' => [
-                'en' => 'enquiries@sis.edu.sa',
-                'ar' => 'enquiries@sis.edu.sa'
-            ],
-            'get_in_touch_phone' => [
-                'en' => '(966) 920002877',
-                'ar' => '(966) 920002877'
-            ],
             'grade_page_collapse_title' => [
                 'en' => 'Files',
                 'ar' => 'الملفات'

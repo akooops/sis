@@ -3,6 +3,10 @@
 
     $footerMenu = getMenu('footer_primary_menu');
     
+    $emails = json_decode(getSetting('emails')->value);
+    $phones = json_decode(getSetting('phones')->value);
+    $address = getSetting('address');
+
     $facebookUrl = getSetting('social_facebook_url');
     $instagramUrl = getSetting('social_instagram_url');
     $twitterUrl = getSetting('social_twitter_url');
@@ -46,13 +50,27 @@
                             </h4>
                             
                             <p>
-                                {{getLanguageKeyLocalTranslation('get_in_touch_address')}}
-                                <br /> 
-
-                                <a href="mailto:{{getLanguageKeyLocalTranslation('get_in_touch_email')}}">
-                                    {{getLanguageKeyLocalTranslation('get_in_touch_email')}}
-                                </a>
-                                <br /> {{getLanguageKeyLocalTranslation('get_in_touch_phone')}}
+                                @if($address)
+                                    {{$address->value}}
+                                    <br /> 
+                                @endif
+                                @if($emails && is_array($emails))
+                                    @foreach ($emails as $email)
+                                        <a href="mailto:{{$email}}">
+                                            {{$email}}
+                                        </a>
+                                        @if(!$loop->last)<br />@endif
+                                    @endforeach
+                                @endif
+                                @if($phones && is_array($phones))
+                                    @if($emails && is_array($emails))<br />@endif
+                                    @foreach ($phones as $phone)
+                                        <a href="tel:{{$phone}}">
+                                            {{$phone}}
+                                        </a>
+                                        @if(!$loop->last)<br />@endif
+                                    @endforeach
+                                @endif
                             </p>
                         </div>
                         <!-- /.widget -->

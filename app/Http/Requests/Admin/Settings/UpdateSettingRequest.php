@@ -27,7 +27,7 @@ class UpdateSettingRequest extends FormRequest
             'date' => ['date_format:Y-m-d'],
             'time' => ['date_format:H:i'],
             'datetime' => ['date', 'date_format:Y-m-d H:i'],
-            'array' => ['array'],
+            'array' => ['string'],
             'media' => ['exists:media,id'],
             'article' => ['exists:articles,id'],
             'page' => ['exists:pages,id'],
@@ -40,5 +40,20 @@ class UpdateSettingRequest extends FormRequest
         return [
             'value' => array_merge($baseRule, $typeRules)
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $setting = request()->route('setting');
+            
+            // Validate JSON for array types
+            if ($setting->type === 'array') {
+                $value = $this->input('value');
+                if (!is_string($value) || !json_decode($value, true)) {
+                    $validator->errors()->add('value', 'The value must be a valid JSON array.');
+                }
+            }
+        });
     }
 }
