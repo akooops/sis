@@ -49,17 +49,7 @@ class VisitTimeSlotsController extends Controller
             'visitService' => $visitService
         ]);
     }
-    
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(VisitService $visitService)
-    {
-        return view('admin.visit-time-slots.create', compact('visitService'));
-    }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -75,8 +65,10 @@ class VisitTimeSlotsController extends Controller
             ]
         ));
         
-        return redirect()->route('admin.visit-time-slots.index', $visitService->id)
-                        ->with('success','Visit Time Slot created successfully');
+        return response()->json([
+            'success' => true,
+            'message' => 'Visit Time Slot created successfully'
+        ]);
     }
 
     /**
