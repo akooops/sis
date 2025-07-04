@@ -29,7 +29,13 @@ class VisitBookingsController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
+        $visit_time_slot_id = $this->indexService->checkIfSearchEmpty($request->query('visit_time_slot_id'));
+
         $visitBookings = $visitService->visitBookings()->with('visitTimeSlot')->latest();
+
+        if($visit_time_slot_id){
+            $visitBookings->where('visit_time_slot_id', $visit_time_slot_id);
+        }
 
         if ($search) {
             $visitBookings->where(function($query) use ($search) {

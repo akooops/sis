@@ -36,6 +36,28 @@ class VisitTimeSlotsController extends Controller
                             ->where('ends_at', '>=', $endDate);
                       });
             });
+        }else{
+            $perPage = $this->indexService->limitPerPage($request->query('perPage', 10));
+            $page = $this->indexService->checkPageIfNull($request->query('page', 1));
+            $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
+
+            if ($search) {
+                $visitTimeSlots->where(function($query) use ($search) {
+                    $query->where('id', $search)
+                          ->orWhere('capacity', 'like', '%' . $search . '%')
+                          ->orWhere('starts_at', 'like', '%' . $search . '%')
+                          ->orWhere('ends_at', 'like', '%' . $search . '%');
+                });
+            }
+
+            $visitTimeSlots = $visitTimeSlots->paginate($perPage, ['*'], 'page', $page);
+
+            if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+                return response()->json([
+                    'visitTimeSlots' => $visitTimeSlots->items(),
+                    'pagination' => $this->indexService->handlePagination($visitTimeSlots)
+                ]);
+            }
         }
 
 

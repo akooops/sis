@@ -1,6 +1,7 @@
 <script>
     import AdminLayout from '../Layouts/AdminLayout.svelte';
     import Pagination from '../Components/Pagination.svelte';
+    import Select2 from '../Components/Forms/Select2.svelte';
     import { onMount, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
 
@@ -31,6 +32,8 @@
     let perPage = 10;
     let currentPage = 1;
     let searchTimeout;
+    let selectedTimeSlotId = '';
+    let selectedTimeSlotText = '';
 
     // Fetch visit bookings data
     async function fetchVisitBookings() {
@@ -40,7 +43,8 @@
                 visitService: visitService.id,
                 page: currentPage,
                 perPage: perPage,
-                search: search
+                search: search,
+                visit_time_slot_id: selectedTimeSlotId
             }), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -81,6 +85,24 @@
     function handleSearchInput(event) {
         search = event.target.value;
         handleSearch();
+    }
+
+    // Handle time slot selection
+    function handleTimeSlotSelect(event) {
+        console.log('Time slot selected:', event.detail);
+        selectedTimeSlotId = event.detail.value;
+        selectedTimeSlotText = event.detail.data.text;
+        currentPage = 1;
+        fetchVisitBookings();
+    }
+
+    // Handle time slot clear
+    function handleTimeSlotClear() {
+        console.log('Time slot cleared');
+        selectedTimeSlotId = '';
+        selectedTimeSlotText = '';
+        currentPage = 1;
+        fetchVisitBookings();
     }
 
     // Handle pagination
@@ -210,15 +232,74 @@
             <div class="kt-card">
                 <div class="kt-card-header">
                     <div class="kt-card-toolbar">
-                        <div class="kt-input max-w-64 w-64">
-                            <i class="ki-filled ki-magnifier"></i>
-                            <input 
-                                type="text" 
-                                class="kt-input" 
-                                placeholder="Search visit bookings..." 
-                                bind:value={search}
-                                on:input={handleSearchInput}
-                            />
+                        <div class="flex items-center gap-3">
+                            <div class="kt-input max-w-64 w-64">
+                                <i class="ki-filled ki-magnifier"></i>
+                                <input 
+                                    type="text" 
+                                    class="kt-input" 
+                                    placeholder="Search visit bookings..." 
+                                    bind:value={search}
+                                    on:input={handleSearchInput}
+                                />
+                            </div>
+                            {#if selectedTimeSlotId}
+                                <!-- Time Slot Badge -->
+                                <div class="flex items-center gap-2">
+                                    <span class="kt-badge kt-badge-outline kt-badge-primary">
+                                        <i class="ki-filled ki-calendar text-sm me-1"></i>
+                                        Time Slot: {selectedTimeSlotText}
+                                    </span>
+                                    <button 
+                                        class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"
+                                        on:click={handleTimeSlotClear}
+                                        title="Clear time slot filter"
+                                    >
+                                        <i class="ki-filled ki-cross text-sm"></i>
+                                    </button>
+                                </div>
+                            {:else}
+                                <!-- Time Slot Filter -->
+                                <div class="w-64">
+                                    <Select2
+                                        id="time-slot-filter"
+                                        placeholder="Filter by time slot..."
+                                        bind:value={selectedTimeSlotId}
+                                        on:select={handleTimeSlotSelect}
+                                        on:clear={handleTimeSlotClear}
+                                        data={[]}
+                                        ajax={{
+                                            url: route('admin.visit-time-slots.index', visitService.id),
+                                            dataType: 'json',
+                                            delay: 300,
+                                            data: function(params) {
+                                                return {
+                                                    search: params.term,
+                                                    perPage: 10
+                                                };
+                                            },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.visitTimeSlots.map(slot => ({
+                                                        id: slot.id,
+                                                        text: `${new Date(slot.starts_at).toLocaleString('en-US', {
+                                                            year: 'numeric',
+                                                            month: 'short',
+                                                            day: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })} - ${new Date(slot.ends_at).toLocaleString('en-US', {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}`
+                                                    }))
+                                                };
+                                            },
+                                            cache: true
+                                        }}
+                                    />
+                                </div>
+                            {/if}
                         </div>
                     </div>
                 </div>
@@ -296,7 +377,7 @@
                                                 </div>
                                                 <h3 class="text-lg font-semibold text-mono mb-2">No visit bookings found</h3>
                                                 <p class="text-sm text-secondary-foreground mb-4">
-                                                    {search ? 'No visit bookings match your search criteria.' : 'Get started by creating your first visit booking.'}
+                                                    {search || selectedTimeSlotId ? 'No visit bookings match your search criteria.' : 'Get started by creating your first visit booking.'}
                                                 </p>
                                                 {#if hasPermission('admin.visit-bookings.store')}
                                                 <a href="{route('admin.visit-bookings.create')}" class="kt-btn kt-btn-primary">
