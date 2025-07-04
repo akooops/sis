@@ -18,7 +18,8 @@
         <link href="/assets/admin/vendors/summernote/summernote-lite.min.css" rel="stylesheet" type="text/css" />
         <!-- Flatpickr CSS -->
         <link href="/assets/admin/vendors/flatpickr/flatpickr.min.css" rel="stylesheet" type="text/css" />
-
+        <!-- FullCalendar CSS -->
+        <link href="/assets/admin/vendors/fullcalendar/main.min.css" rel="stylesheet" type="text/css" />
         @routes
         @vite('resources/js/app.js')
         @inertiaHead
@@ -148,6 +149,8 @@
         <script src="/assets/admin/vendors/summernote/summernote-lite.min.js"></script>
         <!-- Flatpickr JavaScript -->
         <script src="/assets/admin/vendors/flatpickr/flatpickr.min.js"></script>   
+        <!-- FullCalendar JavaScript -->
+        <script src="/assets/admin/vendors/fullcalendar/main.min.js"></script>
         <!-- Sortable JavaScript -->
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
         <!-- Metronic Layout Scripts -->

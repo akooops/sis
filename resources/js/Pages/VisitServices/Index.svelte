@@ -335,6 +335,26 @@
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
+                                                            {#if hasPermission('admin.visit-time-slots.index')}
+                                                            <div class="kt-menu-item">
+                                                                <a class="kt-menu-link" href={route('admin.visit-time-slots.index', { visitService: visitService.id })}>
+                                                                    <span class="kt-menu-icon">
+                                                                        <i class="ki-filled ki-abstract-26"></i>
+                                                                    </span>
+                                                                    <span class="kt-menu-title">Visit Time Slots</span>
+                                                                </a>
+                                                            </div>
+                                                            {/if}
+                                                            {#if hasPermission('admin.visit-bookings.index')}
+                                                            <div class="kt-menu-item">
+                                                                <a class="kt-menu-link" href={route('admin.visit-bookings.index', { visitService: visitService.id })}>
+                                                                    <span class="kt-menu-icon">
+                                                                        <i class="ki-filled ki-abstract-26"></i>
+                                                                    </span>
+                                                                    <span class="kt-menu-title">Visit Bookings</span>
+                                                                </a>
+                                                            </div>
+                                                            {/if}
                                                             {#if hasPermission('admin.visit-services.show')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.visit-services.show', { visitService: visitService.id })}>

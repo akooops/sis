@@ -3,18 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\Admin\VisitTimeSlots\DeleteVisitTimeSlotRequest;
-use App\Http\Requests\Admin\VisitTimeSlots\OrderVisitTimeSlotsRequest;
 use App\Http\Requests\Admin\VisitTimeSlots\StoreVisitTimeSlotRequest;
 use App\Http\Requests\Admin\VisitTimeSlots\UpdateVisitTimeSlotRequest;
-use App\Http\Requests\Admin\VisitTimeSlots\UpdateVisitTimeSlotTranslationRequest;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use App\Models\VisitTimeSlot;
-use App\Models\Media;
-use App\Models\Page;
 use App\Models\VisitService;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class VisitTimeSlotsController extends Controller
 {
@@ -25,11 +19,34 @@ class VisitTimeSlotsController extends Controller
      */
     public function index(Request $request, VisitService $visitService)
     {
-        $visitTimeSlots = $visitService->visitTimeSlots()->latest()->get();
+        $min = $this->indexService->checkIfEmpty($request->query('min'));
+        $max = $this->indexService->checkIfEmpty($request->query('max'));
+        
+        $visitTimeSlots = $visitService->visitTimeSlots()->latest();
+        
+        if ($min && $max) {
+            $startDate = Carbon::parse($min)->startOfDay();
+            $endDate = Carbon::parse($max)->endOfDay();
+            
+            $visitTimeSlots->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('starts_at', [$startDate, $endDate])
+                      ->orWhereBetween('ends_at', [$startDate, $endDate])
+                      ->orWhere(function ($q) use ($startDate, $endDate) {
+                          $q->where('starts_at', '<=', $startDate)
+                            ->where('ends_at', '>=', $endDate);
+                      });
+            });
+        }
 
-        return view('admin.visit-time-slots.index', [
-            'visitService' => $visitService,
-            'visitTimeSlots' => $visitTimeSlots 
+
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'visitTimeSlots' => $visitTimeSlots->get()
+            ]);
+        }
+
+        return inertia('VisitTimeSlots/Index', [
+            'visitService' => $visitService
         ]);
     }
     
