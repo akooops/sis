@@ -59,11 +59,11 @@ Route::get('/', function () {
 */
 
 Route::prefix('admin')->middleware(['force.admin.english', 'handle.inertia'])->group(function () {
-    Route::get('auth/login', [AuthController::class, 'showLoginForm'])->name('admin.auth.login');
-    Route::post('auth/login', [AuthController::class, 'login'])->name('admin.auth.login');
+    Route::get('auth/login', [AuthController::class, 'showLoginForm'])->middleware('guest')->name('admin.auth.login');
+    Route::post('auth/login', [AuthController::class, 'login'])->middleware('guest')->name('admin.auth.login');
     
     // Azure AD authentication routes
-    Route::get('auth/azure', [AuthController::class, 'redirectToAzure'])->name('admin.auth.azure');
+    Route::get('auth/azure', [AuthController::class, 'redirectToAzure'])->middleware('guest')->name('admin.auth.azure');
     Route::get('auth/azure/callback', [AuthController::class, 'handleAzureCallback'])->name('admin.auth.azure.callback');
 });
 
