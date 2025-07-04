@@ -366,13 +366,12 @@
                         <!-- Languages & Skills Card -->
                         <div class="kt-card">
                             <div class="kt-card-header">
-                                <h3 class="kt-card-title">Languages & Skills</h3>
+                                <h3 class="kt-card-title">Languages</h3>
                             </div>
                             <div class="kt-card-content">
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div class="grid grid-cols-1 gap-6">
                                     <!-- Languages Section -->
                                     <div>
-                                        <h5 class="text-sm font-semibold text-mono mb-4">Languages</h5>
                                         {#if jobApplication?.languages && jobApplication.languages.length > 0}
                                             <div class="kt-scrollable-x-auto">
                                                 <table class="kt-table kt-table-border">

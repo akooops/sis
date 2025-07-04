@@ -422,7 +422,7 @@
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={application.cv?.url} target="_blank">
                                                                     <span class="kt-menu-icon">
-                                                                        <i class="ki-filled ki-download"></i>
+                                                                        <i class="ki-filled ki-file-down"></i>
                                                                     </span>
                                                                     <span class="kt-menu-title">Download CV</span>
                                                                 </a>
