@@ -29,7 +29,7 @@ class VisitBookingsController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $visitBookings = $visitService->visitBookings()->latest();
+        $visitBookings = $visitService->visitBookings()->with('visitTimeSlot')->latest();
 
         if ($search) {
             $visitBookings->where(function($query) use ($search) {
@@ -37,18 +37,21 @@ class VisitBookingsController extends Controller
                       ->orWhere('guardian_name', 'like', '%' . $search . '%')
                       ->orWhere('email', 'like', '%' . $search . '%')
                       ->orWhere('phone', 'like', '%' . $search . '%')
-                      ->orWhere('student_name', 'like', '%' . $search . '%')
-                      ->orWhere('student_grade', 'like', '%' . $search . '%')
-                      ->orWhere('student_school', 'like', '%' . $search . '%');
+                      ->orWhere('students', 'like', '%' . $search . '%');
             });
         }
 
         $visitBookings = $visitBookings->paginate($perPage, ['*'], 'visitService', $page);
 
-        return view('admin.visit-bookings.index', [
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'visitBookings' => $visitBookings->items(),
+                'pagination' => $this->indexService->handlePagination($visitBookings)
+            ]);
+        }
+
+        return inertia('VisitBookings/Index', [
             'visitService' => $visitService,
-            'visitBookings' => $visitBookings,
-            'pagination' => $this->indexService->handlePagination($visitBookings)
         ]);
     }
 
@@ -60,7 +63,11 @@ class VisitBookingsController extends Controller
      */
     public function show(VisitBooking $visitBooking)
     {    
-        return view('admin.visit-bookings.show', compact('visitBooking'));
+        $visitBooking->load(['visitService', 'visitTimeSlot']);
+        
+        return inertia('VisitBookings/Show', [
+            'visitBooking' => $visitBooking,
+        ]);
     }
 
 

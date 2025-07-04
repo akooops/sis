@@ -38,10 +38,14 @@ class VisitServicesController extends Controller
 
         $visitServices = $visitServices->paginate($perPage, ['*'], 'visitService', $page);
 
-        return view('admin.visit-services.index', [
-            'visitServices' => $visitServices,
-            'pagination' => $this->indexService->handlePagination($visitServices)
-        ]);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'visitServices' => $visitServices->items(),
+                'pagination' => $this->indexService->handlePagination($visitServices)
+            ]);
+        }
+
+        return inertia('VisitServices/Index');    
     }
     
     /**
@@ -55,9 +59,7 @@ class VisitServicesController extends Controller
             'is_default' => true,
         ])->first();
 
-        $medias = Media::where('type', 'image')->get();
-
-        return view('admin.visit-services.create', compact('defaultLanguage', 'medias'));
+        return inertia('VisitServices/Create', compact('defaultLanguage'));
     }
     
     /**
@@ -103,8 +105,9 @@ class VisitServicesController extends Controller
     
         $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\VisitService', $visitService->id, true);
 
-        return redirect()->route('admin.visit-services.index')
-                        ->with('success','VisitService created successfully');
+        return inertia('VisitServices/Index', [
+            'success' => 'Visit Service created successfully!'
+        ]);
     }
 
     /**
@@ -116,8 +119,13 @@ class VisitServicesController extends Controller
     public function show(VisitService $visitService)
     {    
         $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $visitService->getTranslatableFieldsByLanguages();
 
-        return view('admin.visit-services.show', compact('visitService', 'languages'));
+        return inertia('VisitServices/Show', [
+            'visitService' => $visitService,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -129,9 +137,13 @@ class VisitServicesController extends Controller
     public function edit(VisitService $visitService)
     {
         $languages = Language::orderBy('is_default', 'DESC')->get();
-        $medias = Media::where('type', 'image')->get();
+        $translations = $visitService->getTranslatableFieldsByLanguages();
 
-        return view('admin.visit-services.edit', compact('visitService', 'languages', 'medias'));
+        return inertia('VisitServices/Edit', [
+            'visitService' => $visitService,
+            'languages' => $languages,
+            'translations' => $translations
+        ]);
     }
     
     /**
@@ -165,8 +177,9 @@ class VisitServicesController extends Controller
             $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\VisitService', $visitService->id, true);
         }
 
-        return redirect()->route('admin.visit-services.index')
-                        ->with('success','VisitService updated successfully');
+        return inertia('VisitServices/Index', [
+            'success' => 'Visit Service updated successfully!'
+        ]);
     }
 
     public function updateTranslation(VisitService $visitService, UpdateVisitServiceTranslationRequest $request){
@@ -178,7 +191,7 @@ class VisitServicesController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'VisitService updated successfully',
+            'message' => 'Visit Service updated successfully',
         ]);
     }
 
@@ -193,14 +206,14 @@ class VisitServicesController extends Controller
         $visitService->delete();
 
         return redirect()->route('admin.visit-services.index')
-                        ->with('success','VisitService deleted successfully');
+                        ->with('success','Visit Service deleted successfully');
     }
 
     public function orderPage()
     {
         $visitServices = VisitService::orderBy('order')->get();
 
-        return view('admin.visit-services.order', compact('visitServices'));
+        return inertia('VisitServices/Order', compact('visitServices'));
     }
 
     public function order(OrderVisitServicesRequest $request)
@@ -214,6 +227,7 @@ class VisitServicesController extends Controller
             
         return response()->json([
             'status' => 'success',
+            'message' => 'Visit Services ordered successfully',    
         ]);
     }
 }

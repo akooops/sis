@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\VisitBookings;
 
+use App\Models\VisitTimeSlot;
 use App\Rules\CheckInternationalPhoneNumber;
 use App\Rules\ReCaptcha;
 use Illuminate\Foundation\Http\FormRequest;
@@ -40,16 +41,31 @@ class StoreVisitBookingRequest extends FormRequest
                 new CheckInternationalPhoneNumber(),
             ],
 
-            'student_name' => 'required|string|max:255',
-            'student_grade' => 'required|string|max:255',
-            'student_school' => 'required|string|max:255',
-
             'visitors_count' => "required|integer|min:1",
+
+            'students' => [
+                'required',
+                'array',
+                'min:1',
+                function ($attribute, $value, $fail) {
+                    $visitorsCount = request()->input('visitors_count');
+                    $studentsCount = count($value);
+                    
+                    if ($studentsCount !== $visitorsCount) {
+                        $fail("The number of students ({$studentsCount}) must match the visitors count ({$visitorsCount}).");
+                    }
+                }
+            ],
+
+            'students.*.name' => 'required|string|max:255',
+            'students.*.grade' => 'required|string|max:255',
+            'students.*.school' => 'required|string|max:255',
+
             'visit_time_slot_id' => [
                 'required',
                 'exists:visit_time_slots,id',
                 function ($attribute, $value, $fail) use ($visitService) {
-                    $timeSlot = \App\Models\VisitTimeSlot::find($value);
+                    $timeSlot = VisitTimeSlot::find($value);
                     
                     if (!$timeSlot) {
                         $fail('The selected time slot does not exist.');

@@ -342,50 +342,55 @@
                                                 <div v-if="errors.phone" class="text-danger mb-3">@{{ errors.phone }}</div>
                                                 <div v-else class="mb-3"></div>
 
-                                                <!-- Student Name -->
-                                                <div class="input-group mb-2">
-                                                    <span class="input-group-text">
-                                                        <i class="uil uil-book-reader"></i>
-                                                    </span>
-                                                    <input id="studentNameInput" 
-                                                        v-model.trim="bookingForm.student_name"
-                                                        type="text" 
-                                                        class="form-control"
-                                                        :class="{ 'is-invalid': errors.student_name }"
-                                                        placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_name_input')}}">   
-                                                </div>
-                                                <div v-if="errors.student_name" class="text-danger mb-3">@{{ errors.student_name }}</div>
-                                                <div v-else class="mb-3"></div>
+                                                <!-- Students Information -->
+                                                <div v-for="(student, index) in bookingForm.students" :key="index" class="student-group mb-4">
+                                                    <h6 class="mb-3 text-primary">Student @{{ index + 1 }}</h6>
+                                                    
+                                                    <!-- Student Name -->
+                                                    <div class="input-group mb-2">
+                                                        <span class="input-group-text">
+                                                            <i class="uil uil-book-reader"></i>
+                                                        </span>
+                                                        <input :id="'studentNameInput' + index" 
+                                                            v-model.trim="student.name"
+                                                            type="text" 
+                                                            class="form-control"
+                                                            :class="{ 'is-invalid': errors['students.' + index + '.name'] }"
+                                                            placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_name_input')}}">   
+                                                    </div>
+                                                    <div v-if="errors['students.' + index + '.name']" class="text-danger mb-3">@{{ errors['students.' + index + '.name'] }}</div>
+                                                    <div v-else class="mb-3"></div>
 
-                                                <!-- Student Grade -->
-                                                <div class="input-group mb-2">
-                                                    <span class="input-group-text">
-                                                        <i class="uil uil-code-branch"></i>
-                                                    </span>
-                                                    <input id="gradeInput" 
-                                                        v-model.trim="bookingForm.student_grade"
-                                                        type="text" 
-                                                        class="form-control"
-                                                        :class="{ 'is-invalid': errors.student_grade }"
-                                                        placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_grade_input')}}">   
-                                                </div>
-                                                <div v-if="errors.student_grade" class="text-danger mb-3">@{{ errors.student_grade }}</div>
-                                                <div v-else class="mb-3"></div>
+                                                    <!-- Student Grade -->
+                                                    <div class="input-group mb-2">
+                                                        <span class="input-group-text">
+                                                            <i class="uil uil-code-branch"></i>
+                                                        </span>
+                                                        <input :id="'gradeInput' + index" 
+                                                            v-model.trim="student.grade"
+                                                            type="text" 
+                                                            class="form-control"
+                                                            :class="{ 'is-invalid': errors['students.' + index + '.grade'] }"
+                                                            placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_grade_input')}}">   
+                                                    </div>
+                                                    <div v-if="errors['students.' + index + '.grade']" class="text-danger mb-3">@{{ errors['students.' + index + '.grade'] }}</div>
+                                                    <div v-else class="mb-3"></div>
 
-                                                <!-- Student School -->
-                                                <div class="input-group mb-2">
-                                                    <span class="input-group-text">
-                                                        <i class="uil uil-university"></i>
-                                                    </span>
-                                                    <input id="schoolInput" 
-                                                        v-model.trim="bookingForm.student_school"
-                                                        type="text" 
-                                                        class="form-control"
-                                                        :class="{ 'is-invalid': errors.student_school }"
-                                                        placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_school_input')}}">   
+                                                    <!-- Student School -->
+                                                    <div class="input-group mb-2">
+                                                        <span class="input-group-text">
+                                                            <i class="uil uil-university"></i>
+                                                        </span>
+                                                        <input :id="'schoolInput' + index" 
+                                                            v-model.trim="student.school"
+                                                            type="text" 
+                                                            class="form-control"
+                                                            :class="{ 'is-invalid': errors['students.' + index + '.school'] }"
+                                                            placeholder="{{getLanguageKeyLocalTranslation('visits_page_student_school_input')}}">   
+                                                    </div>
+                                                    <div v-if="errors['students.' + index + '.school']" class="text-danger mb-3">@{{ errors['students.' + index + '.school'] }}</div>
+                                                    <div v-else class="mb-3"></div>
                                                 </div>
-                                                <div v-if="errors.student_school" class="text-danger mb-3">@{{ errors.student_school }}</div>
-                                                <div v-else class="mb-3"></div>
                                             </div>
 
                                             <div class="col-md-6 text-center text-md-start mt-4 mt-md-0">
@@ -467,9 +472,7 @@ createApp({
                 guardian_name: '',
                 email: '',
                 phone: '',
-                student_name: '',
-                student_grade: '',
-                student_school: ''
+                students: []
             },
             
             // Error handling
@@ -599,6 +602,16 @@ createApp({
                 total_capacity: extendedProps.total_capacity
             };
             
+            // Initialize students array based on visitor count
+            this.bookingForm.students = [];
+            for (let i = 0; i < this.selectedService.visitorCount; i++) {
+                this.bookingForm.students.push({
+                    name: '',
+                    grade: '',
+                    school: ''
+                });
+            }
+            
             this.currentStep = 3;
             
             nextTick(() => {
@@ -669,9 +682,7 @@ createApp({
                         guardian_name: this.bookingForm.guardian_name.trim() || null,
                         email: this.bookingForm.email.trim() || null,
                         phone: fullPhoneNumber.trim() || null,
-                        student_name: this.bookingForm.student_name.trim() || null,
-                        student_grade: this.bookingForm.student_grade.trim() || null,
-                        student_school: this.bookingForm.student_school.trim() || null,
+                        students: this.bookingForm.students,
                         visitors_count: this.selectedService.visitorCount,
                         visit_time_slot_id: this.selectedTimeSlot.id
                     })
@@ -750,9 +761,7 @@ createApp({
                 guardian_name: '',
                 email: '',
                 phone: '',
-                student_name: '',
-                student_grade: '',
-                student_school: ''
+                students: []
             };
             this.errors = {};
             

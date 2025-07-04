@@ -12,6 +12,10 @@ class VisitBooking extends Model
     //Properties
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'students' => 'array',
+    ];
+
     //Relationships
     public function visitService()
     {
