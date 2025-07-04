@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\LanguagesKeysController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\MenuItemsController;
 use App\Http\Controllers\Admin\MenusController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PagesController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\ProgramsController;
@@ -287,6 +288,11 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::get('job-postings/{jobPosting}/job-applications/export', [JobApplicationsController::class, 'export'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.export');
     Route::get('job-applications/{jobApplication}', [JobApplicationsController::class, 'show'])->middleware('check.permission:admin.job-applications.show')->name('admin.job-applications.show');
     Route::delete('job-applications/{jobApplication}', [JobApplicationsController::class, 'destroy'])->middleware('check.permission:admin.job-applications.destroy')->name('admin.job-applications.destroy');
+
+    Route::get('notifications', [NotificationController::class, 'index'])->middleware('check.permission:admin.notifications.index')->name('admin.notifications.index');
+    Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount'])->middleware('check.permission:admin.notifications.index')->name('admin.notifications.unread-count');
+    Route::patch('notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead'])->middleware('check.permission:admin.notifications.index')->name('admin.notifications.mark-read');
+    Route::patch('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->middleware('check.permission:admin.notifications.index')->name('admin.notifications.mark-all-read');
 });
 
 Route::middleware(['set.locale'])->group(function () {

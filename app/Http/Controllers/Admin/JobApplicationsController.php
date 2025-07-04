@@ -15,7 +15,7 @@ class JobApplicationsController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $jobApplications = JobApplication::where('job_posting_id', $jobPosting->id)->latest();
+        $jobApplications = JobApplication::with('cv')->where('job_posting_id', $jobPosting->id)->latest();
 
         if ($search) {
             $jobApplications->where(function($query) use ($search) {
@@ -77,7 +77,7 @@ class JobApplicationsController extends Controller
      */
     public function show(JobApplication $jobApplication)
     {
-        $jobApplication->load(['jobPosting', 'education', 'experiences', 'languages']);
+        $jobApplication->load(['jobPosting', 'education', 'experiences', 'languages', 'cv']);
 
         return inertia('JobApplications/Show', [
             'jobApplication' => $jobApplication,

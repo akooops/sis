@@ -18,6 +18,7 @@ use App\Models\VisitService;
 use App\Models\VisitTimeSlot;
 use App\Services\FileService;
 use App\Services\IndexService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -25,10 +26,12 @@ use Illuminate\Support\Str;
 class JobApplicationsController extends Controller
 {
     protected $fileService;
+    protected $notificationService;
 
-    public function __construct(FileService $fileService)
+    public function __construct(FileService $fileService, NotificationService $notificationService)
     {
         $this->fileService = $fileService;
+        $this->notificationService = $notificationService;
     }
 
     public function validateApplication(ValidateJobApplicationStepRequest $request)
@@ -91,6 +94,9 @@ class JobApplicationsController extends Controller
                 true
             );
         }
+
+        // Create notification
+        $this->notificationService->createJobApplicationNotification($application);
 
         return response()->json([
                 'status' => 'success',

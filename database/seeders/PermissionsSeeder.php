@@ -173,6 +173,12 @@ class PermissionsSeeder extends Seeder
             'admin.settings.show',
             'admin.settings.edit',
             'admin.settings.update',
+
+            // Notifications Management
+            'admin.notifications.index',
+            'admin.notifications.unread-count',
+            'admin.notifications.mark-read',
+            'admin.notifications.mark-all-read',
         ];
 
         // Create permissions
