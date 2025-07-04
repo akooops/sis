@@ -97,329 +97,312 @@
 <AdminLayout {breadcrumbs} {pageTitle}>
     <!-- Container -->
     <div class="kt-container-fixed">
-        <div class="grid gap-5 lg:gap-7.5">
-            <!-- Job Application Header -->
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Application Details</h1>
-                    <p class="text-sm text-secondary-foreground">
-                        {jobApplication?.first_name} {jobApplication?.last_name} - {jobApplication?.job_posting?.getLocalTranslation?.('title') || jobApplication?.job_posting?.name}
-                    </p>
-                </div>
-                <div class="flex items-center gap-3">
-                    {#if jobApplication?.ai_score}
-                        <span class="kt-badge {getAiScoreBadgeClass(jobApplication.ai_score)}">
-                            AI Score: {getAiScoreText(jobApplication.ai_score)}
-                        </span>
-                    {/if}
-                    <a href="{route('admin.job-applications.index', { jobPosting: jobApplication?.job_posting?.id })}" class="kt-btn kt-btn-outline">
-                        <i class="ki-filled ki-arrow-left text-base"></i>
-                        Back to Applications
-                    </a>
-                </div>
+        <!-- Job Application Header -->
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="flex flex-col gap-1">
+                <h1 class="text-2xl font-bold text-mono">Job Application Information</h1>
+                <p class="text-sm text-secondary-foreground">
+                    View job application details
+                </p>
             </div>
-
-            <!-- Personal Information Card -->
-            <div class="kt-card">
-                <div class="kt-card-header">
-                    <h4 class="kt-card-title">Personal Information</h4>
-                </div>
-                <div class="kt-card-content">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="grid gap-4">
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Full Name</h4>
-                                <p class="text-sm text-secondary-foreground">
-                                    {jobApplication?.first_name} {jobApplication?.last_name}
-                                </p>
-                            </div>
-
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Email Address</h4>
-                                <a href="mailto:{jobApplication?.email}" class="text-sm text-primary hover:text-primary-dark">
-                                    {jobApplication?.email}
-                                </a>
-                            </div>
-
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Phone Number</h4>
-                                <a href="tel:{jobApplication?.phone}" class="text-sm text-primary hover:text-primary-dark">
-                                    {jobApplication?.phone}
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="grid gap-4">
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Nationality</h4>
-                                <p class="text-sm text-secondary-foreground">{jobApplication?.nationality}</p>
-                            </div>
-
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Address</h4>
-                                <p class="text-sm text-secondary-foreground">{jobApplication?.address}</p>
-                            </div>
-
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Application Date</h4>
-                                <p class="text-sm text-secondary-foreground">
-                                    {jobApplication?.created_at ? new Date(jobApplication.created_at).toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    }) : 'N/A'}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="flex items-center gap-3">
+                <a href="{route('admin.job-applications.index', { jobPosting: jobApplication?.job_posting?.id })}" class="kt-btn kt-btn-outline">
+                    <i class="ki-filled ki-arrow-left text-base"></i>
+                    Back to applications
+                </a>
             </div>
+        </div>
 
-            <!-- Education Background Card -->
-            <div class="kt-card">
-                <div class="kt-card-header">
-                    <h4 class="kt-card-title">Education Background</h4>
-                </div>
-                <div class="kt-card-content">
-                    {#if jobApplication?.education && jobApplication.education.length > 0}
-                        <div class="kt-scrollable-x-auto">
-                            <table class="kt-table kt-table-border">
-                                <thead>
-                                    <tr>
-                                        <th>Institution</th>
-                                        <th>Degree</th>
-                                        <th>Field of Study</th>
-                                        <th>Duration</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {#each jobApplication.education as education}
+        <div class="mt-5">
+            <!-- begin: grid -->
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 lg:gap-7.5">
+                <!-- Left Sidebar -->
+                <div class="col-span-1">
+                    <div class="grid gap-5 lg:gap-7.5">
+                        <!-- Personal Information Card -->
+                        <div class="kt-card">
+                            <div class="kt-card-header">
+                                <h3 class="kt-card-title">About</h3>
+                            </div>
+                            <div class="kt-card-content pt-4 pb-3">
+                                <table class="kt-table-auto">
+                                    <tbody>
                                         <tr>
-                                            <td>
-                                                <h6 class="text-sm font-medium text-mono mb-1">{education.institution}</h6>
-                                            </td>
-                                            <td>
-                                                <span class="text-sm text-secondary-foreground">{education.degree}</span>
-                                            </td>
-                                            <td>
-                                                <span class="text-sm text-secondary-foreground">{education.field_of_study}</span>
-                                            </td>
-                                            <td>
-                                                <span class="kt-badge kt-badge-outline kt-badge-primary">
-                                                    {education.start_year} - {education.end_year}
-                                                </span>
+                                            <td class="text-sm text-secondary-foreground pb-3.5 pe-3">Email:</td>
+                                            <td class="text-sm text-mono pb-3.5">
+                                                <a href="mailto:{jobApplication?.email}" class="text-primary hover:text-primary-dark">
+                                                    {jobApplication?.email || 'N/A'}
+                                                </a>
                                             </td>
                                         </tr>
-                                        {#if education.description}
-                                            <tr>
-                                                <td colspan="4">
-                                                    <small class="text-sm text-secondary-foreground">{education.description}</small>
-                                                </td>
-                                            </tr>
-                                        {/if}
-                                    {/each}
-                                </tbody>
-                            </table>
-                        </div>
-                    {:else}
-                        <div class="text-center py-8">
-                            <p class="text-sm text-secondary-foreground">No education information provided</p>
-                        </div>
-                    {/if}
-                </div>
-            </div>
-
-            <!-- Work Experience Card -->
-            <div class="kt-card">
-                <div class="kt-card-header">
-                    <h4 class="kt-card-title">Work Experience</h4>
-                </div>
-                <div class="kt-card-content">
-                    {#if jobApplication?.experiences && jobApplication.experiences.length > 0}
-                        <div class="kt-scrollable-x-auto">
-                            <table class="kt-table kt-table-border">
-                                <thead>
-                                    <tr>
-                                        <th>Position</th>
-                                        <th>Company</th>
-                                        <th>Duration</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {#each jobApplication.experiences as experience}
                                         <tr>
-                                            <td>
-                                                <h6 class="text-sm font-medium text-mono mb-1">{experience.job_title}</h6>
-                                            </td>
-                                            <td>
-                                                <span class="text-sm text-secondary-foreground">{experience.company_name}</span>
-                                            </td>
-                                            <td>
-                                                <span class="kt-badge kt-badge-outline kt-badge-primary">
-                                                    {experience.start_year} - {experience.is_current ? 'Present' : experience.end_year}
-                                                    ({calculateYears(experience.start_year, experience.end_year, experience.is_current)})
-                                                </span>
-                                            </td>
-                                            <td>
-                                                {#if experience.is_current}
-                                                    <span class="kt-badge kt-badge-success">Current</span>
-                                                {:else}
-                                                    <span class="kt-badge kt-badge-secondary">Previous</span>
-                                                {/if}
+                                            <td class="text-sm text-secondary-foreground pb-3.5 pe-3">Phone:</td>
+                                            <td class="text-sm text-mono pb-3.5">
+                                                <a href="tel:{jobApplication?.phone}" class="text-primary hover:text-primary-dark">
+                                                    {jobApplication?.phone || 'N/A'}
+                                                </a>
                                             </td>
                                         </tr>
-                                        {#if experience.description}
-                                            <tr>
-                                                <td colspan="4">
-                                                    <small class="text-sm text-secondary-foreground">{experience.description}</small>
-                                                </td>
-                                            </tr>
-                                        {/if}
-                                    {/each}
-                                </tbody>
-                            </table>
-                        </div>
-                    {:else}
-                        <div class="text-center py-8">
-                            <p class="text-sm text-secondary-foreground">No work experience provided</p>
-                        </div>
-                    {/if}
-                </div>
-            </div>
-
-            <!-- Languages & Skills Card -->
-            <div class="kt-card">
-                <div class="kt-card-header">
-                    <h4 class="kt-card-title">Languages & Skills</h4>
-                </div>
-                <div class="kt-card-content">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Languages Section -->
-                        <div>
-                            <h5 class="text-sm font-semibold text-mono mb-4">Languages</h5>
-                            {#if jobApplication?.languages && jobApplication.languages.length > 0}
-                                <div class="kt-scrollable-x-auto">
-                                    <table class="kt-table kt-table-border">
-                                        <tbody>
-                                            {#each jobApplication.languages as language}
-                                                <tr>
-                                                    <td>
-                                                        <span class="text-sm text-secondary-foreground">{language.name}</span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="kt-badge {getLanguageProficiencyBadgeClass(language.proficiency)}">
-                                                            {getLanguageProficiencyText(language.proficiency)}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            {/each}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            {:else}
-                                <p class="text-sm text-secondary-foreground">No languages specified</p>
-                            {/if}
+                                        <tr>
+                                            <td class="text-sm text-secondary-foreground pb-3.5 pe-3">Nationality:</td>
+                                            <td class="text-sm text-mono pb-3.5">{jobApplication?.nationality || 'N/A'}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-sm text-secondary-foreground pb-3.5 pe-3">Address:</td>
+                                            <td class="text-sm text-mono pb-3.5">{jobApplication?.address || 'N/A'}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-sm text-secondary-foreground pb-3.5 pe-3">Applied:</td>
+                                            <td class="text-sm text-mono pb-3.5">
+                                                {jobApplication?.created_at ? new Date(jobApplication.created_at).toLocaleDateString('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                }) : 'N/A'}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
-                        <!-- Skills Section -->
-                        <div>
-                            <h5 class="text-sm font-semibold text-mono mb-4">Skills</h5>
-                            {#if getSkillsArray(jobApplication?.skills).length > 0}
-                                <div class="flex flex-wrap gap-2">
-                                    {#each getSkillsArray(jobApplication?.skills) as skill}
-                                        <span class="kt-badge kt-badge-primary">{skill}</span>
-                                    {/each}
-                                </div>
-                            {:else}
-                                <p class="text-sm text-secondary-foreground">No skills specified</p>
-                            {/if}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Documents & Additional Information Card -->
-            <div class="kt-card">
-                <div class="kt-card-header">
-                    <h4 class="kt-card-title">Documents & Additional Information</h4>
-                </div>
-                <div class="kt-card-content">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- CV/Resume Section -->
-                        <div>
-                            <h5 class="text-sm font-semibold text-mono mb-4">CV/Resume</h5>
-                            {#if jobApplication?.cv}
-                                <div class="flex items-center p-4 border border-border rounded-lg">
-                                    <div class="flex-shrink-0">
-                                        <i class="ki-filled ki-file text-danger text-2xl"></i>
+                        <!-- Work Experience Card -->
+                        <div class="kt-card">
+                            <div class="kt-card-header">
+                                <h3 class="kt-card-title">Work Experience</h3>
+                            </div>
+                            <div class="kt-card-content">
+                                {#if jobApplication?.experiences && jobApplication.experiences.length > 0}
+                                    <div class="grid gap-y-5">
+                                        {#each jobApplication.experiences as experience, index}
+                                            <div class="flex align-start gap-3.5">
+                                                <div class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                    <i class="ki-filled ki-briefcase text-lg text-primary"></i>
+                                                </div>
+                                                <div class="flex flex-col gap-1">
+                                                    <a class="text-sm font-medium text-primary leading-none hover:text-primary" href="#">
+                                                        {experience.company_name}
+                                                    </a>
+                                                    <span class="text-sm font-medium text-mono">
+                                                        {experience.job_title}
+                                                    </span>
+                                                    <span class="text-xs text-secondary-foreground leading-none">
+                                                        {experience.start_year} - {experience.is_current ? 'Present' : experience.end_year}
+                                                        ({calculateYears(experience.start_year, experience.end_year, experience.is_current)})
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {#if index < jobApplication.experiences.length - 1}
+                                                <div class="text-secondary-foreground font-semibold text-sm leading-none">
+                                                    Previous Jobs
+                                                </div>
+                                            {/if}
+                                        {/each}
                                     </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <h6 class="text-sm font-medium text-mono mb-1">CV/Resume</h6>
-                                        <p class="text-xs text-secondary-foreground">
-                                            Uploaded: {jobApplication?.created_at ? new Date(jobApplication.created_at).toLocaleDateString('en-US', {
-                                                year: 'numeric',
-                                                month: 'short',
-                                                day: 'numeric'
-                                            }) : 'N/A'}
-                                        </p>
-                                    </div>
-                                    <div class="flex-shrink-0">
-                                        <a href={jobApplication.cv?.url} target="_blank" class="kt-btn kt-btn-sm kt-btn-outline kt-btn-primary">
-                                            <i class="ki-filled ki-download text-xs"></i>
-                                            Download
-                                        </a>
-                                    </div>
-                                </div>
-                            {:else}
-                                <p class="text-sm text-secondary-foreground">No CV uploaded</p>
-                            {/if}
-                        </div>
-
-                        <!-- Application Analytics Section -->
-                        <div>
-                            <h5 class="text-sm font-semibold text-mono mb-4">Application Analytics</h5>
-                            <div class="border border-border rounded-lg p-4">
-                                {#if jobApplication?.ai_score}
-                                    <div class="flex justify-between items-center mb-3">
-                                        <span class="text-sm text-secondary-foreground">AI Score:</span>
-                                        <span class="kt-badge {getAiScoreBadgeClass(jobApplication.ai_score)}">
-                                            {getAiScoreText(jobApplication.ai_score)}
-                                        </span>
-                                    </div>
-                                    {#if jobApplication?.ai_scored_at}
-                                        <small class="text-xs text-secondary-foreground">
-                                            Scored: {new Date(jobApplication.ai_scored_at).toLocaleDateString('en-US', {
-                                                year: 'numeric',
-                                                month: 'short',
-                                                day: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            })}
-                                        </small>
-                                    {/if}
                                 {:else}
-                                    <p class="text-sm text-secondary-foreground mb-0">AI scoring pending</p>
+                                    <div class="text-center py-4">
+                                        <p class="text-sm text-secondary-foreground">No work experience provided</p>
+                                    </div>
                                 {/if}
-                                
-                                <div class="mt-3">
-                                    <small class="text-xs text-secondary-foreground">
-                                        Applied: {jobApplication?.created_at ? new Date(jobApplication.created_at).toLocaleDateString('en-US', {
-                                            year: 'numeric',
-                                            month: 'short',
-                                            day: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        }) : 'N/A'}
-                                    </small>
+                            </div>
+                        </div>
+
+                        <!-- Skills Card -->
+                        <div class="kt-card">
+                            <div class="kt-card-header">
+                                <h3 class="kt-card-title">Skills</h3>
+                            </div>
+                            <div class="kt-card-content">
+                                {#if getSkillsArray(jobApplication?.skills).length > 0}
+                                    <div class="flex flex-wrap gap-2.5 mb-2">
+                                        {#each getSkillsArray(jobApplication?.skills) as skill}
+                                            <span class="kt-badge kt-badge-outline">{skill}</span>
+                                        {/each}
+                                    </div>
+                                {:else}
+                                    <p class="text-sm text-secondary-foreground">No skills specified</p>
+                                {/if}
+                            </div>
+                        </div>
+
+                        <!-- Documents Card -->
+                        <div class="kt-card">
+                            <div class="kt-card-header">
+                                <h3 class="kt-card-title">Documents</h3>
+                            </div>
+                            <div class="kt-card-content">
+                                {#if jobApplication?.cv}
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center grow gap-2.5">
+                                            <i class="ki-filled ki-files text-lg text-primary"></i>
+                                            <div class="flex flex-col">
+                                                <span class="text-sm font-medium text-mono cursor-pointer hover:text-primary mb-px">
+                                                    {jobApplication.cv?.original_name}
+                                                </span>
+
+                                                <span class="text-xs text-secondary-foreground">
+                                                    Uploaded: {jobApplication?.created_at ? new Date(jobApplication.created_at).toLocaleDateString('en-US', {
+                                                        year: 'numeric',
+                                                        month: 'short',
+                                                        day: 'numeric'
+                                                    }) : 'N/A'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="kt-menu" data-kt-menu="true">
+                                            <div class="kt-menu-item kt-menu-item-dropdown" data-kt-menu-item-offset="0, 10px" data-kt-menu-item-placement="bottom-end" data-kt-menu-item-placement-rtl="bottom-start" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click">
+                                                <button class="kt-menu-toggle kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+                                                    <i class="ki-filled ki-dots-vertical text-lg"></i>
+                                                </button>
+                                                <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
+                                                    <div class="kt-menu-item">
+                                                        <a class="kt-menu-link" href={jobApplication.cv?.url} target="_blank">
+                                                            <span class="kt-menu-icon">
+                                                                <i class="ki-filled ki-document"></i>
+                                                            </span>
+                                                            <span class="kt-menu-title">Download</span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {:else}
+                                    <p class="text-sm text-secondary-foreground">No documents uploaded</p>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Area -->
+                <div class="col-span-2">
+                    <div class="flex flex-col gap-5 lg:gap-7.5">
+                        <!-- Header Card -->
+                        <div class="kt-card">
+                            <div class="kt-card-content px-10 py-7.5 lg:pe-12.5">
+                                <div class="flex flex-wrap md:flex-nowrap items-center gap-6 md:gap-10">
+                                    <div class="flex flex-col gap-3">
+                                        <h2 class="text-xl font-semibold text-mono">
+                                            {jobApplication?.first_name} {jobApplication?.last_name}
+                                            <br>
+                                            <span class="text-lg text-secondary-foreground">
+                                                {jobApplication?.job_posting?.getLocalTranslation?.('title') || jobApplication?.job_posting?.name}
+                                            </span>
+                                        </h2>
+                                        {#if jobApplication?.ai_score}
+                                            <div class="flex items-center gap-2">
+                                                <span class="kt-badge {getAiScoreBadgeClass(jobApplication.ai_score)}">
+                                                    AI Score: {getAiScoreText(jobApplication.ai_score)}
+                                                </span>
+                                            </div>
+                                        {/if}
+                                    </div>
+                                    <div class="flex-shrink-0">
+                                        <div class="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <i class="ki-filled ki-profile-user text-4xl text-primary"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Education Background Card -->
+                        <div class="kt-card">
+                            <div class="kt-card-header">
+                                <h3 class="kt-card-title">Education Background</h3>
+                            </div>
+                            <div class="kt-card-content">
+                                {#if jobApplication?.education && jobApplication.education.length > 0}
+                                    <div class="kt-scrollable-x-auto">
+                                        <table class="kt-table kt-table-border">
+                                            <thead>
+                                                <tr>
+                                                    <th>Institution</th>
+                                                    <th>Degree</th>
+                                                    <th>Field of Study</th>
+                                                    <th>Duration</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {#each jobApplication.education as education}
+                                                    <tr>
+                                                        <td>
+                                                            <h6 class="text-sm font-medium text-mono mb-1">{education.institution}</h6>
+                                                        </td>
+                                                        <td>
+                                                            <span class="text-sm text-secondary-foreground">{education.degree}</span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="text-sm text-secondary-foreground">{education.field_of_study}</span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="kt-badge kt-badge-outline kt-badge-primary">
+                                                                {education.start_year} - {education.end_year}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                    {#if education.description}
+                                                        <tr>
+                                                            <td colspan="4">
+                                                                <small class="text-sm text-secondary-foreground">{education.description}</small>
+                                                            </td>
+                                                        </tr>
+                                                    {/if}
+                                                {/each}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {:else}
+                                    <div class="text-center py-8">
+                                        <p class="text-sm text-secondary-foreground">No education information provided</p>
+                                    </div>
+                                {/if}
+                            </div>
+                        </div>
+
+                        <!-- Languages & Skills Card -->
+                        <div class="kt-card">
+                            <div class="kt-card-header">
+                                <h3 class="kt-card-title">Languages & Skills</h3>
+                            </div>
+                            <div class="kt-card-content">
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <!-- Languages Section -->
+                                    <div>
+                                        <h5 class="text-sm font-semibold text-mono mb-4">Languages</h5>
+                                        {#if jobApplication?.languages && jobApplication.languages.length > 0}
+                                            <div class="kt-scrollable-x-auto">
+                                                <table class="kt-table kt-table-border">
+                                                    <tbody>
+                                                        {#each jobApplication.languages as language}
+                                                            <tr>
+                                                                <td>
+                                                                    <span class="text-sm text-secondary-foreground">{language.name}</span>
+                                                                </td>
+                                                                <td>
+                                                                    <span class="kt-badge {getLanguageProficiencyBadgeClass(language.proficiency)}">
+                                                                        {getLanguageProficiencyText(language.proficiency)}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        {/each}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        {:else}
+                                            <p class="text-sm text-secondary-foreground">No languages specified</p>
+                                        {/if}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- end: grid -->
         </div>
     </div>
 </AdminLayout> 
