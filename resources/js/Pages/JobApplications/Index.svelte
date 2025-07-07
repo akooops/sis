@@ -1,6 +1,7 @@
 <script>
     import AdminLayout from '../Layouts/AdminLayout.svelte';
     import Pagination from '../Components/Pagination.svelte';
+    import Select2 from '../Components/Forms/Select2.svelte';
     import { onMount, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
 
@@ -34,6 +35,22 @@
     let currentPage = 1;
     let searchTimeout;
     let aiScoreFilter = '';
+    let showFilters = false;
+
+    // Filter variables
+    let educationInstitution = '';
+    let educationDegree = '';
+    let educationField = '';
+    let educationStartYear = '';
+    let educationEndYear = '';
+    let workCompany = '';
+    let workTitle = '';
+    let workStartYear = '';
+    let workEndYear = '';
+    let languageName = '';
+    let languageProficiency = '';
+    let nationality = '';
+    let skills = '';
 
     // Fetch applications data
     async function fetchApplications() {
@@ -47,6 +64,53 @@
             
             if (aiScoreFilter) {
                 params.append('ai_score_min', aiScoreFilter);
+            }
+
+            // Add education filters
+            if (educationInstitution) {
+                params.append('education_institution', educationInstitution);
+            }
+            if (educationDegree) {
+                params.append('education_degree', educationDegree);
+            }
+            if (educationField) {
+                params.append('education_field', educationField);
+            }
+            if (educationStartYear) {
+                params.append('education_start_year', educationStartYear);
+            }
+            if (educationEndYear) {
+                params.append('education_end_year', educationEndYear);
+            }
+
+            // Add work experience filters
+            if (workCompany) {
+                params.append('work_company', workCompany);
+            }
+            if (workTitle) {
+                params.append('work_title', workTitle);
+            }
+            if (workStartYear) {
+                params.append('work_start_year', workStartYear);
+            }
+            if (workEndYear) {
+                params.append('work_end_year', workEndYear);
+            }
+
+            // Add language filters
+            if (languageName) {
+                params.append('language_name', languageName);
+            }
+            if (languageProficiency) {
+                params.append('language_proficiency', languageProficiency);
+            }
+
+            // Add personal filters
+            if (nationality) {
+                params.append('nationality', nationality);
+            }
+            if (skills) {
+                params.append('skills', skills);
             }
 
             const response = await fetch(route('admin.job-applications.index', {
@@ -99,6 +163,72 @@
         currentPage = 1;
         fetchApplications();
     }
+
+    // Handle filter changes
+    function handleFilterChange() {
+        currentPage = 1;
+        fetchApplications();
+    }
+
+    // Clear all filters
+    function clearAllFilters() {
+        educationInstitution = '';
+        educationDegree = '';
+        educationField = '';
+        educationStartYear = '';
+        educationEndYear = '';
+        workCompany = '';
+        workTitle = '';
+        workStartYear = '';
+        workEndYear = '';
+        languageName = '';
+        languageProficiency = '';
+        nationality = '';
+        skills = '';
+        aiScoreFilter = '';
+        currentPage = 1;
+        fetchApplications();
+    }
+
+    // Toggle filters visibility
+    function toggleFilters() {
+        showFilters = !showFilters;
+    }
+
+    // Reactive export URL that updates when filters change
+    $: {
+        const params = new URLSearchParams();
+        
+        if (search) params.append('search', search);
+        if (aiScoreFilter) params.append('ai_score_min', aiScoreFilter);
+        
+        // Add education filters
+        if (educationInstitution) params.append('education_institution', educationInstitution);
+        if (educationDegree) params.append('education_degree', educationDegree);
+        if (educationField) params.append('education_field', educationField);
+        if (educationStartYear) params.append('education_start_year', educationStartYear);
+        if (educationEndYear) params.append('education_end_year', educationEndYear);
+        
+        // Add work experience filters
+        if (workCompany) params.append('work_company', workCompany);
+        if (workTitle) params.append('work_title', workTitle);
+        if (workStartYear) params.append('work_start_year', workStartYear);
+        if (workEndYear) params.append('work_end_year', workEndYear);
+        
+        // Add language filters
+        if (languageName) params.append('language_name', languageName);
+        if (languageProficiency) params.append('language_proficiency', languageProficiency);
+        
+        // Add personal filters
+        if (nationality) params.append('nationality', nationality);
+        if (skills) params.append('skills', skills);
+        
+        const baseUrl = route('admin.job-applications.export', { jobPosting: jobPosting.id });
+        exportUrl = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+    }
+
+    // Export URL variable
+    let exportUrl = route('admin.job-applications.export', { jobPosting: jobPosting.id });
 
     // Handle pagination
     function goToPage(page) {
@@ -224,7 +354,7 @@
                         Back to Jobs
                     </a>
 
-                    <a href="{route('admin.job-applications.export', jobPosting?.id)}" class="kt-btn kt-btn-success">
+                    <a href="{exportUrl}" class="kt-btn kt-btn-success">
                         <i class="ki-filled ki-download text-base"></i>
                         Export CSV
                     </a>
@@ -258,9 +388,337 @@
                                 <option value="6">6+ Score</option>
                                 <option value="5">5+ Score</option>
                             </select>
+                            
+                            <!-- Filter Toggle Button -->
+                            <button 
+                                class="kt-btn kt-btn-outline"
+                                on:click={toggleFilters}
+                            >
+                                <i class="ki-filled ki-filter text-sm"></i>
+                                {showFilters ? 'Hide Filters' : 'Show Filters'}
+                            </button>
+                            
+                            <!-- Clear Filters Button -->
+                            {#if educationInstitution || educationDegree || educationField || educationStartYear || educationEndYear || workCompany || workTitle || workStartYear || workEndYear || languageName || languageProficiency || nationality || skills}
+                                <button 
+                                    class="kt-btn kt-btn-ghost kt-btn-sm"
+                                    on:click={clearAllFilters}
+                                >
+                                    <i class="ki-filled ki-cross text-sm"></i>
+                                    Clear All
+                                </button>
+                            {/if}
                         </div>
                     </div>
                 </div>
+                
+                <!-- Advanced Filters Section -->
+                {#if showFilters}
+                    <div class="kt-card-body border-t border-gray-200 p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            <!-- Education Filters -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-medium text-gray-700">Education</h4>
+                                
+                                <!-- Education Institution -->
+                                <div class="w-full">
+                                    <Select2
+                                        id="education-institution"
+                                        placeholder="Institution..."
+                                        bind:value={educationInstitution}
+                                        on:select={(e) => { educationInstitution = e.detail.value; handleFilterChange(); }}
+                                        on:clear={() => { educationInstitution = ''; handleFilterChange(); }}
+                                        data={[]}
+                                        ajax={{
+                                            url: route('admin.job-applications.filters.education-institutions', { jobPosting: jobPosting.id }),
+                                            dataType: 'json',
+                                            delay: 300,
+                                            data: function(params) {
+                                                return {
+                                                    search: params.term
+                                                };
+                                            },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.results || []
+                                                };
+                                            },
+                                            cache: true
+                                        }}
+                                    />
+                                </div>
+                                
+                                <!-- Education Degree -->
+                                <div class="w-full">
+                                    <Select2
+                                        id="education-degree"
+                                        placeholder="Degree..."
+                                        bind:value={educationDegree}
+                                        on:select={(e) => { educationDegree = e.detail.value; handleFilterChange(); }}
+                                        on:clear={() => { educationDegree = ''; handleFilterChange(); }}
+                                        data={[]}
+                                        ajax={{
+                                            url: route('admin.job-applications.filters.education-degrees', { jobPosting: jobPosting.id }),
+                                            dataType: 'json',
+                                            delay: 300,
+                                            data: function(params) {
+                                                return {
+                                                    search: params.term
+                                                };
+                                            },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.results || []
+                                                };
+                                            },
+                                            cache: true
+                                        }}
+                                    />
+                                </div>
+                                
+                                <!-- Education Field -->
+                                <div class="w-full">
+                                    <Select2
+                                        id="education-field"
+                                        placeholder="Field of Study..."
+                                        bind:value={educationField}
+                                        on:select={(e) => { educationField = e.detail.value; handleFilterChange(); }}
+                                        on:clear={() => { educationField = ''; handleFilterChange(); }}
+                                        data={[]}
+                                        ajax={{
+                                            url: route('admin.job-applications.filters.education-fields', { jobPosting: jobPosting.id }),
+                                            dataType: 'json',
+                                            delay: 300,
+                                            data: function(params) {
+                                                return {
+                                                    search: params.term
+                                                };
+                                            },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.results || []
+                                                };
+                                            },
+                                            cache: true
+                                        }}
+                                    />
+                                </div>
+                                
+                                <!-- Education Years -->
+                                <div class="flex gap-2">
+                                    <input 
+                                        type="number" 
+                                        class="kt-input flex-1" 
+                                        placeholder="Start Year" 
+                                        bind:value={educationStartYear}
+                                        on:input={handleFilterChange}
+                                        min="1970"
+                                        max="2030"
+                                    />
+                                    <input 
+                                        type="number" 
+                                        class="kt-input flex-1" 
+                                        placeholder="End Year" 
+                                        bind:value={educationEndYear}
+                                        on:input={handleFilterChange}
+                                        min="1970"
+                                        max="2030"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <!-- Work Experience Filters -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-medium text-gray-700">Work Experience</h4>
+                                
+                                <!-- Work Company -->
+                                <div class="w-full">
+                                    <Select2
+                                        id="work-company"
+                                        placeholder="Company..."
+                                        bind:value={workCompany}
+                                        on:select={(e) => { workCompany = e.detail.value; handleFilterChange(); }}
+                                        on:clear={() => { workCompany = ''; handleFilterChange(); }}
+                                        data={[]}
+                                        ajax={{
+                                            url: route('admin.job-applications.filters.work-companies', { jobPosting: jobPosting.id }),
+                                            dataType: 'json',
+                                            delay: 300,
+                                            data: function(params) {
+                                                return {
+                                                    search: params.term
+                                                };
+                                            },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.results || []
+                                                };
+                                            },
+                                            cache: true
+                                        }}
+                                    />
+                                </div>
+                                
+                                <!-- Work Title -->
+                                <div class="w-full">
+                                    <Select2
+                                        id="work-title"
+                                        placeholder="Job Title..."
+                                        bind:value={workTitle}
+                                        on:select={(e) => { workTitle = e.detail.value; handleFilterChange(); }}
+                                        on:clear={() => { workTitle = ''; handleFilterChange(); }}
+                                        data={[]}
+                                        ajax={{
+                                            url: route('admin.job-applications.filters.work-titles', { jobPosting: jobPosting.id }),
+                                            dataType: 'json',
+                                            delay: 300,
+                                            data: function(params) {
+                                                return {
+                                                    search: params.term
+                                                };
+                                            },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.results || []
+                                                };
+                                            },
+                                            cache: true
+                                        }}
+                                    />
+                                </div>
+                                
+                                <!-- Work Years -->
+                                <div class="flex gap-2">
+                                    <input 
+                                        type="number" 
+                                        class="kt-input flex-1" 
+                                        placeholder="Start Year" 
+                                        bind:value={workStartYear}
+                                        on:input={handleFilterChange}
+                                        min="1970"
+                                        max="2030"
+                                    />
+                                    <input 
+                                        type="number" 
+                                        class="kt-input flex-1" 
+                                        placeholder="End Year" 
+                                        bind:value={workEndYear}
+                                        on:input={handleFilterChange}
+                                        min="1970"
+                                        max="2030"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <!-- Language Filters -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-medium text-gray-700">Languages</h4>
+                                
+                                <!-- Language Name -->
+                                <div class="w-full">
+                                    <Select2
+                                        id="language-name"
+                                        placeholder="Language..."
+                                        bind:value={languageName}
+                                        on:select={(e) => { languageName = e.detail.value; handleFilterChange(); }}
+                                        on:clear={() => { languageName = ''; handleFilterChange(); }}
+                                        data={[]}
+                                        ajax={{
+                                            url: route('admin.job-applications.filters.languages', { jobPosting: jobPosting.id }),
+                                            dataType: 'json',
+                                            delay: 300,
+                                            data: function(params) {
+                                                return {
+                                                    search: params.term
+                                                };
+                                            },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.results || []
+                                                };
+                                            },
+                                            cache: true
+                                        }}
+                                    />
+                                </div>
+                                
+                                <!-- Language Proficiency -->
+                                <select 
+                                    class="kt-select w-full" 
+                                    bind:value={languageProficiency}
+                                    on:change={handleFilterChange}
+                                >
+                                    <option value="">All Proficiency</option>
+                                    <option value="basic">Basic</option>
+                                    <option value="intermediate">Intermediate</option>
+                                    <option value="advanced">Advanced</option>
+                                    <option value="native">Native</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Personal Filters -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-medium text-gray-700">Personal</h4>
+                                
+                                <!-- Nationality -->
+                                <div class="w-full">
+                                    <Select2
+                                        id="nationality"
+                                        placeholder="Nationality..."
+                                        bind:value={nationality}
+                                        on:select={(e) => { nationality = e.detail.value; handleFilterChange(); }}
+                                        on:clear={() => { nationality = ''; handleFilterChange(); }}
+                                        data={[]}
+                                        ajax={{
+                                            url: route('admin.job-applications.filters.nationalities', { jobPosting: jobPosting.id }),
+                                            dataType: 'json',
+                                            delay: 300,
+                                            data: function(params) {
+                                                return {
+                                                    search: params.term
+                                                };
+                                            },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.results || []
+                                                };
+                                            },
+                                            cache: true
+                                        }}
+                                    />
+                                </div>
+                                
+                                <!-- Skills -->
+                                <div class="w-full">
+                                    <Select2
+                                        id="skills"
+                                        placeholder="Skills..."
+                                        bind:value={skills}
+                                        on:select={(e) => { skills = e.detail.value; handleFilterChange(); }}
+                                        on:clear={() => { skills = ''; handleFilterChange(); }}
+                                        data={[]}
+                                        ajax={{
+                                            url: route('admin.job-applications.filters.skills', { jobPosting: jobPosting.id }),
+                                            dataType: 'json',
+                                            delay: 300,
+                                            data: function(params) {
+                                                return {
+                                                    search: params.term
+                                                };
+                                            },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.results || []
+                                                };
+                                            },
+                                            cache: true
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {/if}
                 
                 <div class="kt-card-content p-0">
                     <div class="kt-scrollable-x-auto">

@@ -271,6 +271,16 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::get('contact-submissions/{contactSubmission}', [ContactSubmissionsController::class, 'show'])->middleware('check.permission:admin.contact-submissions.show')->name('admin.contact-submissions.show');
     Route::delete('contact-submissions/{contactSubmission}', [ContactSubmissionsController::class, 'destroy'])->middleware('check.permission:admin.contact-submissions.destroy')->name('admin.contact-submissions.destroy');
 
+    // Job applications filters
+    Route::get('job-postings/{jobPosting}/job-applications/education-institutions', [JobApplicationsController::class, 'getEducationInstitutions'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.education-institutions');
+    Route::get('job-postings/{jobPosting}/job-applications/education-degrees', [JobApplicationsController::class, 'getEducationDegrees'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.education-degrees');
+    Route::get('job-postings/{jobPosting}/job-applications/education-fields', [JobApplicationsController::class, 'getEducationFields'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.education-fields');
+    Route::get('job-postings/{jobPosting}/job-applications/work-companies', [JobApplicationsController::class, 'getWorkCompanies'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.work-companies');
+    Route::get('job-postings/{jobPosting}/job-applications/work-titles', [JobApplicationsController::class, 'getWorkTitles'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.work-titles');
+    Route::get('job-postings/{jobPosting}/job-applications/languages', [JobApplicationsController::class, 'getLanguages'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.languages');
+    Route::get('job-postings/{jobPosting}/job-applications/nationalities', [JobApplicationsController::class, 'getNationalities'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.nationalities');
+    Route::get('job-postings/{jobPosting}/job-applications/skills', [JobApplicationsController::class, 'getSkills'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.skills');
+    
     // Job postings
     Route::get('job-postings', [JobPostingsController::class, 'index'])->middleware('check.permission:admin.job-postings.index')->name('admin.job-postings.index');
     Route::get('job-postings/create', [JobPostingsController::class, 'create'])->middleware('check.permission:admin.job-postings.store')->name('admin.job-postings.create');
