@@ -140,6 +140,10 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Options',
                 'ar' => 'الإطلاع'
             ],
+            'header_services_nav_link' => [
+                'en' => 'Services', 
+                'ar' => 'الخدمات'
+            ],
             'index_page_fifth_section_cta' => [
                 'en' => 'View more albums',
                 'ar' => 'عرض المزيد من الألبومات'

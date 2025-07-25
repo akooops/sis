@@ -47,6 +47,7 @@ class StoreVisitBookingRequest extends FormRequest
                 'required',
                 'array',
                 'min:1',
+                'max:5',
                 function ($attribute, $value, $fail) {
                     $visitorsCount = request()->input('visitors_count');
                     $studentsCount = count($value);

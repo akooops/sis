@@ -11,6 +11,8 @@
     $instagramUrl = getSetting('social_instagram_url');
     $twitterUrl = getSetting('social_twitter_url');
     $youtubeUrl = getSetting('social_youtube_url');
+    $linkedinUrl = getSetting('social_linkedin_url');
+    $snapchatUrl = getSetting('social_snapchat_url');
 @endphp
 
 <footer>
@@ -107,27 +109,39 @@
                             </h4>
 
                             <nav class="nav social justify-content-center justify-content-start">
-                                @if($facebookUrl)
+                                @if($facebookUrl && !empty($facebookUrl->value))
                                     <a href="{{$facebookUrl->value}}">
                                         <i class="uil uil-facebook-f"></i>
                                     </a>
                                 @endif
 
-                                @if($instagramUrl)
+                                @if($instagramUrl && !empty($instagramUrl->value))
                                     <a href="{{$instagramUrl->value}}">
                                         <i class="uil uil-instagram"></i>
                                     </a>
                                 @endif
 
-                                @if($twitterUrl)
+                                @if($twitterUrl && !empty($twitterUrl->value))
                                     <a href="{{$twitterUrl->value}}">
                                         <i class="uil uil-twitter"></i>
                                     </a>
                                 @endif
 
-                                @if($youtubeUrl)
+                                @if($youtubeUrl && !empty($youtubeUrl->value))
                                     <a href="{{$youtubeUrl->value}}">
                                         <i class="uil uil-youtube"></i>
+                                    </a>
+                                @endif
+
+                                @if($linkedinUrl && !empty($linkedinUrl->value))
+                                    <a href="{{$linkedinUrl->value}}">
+                                        <i class="uil uil-linkedin"></i>
+                                    </a>
+                                @endif
+
+                                @if($snapchatUrl && !empty($snapchatUrl->value))
+                                    <a href="{{$snapchatUrl->value}}">
+                                        <i class="uil uil-snapchat-ghost"></i>
                                     </a>
                                 @endif
                             </nav>

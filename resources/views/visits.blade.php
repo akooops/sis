@@ -169,6 +169,7 @@
                                             <div class="counter-controls">
                                                 <input type="number" 
                                                     min="1" 
+                                                    max="5"
                                                     class="counter-input" 
                                                     v-model="visitorCounts[{{$visitService->id}}]"
                                                     @input="updateVisitorCount({{$visitService->id}})"
@@ -620,8 +621,10 @@ createApp({
         },
 
         incrementVisitors(serviceId) {
-            const currentCount = this.visitorCounts[serviceId] || 1;                        
-            this.visitorCounts[serviceId] = currentCount + 1;
+            const currentCount = this.visitorCounts[serviceId] || 1;  
+            if (currentCount < 5) {
+                this.visitorCounts[serviceId] = currentCount + 1;
+            }
             this.updateVisitorCount(serviceId);
         },
 

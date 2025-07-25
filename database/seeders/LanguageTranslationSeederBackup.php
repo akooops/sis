@@ -53,6 +53,7 @@ class LanguageTranslationSeeder extends Seeder
             'grade_page_table_cta' => ['en' => 'Download', 'ar' => 'التحميل'],
             'grade_page_table_header_file' => ['en' => 'File', 'ar' => 'الملف'],
             'grade_page_table_header_option' => ['en' => 'Options', 'ar' => 'الإطلاع'],
+            'header_services_nav_link' => ['en' => 'Services', 'ar' => 'الخدمات'],
             'index_page_fifth_section_cta' => ['en' => 'View more albums', 'ar' => 'عرض المزيد من الألبومات'],
             'index_page_fifth_section_subtitle' => ['en' => 'Latest albums', 'ar' => 'أحدث الألبومات'],
             'index_page_fifth_section_title' => ['en' => 'Saud international schools ', 'ar' => 'مدارس سعود العالمية'],

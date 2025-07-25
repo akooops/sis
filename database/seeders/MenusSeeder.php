@@ -17,6 +17,10 @@ class MenusSeeder extends Seeder
                 'is_system_menu' => true,
             ],
             [
+                'name' => 'services_menu',
+                'is_system_menu' => true,
+            ],
+            [
                 'name' => 'footer_primary_menu',
                 'is_system_menu' => true,
             ]

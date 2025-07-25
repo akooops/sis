@@ -1,5 +1,6 @@
 @php
-    $menu = getMenu('header_primary_menu');
+    $headerPrimaryMenu = getMenu('header_primary_menu');
+    $servicesMenu = getMenu('services_menu');
 
     $languages = getLanguages();
     $currentLanguage = getCurrentLanguage();
@@ -13,19 +14,20 @@
                     <ul class="navbar-nav rounded bg-white">
                         <li class="nav-item dropdown">
                             <a class="nav-link py-2 text-primary" href="#" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" role="button">
-                                <i class="uil uil-globe"></i>
+                                {{getLanguageKeyLocalTranslation('header_services_nav_link')}}
                             </a>
 
                             <ul class="languages-dropdown dropdown-menu mt-2">
-                                @foreach ($languages as $language)
-                                    @if($language->code != app()->getLocale())
+                                @if($servicesMenu)
+                                    @foreach ($servicesMenu->items as $servicesMenuItem)
                                         <li class="nav-item">
-                                            <a class="dropdown-item" href="{{route('locale.switch', ['locale' => $language->code])}}">
-                                                {{$language->name}}
+                                            <a
+                                                href="{{$servicesMenuItem->url}}">
+                                                {{$servicesMenuItem->getLocalTranslation('title')}}
                                             </a>
                                         </li>
-                                    @endif
-                                @endforeach  
+                                    @endforeach
+                                @endif
                             </ul>
                         </li>
                     </ul>
@@ -94,29 +96,29 @@
 
         <div class="offcanvas-body d-flex flex-column h-100">
             <ul class="navbar-nav">
-                @if($menu)
-                    @foreach ($menu->items as $menuItem)
-                        @if(count($menuItem->children) == 0)
+                @if($headerPrimaryMenu)
+                    @foreach ($headerPrimaryMenu->items as $headerMenuItem)
+                        @if(count($headerMenuItem->children) == 0)
                             <li class="nav-item mt-2">
                                 <a class="nav-link py-0" 
-                                    href="{{$menuItem->url}}">
-                                    {{$menuItem->getLocalTranslation('title')}}
+                                    href="{{$headerMenuItem->url}}">
+                                    {{$headerMenuItem->getLocalTranslation('title')}}
                                 </a>
                             </li>
                         @else
                             <div class="accordion accordion-wrapper">
                                 <div class="accordion-item py-2">
                                     <div class="card-header p-0" >
-                                        <button class="accordion-button collapsed p-0" data-bs-toggle="collapse" data-bs-target="#collapse-menu-item-{{$menuItem->id}}"> 
-                                            {{$menuItem->getLocalTranslation('title')}} 
+                                        <button class="accordion-button collapsed p-0" data-bs-toggle="collapse" data-bs-target="#collapse-menu-item-{{$headerMenuItem->id}}"> 
+                                            {{$headerMenuItem->getLocalTranslation('title')}} 
                                         </button>
                                     </div>
                                     <!--/.card-header -->
-                                    <div id="collapse-menu-item-{{$menuItem->id}}" class="accordion-collapse collapse mt-2">
-                                        @foreach ($menuItem->children as $childMenuItem)
+                                    <div id="collapse-menu-item-{{$headerMenuItem->id}}" class="accordion-collapse collapse mt-2">
+                                        @foreach ($headerMenuItem->children as $childheaderMenuItem)
                                             <a class="nav-link text-wrap py-1" 
-                                            href="{{$childMenuItem->url}}">
-                                            {{$childMenuItem->getLocalTranslation('title')}}
+                                            href="{{$childheaderMenuItem->url}}">
+                                            {{$childheaderMenuItem->getLocalTranslation('title')}}
                                         </a>
                                         @endforeach
                                     </div>

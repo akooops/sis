@@ -85,7 +85,24 @@ class SettingsSeeder extends Seeder
                 'is_encrypted' => false,
                 'options' => null,
             ],
-
+            [
+                'key' => 'social_linkedin_url',
+                'type' => 'text',
+                'value' => '',
+                'description' => 'LinkedIn profile URL',
+                'group' => 'social',
+                'is_encrypted' => false,
+                'options' => null,
+            ],
+            [
+                'key' => 'social_snapchat_url',
+                'type' => 'text',
+                'value' => '',
+                'description' => 'Snapchat profile URL',
+                'group' => 'social',
+                'is_encrypted' => false,
+                'options' => null,
+            ],
             // Index Page CTA Pages
             [
                 'key' => 'index_page_first_section_cta_page',
