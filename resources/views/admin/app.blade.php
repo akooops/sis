@@ -139,7 +139,6 @@
         <script src="/assets/admin/vendors/apexcharts/apexcharts.min.js"></script>
         <script src="/assets/admin/vendors/ktui/ktui.min.js"></script>
         <script src="/assets/admin/vendors/clipboard/clipboard.min.js"></script>
-        <script src="/assets/admin/vendors/prismjs/prismjs.min.js"></script>
         <script src="/assets/admin/vendors/@form-validation/form-validation.bundle.js"></script>
         <!-- jQuery -->
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

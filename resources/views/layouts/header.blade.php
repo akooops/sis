@@ -21,7 +21,7 @@
                                 @if($servicesMenu)
                                     @foreach ($servicesMenu->items as $servicesMenuItem)
                                         <li class="nav-item">
-                                            <a
+                                            <a class="dropdown-item"
                                                 href="{{$servicesMenuItem->url}}">
                                                 {{$servicesMenuItem->getLocalTranslation('title')}}
                                             </a>

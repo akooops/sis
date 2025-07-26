@@ -47,6 +47,9 @@
 
     let textareaElement;
     let summernoteInstance;
+    let isUploading = false;
+    let uploadProgress = 0;
+    let currentUploadFile = '';
 
     // Create event dispatcher
     function createEventDispatcher() {
@@ -110,6 +113,37 @@
                 codeviewFilter: false,
                 codeviewIframeFilter: false,
                 disableDragAndDrop: false,
+                callbacks: {
+                    onImageUpload: async function(files) {
+                        isUploading = true;
+                        uploadProgress = 0;
+                        
+                        for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+                            currentUploadFile = file.name;
+                            try {
+                                uploadProgress = 0;
+                                const imageUrl = await uploadImage(file);
+                                
+                                globalThis.$(textareaElement).summernote('pasteHTML', `<img src="${imageUrl}" alt="${file.name}">`);
+                                
+                                // Small delay between uploads for better UX
+                                if (i < files.length - 1) {
+                                    await new Promise(resolve => setTimeout(resolve, 200));
+                                }
+                            } catch (error) {
+                                console.error('Failed to upload image:', error);
+                                // You could show a user-friendly error message here
+                                alert(`Failed to upload ${file.name}. Please try again.`);
+                            }
+                        }
+                        
+                        currentUploadFile = '';
+                        
+                        isUploading = false;
+                        uploadProgress = 0;
+                    }
+                }
             });
             if (value) {
                 globalThis.$(textareaElement).summernote('code', value);
@@ -149,6 +183,45 @@
             globalThis.$(textareaElement).summernote('destroy');
         }
     });
+
+    // Custom image upload function
+    const uploadImage = async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // Simulate progress for better UX
+        const progressInterval = setInterval(() => {
+            if (uploadProgress < 90) {
+                uploadProgress += Math.random() * 10;
+            }
+        }, 100);
+        
+        try {
+            const response = await fetch(route('admin.files.upload'), {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                }
+            });
+            
+            clearInterval(progressInterval);
+            uploadProgress = 100;
+            
+            if (response.ok) {
+                const result = await response.json();
+                if (result.status === 'success' && result.data && result.data.file) {
+                    return result.data.file.url;
+                }
+            }
+            throw new Error('Upload failed');
+        } catch (error) {
+            clearInterval(progressInterval);
+            console.error('Error uploading image:', error);
+            throw error;
+        }
+    };
 
     // Expose methods for parent components
     export function getValue() {
@@ -215,15 +288,97 @@
     }
 </script>
 
-<textarea 
-    bind:this={textareaElement}
-    {id}
-    {placeholder}
-    {disabled}
-    class="kt-textarea"
-></textarea>
+<div class="kt-summernote-wrapper">
+    <!-- Loading Spinner -->
+    {#if isUploading}
+        <div class="kt-summernote-loading">
+            <div class="kt-summernote-loading-content">
+                <div class="kt-summernote-spinner">
+                    <i class="ki-outline ki-loading text-xl animate-spin"></i>
+                </div>
+                <div class="kt-summernote-loading-text">
+                    {#if currentUploadFile}
+                        Uploading {currentUploadFile}...
+                    {:else}
+                        Uploading image...
+                    {/if}
+                </div>
+                {#if uploadProgress > 0 && uploadProgress < 100}
+                    <div class="kt-summernote-progress">
+                        <div class="kt-summernote-progress-bar" style="width: {uploadProgress}%"></div>
+                    </div>
+                {/if}
+            </div>
+        </div>
+    {/if}
+    
+    <textarea 
+        bind:this={textareaElement}
+        {id}
+        {placeholder}
+        {disabled}
+        class="kt-textarea"
+    ></textarea>
+</div>
 
 <style>
+    /* Loading spinner styling */
+    .kt-summernote-wrapper {
+        position: relative;
+    }
+
+    .kt-summernote-loading {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(2px);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+    }
+
+    .kt-summernote-loading-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 2rem;
+        background-color: #ffffff;
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+
+    .kt-summernote-spinner {
+        color: #3b82f6;
+    }
+
+    .kt-summernote-loading-text {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        text-align: center;
+    }
+
+    .kt-summernote-progress {
+        width: 200px;
+        height: 4px;
+        background-color: #e2e8f0;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .kt-summernote-progress-bar {
+        height: 100%;
+        background-color: #3b82f6;
+        border-radius: 2px;
+        transition: width 0.3s ease;
+    }
 
     /* Error state styling */
     .kt-summernote-editor.kt-summernote-error .note-editing-area {
