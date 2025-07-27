@@ -108,7 +108,7 @@
                                 {{getLanguageKeyLocalTranslation('footer_nav_menu_title')}}
                             </h4>
 
-                            <nav class="nav social justify-content-center justify-content-start">
+                            <nav class="nav social justify-content-center justify-content-lg-start">
                                 @if($facebookUrl && !empty($facebookUrl->value))
                                     <a href="{{$facebookUrl->value}}">
                                         <i class="uil uil-facebook-f"></i>
@@ -123,7 +123,7 @@
 
                                 @if($twitterUrl && !empty($twitterUrl->value))
                                     <a href="{{$twitterUrl->value}}">
-                                        <i class="uil uil-twitter"></i>
+                                        <i class="uil uil-x-twitter"></i>
                                     </a>
                                 @endif
 

@@ -137,7 +137,7 @@
                             {{getLanguageKeyLocalTranslation('navbar_change_language_nav_link')}}
                         </a>
 
-                        <ul class="dropdown-menu py-0">
+                        <ul class="languages-dropdown dropdown-menu py-0">
                             @foreach ($languages as $language)
                                 @if($language->code != app()->getLocale())
                                     <a class="dropdown-item" href="{{route('locale.switch', ['locale' => $language->code])}}">

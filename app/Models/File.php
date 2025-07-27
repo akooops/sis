@@ -14,7 +14,7 @@ class File extends Model
 
     //Properties
     protected $guarded = ['id'];
-    protected $appends = ['url'];
+    protected $appends = ['url', 'full_path'];
 
     //Relationships
 
@@ -30,6 +30,11 @@ class File extends Model
     public function getUrlAttribute()
     {
         return $this->name ? Storage::disk('public')->url($this->path) : URL::to($this->path);
+    }
+
+    public function getFullPathAttribute()
+    {
+        return "/storage/" . $this->path;
     }
 
     public function attach(Model $model)

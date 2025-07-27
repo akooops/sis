@@ -212,7 +212,7 @@
             if (response.ok) {
                 const result = await response.json();
                 if (result.status === 'success' && result.data && result.data.file) {
-                    return result.data.file.url;
+                    return result.data.file.full_path;
                 }
             }
             throw new Error('Upload failed');

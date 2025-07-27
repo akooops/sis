@@ -367,6 +367,22 @@ p {
     height: 112px;
 }
 
+.page-content-section .divider-section {
+    background-color: var(--bg-white);
+}
+
+.page-content-section .divider-line {
+    height: 2px;
+    width: 100%;
+    margin: 8px auto;
+    background-color: var(--bs-gold);
+}
+
+.page-content-section .divider-section .logo {
+    height: 100%;
+    width: 60%;
+    object-fit: contain;
+}
 /* =============================================================================
    GRADES SECTION
    ============================================================================= */
@@ -734,10 +750,23 @@ footer .copyright p {
     color: var(--bs-secondary);
 }
 
+.page-menu-section .nav-link.active {
+    color: var(--bs-danger);
+}
+
 .page-content-section h2 {
     font-weight: 600;
     font-size: 32px;
-    line-height: 32px;
+    line-height: 42px;
+    color: var(--bs-primary);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+.page-content-section h3 {
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 42px;
     color: var(--bs-primary);
     text-transform: uppercase;
     margin-bottom: 16px;
