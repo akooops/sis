@@ -94,10 +94,6 @@
             {{$page->getLocalTranslation('title')}}
         </h2>
 
-        <p data-aos="fade-up" data-aos-duration="1500">
-            {{$page->getLocalTranslation('description')}}
-        </p>
-
         <hr class="mt-2 mb-4" data-aos="fade-up" data-aos-duration="1500">
 
         <div class="w-100" data-aos="fade-up" data-aos-duration="2000">

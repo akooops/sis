@@ -42,6 +42,12 @@ function getPage($id) {
     });
 }
 
+function getPageBySlug($slug) {
+    return cache()->remember("page-{$slug}", 3600, function() use ($slug) {
+        return Page::where('slug', $slug)->first();
+    });
+}
+
 function getSetting($key) {
     return cache()->remember("setting-{$key}", 3600, function() use ($key) {
         return Setting::where('key', $key)->first();

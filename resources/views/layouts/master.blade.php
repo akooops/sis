@@ -48,6 +48,8 @@
             @include('layouts.header')
 
             @yield('content')
+
+            @include('layouts.privacy-popup')
         </div>
         <!-- END layout-wrapper -->
         @include('layouts.footer')

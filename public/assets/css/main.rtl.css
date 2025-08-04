@@ -1,49 +1,49 @@
 /* Font Faces */
 @font-face {
-  font-family: 'Brandon';
-  src: url('fonts/BrandonGrotesqueThin.ttf') format('truetype');
+  font-family: 'DINNext';
+  src: url('fonts/DINNext/DINNEXTLTARABIC-Light.ttf') format('truetype');
   font-weight: 100;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Brandon';
-  src: url('fonts/BrandonGrotesqueLight.ttf') format('truetype');
+  font-family: 'DINNext';
+  src: url('fonts/DINNext/DINNEXTLTARABIC-Light.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Brandon';
-  src: url('fonts/BrandonGrotesqueRegular.ttf') format('truetype');
+  font-family: 'DINNext';
+  src: url('fonts/DINNext/DINNextLTArabic-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Brandon';
-  src: url('fonts/BrandonGrotesqueMedium.ttf') format('truetype');
+  font-family: 'DINNext';
+  src: url('fonts/DINNext/DINNextLTArabic-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Brandon';
-  src: url('fonts/BrandonGrotesqueBold.ttf') format('truetype');
+  font-family: 'DINNext';
+  src: url('fonts/DINNext/DINNextLTArabic-Bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Brandon';
-  src: url('fonts/BrandonGrotesqueBlack.ttf') format('truetype');
+  font-family: 'DINNext';
+  src: url('fonts/DINNext/DINNextLTArabic-Black.ttf') format('truetype');
   font-weight: 900;
   font-style: normal;
 }
 
 /* CSS Variables */
 :root {
-  --bs-font-sans-serif: "Brandon", sans-serif;
+  --bs-font-sans-serif: "DINNext", sans-serif;
   --bs-navbar-color: #2A5D91;
   --bs-secondary: #3c70a3;
   --bs-light: #EEF8FF;
@@ -72,7 +72,7 @@ p {
     text-transform: uppercase;
     font-size: 15px;
     font-weight: 450;
-    font-family: "Brandon", sans-serif;
+    font-family: "DINNext", sans-serif;
 }
 
 .btn:hover {
@@ -126,6 +126,12 @@ p {
 }
 
 .navbar .nav-link {
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.services-dropdown .dropdown-item {
     text-transform: uppercase;
     font-weight: 600;
     font-size: 15px;
@@ -275,7 +281,7 @@ p {
     text-transform: uppercase;
     font-size: 15px;
     font-weight: 450;
-    font-family: "Brandon", sans-serif;
+    font-family: "DINNext", sans-serif;
 }
 
 .banners-section .btn:hover {
@@ -325,7 +331,7 @@ p {
     text-transform: uppercase;
     font-size: 15px;
     font-weight: 450;
-    font-family: "Brandon", sans-serif;
+    font-family: "DINNext", sans-serif;
     transition: border-color 0.4s ease;
 }
 
@@ -461,7 +467,7 @@ p {
     text-transform: uppercase;
     font-size: 15px;
     font-weight: 450;
-    font-family: "Brandon", sans-serif;
+    font-family: "DINNext", sans-serif;
     width: 100%;
 }
 
@@ -560,7 +566,7 @@ p {
     text-transform: uppercase;
     font-size: 15px;
     font-weight: 450;
-    font-family: "Brandon", sans-serif;
+    font-family: "DINNext", sans-serif;
 }
 
 .facts-section .facts-content-container .btn:hover {

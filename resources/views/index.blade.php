@@ -22,7 +22,7 @@
     <div class="swiper-container" 
         data-margin="0" 
         data-autoplay="true" 
-        data-autoplaytime="7000" 
+        data-autoplaytime="60000" 
         data-nav="true" 
         data-dots="true" 
         data-items="1"
@@ -47,6 +47,7 @@
                             <div class="banner-img" style="background-image: url('{{ $banner->thumbnailUrl }}')"></div>
                         @endif
 
+                        {{--}}
                         <div class="container h-100">
                             <div class="row h-100 align-items-end px-8 px-lg-0 pb-16">           
                                 <div class="row px-0 px-lg-14">
@@ -72,6 +73,7 @@
                             <!--/.row -->
                         </div>
                         <!--/.container -->
+                        {{--}}
                     </div>
                     <!--/.swiper-slide -->
                 @endforeach
@@ -169,9 +171,14 @@
                                         {{$program->getLocalTranslation('title')}}
                                     </p>
 
-                                    <h3 class="px-0">
-                                        {{$program->getLocalTranslation('subtitle')}}
-                                    </h3>
+                                    @php
+                                        $subtitle = $program->getLocalTranslation('subtitle');
+                                    @endphp
+                                    @if(!empty($subtitle) && trim(strip_tags($subtitle)) !== '' && $subtitle !== "\u{200e}")
+                                        <h3 class="px-0 py-0">
+                                            {{ $subtitle }}
+                                        </h3>
+                                    @endif
 
                                     <a href="{{route('program', ['slug' => $program->slug])}}" 
                                         class="btn py-1">
@@ -196,6 +203,7 @@
     <!-- /.swiper-container -->
 </section>
 
+{{--}}
 <section class="wrapper facts-section">
     <div class="container h-100 py-12">
         <div class="row h-100 align-items-center">
@@ -305,6 +313,7 @@
     <!-- /.container -->
 </section>
 <!-- /section -->
+{{--}}
 
 <section class="wrapper divider-section pt-8">
     <div class="container pb-8">

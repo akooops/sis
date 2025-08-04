@@ -93,11 +93,7 @@
         <h2 data-aos="fade-up" data-aos-duration="1000">
             {{$page->getLocalTranslation('title')}}
         </h2>
-
-        <p data-aos="fade-up" data-aos-duration="1500">
-            {{$page->getLocalTranslation('description')}}
-        </p>
-
+        
         <hr class="mt-2 mb-4" data-aos="fade-up" data-aos-duration="1500">
 
         <div class="w-100" data-aos="fade-up" data-aos-duration="2000">
@@ -147,13 +143,13 @@
                                         {{$visitService->getLocalTranslation('title')}}
                                     </h2>
 
-                                    <p class="truncate-3-lines mb-6">
-                                        {{$visitService->getLocalTranslation('description')}}...
-
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#visit-service-{{$visitService->id}}">
-                                            {{getLanguageKeyLocalTranslation('visits_page_read_more_cta')}}
-                                        </a>
+                                    <p class="truncate-3-lines">
+                                        {{$visitService->getLocalTranslation('description')}}
                                     </p>
+
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#visit-service-{{$visitService->id}}">
+                                        {{getLanguageKeyLocalTranslation('visits_page_read_more_cta')}}
+                                    </a>
                                     
                                     <ul class="post-meta d-flex mb-0">
                                         <li class="post-date">

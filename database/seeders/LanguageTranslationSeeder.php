@@ -141,16 +141,16 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => 'الإطلاع'
             ],
             'header_services_nav_link' => [
-                'en' => 'Services', 
-                'ar' => 'الخدمات'
+                'en' => 'Access Portal', 
+                'ar' => 'منصة الخدمات'
             ],
             'index_page_fifth_section_cta' => [
                 'en' => 'View more albums',
                 'ar' => 'عرض المزيد من الألبومات'
             ],
             'index_page_fifth_section_title' => [
-                'en' => 'Saud international schools Latest albums',
-                'ar' => 'أحدث ألبومات مدارس سعود العالمية'
+                'en' => 'Latest albums',
+                'ar' => 'أحدث الألبومات'
             ],
             'index_page_first_number_title' => [
                 'en' => 'Schools',
@@ -185,8 +185,8 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => 'عرض المزيد من الفعاليات'
             ],
             'index_page_forth_section_title' => [
-                'en' => 'Saud international schools latest events',
-                'ar' => 'أخر فعاليات مدارس سعود العالمية'
+                'en' => 'Latest events',
+                'ar' => 'أحدث الفعاليات'
             ],
             'index_page_second_number_title' => [
                 'en' => 'Students',
@@ -201,8 +201,8 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => 'اعرف المزيد'
             ],
             'index_page_second_section_title' => [
-                'en' => 'Our school courses',
-                'ar' => 'دورات مدرستنا'
+                'en' => 'Our Academic Levels',
+                'ar' => 'مستوياتنا الأكاديمية'
             ],
             'index_page_third_number_title' => [
                 'en' => 'Alumni',
@@ -632,10 +632,6 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'View Details',
                 'ar' => 'عرض التفاصيل'
             ],
-            'navbar_applications_nav_link' => [
-                'en' => 'Apply',
-                'ar' => 'تقديم'
-            ],
             'navbar_change_language_nav_link' => [
                 'en' => 'Change language',
                 'ar' => 'تغيير اللغة'
@@ -644,13 +640,37 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Inquire',
                 'ar' => 'استفسار'
             ],
+            'navbar_visits_nav_link' => [
+                'en' => 'Visit',
+                'ar' => 'زيارة'
+            ],
+            'navbar_applications_nav_link' => [
+                'en' => 'Enroll',
+                'ar' => 'تسجيل'
+            ],
+            'navbar_school_fees_nav_link' => [
+                'en' => 'Fees',
+                'ar' => 'الرسوم'
+            ],
             'navbar_search_form_placeholder' => [
                 'en' => 'Type keyword and hit enter',
                 'ar' => 'اكتب كلمة مفتاحية واضغط إنتر'
             ],
-            'navbar_visits_nav_link' => [
-                'en' => 'Visit',
-                'ar' => 'زيارة'
+            'privacy_popup_title' => [
+                'en' => 'Privacy Policy',
+                'ar' => 'سياسة الخصوصية'
+            ],
+            'privacy_popup_description' => [
+                'en' => 'Please read our privacy policy to understand how we use your data. Continuing means you agree to our policy.',
+                'ar' => 'يرجى قراءة سياسة الخصوصية لفهم كيفية استخدامنا لبياناتك. الاستمرار يعني موافقتك على السياسة.'
+            ],
+            'privacy_popup_button_read_more' => [
+                'en' => 'Privacy Policy',
+                'ar' => 'سياسة الخصوصية'
+            ],
+            'privacy_popup_button' => [
+                'en' => 'Agree',
+                'ar' => 'موافق'
             ],
             'program_page_collapse_title' => [
                 'en' => 'Grades',
