@@ -313,7 +313,7 @@ class PagesController extends Controller
         ]);
     }
 
-    public function guidlines(Request $request)
+    public function guidelines(Request $request)
     {
         $page = Page::where([
             'slug' => 'guidelines',
