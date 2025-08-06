@@ -317,7 +317,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/jobs', [ControllersPagesController::class, 'jobs'])->name('jobs');
     Route::get('/programs/{program}', [ControllersPagesController::class, 'program'])->name('program');
     Route::get('/forms', [ControllersPagesController::class, 'forms'])->name('forms');
-    Route::get('/guidlines', [ControllersPagesController::class, 'guidlines'])->name('guidlines');
+    Route::get('/guidelines', [ControllersPagesController::class, 'guidelines'])->name('guidelines');
 
     Route::get('/{slug}', [ControllersPagesController::class, 'page'])->name('page');
     Route::get('/program/{slug}', [ControllersPagesController::class, 'program'])->name('program');
