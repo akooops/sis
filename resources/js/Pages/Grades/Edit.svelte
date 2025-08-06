@@ -3,13 +3,9 @@
     import { onMount, tick } from 'svelte';
     import { router } from '@inertiajs/svelte';
     import Select2 from '../Components/Forms/Select2.svelte';
-    import Summernote from '../Components/Forms/Summernote.svelte';
 
     // Props from the server
     export let grade;
-    export let languages;
-    export let translations;
-    export let medias;
 
     // Define breadcrumbs for this grade
     const breadcrumbs = [
@@ -30,11 +26,7 @@
     // Form data for basic grade info
     let form = {
         name: grade?.name || '',
-        slug: grade?.slug || '',
         program_id: grade?.program?.id || '',
-        media_option: 'upload',
-        file: null,
-        media_id: ''
     };
 
     // Form errors
@@ -46,45 +38,17 @@
     // Loading state
     let loading = false;
 
-    // Slug generation flag
-    let slugManuallyEdited = false;
-
     // Dynamic data for selects
     let selectedMedia = null;
     let selectedProgram = null;
 
     // Select2 component references
-    let mediaSelectComponent;
     let programSelectComponent;
-    let summernoteComponent;
-
-    // Translation form data
-    let translationForms = {};
-    let translationErrors = {};
-    let translationLoading = {};
 
     // Grade files state
     let gradeFiles = [];
     let uploadingFiles = false;
     let fileUploadProgress = {};
-
-    // Initialize translation forms immediately to prevent undefined errors
-    if (languages && Array.isArray(languages)) {
-        languages.forEach(language => {
-            // Get translation data - now always has values (either translation or fallback)
-            const title = translations?.title?.[language.code] || '';
-            const description = translations?.description?.[language.code] || '';
-            const content = translations?.content?.[language.code] || '';
-            
-            translationForms[language.code] = {
-                title: title,
-                description: description,
-                content: content
-            };
-            translationErrors[language.code] = {};
-            translationLoading[language.code] = false;
-        });
-    }
 
     // Initialize selected program if grade has one
     if (grade?.program) {
@@ -113,71 +77,6 @@
                 size: file.size
             };
         });
-    }
-
-    // Function to convert string to slug
-    function stringToSlug(str) {
-        return str
-            .toLowerCase()
-            .replace(/[^\w\s-]/g, '') // Remove special characters
-            .replace(/\s+/g, '-')     // Replace spaces with hyphens
-            .replace(/-+/g, '-')      // Replace multiple hyphens with single hyphen
-            .trim();                  // Trim leading/trailing spaces
-    }
-
-    // Handle name input change
-    function handleNameChange() {
-        if (!slugManuallyEdited) {
-            form.slug = stringToSlug(form.name);
-        }
-    }
-
-    // Handle slug input change
-    function handleSlugChange() {
-        slugManuallyEdited = true;
-    }
-
-    // Handle file input change
-    function handleFileChange(event) {
-        const file = event.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-            form.file = file;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                filePreview = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    // Handle media option change
-    function handleMediaOptionChange() {
-        if (form.media_option === 'upload') {
-            form.media_id = '';
-            selectedMedia = null;
-        } else {
-            form.file = null;
-            filePreview = null;
-        }
-    }
-
-    // Handle media selection
-    function handleMediaSelect(event) {
-        form.media_id = event.detail.value;
-        // Update selected media for preview
-        if (event.detail.data) {
-            selectedMedia = {
-                id: event.detail.data.id,
-                name: event.detail.data.text,
-                file: { url: event.detail.data.mediaUrl }
-            };
-        }
-    }
-
-    // Handle media clear
-    function handleMediaClear() {
-        form.media_id = '';
-        selectedMedia = null;
     }
 
     // Handle program selection
@@ -319,11 +218,6 @@
     function handleSubmit() {
         loading = true;
 
-        // Ensure form.content is up-to-date from Summernote
-        if (summernoteComponent && summernoteComponent.getValue) {
-            form.content = summernoteComponent.getValue();
-        }
-        
         const formData = new FormData();
         
         // Add form fields
@@ -358,12 +252,6 @@
                 // Apply error styling to Select2 components
                 if (errors.program_id && programSelectComponent) {
                     programSelectComponent.setError(true);
-                }
-                if (errors.media_id && mediaSelectComponent) {
-                    mediaSelectComponent.setError(true);
-                }
-                if (errors.content && summernoteComponent) {
-                    summernoteComponent.setError(true);
                 }
             },
             onFinish: () => {
@@ -466,27 +354,6 @@
             <!-- Main Content with Tabs -->
             <div class="kt-card w-full">
                 <div class="kt-card-content">
-                    <!-- Language Tabs -->
-                    <div class="kt-tabs kt-tabs-line justify-between mb-6" data-kt-tabs="true">
-                        <div class="flex items-center gap-5">
-                            <button 
-                                class="kt-tab-toggle py-3 active" 
-                                data-kt-tab-toggle="#grade_form_tab"
-                            >
-                                <i class="ki-filled ki-document text-base me-2"></i>
-                                Edit grade
-                            </button>
-                            <button 
-                                class="kt-tab-toggle py-3" 
-                                data-kt-tab-toggle="#translations_tab"
-                            >
-                                <i class="ki-filled ki-geolocation text-base me-2"></i>
-                                Translations
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Tab Content -->
                     <!-- Grade Form Tab -->
                     <div class="grow flex flex-col" id="grade_form_tab">
                         <div class="grid gap-5 lg:gap-7.5 w-full py-4">
@@ -508,28 +375,9 @@
                                                 class="kt-input {errors.name ? 'kt-input-error' : ''}"
                                                 placeholder="Enter grade name"
                                                 bind:value={form.name}
-                                                on:input={handleNameChange}
                                             />
                                             {#if errors.name}
                                                 <p class="text-sm text-destructive">{errors.name}</p>
-                                            {/if}
-                                        </div>
-
-                                        <!-- Grade Slug -->
-                                        <div class="flex flex-col gap-2">
-                                            <label class="text-sm font-medium text-mono" for="slug">
-                                                Grade Slug <span class="text-destructive">*</span>
-                                            </label>
-                                            <input
-                                                id="slug"
-                                                type="text"
-                                                class="kt-input {errors.slug ? 'kt-input-error' : ''}"
-                                                placeholder="Enter grade slug"
-                                                bind:value={form.slug}
-                                                on:input={handleSlugChange}
-                                            />
-                                            {#if errors.slug}
-                                                <p class="text-sm text-destructive">{errors.slug}</p>
                                             {/if}
                                         </div>
 
@@ -592,148 +440,6 @@
                                     </div>
                                 </div>
                             </form>
-
-                            <!-- Grade Thumbnail Card -->
-                            <div class="kt-card">
-                                <div class="kt-card-header">
-                                    <h4 class="kt-card-title">Grade Thumbnail</h4>
-                                </div>
-                                <div class="kt-card-content">
-                                    <div class="grid gap-4">
-                                        <!-- Current Thumbnail Display -->
-                                        {#if grade?.thumbnailUrl}
-                                            <div class="flex flex-col gap-2">
-                                                <label class="text-sm font-medium text-mono">Current Thumbnail</label>
-                                                <div class="relative inline-block">
-                                                    <div class="p-2 border-2 border-primary/20 bg-primary/5 rounded-lg">
-                                                        <img 
-                                                            src={grade.thumbnailUrl} 
-                                                            alt="Current grade thumbnail"
-                                                            class="w-32 h-32 object-cover rounded-lg" 
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {/if}
-
-                                        <!-- Media Option Selection -->
-                                        <div class="flex items-center gap-2">
-                                            <input 
-                                                class="kt-switch" 
-                                                type="checkbox" 
-                                                id="media-switch" 
-                                                checked={form.media_option === 'select'}
-                                                on:change={(e) => {
-                                                    form.media_option = e.target.checked ? 'select' : 'upload';
-                                                    handleMediaOptionChange();
-                                                }}
-                                            />
-                                            <label class="kt-label" for="media-switch">
-                                                Select from Media Library
-                                            </label>
-                                        </div>
-
-                                        <!-- File Upload Section -->
-                                        {#if form.media_option === 'upload'}
-                                            <div class="flex flex-col gap-2">
-                                                <label class="text-sm font-medium text-mono" for="file">
-                                                    Upload Image
-                                                </label>
-                                                <input
-                                                    id="file"
-                                                    type="file"
-                                                    class="kt-input"
-                                                    accept="image/*"
-                                                    on:change={handleFileChange}
-                                                />
-                                                {#if filePreview}
-                                                    <div class="mt-2">
-                                                        <img 
-                                                            src={filePreview} 
-                                                            alt="Preview"
-                                                            class="w-32 h-32 object-cover rounded-lg border" 
-                                                        />
-                                                    </div>
-                                                {/if}
-                                                {#if errors.file}
-                                                    <p class="text-sm text-destructive">{errors.file}</p>
-                                                {/if}
-                                            </div>
-                                        {/if}
-
-                                        <!-- Media Select Section -->
-                                        {#if form.media_option === 'select'}
-                                            <div class="flex flex-col gap-2">
-                                                <label class="text-sm font-medium text-mono" for="media-select">
-                                                    Select Media
-                                                </label>
-                                                <Select2
-                                                    bind:this={mediaSelectComponent}
-                                                    id="media-select"
-                                                    placeholder="Select media..."
-                                                    bind:value={form.media_id}
-                                                    on:select={handleMediaSelect}
-                                                    on:clear={handleMediaClear}
-                                                    ajax={{
-                                                        url: route('admin.media.index'),
-                                                        dataType: 'json',
-                                                        delay: 300,
-                                                        data: function(params) {
-                                                            return {
-                                                                search: params.term,
-                                                                type: 'image',
-                                                                perPage: 10
-                                                            };
-                                                        },
-                                                        processResults: function(data) {
-                                                            return {
-                                                                results: data.medias.map(media => ({
-                                                                    id: media.id,
-                                                                    text: media.name,
-                                                                    mediaUrl: media.file?.url || ''
-                                                                }))
-                                                            };
-                                                        },
-                                                        cache: true
-                                                    }}
-                                                    templateResult={function(data) {
-                                                        if (data.loading) return data.text;
-                                                        if (!data.id) return data.text;
-                                                        
-                                                        return globalThis.$('<div class="d-flex align-items-center">' +
-                                                            '<img src="' + data.mediaUrl + '" class="me-2" style="width: 30px; height: 30px; object-fit: cover; border-radius: 4px;">' +
-                                                            '<span>' + data.text + '</span>' +
-                                                            '</div>');
-                                                    }}
-                                                    templateSelection={function(data) {
-                                                        if (!data.id) return data.text;
-                                                        
-                                                        return globalThis.$('<div class="d-flex flex-column align-items-center">' +
-                                                            '<img src="' + data.mediaUrl + '" class="me-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 3px;">' +
-                                                            '<span>' + data.text + '</span>' +
-                                                            '</div>');
-                                                    }}
-                                                />
-                                                
-                                                <!-- Media Preview -->
-                                                {#if form.media_id && selectedMedia}
-                                                    <div class="mt-2">
-                                                        <img 
-                                                            src={selectedMedia.file?.url} 
-                                                            alt={selectedMedia.name}
-                                                            class="w-32 h-32 object-cover rounded-lg border" 
-                                                        />
-                                                    </div>
-                                                {/if}
-                                                
-                                                {#if errors.media_id}
-                                                    <p class="text-sm text-destructive">{errors.media_id}</p>
-                                                {/if}
-                                            </div>
-                                        {/if}
-                                    </div>
-                                </div>
-                            </div>
 
                             <!-- Grade Files Card -->
                             <div class="kt-card">
@@ -881,113 +587,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Translations Tab -->
-                    <div class="grow flex flex-col hidden" id="translations_tab">
-                        <div class="grid gap-5 lg:gap-7.5 w-full py-4">
-                            <!-- Language Tabs -->
-                            <div class="kt-tabs kt-tabs-line justify-between mb-6" data-kt-tabs="true">
-                                <div class="flex items-center gap-5">
-                                    {#each languages as language, index}
-                                        <button 
-                                            class="kt-tab-toggle py-3 {index === 0 ? 'active' : ''}" 
-                                            data-kt-tab-toggle="#translation_tab_{language.code}"
-                                        >
-                                            <i class="ki-filled ki-translate text-base me-2"></i>
-                                            {language.name}
-                                        </button>
-                                    {/each}
-                                </div>
-                            </div>
-
-                            <!-- Tab Content -->
-                            {#each languages as language, index}
-                                <div 
-                                    class="grow flex flex-col {index === 0 ? '' : 'hidden'}" 
-                                    id="translation_tab_{language.code}"
-                                >
-                                    <form 
-                                        on:submit|preventDefault={() => handleTranslationSubmit(language.code, language.id)}
-                                        class="grid gap-4"
-                                    >
-                                        <!-- Grade Title -->
-                                        <div class="flex flex-col gap-2">
-                                            <label class="text-sm font-medium text-mono" for="title-{language.id}">
-                                                Title <span class="text-destructive">*</span>
-                                            </label>
-                                            <input
-                                                id="title-{language.id}"
-                                                type="text"
-                                                class="kt-input {translationErrors[language.code]?.title ? 'kt-input-error' : ''}"
-                                                placeholder="Enter grade title"
-                                                bind:value={translationForms[language.code].title}
-                                            />
-                                            {#if translationErrors[language.code]?.title}
-                                                <p class="text-sm text-destructive">{translationErrors[language.code].title[0]}</p>
-                                            {/if}
-                                        </div>
-
-                                        <!-- Grade Description -->
-                                        <div class="flex flex-col gap-2">
-                                            <label class="text-sm font-medium text-mono" for="description-{language.id}">
-                                                Description <span class="text-destructive">*</span>
-                                            </label>
-                                            <textarea
-                                                id="description-{language.id}"
-                                                class="kt-textarea {translationErrors[language.code]?.description ? 'kt-textarea-error' : ''}"
-                                                placeholder="Enter grade description"
-                                                rows="3"
-                                                bind:value={translationForms[language.code].description}
-                                            ></textarea>
-                                            {#if translationErrors[language.code]?.description}
-                                                <p class="text-sm text-destructive">{translationErrors[language.code].description[0]}</p>
-                                            {/if}
-                                        </div>
-
-                                        <!-- Grade Content -->
-                                        <div class="flex flex-col gap-2">
-                                            <label class="text-sm font-medium text-mono" for="summernote-editor-{language.code}">
-                                                Content <span class="text-destructive">*</span>
-                                            </label>
-                                            <Summernote
-                                                bind:this={summernoteComponent}
-                                                id="summernote-editor-{language.code}"
-                                                bind:value={translationForms[language.code].content}
-                                                placeholder="Enter grade content"
-                                                height={400}
-                                                minHeight={300}
-                                                maxHeight={600}
-                                                on:change={(event) => {
-                                                    translationForms[language.code].content = event.detail.contents;
-                                                }}
-                                            />
-                                            {#if translationErrors[language.code]?.content}
-                                                <p class="text-sm text-destructive">{translationErrors[language.code].content[0]}</p>
-                                            {/if}
-                                        </div>
-
-                                        <!-- Form Actions -->
-                                        <div class="flex items-center justify-end gap-3 pt-4">
-                                            <button
-                                                type="submit"
-                                                class="kt-btn kt-btn-success"
-                                                disabled={translationLoading[language.code]}
-                                            >
-                                                {#if translationLoading[language.code]}
-                                                    <i class="ki-outline ki-loading text-base animate-spin"></i>
-                                                    Saving...
-                                                {:else}
-                                                    <i class="ki-filled ki-check text-base"></i>
-                                                    Save Translation
-                                                {/if}
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            {/each}
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

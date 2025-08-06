@@ -2,6 +2,10 @@
     $currentLanguage = getCurrentLanguage();
 
     $googleAnalyticsIdSetting = getSetting('google_analytics_id');
+
+    $headCodeSetting = getSetting('head_code');
+    $footCodeSetting = getSetting('foot_code');
+    $supportButtonCodeSetting = getSetting('support_button_code');
 @endphp
 
 <!DOCTYPE html>
@@ -39,6 +43,10 @@
             gtag('config', '{{ $googleAnalyticsIdSetting->value }}');
         </script>
     @endif
+
+    @if($headCodeSetting && !empty($headCodeSetting->value))
+        {!! $headCodeSetting->value !!}
+    @endif
 </head>
 
 <body dir="{{($currentLanguage && $currentLanguage->is_rtl) ? 'rtl' : 'ltr'}}">
@@ -54,7 +62,11 @@
         <!-- END layout-wrapper -->
         @include('layouts.footer')
 
-        <div class="progress-wrap">
+        @if($supportButtonCodeSetting && !empty($supportButtonCodeSetting->value))
+            <div class="progress-wrap" style="bottom: 4.5rem; left: unset; right: 1.5rem">
+        @else
+            <div class="progress-wrap">
+        @endif
             <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
                 <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" />
             </svg>
@@ -65,6 +77,14 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
     @include('layouts.vendor-scripts')
+
+    @if($supportButtonCodeSetting && !empty($supportButtonCodeSetting->value))
+        {!! $supportButtonCodeSetting->value !!}
+    @endif
+
+    @if($footCodeSetting && !empty($footCodeSetting->value))
+        {!! $footCodeSetting->value !!}
+    @endif
 </body>
 
 </html>

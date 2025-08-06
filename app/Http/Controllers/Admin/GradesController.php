@@ -2,20 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Admin\Grades\DeleteGradeRequest;
 use App\Http\Requests\Admin\Grades\OrderGradesRequest;
 use App\Http\Requests\Admin\Grades\StoreGradeRequest;
 use App\Http\Requests\Admin\Grades\UpdateGradeRequest;
-use App\Http\Requests\Admin\Grades\UpdateGradeTranslationRequest;
 use App\Models\File;
 use App\Models\Language;
-use App\Models\Permission;
 use Illuminate\Http\Request;
 use App\Models\Grade;
-use App\Models\Media;
-use App\Models\Program;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 
 class GradesController extends Controller
 {
@@ -79,56 +72,7 @@ class GradesController extends Controller
      */
     public function store(StoreGradeRequest $request)
     {
-        $grade = Grade::create(array_merge(
-            $request->validated(),
-            [
-                'slug' => Str::slug($request->slug)
-            ]
-        ));
-        
-        $defaultLanguage = Language::where([
-            'is_default' => true,
-        ])->first();
-
-        foreach($grade->getTranslatableFields() as $field){
-            $grade->setTranslation($field, $defaultLanguage->code, $request->input($field));    
-        }
-
-        $media = null;
-
-        if ($request->hasFile('file')) {
-            // Get MIME type
-            $mimeType = $request->file('file')->getMimeType();
-            
-            // Determine file category using match expression
-            $type = match (true) {
-                str_starts_with($mimeType, 'image/') => 'image',
-                str_starts_with($mimeType, 'video/') => 'video',
-                str_starts_with($mimeType, 'audio/') => 'audio',
-                default => 'document',
-            };
-
-            $media = Media::create(array_merge(
-                $request->validated(),
-                [
-                    'type' => $type
-                ]
-            ));
-
-            $defaultLanguage = Language::where([
-                'is_default' => true,
-            ])->first();
-
-            foreach($media->getTranslatableFields() as $field){
-                $media->setTranslation($field, $defaultLanguage->code, $request->input($field));    
-            }
-            
-            $file = $this->fileService->upload($request->file('file'), 'App\\Models\\Media', $media->id);
-        } else {
-            $media = Media::find($request->input('media_id'));
-        }
-    
-        $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Grade', $grade->id, true);
+        $grade = Grade::create($request->validated());
 
         if ($request->has('files')) {
             foreach ($request->input('files') as $file) {
@@ -155,13 +99,8 @@ class GradesController extends Controller
         $grade->load('files');
         $grade->load('program');
 
-        $languages = Language::orderBy('is_default', 'DESC')->get();
-        $translations = $grade->getTranslatableFieldsByLanguages();
-
         return inertia('Grades/Show', [
             'grade' => $grade,
-            'languages' => $languages,
-            'translations' => $translations
         ]);
     }
     
@@ -176,13 +115,8 @@ class GradesController extends Controller
         $grade->load('files');
         $grade->load('program');
 
-        $languages = Language::orderBy('is_default', 'DESC')->get();
-        $translations = $grade->getTranslatableFieldsByLanguages();
-
         return inertia('Grades/Edit', [
             'grade' => $grade,
-            'languages' => $languages,
-            'translations' => $translations
         ]);
     }
     
@@ -195,43 +129,7 @@ class GradesController extends Controller
      */
     public function update(Grade $grade, UpdateGradeRequest $request)
     {
-        $grade->update(array_merge(
-            $request->validated(),
-            [
-                'slug' => Str::slug($request->slug)
-            ]
-        ));
-    
-        $media = null;
-
-        if ($request->hasFile('file')) {
-            // Get MIME type
-            $mimeType = $request->file('file')->getMimeType();
-            
-            // Determine file category using match expression
-            $type = match (true) {
-                str_starts_with($mimeType, 'image/') => 'image',
-                str_starts_with($mimeType, 'video/') => 'video',
-                str_starts_with($mimeType, 'audio/') => 'audio',
-                default => 'document',
-            };
-
-            $media = Media::create(array_merge(
-                $request->validated(),
-                [
-                    'type' => $type
-                ]
-            ));
-            
-            $file = $this->fileService->upload($request->file('file'), 'App\\Models\\Media', $media->id);
-        } else {
-            $media = Media::find($request->input('media_id'));
-        }
-    
-        if($media){
-            if($grade->file) $grade->file->detach();
-            $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Grade', $grade->id, true);
-        }
+        $grade->update($request->validated());
 
         $grade->files()->where('is_main', false)->update([
             'model_type' => null,
@@ -249,19 +147,6 @@ class GradesController extends Controller
 
         return inertia('Grades/Index', [
             'success' => 'Grade updated successfully!'
-        ]);
-    }
-
-    public function updateTranslation(Grade $grade, UpdateGradeTranslationRequest $request){
-        $language = Language::find($request->language_id);
-
-        foreach($grade->getTranslatableFields() as $field){
-            $grade->setTranslation($field, $language->code, $request->input($field));    
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Grade updated successfully',
         ]);
     }
 

@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Admin\Grades;
 
-use App\Models\Media;
 use Illuminate\Foundation\Http\FormRequest;
 
 class OrderGradesRequest extends FormRequest

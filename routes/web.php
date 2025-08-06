@@ -162,7 +162,6 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::post('grades', [GradesController::class, 'store'])->middleware('check.permission:admin.grades.store')->name('admin.grades.store');
     Route::get('grades/{grade}', [GradesController::class, 'show'])->middleware('check.permission:admin.grades.show')->name('admin.grades.show');
     Route::get('grades/{grade}/edit', [GradesController::class, 'edit'])->middleware('check.permission:admin.grades.update')->name('admin.grades.edit');
-    Route::patch('grades/{grade}/update-translation', [GradesController::class, 'updateTranslation'])->middleware('check.permission:admin.grades.update')->name('admin.grades.update-translation');
     Route::patch('grades/{grade}', [GradesController::class, 'update'])->middleware('check.permission:admin.grades.update')->name('admin.grades.update');
     Route::delete('grades/{grade}', [GradesController::class, 'destroy'])->middleware('check.permission:admin.grades.destroy')->name('admin.grades.destroy');
 

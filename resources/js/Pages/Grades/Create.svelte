@@ -3,7 +3,6 @@
     import { onMount, tick } from 'svelte';
     import { router } from '@inertiajs/svelte';
     import Select2 from '../Components/Forms/Select2.svelte';
-    import Summernote from '../Components/Forms/Summernote.svelte';
 
     // Props from the server
     export let defaultLanguage;
@@ -32,14 +31,7 @@
     // Form data
     let form = {
         name: '',
-        slug: '',
         program_id: '',
-        media_option: 'upload',
-        file: null,
-        media_id: '',
-        title: '',
-        description: '',
-        content: '',
         files: []
     };
 
@@ -53,9 +45,6 @@
     let loading = false;
     let uploadingFiles = false;
 
-    // Slug generation flag
-    let slugManuallyEdited = false;
-
     // Dynamic data for selects
     let selectedMedia = null;
     let selectedProgram = null;
@@ -64,74 +53,7 @@
     let gradeFiles = [];
 
     // Select2 component references
-    let mediaSelectComponent;
     let programSelectComponent;
-    let summernoteComponent;
-
-    // Function to convert string to slug
-    function stringToSlug(str) {
-        return str
-            .toLowerCase()
-            .replace(/[^\w\s-]/g, '') // Remove special characters
-            .replace(/\s+/g, '-')     // Replace spaces with hyphens
-            .replace(/-+/g, '-')      // Replace multiple hyphens with single hyphen
-            .trim();                  // Trim leading/trailing spaces
-    }
-
-    // Handle name input change
-    function handleNameChange() {
-        if (!slugManuallyEdited) {
-            form.slug = stringToSlug(form.name);
-        }
-    }
-
-    // Handle slug input change
-    function handleSlugChange() {
-        slugManuallyEdited = true;
-    }
-
-    // Handle file input change
-    function handleFileChange(event) {
-        const file = event.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-            form.file = file;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                filePreview = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    // Handle media option change
-    function handleMediaOptionChange() {
-        if (form.media_option === 'upload') {
-            form.media_id = '';
-            selectedMedia = null;
-        } else {
-            form.file = null;
-            filePreview = null;
-        }
-    }
-
-    // Handle media selection
-    function handleMediaSelect(event) {
-        form.media_id = event.detail.value;
-        // Update selected media for preview
-        if (event.detail.data) {
-            selectedMedia = {
-                id: event.detail.data.id,
-                name: event.detail.data.text,
-                file: { url: event.detail.data.mediaUrl }
-            };
-        }
-    }
-
-    // Handle media clear
-    function handleMediaClear() {
-        form.media_id = '';
-        selectedMedia = null;
-    }
 
     // Handle program selection
     function handleProgramSelect(event) {
@@ -260,11 +182,6 @@
     function handleSubmit() {
         loading = true;
 
-        // Ensure form.content is up-to-date from Summernote
-        if (summernoteComponent && summernoteComponent.getValue) {
-            form.content = summernoteComponent.getValue();
-        }
-        
         const formData = new FormData();
         
         // Add form fields
@@ -294,12 +211,6 @@
                 // Apply error styling to Select2 components
                 if (errors.program_id && programSelectComponent) {
                     programSelectComponent.setError(true);
-                }
-                if (errors.media_id && mediaSelectComponent) {
-                    mediaSelectComponent.setError(true);
-                }
-                if (errors.content && summernoteComponent) {
-                    summernoteComponent.setError(true);
                 }
             },
             onFinish: () => {
@@ -371,28 +282,9 @@
                                     class="kt-input {errors.name ? 'kt-input-error' : ''}"
                                     placeholder="Enter grade name"
                                     bind:value={form.name}
-                                    on:input={handleNameChange}
                                 />
                                 {#if errors.name}
                                     <p class="text-sm text-destructive">{errors.name}</p>
-                                {/if}
-                            </div>
-
-                            <!-- Grade Slug -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="slug">
-                                    Grade Slug <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="slug"
-                                    type="text"
-                                    class="kt-input {errors.slug ? 'kt-input-error' : ''}"
-                                    placeholder="Enter grade slug"
-                                    bind:value={form.slug}
-                                    on:input={handleSlugChange}
-                                />
-                                {#if errors.slug}
-                                    <p class="text-sm text-destructive">{errors.slug}</p>
                                 {/if}
                             </div>
 
@@ -456,129 +348,7 @@
                     </div>
                 </div>
 
-                <!-- Media Selection Card -->
-                <div class="kt-card">
-                    <div class="kt-card-header">
-                        <h4 class="kt-card-title">Grade Thumbnail</h4>
-                    </div>
-                    <div class="kt-card-content">
-                        <div class="grid gap-4">
-                            <!-- Media Option Selection -->
-                            <div class="flex items-center gap-2">
-                                <input 
-                                    class="kt-switch" 
-                                    type="checkbox" 
-                                    id="media-switch" 
-                                    checked={form.media_option === 'select'}
-                                    on:change={(e) => {
-                                        form.media_option = e.target.checked ? 'select' : 'upload';
-                                        handleMediaOptionChange();
-                                    }}
-                                />
-                                <label class="kt-label" for="media-switch">
-                                    Select from Media Library
-                                </label>
-                            </div>
-
-                            <!-- File Upload Section -->
-                            {#if form.media_option === 'upload'}
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="file">
-                                        Upload Image <span class="text-destructive">*</span>
-                                    </label>
-                                    <input
-                                        id="file"
-                                        type="file"
-                                        class="kt-input"
-                                        accept="image/*"
-                                        on:change={handleFileChange}
-                                    />
-                                    {#if filePreview}
-                                        <div class="mt-2">
-                                            <img src={filePreview} alt="Preview" class="w-32 h-32 object-cover rounded-lg border" />
-                                        </div>
-                                    {/if}
-                                    {#if errors.file}
-                                        <p class="text-sm text-destructive">{errors.file}</p>
-                                    {/if}
-                                </div>
-                            {/if}
-
-                            <!-- Media Select Section -->
-                            {#if form.media_option === 'select'}
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="media-select">
-                                        Select Media <span class="text-destructive">*</span>
-                                    </label>
-                                    <Select2
-                                        bind:this={mediaSelectComponent}
-                                        id="media-select"
-                                        placeholder="Select media..."
-                                        bind:value={form.media_id}
-                                        on:select={handleMediaSelect}
-                                        on:clear={handleMediaClear}
-                                        ajax={{
-                                            url: route('admin.media.index'),
-                                            dataType: 'json',
-                                            delay: 300,
-                                            data: function(params) {
-                                                return {
-                                                    search: params.term,
-                                                    type: 'image',
-                                                    perPage: 10
-                                                };
-                                            },
-                                            processResults: function(data) {
-                                                return {
-                                                    results: data.medias.map(media => ({
-                                                        id: media.id,
-                                                        text: media.name,
-                                                        mediaUrl: media.file?.url || ''
-                                                    }))
-                                                };
-                                            },
-                                            cache: true
-                                        }}
-                                        templateResult={function(data) {
-                                            if (data.loading) return data.text;
-                                            if (!data.id) return data.text;
-                                            
-                                            return globalThis.$('<div class="d-flex align-items-center">' +
-                                                '<img src="' + data.mediaUrl + '" class="me-2" style="width: 30px; height: 30px; object-fit: cover; border-radius: 4px;">' +
-                                                '<span>' + data.text + '</span>' +
-                                                '</div>');
-                                        }}
-                                        templateSelection={function(data) {
-                                            if (!data.id) return data.text;
-                                            
-                                            return globalThis.$('<div class="d-flex flex-column align-items-center">' +
-                                                '<img src="' + data.mediaUrl + '" class="me-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 3px;">' +
-                                                '<span>' + data.text + '</span>' +
-                                                '</div>');
-                                        }}
-                                    />
-                                    
-                                    <!-- Media Preview -->
-                                    {#if form.media_id && selectedMedia}
-                                        <div class="mt-2">
-                                            <img 
-                                                src={selectedMedia.file?.url} 
-                                                alt={selectedMedia.name}
-                                                class="w-32 h-32 object-cover rounded-lg border" 
-                                            />
-                                        </div>
-                                    {/if}
-                                    
-                                    {#if errors.media_id}
-                                        <p class="text-sm text-destructive">{errors.media_id}</p>
-                                    {/if}
-                                </div>
-                            {/if}
-                        </div>
-                    </div>
-                </div>
-
-                                <!-- Grade Files Card -->
+                <!-- Grade Files Card -->
                 <div class="kt-card">
                     <div class="kt-card-header">
                         <h4 class="kt-card-title">Grade Files</h4>
@@ -687,73 +457,6 @@
                                     </div>
                                 </div>
                             {/if}
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- Content Card -->
-                <div class="kt-card">
-                    <div class="kt-card-header">
-                        <h4 class="kt-card-title">Grade Content ({defaultLanguage.name})</h4>
-                    </div>
-                    <div class="kt-card-content">
-                        <div class="grid gap-4">
-                            <!-- Grade Title -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="title">
-                                    Grade Title <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="title"
-                                    type="text"
-                                    class="kt-input {errors.title ? 'kt-input-error' : ''}"
-                                    placeholder="Enter grade title"
-                                    bind:value={form.title}
-                                />
-                                {#if errors.title}
-                                    <p class="text-sm text-destructive">{errors.title}</p>
-                                {/if}
-                            </div>
-
-                            <!-- Grade Description -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="description">
-                                    Grade Description <span class="text-destructive">*</span>
-                                </label>
-                                <textarea
-                                    id="description"
-                                    class="kt-textarea {errors.description ? 'kt-textarea-error' : ''}"
-                                    placeholder="Enter grade description"
-                                    rows="3"
-                                    bind:value={form.description}
-                                ></textarea>
-                                {#if errors.description}
-                                    <p class="text-sm text-destructive">{errors.description}</p>
-                                {/if}
-                            </div>
-
-                            <!-- Grade Content -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="summernote-editor">
-                                    Grade Content <span class="text-destructive">*</span>
-                                </label>
-                                <Summernote
-                                    bind:this={summernoteComponent}
-                                    id="summernote-editor"
-                                    bind:value={form.content}
-                                    placeholder="Enter grade content"
-                                    height={400}
-                                    minHeight={300}
-                                    maxHeight={600}
-                                    on:change={(event) => {
-                                        form.content = event.detail.contents;
-                                    }}
-                                />
-                                {#if errors.content}
-                                    <p class="text-sm text-destructive">{errors.content}</p>
-                                {/if}
-                            </div>
                         </div>
                     </div>
                 </div>

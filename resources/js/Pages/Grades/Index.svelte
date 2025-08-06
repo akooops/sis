@@ -323,11 +323,6 @@
                                             <span class="kt-table-col-label">Grade</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[150px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Slug</span>
-                                        </span>
-                                    </th>
                                     {#if !selectedProgramId}
                                     <th class="min-w-[150px]">
                                         <span class="kt-table-col">
@@ -352,15 +347,6 @@
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="kt-skeleton w-10 h-10 rounded-lg"></div>
-                                                    <div class="flex flex-col gap-1">
-                                                        <div class="kt-skeleton w-24 h-4 rounded"></div>
-                                                        <div class="kt-skeleton w-16 h-3 rounded"></div>
-                                                    </div>
-                                                </div>
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-16 h-6 rounded"></div>
@@ -407,25 +393,7 @@
                                                 <span class="text-sm font-medium text-mono">#{grade.id}</span>
                                             </td>
                                             <td>
-                                                <div class="flex items-center gap-3">
-                                                    <div class="flex-shrink-0">
-                                                        <img 
-                                                            src={grade.thumbnailUrl} 
-                                                            alt={grade.name}
-                                                            class="w-10 h-10 rounded-lg object-cover"
-                                                        />
-                                                    </div>
-                                                    <div class="flex flex-col gap-1">
-                                                        <span class="text-sm font-medium text-mono hover:text-primary">
-                                                            {grade.name}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="kt-badge kt-badge-outline kt-badge-primary">
-                                                    {grade.slug}
-                                                </span>
+                                                <span class="text-sm font-medium text-mono">{grade.name}</span>
                                             </td>
                                             {#if !selectedProgramId}
                                             <td>

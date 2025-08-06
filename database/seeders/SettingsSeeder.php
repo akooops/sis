@@ -11,6 +11,36 @@ class SettingsSeeder extends Seeder
     public function run()
     {
         $settings = [
+            // Custom codes
+            [
+                'key' => 'head_code',
+                'type' => 'text',
+                'value' => '',
+                'description' => 'Code to be added to the head of the page',
+                'group' => 'code',
+                'is_encrypted' => false,
+                'options' => null,
+            ],
+            [
+                'key' => 'foot_code',
+                'type' => 'text',
+                'value' => '',
+                'description' => 'Code to be added to the foot of the page',
+                'group' => 'code',
+                'is_encrypted' => false,
+                'options' => null,
+            ],
+            [
+                'key' => 'support_button_code',
+                'type' => 'text',
+                'value' => '',
+                'description' => 'Code to be added to the support button',
+                'group' => 'code',
+                'is_encrypted' => false,
+                'options' => null,
+            ],
+
+            // Google Settings
             [
                 'key' => 'google_recaptcha_public_key',
                 'type' => 'text',

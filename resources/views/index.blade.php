@@ -47,7 +47,6 @@
                             <div class="banner-img" style="background-image: url('{{ $banner->thumbnailUrl }}')"></div>
                         @endif
 
-                        {{--}}
                         <div class="container h-100">
                             <div class="row h-100 align-items-end px-8 px-lg-0 pb-16">           
                                 <div class="row px-0 px-lg-14">
@@ -73,7 +72,6 @@
                             <!--/.row -->
                         </div>
                         <!--/.container -->
-                        {{--}}
                     </div>
                     <!--/.swiper-slide -->
                 @endforeach

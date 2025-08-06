@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
 
             $table->string('name');
-            $table->string('slug')->unique();
 
             $table->unsignedBigInteger('program_id')->nullable();
             $table->foreign('program_id')->references('id')->on('programs')->cascadeOnDelete();

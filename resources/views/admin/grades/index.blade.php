@@ -80,7 +80,6 @@
                                         <tr>
                                             <th scope="col" width="10%" width="100px">#</th>
                                             <th scope="col">Name</th> 
-                                            <th scope="col">Slug</th> 
                                             <th scope="col">Program</th> 
                                             <th scope="col" width="75px">Actions</th>                                        
                                         </tr>
@@ -93,18 +92,9 @@
                                             </td>
 
                                             <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-shrink-0 me-2">
-                                                        <img src="{{ $grade->thumbnailUrl }}" class="avatar-xs material-shadow">
-                                                    </div>
-                                                    <div class="flex-grow-1">{{ $grade->name }}</div>
-                                                </div>
+                                                {{ $grade->name }}
                                             </td>  
 
-                                            <td>
-                                                <span class="badge bg-primary"> {{$grade->slug }} </span>
-                                            </td> 
-                                            
                                             <td>{{$grade->program->name }}</td>  
 
                                             <td>

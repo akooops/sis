@@ -4,8 +4,6 @@
 
     // Props
     export let grade;
-    export let languages;
-    export let translations;
 
     // Define breadcrumbs for this grade
     const breadcrumbs = [
@@ -22,14 +20,6 @@
     ];
     
     const pageTitle = 'Grade Details';
-
-    // Get translation for a field and language
-    function getTranslation(field, languageCode) {
-        if (translations && translations[field] && translations[field][languageCode]) {
-            return translations[field][languageCode];
-        }
-        return `${field}.${languageCode}`;
-    }
 
     // Get file icon based on type
     function getFileIcon(fileType) {
@@ -155,27 +145,9 @@
                         
                         <!-- Grade Details -->
                         <div class="grid gap-4 w-full">
-                            <!-- Grade Thumbnail -->
-                            <div class="flex">
-                                <figure class="figure">
-                                    <img 
-                                        src={grade?.thumbnailUrl} 
-                                        alt={grade?.name}
-                                        class="rounded-lg w-32 h-32 object-cover"
-                                    />
-                                </figure>
-                            </div>
-
                             <div class="flex flex-col gap-2">
                                 <h4 class="text-sm font-semibold text-mono">Grade Name</h4>
                                 <p class="text-sm text-secondary-foreground">{grade?.name}</p>
-                            </div>
-
-                            <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Grade Slug</h4>
-                                <span class="kt-badge kt-badge-outline kt-badge-primary w-fit">
-                                    {grade?.slug}
-                                </span>
                             </div>
 
                             <!-- Program Information -->
@@ -288,66 +260,6 @@
                     </div>
                 </div>
             {/if}
-
-            <!-- Translations Card -->
-            <div class="kt-card w-full">
-                <div class="kt-card-content">
-                    <!-- Language Tabs -->
-                    <div class="kt-tabs kt-tabs-line justify-between mb-6" data-kt-tabs="true">
-                        <div class="flex items-center gap-5">
-                            {#each languages as language, index}
-                                <button 
-                                    class="kt-tab-toggle py-3 {index === 0 ? 'active' : ''}" 
-                                    data-kt-tab-toggle="#translation_tab_{language.code}"
-                                >
-                                    <i class="ki-filled ki-translate text-base me-2"></i>
-                                    {language.name}
-                                </button>
-                            {/each}
-                        </div>
-                    </div>
-
-                    <!-- Tab Content -->
-                    {#each languages as language, index}
-                        <div 
-                            class="grow flex flex-col {index === 0 ? '' : 'hidden'}" 
-                            id="translation_tab_{language.code}"
-                        >
-                            <div class="grid gap-6 w-full py-4">
-                                <!-- Title Translation -->
-                                <div class="flex flex-col gap-2">
-                                    <h4 class="text-sm font-semibold text-mono">
-                                        Grade {language.name} Title
-                                    </h4>
-                                    <p class="text-sm text-secondary-foreground p-3 bg-muted/50 rounded-lg">
-                                        {getTranslation('title', language.code)}
-                                    </p>
-                                </div>
-
-                                <!-- Description Translation -->
-                                <div class="flex flex-col gap-2">
-                                    <h4 class="text-sm font-semibold text-mono">
-                                        Grade {language.name} Description
-                                    </h4>
-                                    <p class="text-sm text-secondary-foreground p-3 bg-muted/50 rounded-lg">
-                                        {getTranslation('description', language.code)}
-                                    </p>
-                                </div>
-
-                                <!-- Content Translation -->
-                                <div class="flex flex-col gap-2">
-                                    <h4 class="text-sm font-semibold text-mono">
-                                        Grade {language.name} Content
-                                    </h4>
-                                    <div class="text-sm text-secondary-foreground p-3 bg-muted/50 rounded-lg">
-                                        {@html getTranslation('content', language.code)}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {/each}
-                </div>
-            </div>
         </div>
     </div>
     <!-- End of Container -->
