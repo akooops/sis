@@ -109,8 +109,8 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => 'الصفحة الرئيسية'
             ],
             'footer_all_rights_reserved' => [
-                'en' => '© 2025 Saudi international schools. All rights reserved.',
-                'ar' => '© 2025 مدارس سعود العالمية. جميع الحقوق محفوظة.'
+                'en' => '© 2025 Al Awael Education Company. All rights reserved.',
+                'ar' => '© 2025 شركة الأوائل للتعليم. جميع الحقوق محفوظة.'
             ],
             'footer_first_menu_title' => [
                 'en' => 'Quick links',

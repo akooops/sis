@@ -1,5 +1,6 @@
 
 @php
+    $googleMapEmbedUrl = getSetting('google_maps_embed_url');
     $googleMapUrl = getSetting('google_maps_url');
 
     $emails = json_decode(getSetting('emails')->value);
@@ -126,7 +127,7 @@
                 @if($googleMapUrl)
                 <div class="row gx-0">
                     <div class="map map-full rounded-top rounded-lg-start">
-                        <iframe id="google-map" src="{{$googleMapUrl->value}}" style="width:100%; height: 500px; border:0" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        <iframe id="google-map" src="{{$googleMapEmbedUrl->value}}" style="width:100%; height: 500px; border:0" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                     </div>
                 </div>
                 @endif
@@ -142,7 +143,15 @@
                             </h5>
                             @if($address)
                                 <address>
-                                    {{$address->value}}
+                                    <p>
+                                        @if($googleMapUrl && !empty($googleMapUrl->value))
+                                            <a href="{{$googleMapUrl->value}}" target="_blank" class="text-primary">
+                                                {{$address->value}}
+                                            </a>
+                                        @else
+                                            {{$address->value}}
+                                        @endif
+                                    </p>
                                 </address>
                             @endif
                         </div>
@@ -160,7 +169,7 @@
                             @if($phones && is_array($phones))
                                 @foreach ($phones as $phone)
                                     <p>
-                                        <a href="tel:{{$phone}}">{{$phone}}</a> <br class="d-none d-md-block">
+                                        <a href="https://wa.me/{{ preg_replace('/\D+/', '', $phone) }}" class="text-primary">{{$phone}}</a> <br class="d-none d-md-block">
                                     </p>
                                 @endforeach
                             @endif
@@ -179,7 +188,7 @@
                                 @if($emails && is_array($emails))
                                     @foreach ($emails as $email)
                                         <p class="my-2">
-                                            <a href="mailto:{{$email}}" class="link-body">
+                                            <a href="mailto:{{$email}}" class="text-primary">
                                                 {{$email}}
                                             </a>        
                                         </p>

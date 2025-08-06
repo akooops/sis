@@ -6,6 +6,7 @@
     $emails = json_decode(getSetting('emails')->value);
     $phones = json_decode(getSetting('phones')->value);
     $address = getSetting('address');
+    $googleMapsUrl = getSetting('google_maps_url');
 
     $facebookUrl = getSetting('social_facebook_url');
     $instagramUrl = getSetting('social_instagram_url');
@@ -53,12 +54,18 @@
                             
                             <p>
                                 @if($address)
-                                    {{$address->value}}
+                                    @if($googleMapsUrl && !empty($googleMapsUrl->value))
+                                        <a href="{{$googleMapsUrl->value}}" target="_blank" class="text-primary">
+                                            {{$address->value}}
+                                        </a>
+                                    @else
+                                        {{$address->value}}
+                                    @endif
                                     <br /> 
                                 @endif
                                 @if($emails && is_array($emails))
                                     @foreach ($emails as $email)
-                                        <a href="mailto:{{$email}}">
+                                        <a href="mailto:{{$email}}" class="text-primary">
                                             {{$email}}
                                         </a>
                                         @if(!$loop->last)<br />@endif
@@ -67,7 +74,7 @@
                                 @if($phones && is_array($phones))
                                     @if($emails && is_array($emails))<br />@endif
                                     @foreach ($phones as $phone)
-                                        <a href="tel:{{$phone}}">
+                                        <a href="https://wa.me/{{ preg_replace('/\D+/', '', $phone) }}" class="text-primary">
                                             {{$phone}}
                                         </a>
                                         @if(!$loop->last)<br />@endif
