@@ -223,18 +223,32 @@ class PagesSeeder extends Seeder
                     'ar' => 'اكتشف الفرص الوظيفية المثيرة في مدارس سعود العالمية. نحن نبحث دائماً عن معلمين متحمسين ومهنيين متفانين للانضمام إلى فريقنا والمساعدة في تشكيل مستقبل التعليم.'
                 ]
             ],
-            'documents' => [
+            'forms' => [
                 'title' => [
-                    'en' => 'School Documents',
-                    'ar' => 'وثائق المدرسة'
+                    'en' => 'School Forms',
+                    'ar' => 'نماذج المدرسة'
                 ],
                 'description' => [
-                    'en' => 'Access important school documents, policies, and forms',
-                    'ar' => 'الوصول إلى وثائق المدرسة المهمة والسياسات والنماذج'
+                    'en' => 'Access important school forms, policies, and documents',
+                    'ar' => 'الوصول إلى نماذج المدرسة المهمة والسياسات والوثائق'
                 ],
                 'content' => [
-                    'en' => 'Find all the important school documents including policies, handbooks, forms, and official communications. All documents are available for download.',
+                    'en' => 'Find all the important school forms including policies, handbooks, forms, and official communications. All forms are available for download.',
                     'ar' => 'ابحث عن جميع وثائق المدرسة المهمة بما في ذلك السياسات والكتيبات والنماذج والمراسلات الرسمية. جميع الوثائق متاحة للتحميل.'
+                ]
+            ],
+            'guidlines' => [
+                'title' => [
+                    'en' => 'School Guidlines',
+                    'ar' => 'الإرشادات المدرسية'
+                ],
+                'description' => [
+                    'en' => 'Access important school guidlines, policies, and documents',
+                    'ar' => 'الوصول إلى الإرشادات المدرسية المهمة والسياسات والوثائق'
+                ],
+                'content' => [
+                    'en' => 'Find all the important school guidlines including policies, handbooks, forms, and official communications. All guidlines are available for download.',
+                    'ar' => 'ابحث عن جميع الإرشادات المدرسية المهمة بما في ذلك السياسات والكتيبات والنماذج والمراسلات الرسمية. جميع الإرشادات متاحة للتحميل.'
                 ]
             ],
             'error' => [

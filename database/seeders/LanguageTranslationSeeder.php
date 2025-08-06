@@ -124,19 +124,27 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Follow Us',
                 'ar' => 'تابعنا'
             ],
-            'grade_page_collapse_title' => [
+            'guidlines_page_collapse_title' => [
+                'en' => 'Guidlines',
+                'ar' => 'الإرشادات'
+            ],
+            'guidlines_page_select_grade_placeholder' => [
+                'en' => 'Select Grade',
+                'ar' => 'اختر الدرجة'
+            ],
+            'guidlines_page_table_header_file' => [
                 'en' => 'Files',
                 'ar' => 'الملفات'
             ],
-            'grade_page_table_cta' => [
+            'guidlines_page_table_cta' => [
                 'en' => 'Download',
                 'ar' => 'التحميل'
             ],
-            'grade_page_table_header_file' => [
-                'en' => 'File',
-                'ar' => 'الملف'
+            'guidlines_page_table_header_grade' => [
+                'en' => 'Grade',
+                'ar' => 'الدرجة'
             ],
-            'grade_page_table_header_option' => [
+            'guidlines_page_table_header_option' => [
                 'en' => 'Options',
                 'ar' => 'الإطلاع'
             ],
@@ -671,22 +679,6 @@ class LanguageTranslationSeeder extends Seeder
             'privacy_popup_button' => [
                 'en' => 'Agree',
                 'ar' => 'موافق'
-            ],
-            'program_page_collapse_title' => [
-                'en' => 'Grades',
-                'ar' => 'الدرجات'
-            ],
-            'program_page_table_cta' => [
-                'en' => 'Check it out',
-                'ar' => 'الإطلاع'
-            ],
-            'program_page_table_header_grade' => [
-                'en' => 'Grade',
-                'ar' => 'الدرجة'
-            ],
-            'program_page_table_header_option' => [
-                'en' => 'Options',
-                'ar' => 'الإطلاع'
             ],
             'recaptcha_error' => [
                 'en' => 'Security verification failed. Please try again.',

@@ -105,21 +105,21 @@
             <div id="accordion-3" class="accordion-wrapper">
                 <div class="card accordion-item">
                     <div class="card-header" id="accordion-heading-3-1">
-                        <button class="collapsed" data-bs-toggle="collapse" data-bs-target="#documents-collapse" aria-expanded="false" aria-controls="documents-collapse">
-                            {{getLanguageKeyLocalTranslation('documents_page_collapse_title')}}
+                        <button class="collapsed" data-bs-toggle="collapse" data-bs-target="#guidlines-collapse" aria-expanded="false" aria-controls="guidlines-collapse">
+                            {{getLanguageKeyLocalTranslation('guidlines_page_collapse_title')}}
                         </button>
                     </div>
                     <!-- /.card-header -->
-                    <div id="documents-collapse" class="collapse show">
+                    <div id="guidlines-collapse" class="collapse show">
                         <div class="card-body">
                             <!-- Grade Selection -->
                             <div class="row mb-4">
-                                <div class="col-md-6">
+                                <div class="col-12">
                                     <label for="grade-select" class="form-label fw-semibold">
-                                        {{getLanguageKeyLocalTranslation('grade_page_table_header_file')}}
+                                        {{getLanguageKeyLocalTranslation('guidlines_page_table_header_grade')}}
                                     </label>
                                     <select id="grade-select" class="form-select" onchange="showGradeFiles()">
-                                        <option value="">{{getLanguageKeyLocalTranslation('select_grade_placeholder')}}</option>
+                                        <option value="">{{getLanguageKeyLocalTranslation('guidlines_page_select_grade_placeholder')}}</option>
                                         @foreach ($grades as $grade)
                                             <option value="{{ $grade->id }}" data-grade-index="{{ $loop->index }}">
                                                 {{$grade->getLocalTranslation('title')}}
@@ -136,10 +136,10 @@
                                         <tr>
                                             <th scope="col" width="25px">#</th>
                                             <th scope="col" width="90%">
-                                                {{getLanguageKeyLocalTranslation('grade_page_table_header_file')}}
+                                                {{getLanguageKeyLocalTranslation('guidlines_page_table_header_file')}}
                                             </th>
                                             <th scope="col">
-                                                {{getLanguageKeyLocalTranslation('grade_page_table_header_option')}}
+                                                {{getLanguageKeyLocalTranslation('guidlines_page_table_header_option')}}
                                             </th>
                                         </tr>
                                     </thead>
@@ -206,7 +206,7 @@ function showGradeFiles() {
             <td>
                 <a href="${file.url}" target="_blank" class="btn btn-sm btn-primary">
                     <i class="uil uil-angle-right-b me-2"></i>
-                    {{getLanguageKeyLocalTranslation('grade_page_table_cta')}}
+                    {{getLanguageKeyLocalTranslation('guidlines_page_table_cta')}}
                 </a>
             </td>
         `;

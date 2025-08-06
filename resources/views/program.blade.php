@@ -95,60 +95,6 @@
                 {!! $program->getLocalTranslation('content') !!}
             </div>
         </div>
-
-        <div class="row pt-6" data-aos="fade-up" data-aos-duration="2000">
-            <div class="accordion-wrapper">
-                <div class="card accordion-item">
-                    <div class="card-header">
-                        <button class="collapsed" data-bs-toggle="collapse" data-bs-target="#grades-collapse" aria-expanded="false" aria-controls="grades-collapse">
-                            {{getLanguageKeyLocalTranslation('program_page_collapse_title')}}
-                        </button>
-                    </div>
-                    <!-- /.card-header -->
-
-                    <div id="grades-collapse" class="collapse show">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col" width="25px">#</th>
-                                            <th scope="col" width="90%">
-                                                {{getLanguageKeyLocalTranslation('program_page_table_header_grade')}}
-                                            </th>
-                                            <th scope="col">
-                                                {{getLanguageKeyLocalTranslation('program_page_table_header_option')}}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($program->grades as $key => $grade)
-                                            <tr>
-                                                <th scope="row">
-                                                    {{$key + 1}}
-                                                </th>
-                                                <td>
-                                                    {{$grade->getLocalTranslation('title') }}
-                                                </td>
-                                                <td>
-                                                    <a href="{{route('grade', ['slug' => $grade->slug])}}" class="btn btn-primary">
-                                                        <i class="uil uil-angle-right-b me-2"></i>
-                                                        {{getLanguageKeyLocalTranslation('program_page_table_cta')}}
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <!-- /.card-body -->
-                    </div>
-                    <!-- /.collapse -->
-                </div>
-            </div>
-        </div>
-        <!-- /.container -->
     </div>
 </section>
 
