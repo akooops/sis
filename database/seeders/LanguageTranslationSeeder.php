@@ -124,27 +124,27 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Follow Us',
                 'ar' => 'تابعنا'
             ],
-            'guidlines_page_collapse_title' => [
-                'en' => 'Guidlines',
+            'guidelines_page_collapse_title' => [
+                'en' => 'Guidelines',
                 'ar' => 'الإرشادات'
             ],
-            'guidlines_page_select_grade_placeholder' => [
+            'guidelines_page_select_grade_placeholder' => [
                 'en' => 'Select Grade',
                 'ar' => 'اختر الدرجة'
             ],
-            'guidlines_page_table_header_file' => [
+            'guidelines_page_table_header_file' => [
                 'en' => 'Files',
                 'ar' => 'الملفات'
             ],
-            'guidlines_page_table_cta' => [
+            'guidelines_page_table_cta' => [
                 'en' => 'Download',
                 'ar' => 'التحميل'
             ],
-            'guidlines_page_table_header_grade' => [
+            'guidelines_page_table_header_grade' => [
                 'en' => 'Grade',
                 'ar' => 'الدرجة'
             ],
-            'guidlines_page_table_header_option' => [
+            'guidelines_page_table_header_option' => [
                 'en' => 'Options',
                 'ar' => 'الإطلاع'
             ],

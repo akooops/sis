@@ -316,7 +316,7 @@ class PagesController extends Controller
     public function guidlines(Request $request)
     {
         $page = Page::where([
-            'slug' => 'guidlines',
+            'slug' => 'guidelines',
             'status' => 'published'
         ])->first();
 
@@ -324,7 +324,7 @@ class PagesController extends Controller
 
         $grades = Grade::with('files')->orderBy('order', 'asc')->get();
 
-        return view('guidlines', [
+        return view('guidelines', [
             'page' => $page,
             'grades' => $grades
         ]);

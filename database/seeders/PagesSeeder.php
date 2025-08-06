@@ -75,8 +75,8 @@ class PagesSeeder extends Seeder
                 'menu_id' => null,
             ],
             [
-                'name' => 'Guidlines',
-                'slug' => 'guidlines',
+                'name' => 'Guidelines',
+                'slug' => 'guidelines',
                 'is_system_page' => true,
                 'status' => 'published',
                 'menu_id' => null,
@@ -237,17 +237,17 @@ class PagesSeeder extends Seeder
                     'ar' => 'ابحث عن جميع وثائق المدرسة المهمة بما في ذلك السياسات والكتيبات والنماذج والمراسلات الرسمية. جميع الوثائق متاحة للتحميل.'
                 ]
             ],
-            'guidlines' => [
+            'guidelines' => [
                 'title' => [
-                    'en' => 'School Guidlines',
+                    'en' => 'School Guidelines',
                     'ar' => 'الإرشادات المدرسية'
                 ],
                 'description' => [
-                    'en' => 'Access important school guidlines, policies, and documents',
+                    'en' => 'Access important school guidelines, policies, and documents',
                     'ar' => 'الوصول إلى الإرشادات المدرسية المهمة والسياسات والوثائق'
                 ],
                 'content' => [
-                    'en' => 'Find all the important school guidlines including policies, handbooks, forms, and official communications. All guidlines are available for download.',
+                    'en' => 'Find all the important school guidelines including policies, handbooks, forms, and official communications. All guidelines are available for download.',
                     'ar' => 'ابحث عن جميع الإرشادات المدرسية المهمة بما في ذلك السياسات والكتيبات والنماذج والمراسلات الرسمية. جميع الإرشادات متاحة للتحميل.'
                 ]
             ],
