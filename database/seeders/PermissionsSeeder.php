@@ -118,11 +118,11 @@ class PermissionsSeeder extends Seeder
             'admin.banners.order',
             
             // Documents Management
-            'admin.documents.index',
-            'admin.documents.store',
-            'admin.documents.show',
-            'admin.documents.update',
-            'admin.documents.destroy',
+            'admin.forms.index',
+            'admin.forms.store',
+            'admin.forms.show',
+            'admin.forms.update',
+            'admin.forms.destroy',
             
             // Visit Services Management
             'admin.visit-services.index',
@@ -231,7 +231,7 @@ class PermissionsSeeder extends Seeder
             ->orWhere('name', 'like', '%events%')
             ->orWhere('name', 'like', '%media%')
             ->orWhere('name', 'like', '%banners%')
-            ->orWhere('name', 'like', '%documents%')
+            ->orWhere('name', 'like', '%forms%')
             ->orWhere('name', 'like', '%files%')
             ->get();
             

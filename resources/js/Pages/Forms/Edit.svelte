@@ -4,29 +4,29 @@
     import { router } from '@inertiajs/svelte';
 
     // Props from the server
-    export let documentItem;
+    export let formItem;
     export let languages;
     export let translations;
 
-    // Define breadcrumbs for this document
+    // Define breadcrumbs for this form
     const breadcrumbs = [
         {
-            title: 'Documents',
-            url: route('admin.documents.index'),
+            title: 'Forms',
+            url: route('admin.forms.index'),
             active: false
         },
         {
             title: 'Edit',
-            url: route('admin.documents.edit', { document: documentItem?.id }),
+            url: route('admin.forms.edit', { form: formItem?.id }),
             active: true
         }
     ];
     
-    const pageTitle = 'Edit Document';
+    const pageTitle = 'Edit Form';
 
-    // Form data for basic document info
+    // Form data for basic form info
     let form = {
-        name: documentItem?.name || '',
+        name: formItem?.name || '',
         file: null,
     };
 
@@ -41,7 +41,7 @@
     let translationErrors = {};
     let translationLoading = {};
 
-    // Initialize translation forms imdocumenttely to prevent undefined errors
+    // Initialize translation forms imformtely to prevent undefined errors
     if (languages && Array.isArray(languages)) {
         languages.forEach(language => {
             // Get translation data - now always has values (either translation or fallback)
@@ -78,7 +78,7 @@
             formData.append('file', form.file);
         }
 
-        router.post(route('admin.documents.update', { document: documentItem.id }), formData, {
+        router.post(route('admin.forms.update', { form: formItem.id }), formData, {
             onError: (err) => {
                 errors = err;
                 loading = false;
@@ -104,7 +104,7 @@
         formData.append('title', translationForms[languageCode].title);
 
         // Send AJAX request
-        fetch(route('admin.documents.update-translation', { document: documentItem.id }), {
+        fetch(route('admin.forms.update-translation', { form: formItem.id }), {
             method: 'POST',
             body: formData,
             headers: {
@@ -156,18 +156,18 @@
     <!-- Container -->
     <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
-            <!-- Document Header -->
+            <!-- Form Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Edit Document</h1>
+                    <h1 class="text-2xl font-bold text-mono">Edit Form</h1>
                     <p class="text-sm text-secondary-foreground">
-                        Update document information and content
+                        Update form information and content
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="{route('admin.documents.index')}" class="kt-btn kt-btn-outline">
+                    <a href="{route('admin.forms.index')}" class="kt-btn kt-btn-outline">
                         <i class="ki-filled ki-arrow-left text-base"></i>
-                        Back to Document
+                        Back to Form
                     </a>
                 </div>
             </div>
@@ -180,10 +180,10 @@
                         <div class="flex items-center gap-5">
                             <button 
                                 class="kt-tab-toggle py-3 active" 
-                                data-kt-tab-toggle="#document_form_tab"
+                                data-kt-tab-toggle="#form_form_tab"
                             >
-                                <i class="ki-filled ki-document text-base me-2"></i>
-                                Edit document
+                                <i class="ki-filled ki-form text-base me-2"></i>
+                                Edit form
                             </button>
                             <button 
                                 class="kt-tab-toggle py-3" 
@@ -196,8 +196,8 @@
                     </div>
 
                     <!-- Tab Content -->
-                    <!-- Document Form Tab -->
-                    <div class="grow flex flex-col" id="document_form_tab">
+                    <!-- Form Form Tab -->
+                    <div class="grow flex flex-col" id="form_form_tab">
                         <div class="grid gap-5 lg:gap-7.5 w-full py-4">
                             <!-- Basic Info Form -->
                             <form on:submit|preventDefault={handleSubmit} class="kt-card">
@@ -208,16 +208,16 @@
                                     </div>
                                     <div class="kt-card-content">
                                         <div class="grid gap-4">
-                                            <!-- Document Name -->
+                                            <!-- Form Name -->
                                             <div class="flex flex-col gap-2">
                                                 <label class="text-sm font-medium text-mono" for="name">
-                                                    Document Name <span class="text-destructive">*</span>
+                                                    Form Name <span class="text-destructive">*</span>
                                                 </label>
                                                 <input
                                                     id="name"
                                                     type="text"
                                                     class="kt-input {errors.name ? 'kt-input-error' : ''}"
-                                                    placeholder="Enter document name"
+                                                    placeholder="Enter form name"
                                                     bind:value={form.name}
                                                 />
                                                 {#if errors.name}
@@ -229,15 +229,15 @@
                                 </div>
                             </form>
 
-                            <!-- Document Selection Card -->
+                            <!-- Form Selection Card -->
                             <div class="kt-card">
                                 <div class="kt-card-header">
-                                    <h4 class="kt-card-title">Document file</h4>
+                                    <h4 class="kt-card-title">Form file</h4>
                                 </div>
                                 <div class="kt-card-content">
                                     <div class="grid gap-4">
                                         <!-- Current File Display -->
-                                        {#if documentItem?.documentUrl}
+                                        {#if formItem?.formUrl}
                                             <div class="flex flex-col gap-2">
                                                 <label class="text-sm font-medium text-mono">Current File</label>
                                                 <div class="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
@@ -247,9 +247,9 @@
                                                         </div>
                                                     </div>
                                                     <div class="flex flex-col gap-1">
-                                                        <span class="text-sm font-medium text-mono">{documentItem.name}</span>
-                                                        <span class="text-xs text-secondary-foreground">Document</span>
-                                                        <a href={documentItem.documentUrl} target="_blank" class="text-xs text-primary hover:underline">
+                                                        <span class="text-sm font-medium text-mono">{formItem.name}</span>
+                                                        <span class="text-xs text-secondary-foreground">Form</span>
+                                                        <a href={formItem.formUrl} target="_blank" class="text-xs text-primary hover:underline">
                                                             View File <i class="ki-filled ki-arrow-up-right"></i>
                                                         </a>
                                                     </div>
@@ -282,7 +282,7 @@
 
                             <!-- Form Actions -->
                             <div class="flex items-center justify-end gap-3">
-                                <a href="{route('admin.documents.index')}" class="kt-btn kt-btn-outline">
+                                <a href="{route('admin.forms.index')}" class="kt-btn kt-btn-outline">
                                     Cancel
                                 </a>
                                 <button
@@ -296,7 +296,7 @@
                                         Updating...
                                     {:else}
                                         <i class="ki-filled ki-check text-base"></i>
-                                        Update Document
+                                        Update Form
                                     {/if}
                                 </button>
                             </div>
@@ -331,7 +331,7 @@
                                         on:submit|preventDefault={() => handleTranslationSubmit(language.code, language.id)}
                                         class="grid gap-4"
                                     >
-                                        <!-- Document Title -->
+                                        <!-- Form Title -->
                                         <div class="flex flex-col gap-2">
                                             <label class="text-sm font-medium text-mono" for="title-{language.id}">
                                                 Title <span class="text-destructive">*</span>
@@ -340,7 +340,7 @@
                                                 id="title-{language.id}"
                                                 type="text"
                                                 class="kt-input {translationErrors[language.code]?.title ? 'kt-input-error' : ''}"
-                                                placeholder="Enter document title"
+                                                placeholder="Enter form title"
                                                 bind:value={translationForms[language.code].title}
                                             />
                                             {#if translationErrors[language.code]?.title}

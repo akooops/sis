@@ -88,19 +88,19 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Thank you for your message! We will get back to you as soon as possible.',
                 'ar' => 'شكراً لك على رسالتك! سنتواصل معك في أقرب وقت ممكن.'
             ],
-            'documents_page_collapse_title' => [
+            'forms_page_collapse_title' => [
                 'en' => 'Files',
                 'ar' => 'الملفات'
             ],
-            'documents_page_table_cta' => [
+            'forms_page_table_cta' => [
                 'en' => 'Download',
                 'ar' => 'التحميل'
             ],
-            'documents_page_table_header_file' => [
+            'forms_page_table_header_file' => [
                 'en' => 'File',
                 'ar' => 'الملف'
             ],
-            'documents_page_table_header_option' => [
+            'forms_page_table_header_option' => [
                 'en' => 'Options',
                 'ar' => 'الإطلاع'
             ],

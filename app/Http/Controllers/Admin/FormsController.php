@@ -2,19 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Admin\Documents\DeleteDocumentRequest;
-use App\Http\Requests\Admin\Documents\StoreDocumentRequest;
-use App\Http\Requests\Admin\Documents\UpdateDocumentRequest;
-use App\Http\Requests\Admin\Documents\UpdateDocumentTranslationRequest;
+use App\Http\Requests\Admin\Forms\StoreFormRequest;
+use App\Http\Requests\Admin\Forms\UpdateFormRequest;
+use App\Http\Requests\Admin\Forms\UpdateFormTranslationRequest;
 use App\Models\Language;
-use App\Models\Permission;
 use Illuminate\Http\Request;
-use App\Models\Document;
+use App\Models\Form;
 use App\Models\Media;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 
-class DocumentsController extends Controller
+class FormsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,25 +23,25 @@ class DocumentsController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $documents = Document::latest();
+        $forms = Form::latest();
 
         if ($search) {
-            $documents->where(function($query) use ($search) {
+            $forms->where(function($query) use ($search) {
                 $query->where('id', $search)
                       ->orWhere('name', 'like', '%' . $search . '%');
             });
         }
 
-        $documents = $documents->paginate($perPage, ['*'], 'document', $page);
+        $forms = $forms->paginate($perPage, ['*'], 'form', $page);
 
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
-                'documents' => $documents->items(),
-                'pagination' => $this->indexService->handlePagination($documents)
+                'forms' => $forms->items(),
+                'pagination' => $this->indexService->handlePagination($forms)
             ]);
         }
 
-        return inertia('Documents/Index');
+        return inertia('Forms/Index');
     }
     
     /**
@@ -59,7 +55,7 @@ class DocumentsController extends Controller
             'is_default' => true,
         ])->first();
 
-        return inertia('Documents/Create', compact('defaultLanguage'));
+        return inertia('Forms/Create', compact('defaultLanguage'));
     }
     
     /**
@@ -68,16 +64,16 @@ class DocumentsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreDocumentRequest $request)
+    public function store(StoreFormRequest $request)
     {
-        $document = Document::create($request->validated());
+        $form = Form::create($request->validated());
         
         $defaultLanguage = Language::where([
             'is_default' => true,
         ])->first();
 
-        foreach($document->getTranslatableFields() as $field){
-            $document->setTranslation($field, $defaultLanguage->code, $request->input($field));    
+        foreach($form->getTranslatableFields() as $field){
+            $form->setTranslation($field, $defaultLanguage->code, $request->input($field));    
         }
 
         $media = null;
@@ -112,10 +108,10 @@ class DocumentsController extends Controller
             $file = $this->fileService->upload($request->file('file'), 'App\\Models\\Media', $media->id);
         }
     
-        $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Document', $document->id, true);
+        $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Form', $form->id, true);
 
-        return inertia('Documents/Index', [
-            'success' => 'Document created successfully!'
+        return inertia('Forms/Index', [
+            'success' => 'Form created successfully!'
         ]);
     }
 
@@ -125,13 +121,13 @@ class DocumentsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Document $document)
+    public function show(Form $form)
     {    
         $languages = Language::orderBy('is_default', 'DESC')->get();
-        $translations = $document->getTranslatableFieldsByLanguages();
+        $translations = $form->getTranslatableFieldsByLanguages();
 
-        return inertia('Documents/Show', [
-            'document' => $document,
+        return inertia('Forms/Show', [
+            'form' => $form,
             'languages' => $languages,
             'translations' => $translations
         ]);
@@ -143,13 +139,13 @@ class DocumentsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Document $document)    
+    public function edit(Form $form)    
     {
         $languages = Language::orderBy('is_default', 'DESC')->get();
-        $translations = $document->getTranslatableFieldsByLanguages();
+        $translations = $form->getTranslatableFieldsByLanguages();
 
-        return inertia('Documents/Edit', [
-            'documentItem' => $document,
+        return inertia('Forms/Edit', [
+            'formItem' => $form,
             'languages' => $languages,
             'translations' => $translations
         ]);
@@ -162,9 +158,9 @@ class DocumentsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Document $document, UpdateDocumentRequest $request)
+    public function update(Form $form, UpdateFormRequest $request)
     {
-        $document->update($request->validated());
+        $form->update($request->validated());
     
         $media = null;
 
@@ -191,25 +187,25 @@ class DocumentsController extends Controller
         }
     
         if($media){
-            if($document->file) $document->file->detach();
-            $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Document', $document->id, true);
+            if($form->file) $form->file->detach();
+            $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Form', $form->id, true);
         }
 
-        return inertia('Documents/Index', [
-            'success' => 'Document updated successfully!'
+        return inertia('Forms/Index', [
+            'success' => 'Form updated successfully!'
         ]);
     }
 
-    public function updateTranslation(Document $document, UpdateDocumentTranslationRequest $request){
+    public function updateTranslation(Form $form, UpdateFormTranslationRequest $request){
         $language = Language::find($request->language_id);
 
-        foreach($document->getTranslatableFields() as $field){
-            $document->setTranslation($field, $language->code, $request->input($field));    
+        foreach($form->getTranslatableFields() as $field){
+            $form->setTranslation($field, $language->code, $request->input($field));    
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Document updated successfully',
+            'message' => 'Form updated successfully',
         ]);
     }
 
@@ -219,11 +215,11 @@ class DocumentsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Document $document)
+    public function destroy(Form $form)
     {
-        $document->delete();
+        $form->delete();
 
-        return redirect()->route('admin.documents.index')
-                        ->with('success','Document deleted successfully');
+        return redirect()->route('admin.forms.index')
+                        ->with('success','Form deleted successfully');
     }
 }

@@ -7,21 +7,21 @@
     // Define breadcrumbs for this page
     const breadcrumbs = [
         {
-            title: 'Documents',
-            url: route('admin.documents.index'),
+            title: 'Forms',
+            url: route('admin.forms.index'),
             active: false
         },
         {
             title: 'Index',
-            url: route('admin.documents.index'),
+            url: route('admin.forms.index'),
             active: true
         }
     ];
     
-    const pageTitle = 'Documents';
+    const pageTitle = 'Forms';
 
     // Reactive variables
-    let documents = [];
+    let forms = [];
     let pagination = {};
     let loading = true;
     let search = '';
@@ -29,8 +29,8 @@
     let currentPage = 1;
     let searchTimeout;
 
-    // Fetch documents data
-    async function fetchDocuments() {
+    // Fetch forms data
+    async function fetchForms() {
         loading = true;
         try {
             const params = new URLSearchParams({
@@ -39,7 +39,7 @@
                 search: search
             });
             
-            const response = await fetch(route('admin.documents.index', {
+            const response = await fetch(route('admin.forms.index', {
                 page: currentPage,
                 perPage: perPage,
                 search: search
@@ -50,7 +50,7 @@
             });
             
             const data = await response.json();
-            documents = data.documents;
+            forms = data.forms;
             pagination = data.pagination;
             
             // Wait for DOM to update, then initialize menus
@@ -59,7 +59,7 @@
                 window.KTMenu.init();
             }
         } catch (error) {
-            console.error('Error fetching documents:', error);
+            console.error('Error fetching forms:', error);
         } finally {
             loading = false;
         }
@@ -75,7 +75,7 @@
         // Set new timeout for 500ms
         searchTimeout = setTimeout(() => {
             currentPage = 1;
-            fetchDocuments();
+            fetchForms();
         }, 500);
     }
 
@@ -89,7 +89,7 @@
     function goToPage(page) {
         if (page && page !== currentPage) {
             currentPage = page;
-            fetchDocuments();
+            fetchForms();
         }
     }
 
@@ -97,12 +97,12 @@
     function handlePerPageChange(newPerPage) {
         perPage = newPerPage;
         currentPage = 1;
-        fetchDocuments();
+        fetchForms();
     }
 
-    // Delete document
-    async function deleteDocument(documentId) {
-        if (!confirm('Are you sure you want to delete this document? This action cannot be undone.')) {
+    // Delete form
+    async function deleteForm(formId) {
+        if (!confirm('Are you sure you want to delete this form? This action cannot be undone.')) {
             return;
         }
 
@@ -111,7 +111,7 @@
             formData.append('_method', 'DELETE');
             formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
 
-            const response = await fetch(route('admin.documents.destroy', { document: documentId }), {
+            const response = await fetch(route('admin.forms.destroy', { form: formId }), {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -123,16 +123,16 @@
                 // Show success toast
                 KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Document deleted successfully!",
+                    message: "Form deleted successfully!",
                     variant: "success",
                     position: "bottom-right",
                 });
 
-                // Refresh the documents list
-                fetchDocuments();
+                // Refresh the forms list
+                fetchForms();
             } else {
                 const errorData = await response.json().catch(() => ({}));
-                const errorMessage = errorData.message || 'Error deleting document. Please try again.';
+                const errorMessage = errorData.message || 'Error deleting form. Please try again.';
                 
                 KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
@@ -142,7 +142,7 @@
                 });
             }
         } catch (error) {
-            console.error('Error deleting document:', error);
+            console.error('Error deleting form:', error);
             
             KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
@@ -154,7 +154,7 @@
     }
 
     onMount(() => {
-        fetchDocuments();
+        fetchForms();
     });
 
     // Flash message handling
@@ -178,25 +178,25 @@
     <!-- Container -->
     <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
-            <!-- Document Header -->
+            <!-- Form Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Documents Management</h1>
+                    <h1 class="text-2xl font-bold text-mono">Forms Management</h1>
                     <p class="text-sm text-secondary-foreground">
-                        Manage your website documents and content
+                        Manage your website forms and content
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    {#if hasPermission('admin.documents.store')}
-                    <a href="{route('admin.documents.create')}" class="kt-btn kt-btn-primary">
+                    {#if hasPermission('admin.forms.store')}
+                    <a href="{route('admin.forms.create')}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-plus text-base"></i>
-                        Add New Document
+                        Add New Form
                     </a>
                     {/if}
                 </div>
             </div>
 
-            <!-- Documents Table -->
+            <!-- Forms Table -->
             <div class="kt-card">
                 <div class="kt-card-header">
                     <div class="kt-card-toolbar">
@@ -205,7 +205,7 @@
                             <input 
                                 type="text" 
                                 class="kt-input" 
-                                placeholder="Search documents..." 
+                                placeholder="Search forms..." 
                                 bind:value={search}
                                 on:input={handleSearchInput}
                             />
@@ -228,7 +228,7 @@
                                     </th>
                                     <th class="min-w-[200px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Document</span>
+                                            <span class="kt-table-col-label">Form</span>
                                         </span>
                                     </th>
                                     <th class="w-[200px]">
@@ -271,22 +271,22 @@
                                             </td>
                                         </tr>
                                     {/each}
-                                {:else if documents.length === 0}
+                                {:else if forms.length === 0}
                                     <!-- Empty state -->
                                     <tr>
                                         <td colspan="8" class="p-10">
                                             <div class="flex flex-col items-center justify-center text-center">
                                                 <div class="mb-4">
-                                                    <i class="ki-filled ki-document text-4xl text-muted-foreground"></i>
+                                                    <i class="ki-filled ki-form text-4xl text-muted-foreground"></i>
                                                 </div>
-                                                <h3 class="text-lg font-semibold text-mono mb-2">No documents found</h3>
+                                                <h3 class="text-lg font-semibold text-mono mb-2">No forms found</h3>
                                                 <p class="text-sm text-secondary-foreground mb-4">
-                                                    {search ? 'No documents match your search criteria.' : 'Get started by creating your first document.'}
+                                                    {search ? 'No forms match your search criteria.' : 'Get started by creating your first form.'}
                                                 </p>
-                                                {#if hasPermission('admin.documents.store')}
-                                                <a href="{route('admin.documents.create')}" class="kt-btn kt-btn-primary">
+                                                {#if hasPermission('admin.forms.store')}
+                                                <a href="{route('admin.forms.create')}" class="kt-btn kt-btn-primary">
                                                     <i class="ki-filled ki-plus text-base"></i>
-                                                    Create First Document
+                                                    Create First Form
                                                 </a>
                                                 {/if}
                                             </div>
@@ -294,23 +294,23 @@
                                     </tr>
                                 {:else}
                                     <!-- Actual data rows -->
-                                    {#each documents as document}
+                                    {#each forms as form}
                                         <tr class="hover:bg-muted/50">
                                             <td>
-                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={document.id}/>
+                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={form.id}/>
                                             </td>
                                             <td>
-                                                <span class="text-sm font-medium text-mono">#{document.id}</span>
+                                                <span class="text-sm font-medium text-mono">#{form.id}</span>
                                             </td>
                                             <td>
                                                 <span class="text-sm font-medium text-mono hover:text-primary">
-                                                    {document.name}
+                                                    {form.name}
                                                 </span>
                                             </td>
                                             
                                             <td>
                                                 <span class="kt-badge kt-badge-outline kt-badge-primary">
-                                                    <a href={document.documentUrl} target="_blank">
+                                                    <a href={form.formUrl} target="_blank">
                                                         Open <i class="ki-filled ki-arrow-up-right"></i> 
                                                     </a>
                                                 </span>
@@ -323,9 +323,9 @@
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
-                                                            {#if hasPermission('admin.documents.show')}
+                                                            {#if hasPermission('admin.forms.show')}
                                                             <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.documents.show', { document: document.id })}>
+                                                                <a class="kt-menu-link" href={route('admin.forms.show', { form: form.id })}>
                                                                     <span class="kt-menu-icon">
                                                                         <i class="ki-filled ki-search-list"></i>
                                                                     </span>
@@ -333,9 +333,9 @@
                                                                 </a>
                                                             </div>
                                                             {/if}
-                                                            {#if hasPermission('admin.documents.update')}
+                                                            {#if hasPermission('admin.forms.update')}
                                                             <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.documents.edit', { document: document.id })}>
+                                                                <a class="kt-menu-link" href={route('admin.forms.edit', { form: form.id })}>
                                                                     <span class="kt-menu-icon">
                                                                         <i class="ki-filled ki-pencil"></i>
                                                                     </span>
@@ -343,10 +343,10 @@
                                                                 </a>
                                                             </div>
                                                             {/if}
-                                                            {#if hasPermission('admin.documents.destroy')}
+                                                            {#if hasPermission('admin.forms.destroy')}
                                                                 <div class="kt-menu-separator"></div>
                                                                 <div class="kt-menu-item">
-                                                                    <button class="kt-menu-link" on:click={() => deleteDocument(document.id)}>
+                                                                    <button class="kt-menu-link" on:click={() => deleteForm(form.id)}>
                                                                         <span class="kt-menu-icon">
                                                                             <i class="ki-filled ki-trash"></i>
                                                                         </span>

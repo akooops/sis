@@ -105,12 +105,12 @@
             <div id="accordion-3" class="accordion-wrapper">
                 <div class="card accordion-item">
                     <div class="card-header" id="accordion-heading-3-1">
-                        <button class="collapsed" data-bs-toggle="collapse" data-bs-target="#documents-collapse" aria-expanded="false" aria-controls="documents-collapse">
-                            {{getLanguageKeyLocalTranslation('documents_page_collapse_title')}}
+                        <button class="collapsed" data-bs-toggle="collapse" data-bs-target="#forms-collapse" aria-expanded="false" aria-controls="forms-collapse">
+                            {{getLanguageKeyLocalTranslation('forms_page_collapse_title')}}
                         </button>
                     </div>
                     <!-- /.card-header -->
-                    <div id="documents-collapse" class="collapse show">
+                    <div id="forms-collapse" class="collapse show">
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table">
@@ -118,27 +118,27 @@
                                         <tr>
                                             <th scope="col" width="25px">#</th>
                                             <th scope="col" width="90%">
-                                                {{getLanguageKeyLocalTranslation('documents_page_table_header_file')}}
+                                                {{getLanguageKeyLocalTranslation('forms_page_table_header_file')}}
                                             </th>
                                             <th scope="col">
-                                                {{getLanguageKeyLocalTranslation('documents_page_table_header_option')}}
+                                                {{getLanguageKeyLocalTranslation('forms_page_table_header_option')}}
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($documents as $key => $document)
+                                        @foreach ($forms as $key => $form)
                                             <tr>
                                                 <th scope="row">
                                                     {{$key + 1}}
                                                 </th>
                                                 <td>
-                                                    {{$document->getLocalTranslation('title')}}
+                                                    {{$form->getLocalTranslation('title')}}
                                                 </td>
                                                 <td>
-                                                    <a href="{{$document->documentUrl}}" target="_blank" class="btn btn-sm btn-primary">
+                                                    <a href="{{$form->formUrl}}" target="_blank" class="btn btn-sm btn-primary">
                                                         <i class="uil uil-angle-right-b me-2"></i>
 
-                                                        {{getLanguageKeyLocalTranslation('documents_page_table_cta')}}
+                                                        {{getLanguageKeyLocalTranslation('forms_page_table_cta')}}
                                                     </a>
                                                 </td>
                                             </tr>

@@ -6,7 +6,6 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BannersController;
 use App\Http\Controllers\Admin\ContactSubmissionsController;
 use App\Http\Controllers\Admin\DashboardContoller;
-use App\Http\Controllers\Admin\DocumentsController;
 use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\Admin\FilesController;
 use App\Http\Controllers\Admin\FormsController;
@@ -222,15 +221,15 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::delete('banners/{banner}', [BannersController::class, 'destroy'])->middleware('check.permission:admin.banners.destroy')->name('admin.banners.destroy');
 
 
-    // Documents
-    Route::get('documents', [DocumentsController::class, 'index'])->middleware('check.permission:admin.documents.index')->name('admin.documents.index');
-    Route::get('documents/create', [DocumentsController::class, 'create'])->middleware('check.permission:admin.documents.store')->name('admin.documents.create');
-    Route::post('documents', [DocumentsController::class, 'store'])->middleware('check.permission:admin.documents.store')->name('admin.documents.store');
-    Route::get('documents/{document}', [DocumentsController::class, 'show'])->middleware('check.permission:admin.documents.show')->name('admin.documents.show');
-    Route::get('documents/{document}/edit', [DocumentsController::class, 'edit'])->middleware('check.permission:admin.documents.update')->name('admin.documents.edit');
-    Route::patch('documents/{document}/update-translation', [DocumentsController::class, 'updateTranslation'])->middleware('check.permission:admin.documents.update')->name('admin.documents.update-translation');
-    Route::patch('documents/{document}', [DocumentsController::class, 'update'])->middleware('check.permission:admin.documents.update')->name('admin.documents.update');
-    Route::delete('documents/{document}', [DocumentsController::class, 'destroy'])->middleware('check.permission:admin.documents.destroy')->name('admin.documents.destroy');
+    // Forms
+    Route::get('forms', [FormsController::class, 'index'])->middleware('check.permission:admin.forms.index')->name('admin.forms.index');
+    Route::get('forms/create', [FormsController::class, 'create'])->middleware('check.permission:admin.forms.store')->name('admin.forms.create');
+    Route::post('forms', [FormsController::class, 'store'])->middleware('check.permission:admin.forms.store')->name('admin.forms.store');
+    Route::get('forms/{form}', [FormsController::class, 'show'])->middleware('check.permission:admin.forms.show')->name('admin.forms.show');
+    Route::get('forms/{form}/edit', [FormsController::class, 'edit'])->middleware('check.permission:admin.forms.update')->name('admin.forms.edit');
+    Route::patch('forms/{form}/update-translation', [FormsController::class, 'updateTranslation'])->middleware('check.permission:admin.forms.update')->name('admin.forms.update-translation');
+    Route::patch('forms/{form}', [FormsController::class, 'update'])->middleware('check.permission:admin.forms.update')->name('admin.forms.update');
+    Route::delete('forms/{form}', [FormsController::class, 'destroy'])->middleware('check.permission:admin.forms.destroy')->name('admin.forms.destroy');
 
     //Settings
     Route::get('settings', [SettingsController::class, 'index'])->middleware('check.permission:admin.settings.index')->name('admin.settings.index');

@@ -39,7 +39,7 @@ class FileService
         }
 
         $extension = pathinfo($originalFile->name, PATHINFO_EXTENSION);
-        $newFileName = uniqid() . '.' . $extension;
+        $newFileName = Str::uuid() . '.' . $extension;
         $newFilePath = dirname($originalFile->path) . '/' . $newFileName;
 
         // Copy the file in storage

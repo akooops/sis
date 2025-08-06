@@ -3,25 +3,25 @@
     import { onMount } from 'svelte';
 
     // Props
-    export let document;
+    export let form;
     export let languages;
     export let translations;
 
-    // Define breadcrumbs for this document
+    // Define breadcrumbs for this form
     const breadcrumbs = [
         {
-            title: 'Documents',
-            url: route('admin.documents.index'),
+            title: 'Forms',
+            url: route('admin.forms.index'),
             active: false
         },
         {
-            title: document?.name || 'Document Details',
-            url: route('admin.documents.show', { document: document?.id }),
+            title: form?.name || 'Form Details',
+            url: route('admin.forms.show', { form: form?.id }),
             active: true
         }
     ];
     
-    const pageTitle = 'Document Details';
+    const pageTitle = 'Form Details';
 
     // Get translation for a field and language
     function getTranslation(field, languageCode) {
@@ -41,46 +41,46 @@
     <!-- Container -->
     <div class="kt-container-fluid">
         <div class="grid gap-5 lg:gap-7.5 w-full">
-            <!-- Document Header -->
+            <!-- Form Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Document Information</h1>
+                    <h1 class="text-2xl font-bold text-mono">Form Information</h1>
                     <p class="text-sm text-secondary-foreground">
-                        View document details and translations
+                        View form details and translations
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="{route('admin.documents.index')}" class="kt-btn kt-btn-outline">
+                    <a href="{route('admin.forms.index')}" class="kt-btn kt-btn-outline">
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back
                     </a>
-                    {#if hasPermission('admin.documents.update')}
-                        <a href={route('admin.documents.edit', { document: document?.id })} class="kt-btn kt-btn-primary">
+                    {#if hasPermission('admin.forms.update')}
+                        <a href={route('admin.forms.edit', { form: form?.id })} class="kt-btn kt-btn-primary">
                             <i class="ki-filled ki-pencil text-base"></i>
-                            Edit Document
+                            Edit Form
                         </a>
                     {/if}
                 </div>
             </div>
 
-            <!-- Document Information Card -->
+            <!-- Form Information Card -->
             <div class="kt-card w-full">
                 <div class="kt-card-header">
-                    <h4 class="kt-card-title">Document Information</h4>
+                    <h4 class="kt-card-title">Form Information</h4>
                 </div>
                 <div class="kt-card-content">
                     <div class="flex flex-col lg:flex-row gap-6 w-full">
-                        <!-- Document Details -->
+                        <!-- Form Details -->
                         <div class="grid gap-4 w-full">
                             <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Document Name</h4>
-                                <p class="text-sm text-secondary-foreground">{document?.name}</p>
+                                <h4 class="text-sm font-semibold text-mono">Form Name</h4>
+                                <p class="text-sm text-secondary-foreground">{form?.name}</p>
                             </div>
 
                             <div class="flex flex-col gap-2">
-                                <h4 class="text-sm font-semibold text-mono">Document Url</h4>
+                                <h4 class="text-sm font-semibold text-mono">Form Url</h4>
                                 <span class="kt-badge kt-badge-outline kt-badge-primary w-fit">
-                                    <a href={document?.documentUrl} target="_blank">
+                                    <a href={form?.formUrl} target="_blank">
                                         Open <i class="ki-filled ki-arrow-up-right"></i> 
                                     </a>
                                 </span>
@@ -89,7 +89,7 @@
                             <div class="flex flex-col gap-2">
                                 <h4 class="text-sm font-semibold text-mono">Created At</h4>
                                 <p class="text-sm text-secondary-foreground">
-                                    {document?.created_at ? new Date(document.created_at).toLocaleDateString('en-US', {
+                                    {form?.created_at ? new Date(form.created_at).toLocaleDateString('en-US', {
                                         year: 'numeric',
                                         month: 'long',
                                         day: 'numeric',
@@ -102,7 +102,7 @@
                             <div class="flex flex-col gap-2">
                                 <h4 class="text-sm font-semibold text-mono">Updated At</h4>
                                 <p class="text-sm text-secondary-foreground">
-                                    {document?.updated_at ? new Date(document.updated_at).toLocaleDateString('en-US', {
+                                    {form?.updated_at ? new Date(form.updated_at).toLocaleDateString('en-US', {
                                         year: 'numeric',
                                         month: 'long',
                                         day: 'numeric',
@@ -144,7 +144,7 @@
                                 <!-- Title Translation -->
                                 <div class="flex flex-col gap-2">
                                     <h4 class="text-sm font-semibold text-mono">
-                                        Document {language.name} Title
+                                        Form {language.name} Title
                                     </h4>
                                     <p class="text-sm text-secondary-foreground p-3 bg-muted/50 rounded-lg">
                                         {getTranslation('title', language.code)}

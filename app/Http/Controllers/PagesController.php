@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Album;
 use App\Models\Article;
 use App\Models\Banner;
-use App\Models\Document;
+use App\Models\Form;
 use App\Models\Event;
 use App\Models\Grade;
 use App\Models\JobPosting;
@@ -305,11 +305,11 @@ class PagesController extends Controller
 
         if(!$page) abort(404);
 
-        $documents = Document::get();
+        $forms = Form::get();
 
         return view('forms', [
             'page' => $page,
-            'documents' => $documents
+            'forms' => $forms
         ]);
     }
 

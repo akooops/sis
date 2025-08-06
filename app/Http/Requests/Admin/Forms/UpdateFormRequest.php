@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Admin\Documents;
+namespace App\Http\Requests\Admin\Forms;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Media;
 
-class UpdateDocumentRequest extends FormRequest
+class UpdateFormRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

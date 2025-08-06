@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Admin\Documents;
+namespace App\Http\Requests\Admin\Forms;
 
-use App\Models\Media;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreDocumentRequest extends FormRequest
+class UpdateFormTranslationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +21,11 @@ class StoreDocumentRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required|string|max:255',
-            'title' => 'required|string|max:1000',
-            'file' => 'required|file'
+        $data = [
+            'title' => 'required|string|max:255',
+            'language_id' => 'required|exists:languages,id',
         ];
+        
+        return $data;
     }
 }

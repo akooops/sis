@@ -8,14 +8,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 
-class Document extends Model
+class Form extends Model
 {
     use HasFactory, Translatable, HasFiles;
 
     //Properties
     protected $guarded = ['id'];
 
-    protected $appends = ['documentUrl'];
+    protected $appends = ['formUrl'];
 
     //Relationships
     public function file()
@@ -24,7 +24,7 @@ class Document extends Model
     }
 
     //Accessors & Mutators
-    public function getDocumentUrlAttribute()
+    public function getFormUrlAttribute()
     {
         return ($this->file) ? $this->file->url : "#";
     }

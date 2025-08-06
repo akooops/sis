@@ -7,21 +7,21 @@
     // Props from the server
     export let defaultLanguage;
 
-    // Define breadcrumbs for this document
+    // Define breadcrumbs for this form
     const breadcrumbs = [
         {
-            title: 'Documents',
-            url: route('admin.documents.index'),
+            title: 'Forms',
+            url: route('admin.forms.index'),
             active: false
         },
         {
             title: 'Create',
-            url: route('admin.documents.create'),
+            url: route('admin.forms.create'),
             active: true
         }
     ];
     
-    const pageTitle = 'Create Document';
+    const pageTitle = 'Create Form';
 
     // Form data
     let form = {
@@ -62,14 +62,14 @@
             }
         });
 
-        router.post(route('admin.documents.store'), formData, {
+        router.post(route('admin.forms.store'), formData, {
             onError: (err) => {
                 errors = err;
                 loading = false;
                 
                 // Apply error styling to Select2 components
-                if (errors.document_id && documentSelectComponent) {
-                    documentSelectComponent.setError(true);
+                if (errors.form_id && formSelectComponent) {
+                    formSelectComponent.setError(true);
                 }
             },
             onFinish: () => {
@@ -92,18 +92,18 @@
     <!-- Container -->
     <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
-            <!-- Document Header -->
+            <!-- Form Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Create New Document</h1>
+                    <h1 class="text-2xl font-bold text-mono">Create New Form</h1>
                     <p class="text-sm text-secondary-foreground">
-                        Add a new document to your website
+                        Add a new form to your website
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="{route('admin.documents.index')}" class="kt-btn kt-btn-outline">
+                    <a href="{route('admin.forms.index')}" class="kt-btn kt-btn-outline">
                         <i class="ki-filled ki-arrow-left text-base"></i>
-                        Back to Document
+                        Back to Form
                     </a>
                 </div>
             </div>
@@ -117,16 +117,16 @@
                     </div>
                     <div class="kt-card-content">
                         <div class="grid gap-4">
-                            <!-- Document Name -->
+                            <!-- Form Name -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono" for="name">
-                                    Document Name <span class="text-destructive">*</span>
+                                    Form Name <span class="text-destructive">*</span>
                                 </label>
                                 <input
                                     id="name"
                                     type="text"
                                     class="kt-input {errors.name ? 'kt-input-error' : ''}"
-                                    placeholder="Enter document name"
+                                    placeholder="Enter form name"
                                     bind:value={form.name}
                                 />
                                 {#if errors.name}
@@ -137,10 +137,10 @@
                     </div>
                 </div>
 
-                <!-- Document Selection Card -->
+                <!-- Form Selection Card -->
                 <div class="kt-card">
                     <div class="kt-card-header">
-                        <h4 class="kt-card-title">Document file</h4>
+                        <h4 class="kt-card-title">Form file</h4>
                     </div>
                     <div class="kt-card-content">
                         <div class="grid gap-4">
@@ -167,20 +167,20 @@
                 <!-- Content Card -->
                 <div class="kt-card">
                     <div class="kt-card-header">
-                        <h4 class="kt-card-title">Document Content ({defaultLanguage.name})</h4>
+                        <h4 class="kt-card-title">Form Content ({defaultLanguage.name})</h4>
                     </div>
                     <div class="kt-card-content">
                         <div class="grid gap-4">
-                            <!-- Document Title -->
+                            <!-- Form Title -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono" for="title">
-                                    Document Title <span class="text-destructive">*</span>
+                                    Form Title <span class="text-destructive">*</span>
                                 </label>
                                 <input
                                     id="title"
                                     type="text"
                                     class="kt-input {errors.title ? 'kt-input-error' : ''}"
-                                    placeholder="Enter document title"
+                                    placeholder="Enter form title"
                                     bind:value={form.title}
                                 />
                                 {#if errors.title}
@@ -193,7 +193,7 @@
 
                 <!-- Form Actions -->
                 <div class="flex items-center justify-end gap-3">
-                    <a href="{route('admin.documents.index')}" class="kt-btn kt-btn-outline">
+                    <a href="{route('admin.forms.index')}" class="kt-btn kt-btn-outline">
                         Cancel
                     </a>
                     <button
@@ -206,7 +206,7 @@
                             Creating...
                         {:else}
                             <i class="ki-filled ki-plus text-base"></i>
-                            Create Document
+                            Create Form
                         {/if}
                     </button>
                 </div>
