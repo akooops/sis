@@ -296,10 +296,10 @@ class PagesController extends Controller
         return view('grade', compact('grade', 'grades'));
     }
 
-    public function documents(Request $request)
+    public function forms(Request $request)
     {
         $page = Page::where([
-            'slug' => 'documents',
+            'slug' => 'forms',
             'status' => 'published'
         ])->first();
 
@@ -307,9 +307,26 @@ class PagesController extends Controller
 
         $documents = Document::get();
 
-        return view('documents', [
+        return view('forms', [
             'page' => $page,
             'documents' => $documents
+        ]);
+    }
+
+    public function guidlines(Request $request)
+    {
+        $page = Page::where([
+            'slug' => 'guidlines',
+            'status' => 'published'
+        ])->first();
+
+        if(!$page) abort(404);
+
+        $grades = Grade::get();
+
+        return view('guidlines', [
+            'page' => $page,
+            'grades' => $grades
         ]);
     }
 }

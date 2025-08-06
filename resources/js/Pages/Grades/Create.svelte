@@ -31,6 +31,7 @@
     // Form data
     let form = {
         name: '',
+        title: '',
         program_id: '',
         files: []
     };
@@ -457,6 +458,33 @@
                                     </div>
                                 </div>
                             {/if}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Card -->
+                <div class="kt-card">
+                    <div class="kt-card-header">
+                        <h4 class="kt-card-title">Grade Content ({defaultLanguage.name})</h4>
+                    </div>
+                    <div class="kt-card-content">
+                        <div class="grid gap-4">
+                            <!-- Grade Title -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="title">
+                                    Grade Title <span class="text-destructive">*</span>
+                                </label>
+                                <input
+                                    id="title"
+                                    type="text"
+                                    class="kt-input {errors.title ? 'kt-input-error' : ''}"
+                                    placeholder="Enter grade title"
+                                    bind:value={form.title}
+                                />
+                                {#if errors.title}
+                                    <p class="text-sm text-destructive">{errors.title}</p>
+                                {/if}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -185,7 +185,7 @@ class SettingsSeeder extends Seeder
             [
                 'key' => 'address',
                 'type' => 'text',
-                'value' => 'Alawail For Education Company, Abi Al Abbas Al Shafei Street, Hiteen District, Riyadh, Kingdom of Saudi Arabia.',
+                'value' => 'Saud International School, Abi Al Abbas Al Shafei Street, Hiteen District, Riyadh, Kingdom of Saudi Arabia.',
                 'description' => 'School physical address',
                 'group' => 'contact',
                 'is_encrypted' => false,

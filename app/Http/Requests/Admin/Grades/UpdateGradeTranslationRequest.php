@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests\Admin\Grades;
 
-use App\Models\Media;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreGradeRequest extends FormRequest
+class UpdateGradeTranslationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,12 +21,11 @@ class StoreGradeRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required|string|max:255',
+        $data = [
             'title' => 'required|string|max:255',
-            'program_id' => 'required|exists:programs,id',
-            'files' => 'nullable|array',
-            'files.*' => 'exists:files,id'
+            'language_id' => 'required|exists:languages,id',
         ];
+        
+        return $data;
     }
 }

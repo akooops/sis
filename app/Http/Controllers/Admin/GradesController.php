@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\Admin\Grades\OrderGradesRequest;
+use App\Http\Requests\Admin\Grades\UpdateGradeTranslationRequest;
 use App\Http\Requests\Admin\Grades\StoreGradeRequest;
 use App\Http\Requests\Admin\Grades\UpdateGradeRequest;
 use App\Models\File;
@@ -74,6 +75,15 @@ class GradesController extends Controller
     {
         $grade = Grade::create($request->validated());
 
+        $defaultLanguage = Language::where([
+            'is_default' => true,
+        ])->first();
+
+
+        foreach($grade->getTranslatableFields() as $field){
+            $grade->setTranslation($field, $defaultLanguage->code, $request->input($field));    
+        }
+        
         if ($request->has('files')) {
             foreach ($request->input('files') as $file) {
                 foreach ($request->input('files') as $fileId) {
@@ -99,8 +109,13 @@ class GradesController extends Controller
         $grade->load('files');
         $grade->load('program');
 
+        $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $grade->getTranslatableFieldsByLanguages();
+
         return inertia('Grades/Show', [
             'grade' => $grade,
+            'languages' => $languages,
+            'translations' => $translations
         ]);
     }
     
@@ -115,8 +130,15 @@ class GradesController extends Controller
         $grade->load('files');
         $grade->load('program');
 
+        $languages = Language::orderBy('is_default', 'DESC')->get();
+        $translations = $grade->getTranslatableFieldsByLanguages();
+        $medias = collect(); // Empty collection for medias since grades don't use media library
+
         return inertia('Grades/Edit', [
             'grade' => $grade,
+            'languages' => $languages,
+            'translations' => $translations,
+            'medias' => $medias
         ]);
     }
     
@@ -147,6 +169,19 @@ class GradesController extends Controller
 
         return inertia('Grades/Index', [
             'success' => 'Grade updated successfully!'
+        ]);
+    }
+
+    public function updateTranslation(Grade $grade, UpdateGradeTranslationRequest $request){
+        $language = Language::find($request->language_id);
+
+        foreach($grade->getTranslatableFields() as $field){
+            $grade->setTranslation($field, $language->code, $request->input($field));    
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Page updated successfully',
         ]);
     }
 

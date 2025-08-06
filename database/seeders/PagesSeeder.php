@@ -68,8 +68,15 @@ class PagesSeeder extends Seeder
                 'menu_id' => null,
             ],
             [
-                'name' => 'Documents',
-                'slug' => 'documents',
+                'name' => 'Forms',
+                'slug' => 'forms',
+                'is_system_page' => true,
+                'status' => 'published',
+                'menu_id' => null,
+            ],
+            [
+                'name' => 'Guidlines',
+                'slug' => 'guidlines',
                 'is_system_page' => true,
                 'status' => 'published',
                 'menu_id' => null,

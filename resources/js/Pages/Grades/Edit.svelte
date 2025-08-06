@@ -6,6 +6,9 @@
 
     // Props from the server
     export let grade;
+    export let languages;
+    export let translations;
+    export let medias;
 
     // Define breadcrumbs for this grade
     const breadcrumbs = [
@@ -32,14 +35,10 @@
     // Form errors
     let errors = {};
 
-    // File preview
-    let filePreview = null;
-
     // Loading state
     let loading = false;
 
     // Dynamic data for selects
-    let selectedMedia = null;
     let selectedProgram = null;
 
     // Select2 component references
@@ -49,6 +48,11 @@
     let gradeFiles = [];
     let uploadingFiles = false;
     let fileUploadProgress = {};
+
+    // Translation form data
+    let translationForms = {};
+    let translationErrors = {};
+    let translationLoading = {};
 
     // Initialize selected program if grade has one
     if (grade?.program) {
@@ -76,6 +80,20 @@
                 category: category,
                 size: file.size
             };
+        });
+    }
+
+    // Initialize translation forms immediately to prevent undefined errors
+    if (languages && Array.isArray(languages)) {
+        languages.forEach(language => {
+            // Get translation data - now always has values (either translation or fallback)
+            const title = translations?.title?.[language.code] || '';
+            
+            translationForms[language.code] = {
+                title: title
+            };
+            translationErrors[language.code] = {};
+            translationLoading[language.code] = false;
         });
     }
 
@@ -271,11 +289,6 @@
         formData.append('_method', 'PATCH');
         formData.append('language_id', languageId);
         formData.append('title', translationForms[languageCode].title);
-        formData.append('description', translationForms[languageCode].description);
-        
-        // Get Summernote content
-        const summernoteContent = summernoteComponent?.getValue?.() || translationForms[languageCode].content;
-        formData.append('content', summernoteContent);
 
         // Send AJAX request
         fetch(route('admin.grades.update-translation', { grade: grade.id }), {
@@ -319,11 +332,6 @@
     // Initialize components after mount
     onMount(async () => {
         await tick();
-        
-        // Set slug manually edited flag if slug was pre-populated
-        if (grade?.slug) {
-            slugManuallyEdited = true;
-        }
     });
 </script>
 
@@ -354,6 +362,27 @@
             <!-- Main Content with Tabs -->
             <div class="kt-card w-full">
                 <div class="kt-card-content">
+                    <!-- Language Tabs -->
+                    <div class="kt-tabs kt-tabs-line justify-between mb-6" data-kt-tabs="true">
+                        <div class="flex items-center gap-5">
+                            <button 
+                                class="kt-tab-toggle py-3 active" 
+                                data-kt-tab-toggle="#grade_form_tab"
+                            >
+                                <i class="ki-filled ki-document text-base me-2"></i>
+                                Edit grade
+                            </button>
+                            <button 
+                                class="kt-tab-toggle py-3" 
+                                data-kt-tab-toggle="#translations_tab"
+                            >
+                                <i class="ki-filled ki-geolocation text-base me-2"></i>
+                                Translations
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content -->
                     <!-- Grade Form Tab -->
                     <div class="grow flex flex-col" id="grade_form_tab">
                         <div class="grid gap-5 lg:gap-7.5 w-full py-4">
@@ -587,6 +616,74 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Translations Tab -->
+                    <div class="grow flex flex-col hidden" id="translations_tab">
+                        <div class="grid gap-5 lg:gap-7.5 w-full py-4">
+                            <!-- Language Tabs -->
+                            <div class="kt-tabs kt-tabs-line justify-between mb-6" data-kt-tabs="true">
+                                <div class="flex items-center gap-5">
+                                    {#each languages as language, index}
+                                        <button 
+                                            class="kt-tab-toggle py-3 {index === 0 ? 'active' : ''}" 
+                                            data-kt-tab-toggle="#translation_tab_{language.code}"
+                                        >
+                                            <i class="ki-filled ki-translate text-base me-2"></i>
+                                            {language.name}
+                                        </button>
+                                    {/each}
+                                </div>
+                            </div>
+
+                            <!-- Tab Content -->
+                            {#each languages as language, index}
+                                <div 
+                                    class="grow flex flex-col {index === 0 ? '' : 'hidden'}" 
+                                    id="translation_tab_{language.code}"
+                                >
+                                    <form 
+                                        on:submit|preventDefault={() => handleTranslationSubmit(language.code, language.id)}
+                                        class="grid gap-4"
+                                    >
+                                        <!-- Grade Title -->
+                                        <div class="flex flex-col gap-2">
+                                            <label class="text-sm font-medium text-mono" for="title-{language.id}">
+                                                Title <span class="text-destructive">*</span>
+                                            </label>
+                                            <input
+                                                id="title-{language.id}"
+                                                type="text"
+                                                class="kt-input {translationErrors[language.code]?.title ? 'kt-input-error' : ''}"
+                                                placeholder="Enter grade title"
+                                                bind:value={translationForms[language.code].title}
+                                            />
+                                            {#if translationErrors[language.code]?.title}
+                                                <p class="text-sm text-destructive">{translationErrors[language.code].title[0]}</p>
+                                            {/if}
+                                        </div>
+
+                                        <!-- Form Actions -->
+                                        <div class="flex items-center justify-end gap-3 pt-4">
+                                            <button
+                                                type="submit"
+                                                class="kt-btn kt-btn-success"
+                                                disabled={translationLoading[language.code]}
+                                            >
+                                                {#if translationLoading[language.code]}
+                                                    <i class="ki-outline ki-loading text-base animate-spin"></i>
+                                                    Saving...
+                                                {:else}
+                                                    <i class="ki-filled ki-check text-base"></i>
+                                                    Save Translation
+                                                {/if}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            {/each}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

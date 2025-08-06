@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Traits\HasFiles;
+use App\Traits\Translatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Grade extends Model
 {
-    use HasFactory, HasFiles;
+    use HasFactory, HasFiles, Translatable;
 
     //Properties
     protected $guarded = ['id'];
@@ -22,5 +23,11 @@ class Grade extends Model
     public function program()
     {
         return $this->belongsTo(Program::class);
+    }
+
+    //Accessors & Mutators
+    public function getTranslatableFields(): array
+    {
+        return ['title'];
     }
 }
