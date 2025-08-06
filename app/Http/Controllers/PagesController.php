@@ -322,7 +322,7 @@ class PagesController extends Controller
 
         if(!$page) abort(404);
 
-        $grades = Grade::get();
+        $grades = Grade::with('files')->orderBy('order', 'asc')->get();
 
         return view('guidlines', [
             'page' => $page,
