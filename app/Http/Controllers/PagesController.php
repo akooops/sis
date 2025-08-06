@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Album;
 use App\Models\Article;
 use App\Models\Banner;
+use App\Models\Calendar;
 use App\Models\Form;
 use App\Models\Event;
 use App\Models\Grade;
@@ -327,6 +328,23 @@ class PagesController extends Controller
         return view('guidelines', [
             'page' => $page,
             'grades' => $grades
+        ]);
+    }
+
+    public function calendars(Request $request)
+    {
+        $page = Page::where([
+            'slug' => 'calendars',
+            'status' => 'published'
+        ])->first();
+
+        if(!$page) abort(404);
+
+        $calendars = Calendar::get();
+
+        return view('calendars', [
+            'page' => $page,
+            'calendars' => $calendars
         ]);
     }
 }

@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\VisitBookingsController;
 use App\Http\Controllers\Admin\VisitServicesController;
 use App\Http\Controllers\Admin\VisitTimeSlotsController;
+use App\Http\Controllers\Admin\CalendarsController;
 use App\Http\Controllers\ContactSubmissionsController as ControllersContactSubmissionsController;
 use App\Http\Controllers\InquiriesController as ControllersInquiriesController;
 use App\Http\Controllers\JobApplicationsController as ControllersJobApplicationsController;
@@ -231,6 +232,16 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::patch('forms/{form}', [FormsController::class, 'update'])->middleware('check.permission:admin.forms.update')->name('admin.forms.update');
     Route::delete('forms/{form}', [FormsController::class, 'destroy'])->middleware('check.permission:admin.forms.destroy')->name('admin.forms.destroy');
 
+    // Calendars
+    Route::get('calendars', [CalendarsController::class, 'index'])->middleware('check.permission:admin.calendars.index')->name('admin.calendars.index');
+    Route::get('calendars/create', [CalendarsController::class, 'create'])->middleware('check.permission:admin.calendars.store')->name('admin.calendars.create');
+    Route::post('calendars', [CalendarsController::class, 'store'])->middleware('check.permission:admin.calendars.store')->name('admin.calendars.store');
+    Route::get('calendars/{calendar}', [CalendarsController::class, 'show'])->middleware('check.permission:admin.calendars.show')->name('admin.calendars.show');
+    Route::get('calendars/{calendar}/edit', [CalendarsController::class, 'edit'])->middleware('check.permission:admin.calendars.update')->name('admin.calendars.edit');
+    Route::patch('calendars/{calendar}/update-translation', [CalendarsController::class, 'updateTranslation'])->middleware('check.permission:admin.calendars.update')->name('admin.calendars.update-translation');
+    Route::patch('calendars/{calendar}', [CalendarsController::class, 'update'])->middleware('check.permission:admin.calendars.update')->name('admin.calendars.update');
+    Route::delete('calendars/{calendar}', [CalendarsController::class, 'destroy'])->middleware('check.permission:admin.calendars.destroy')->name('admin.calendars.destroy');
+
     //Settings
     Route::get('settings', [SettingsController::class, 'index'])->middleware('check.permission:admin.settings.index')->name('admin.settings.index');
     Route::post('settings/{setting}', [SettingsController::class, 'update'])->middleware('check.permission:admin.settings.update')->name('admin.settings.update');
@@ -317,6 +328,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/programs/{program}', [ControllersPagesController::class, 'program'])->name('program');
     Route::get('/forms', [ControllersPagesController::class, 'forms'])->name('forms');
     Route::get('/guidelines', [ControllersPagesController::class, 'guidelines'])->name('guidelines');
+    Route::get('/calendars', [ControllersPagesController::class, 'calendars'])->name('calendars');
 
     Route::get('/{slug}', [ControllersPagesController::class, 'page'])->name('page');
     Route::get('/program/{slug}', [ControllersPagesController::class, 'program'])->name('program');

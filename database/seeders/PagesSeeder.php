@@ -82,6 +82,13 @@ class PagesSeeder extends Seeder
                 'menu_id' => null,
             ],
             [
+                'name' => 'Calendars',
+                'slug' => 'calendars',
+                'is_system_page' => true,
+                'status' => 'published',
+                'menu_id' => null,
+            ],
+            [
                 'name' => 'Error',
                 'slug' => 'error',
                 'is_system_page' => true,
@@ -249,6 +256,20 @@ class PagesSeeder extends Seeder
                 'content' => [
                     'en' => 'Find all the important school guidelines including policies, handbooks, forms, and official communications. All guidelines are available for download.',
                     'ar' => 'ابحث عن جميع الإرشادات المدرسية المهمة بما في ذلك السياسات والكتيبات والنماذج والمراسلات الرسمية. جميع الإرشادات متاحة للتحميل.'
+                ]
+            ],
+            'calendars' => [
+                'title' => [
+                    'en' => 'School Calendars',
+                    'ar' => 'التقويمات المدرسية'
+                ],
+                'description' => [
+                    'en' => 'Access important school calendars, events, and schedules',
+                    'ar' => 'الوصول إلى التقويمات المدرسية المهمة والفعاليات والجداول'
+                ],
+                'content' => [
+                    'en' => 'Find all the important school calendars including events, schedules, and important dates. All calendars are available for download.',
+                    'ar' => 'ابحث عن جميع التقويمات المدرسية المهمة بما في ذلك الفعاليات والجداول والتواريخ المهمة. جميع التقويمات متاحة للتحميل.'
                 ]
             ],
             'error' => [

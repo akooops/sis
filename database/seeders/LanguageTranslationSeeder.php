@@ -48,6 +48,30 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Jobs',
                 'ar' => 'الوظائف'
             ],
+            'calendars_page_collapse_title' => [
+                'en' => 'Calendars',
+                'ar' => 'التقويمات'
+            ],
+            'calendars_page_table_cta' => [
+                'en' => 'Download',
+                'ar' => 'التحميل'
+            ],
+            'calendars_page_table_header_calendar' => [
+                'en' => 'Calendar',
+                'ar' => 'التقويم'
+            ],
+            'calendars_page_table_header_start_date' => [
+                'en' => 'Start Date',
+                'ar' => 'تاريخ البدء'
+            ],
+            'calendars_page_table_header_end_date' => [
+                'en' => 'End Date',
+                'ar' => 'تاريخ النهاية'
+            ],
+            'calendars_page_table_header_option' => [
+                'en' => 'Options',
+                'ar' => 'الإطلاع'
+            ],
             'contact_page_address_title' => [
                 'en' => 'Address',
                 'ar' => 'العنوان'
