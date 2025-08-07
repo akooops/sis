@@ -176,73 +176,41 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Access Portal', 
                 'ar' => 'منصة الخدمات'
             ],
-            'index_page_fifth_section_cta' => [
+            'index_page_albums_section_cta' => [
                 'en' => 'View more albums',
                 'ar' => 'عرض المزيد من الألبومات'
             ],
-            'index_page_fifth_section_title' => [
+            'index_page_albums_section_title' => [
                 'en' => 'Latest albums',
                 'ar' => 'أحدث الألبومات'
-            ],
-            'index_page_first_number_title' => [
-                'en' => 'Schools',
-                'ar' => 'مدارس'
-            ],
-            'index_page_first_number_value' => [
-                'en' => '4',
-                'ar' => '4'
             ],
             'index_page_first_section_cta' => [
                 'en' => 'Learn more',
                 'ar' => 'اعرف المزيد'
             ],
-            'index_page_first_section_subtitle' => [
+            'index_page_welcome_section_subtitle' => [
                 'en' => 'Welcome to Saud International School! We\'re thrilled to have you join our diverse community where we provide a challenging and inspiring educational environment. Together, we\'ll explore our internationally recognized curriculum enhanced with cutting-edge technology and enriching extra-curricular activities designed to help you thrive and discover your potential.',
                 'ar' => 'مرحباً بكم في مدارس سعود العالمية! نحن متحمسون لانضمامكم إلى مجتمعنا المتنوع حيث نوفر بيئة تعليمية تحدي وملهمة. معاً، سنستكشف منهجنا المعترف به دولياً والمعزز بأحدث التقنيات والأنشطة اللامنهجية الإثرائية المصممة لمساعدتكم على الازدهار واكتشاف إمكاناتكم.'
             ],
-            'index_page_first_section_title' => [
+            'index_page_welcome_section_title' => [
                 'en' => 'Welcome to Saud international schools',
                 'ar' => 'مرحباً بكم في مدارس سعود العالمية'
             ],
-            'index_page_forth_number_title' => [
-                'en' => 'School in saudi',
-                'ar' => 'مدرسة في السعودية'
-            ],
-            'index_page_forth_number_value' => [
-                'en' => '1st',
-                'ar' => 'أول'
-            ],
-            'index_page_forth_section_cta' => [
+            'index_page_events_section_cta' => [
                 'en' => 'View more events',
                 'ar' => 'عرض المزيد من الفعاليات'
             ],
-            'index_page_forth_section_title' => [
+            'index_page_events_section_title' => [
                 'en' => 'Latest events',
                 'ar' => 'أحدث الفعاليات'
             ],
-            'index_page_second_number_title' => [
-                'en' => 'Students',
-                'ar' => 'طلاب'
-            ],
-            'index_page_second_number_value' => [
-                'en' => '7518',
-                'ar' => '7518'
-            ],
-            'index_page_second_section_cta' => [
+            'index_page_academics_levels_section_cta' => [
                 'en' => 'Learn more',
                 'ar' => 'اعرف المزيد'
             ],
-            'index_page_second_section_title' => [
+            'index_page_academics_levels_section_title' => [
                 'en' => 'Our Academic Levels',
                 'ar' => 'مستوياتنا الأكاديمية'
-            ],
-            'index_page_third_number_title' => [
-                'en' => 'Alumni',
-                'ar' => 'خريجون'
-            ],
-            'index_page_third_number_value' => [
-                'en' => '10000',
-                'ar' => '10000'
             ],
             'index_page_third_section_cta' => [
                 'en' => 'Learn more',

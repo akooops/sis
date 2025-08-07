@@ -1,15 +1,3 @@
-@php
-    $firstSectionCtaPageSetting = getSetting('index_page_first_section_cta_page');
-    $firstSectionCtaPage = null;
-
-    if($firstSectionCtaPageSetting) $firstSectionCtaPage = getPage($firstSectionCtaPageSetting->value);
-
-    $thirdSectionCtaPageSetting = getSetting('index_page_third_section_cta_page');
-    $thirdSectionCtaPage = null;
-
-    if($thirdSectionCtaPageSetting) $thirdSectionCtaPage = getPage($thirdSectionCtaPageSetting->value);
-@endphp
-
 @extends('layouts.master')
 @section('title', $page->getLocalTranslation('title'))
 @section('description', $page->getLocalTranslation('description'))
@@ -99,21 +87,12 @@
 
             <div class="col-lg-6 mt-12 mt-lg-0 text-center text-lg-start">
                 <h2 class="text-primary mb-0" data-aos="fade-left" data-aos-duration="1000">
-                    {{getLanguageKeyLocalTranslation('index_page_first_section_title')}}
+                    {{getLanguageKeyLocalTranslation('index_page_welcome_section_title')}}
                 </h2>
                 
                 <p class="mt-4 mb-8" data-aos="fade-left" data-aos-duration="1500">
-                    {{getLanguageKeyLocalTranslation('index_page_first_section_subtitle')}}
+                    {{getLanguageKeyLocalTranslation('index_page_welcome_section_subtitle')}}
                 </p>
-
-                @if($firstSectionCtaPage)
-                    <a href="{{route('page', ['slug' => $firstSectionCtaPage->slug])}}" class="btn" data-aos="fade-left" data-aos-duration="1500">
-                        <i class="uil uil-angle-right-b me-2"></i>
-                        <span>
-                            {{getLanguageKeyLocalTranslation('index_page_first_section_cta')}}
-                        </span>
-                    </a>
-                @endif
             </div>
             <!--/column -->
         </div>
@@ -140,7 +119,7 @@
     <div class="container">
         <div class="row text-center mb-6">
             <h2 class="text-primary" data-aos="fade-up" data-aos-duration="1000">
-                {{getLanguageKeyLocalTranslation('index_page_second_section_title')}}
+                {{getLanguageKeyLocalTranslation('index_page_academics_levels_section_title')}}
             </h2>
         </div>
     </div>
@@ -182,7 +161,7 @@
                                         class="btn py-1">
                                         <i class="uil uil-angle-right-b me-2"></i>
 
-                                        {{getLanguageKeyLocalTranslation('index_page_second_section_cta')}}
+                                        {{getLanguageKeyLocalTranslation('index_page_academics_levels_section_cta')}}
                                     </a>
                                 </div>     
                                 <!--/.row -->      
@@ -201,118 +180,6 @@
     <!-- /.swiper-container -->
 </section>
 
-{{--}}
-<section class="wrapper facts-section">
-    <div class="container h-100 py-12">
-        <div class="row h-100 align-items-center">
-            <div class="col-lg-5 pe-0 pe-lg-16 mb-8 mb-lg-0 facts-content-container" data-aos="fade-right" data-aos-duration="2000">
-                <h3 data-aos="fade-up" data-aos-duration="1500">
-                    {{getLanguageKeyLocalTranslation('index_page_third_section_title')}}
-                </h3>
-
-                <p class="mt-4 mb-8 text-light">
-                   {{getLanguageKeyLocalTranslation('index_page_third_section_subtitle')}}
-                </p>
-
-                @if($thirdSectionCtaPage)
-                    <a href="{{route('page', ['slug' => $thirdSectionCtaPage->slug])}}" 
-                        class="btn py-1 px-8">
-                        <i class="uil uil-angle-right-b me-2"></i>
-                        {{getLanguageKeyLocalTranslation('index_page_third_section_cta')}}
-                    </a>
-                @endif
-            </div>
-            <!--/column -->
-
-            <div class="col-lg-7 grid facts-numbers-container" data-aos="fade-left" data-aos-duration="3000">
-                <div class="row gx-md-5 gy-5 align-items-center counter-wrapper isotope">
-                    <div class="item col-md-6 px-2 py-4">
-                        <div class="d-flex flex-row">
-                            <div class="icon btn btn-circle me-4"> 
-                                <i class="uil uil-presentation-check"></i> 
-                            </div>
-
-                            <div>
-                                <h4 class="counter">
-                                    {{getLanguageKeyLocalTranslation('index_page_first_number_value')}}
-                                </h4>
-
-                                <p>
-                                    {{getLanguageKeyLocalTranslation('index_page_first_number_title')}}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <!--/column -->
-
-                    <div class="item col-md-6 px-2 py-4">
-                        <div class="d-flex flex-row">
-                            <div class="icon btn btn-circle me-4"> 
-                                <i class="uil uil-users-alt"></i> 
-                            </div>
-
-                            <div>
-                                <h4 class="counter">
-                                    {{getLanguageKeyLocalTranslation('index_page_second_number_value')}}
-                                </h4>
-
-                                <p>
-                                    {{getLanguageKeyLocalTranslation('index_page_second_number_title')}}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <!--/column -->
-
-                    <div class="item col-md-6 px-2 py-4">
-                        <div class="d-flex flex-row">
-                            <div class="icon btn btn-circle me-4"> 
-                                <i class="uil uil-user-check"></i> 
-                            </div>
-
-                            <div>
-                                <h4 class="counter">
-                                    {{getLanguageKeyLocalTranslation('index_page_third_number_value')}}
-                                </h4>
-
-                                <p>
-                                    {{getLanguageKeyLocalTranslation('index_page_third_number_title')}}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <!--/column -->
-
-                    <div class="item col-md-6 px-2 py-4">
-                        <div class="d-flex flex-row">
-                            <div class="icon btn btn-circle me-4"> 
-                                <i class="uil uil-trophy"></i> 
-                            </div>
-
-                            <div>
-                                <h4 class="counter">
-                                    {{getLanguageKeyLocalTranslation('index_page_forth_number_value')}}
-                                </h4>
-
-                                <p>
-                                    {{getLanguageKeyLocalTranslation('index_page_forth_number_title')}}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <!--/column -->
-                </div>
-                <!--/.row -->
-            </div>
-            <!--/column -->
-        </div>
-        <!--/.row -->
-    </div>
-    <!-- /.container -->
-</section>
-<!-- /section -->
-{{--}}
-
 <section class="wrapper divider-section pt-8">
     <div class="container pb-8">
         <div class="row" data-aos="fade-up" data-aos-duration="1000">
@@ -330,7 +197,7 @@
     <div class="container pb-12">
         <div class="row text-center mb-6">
             <h2 class="text-primary" data-aos="fade-up" data-aos-duration="1000">
-                {{getLanguageKeyLocalTranslation('index_page_forth_section_title')}}
+                {{getLanguageKeyLocalTranslation('index_page_events_section_title')}}
             </h2>
         </div>
 
@@ -376,7 +243,7 @@
         <div class="d-flex justify-content-center justify-content-lg-end px-0 px-lg-8">
               <a href="{{route('events')}}" class="btn btn-primary rounded text-center">
                     <i class="uil uil-angle-right-b me-2"></i>
-                    {{getLanguageKeyLocalTranslation('index_page_forth_section_cta')}}
+                    {{getLanguageKeyLocalTranslation('index_page_events_section_cta')}}
               </a>
         </div>
     </div>
@@ -389,7 +256,7 @@
         <div class="container py-18">
             <div class="row text-center mb-6">
                 <h2 class="text-primary" data-aos="fade-up" data-aos-duration="1000">
-                    {{getLanguageKeyLocalTranslation('index_page_fifth_section_title')}}
+                    {{getLanguageKeyLocalTranslation('index_page_albums_section_title')}}
                 </h2>
             </div>
 
@@ -427,7 +294,7 @@
             <div class="d-flex justify-content-center px-0 px-lg-8">
                 <a href="{{route('albums')}}" class="btn btn-primary rounded text-center">
                     <i class="uil uil-angle-right-b me-2"></i>
-                    {{getLanguageKeyLocalTranslation('index_page_fifth_section_cta')}}
+                    {{getLanguageKeyLocalTranslation('index_page_albums_section_cta')}}
                 </a>
             </div>
         </div>

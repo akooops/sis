@@ -16,7 +16,7 @@ return new class extends Migration
         });
 
         Schema::table('grades', function (Blueprint $table) {
-            $table->integer('order')->default(0)->after('slug');
+            $table->integer('order')->default(0)->after('name');
         });
     }
 

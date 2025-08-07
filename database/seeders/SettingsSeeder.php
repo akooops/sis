@@ -143,25 +143,6 @@ class SettingsSeeder extends Seeder
                 'is_encrypted' => false,
                 'options' => null,
             ],
-            // Index Page CTA Pages
-            [
-                'key' => 'index_page_first_section_cta_page',
-                'type' => 'page',
-                'value' => '',
-                'description' => 'Page linked to first section CTA button',
-                'group' => 'homepage',
-                'is_encrypted' => false,
-                'options' => null,
-            ],
-            [
-                'key' => 'index_page_third_section_cta_page',
-                'type' => 'page',
-                'value' => '',
-                'description' => 'Page linked to third section CTA button',
-                'group' => 'homepage',
-                'is_encrypted' => false,
-                'options' => null,
-            ],
 
             // Contact Information
             [
