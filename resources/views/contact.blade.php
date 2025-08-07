@@ -5,7 +5,6 @@
 
     $emails = json_decode(getSetting('emails')->value);
     $phones = json_decode(getSetting('phones')->value);
-    $address = getSetting('address');
 @endphp
 
 @extends('layouts.master')
@@ -141,18 +140,16 @@
                             <h5 class="mb-1">
                                 {{getLanguageKeyLocalTranslation('contact_page_address_title')}}                    
                             </h5>
-                            @if($address)
+                            @if($googleMapUrl && !empty($googleMapUrl->value))
                                 <address>
                                     <p>
-                                        @if($googleMapUrl && !empty($googleMapUrl->value))
-                                            <a href="{{$googleMapUrl->value}}" target="_blank" class="text-primary">
-                                                {{$address->value}}
-                                            </a>
-                                        @else
-                                            {{$address->value}}
-                                        @endif
+                                        <a href="{{$googleMapUrl->value}}" target="_blank" class="text-primary">
+                                            {{getLanguageKeyLocalTranslation('footer_address_placeholder')}}
+                                        </a>
                                     </p>
                                 </address>
+                            @else
+                                {{getLanguageKeyLocalTranslation('footer_address_placeholder')}}
                             @endif
                         </div>
                     </div>
@@ -169,7 +166,9 @@
                             @if($phones && is_array($phones))
                                 @foreach ($phones as $phone)
                                     <p>
-                                        <a href="https://wa.me/{{ preg_replace('/\D+/', '', $phone) }}" class="text-primary">{{$phone}}</a> <br class="d-none d-md-block">
+                                        <a href="https://wa.me/{{ preg_replace('/\D+/', '', $phone) }}" class="text-primary" dir="ltr">
+                                            {{$phone}} <i class="uil uil-whatsapp" style="color: #25D366;"></i>
+                                        </a> <br class="d-none d-md-block">
                                     </p>
                                 @endforeach
                             @endif

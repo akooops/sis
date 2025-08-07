@@ -277,9 +277,8 @@
                         @foreach ($albums as $album)   
                             <div class="swiper-slide">
                                 <figure class="hover-scale">
-                                    <img src="{{$album->thumbnailUrl}}" alt="{{$album->getLocalTranslation('title')}}" />
-                                    <a class="item-link" href="{{route('album', ['slug' => $album->slug])}}">
-                                        <i class="uil uil-link"></i>
+                                    <a href="{{route('album', ['slug' => $album->slug])}}">
+                                        <img src="{{$album->thumbnailUrl}}" alt="{{$album->getLocalTranslation('title')}}" />
                                     </a>
                                 </figure>
                             </div>

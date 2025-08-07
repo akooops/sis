@@ -71,7 +71,7 @@ class SettingsSeeder extends Seeder
             [
                 'key' => 'google_maps_embed_url',
                 'type' => 'text',
-                'value' => 'https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3491.1677000940404!2d46.61173627536739!3d24.752069478000166!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjTCsDQ1JzA3LjUiTiA0NsKwMzYnNTEuNSJF!5e1!3m2!1sen!2sdz!4v1754475328828!5m2!1sen!2sdz',
+                'value' => 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3491.184195429717!2d46.614758599999995!3d24.7514823!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e2ee3a97f2ef8f9%3A0x191e451556a20c7a!2z2YXYr9in2LHYsyDYs9i52YjYryDYp9mE2LnYp9mE2YXZitipIHwgU2F1ZCBJbnRlcm5hdGlvbmFsIFNjaG9vbA!5e1!3m2!1sen!2sdz!4v1754580709950!5m2!1sen!2sdz',
                 'description' => 'Google Maps url that will be used in the map embed',
                 'group' => 'google',
                 'is_encrypted' => false,
@@ -80,7 +80,7 @@ class SettingsSeeder extends Seeder
             [
                 'key' => 'google_maps_url',
                 'type' => 'text',
-                'value' => 'https://maps.app.goo.gl/jm83RmQLtMY2sRee7',
+                'value' => 'https://maps.app.goo.gl/2wzChEohJMe4BMp86',
                 'description' => 'Google Maps url that will be used in the map link',
                 'group' => 'google',
                 'is_encrypted' => false,

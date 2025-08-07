@@ -314,8 +314,8 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
 });
 
 Route::middleware(['set.locale'])->group(function () {
-    Route::get('home', [ControllersPagesController::class, 'index'])->name('index');
-    Route::get('', [ControllersPagesController::class, 'index'])->name('index');
+    Route::get('/', [ControllersPagesController::class, 'index'])->name('index');
+    Route::get('/home', [ControllersPagesController::class, 'index'])->name('index');
 
     Route::get('/visits', [ControllersPagesController::class, 'visits'])->name('visits');
     Route::get('/inquiries', [ControllersPagesController::class, 'inquiries'])->name('inquiries');

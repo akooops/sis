@@ -148,6 +148,10 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Follow Us',
                 'ar' => 'تابعنا'
             ],
+            'footer_address_placeholder' => [
+                'en' => 'Saud International School, Abi Al Abbas Al Shafei Street, Hiteen District, Riyadh, Kingdom of Saudi Arabia.',
+                'ar' => 'مدارس سعود العالمية، شارع أبي العباس الشافعي، حي حطين، الرياض، المملكة العربية السعودية'
+            ],
             'guidelines_page_collapse_title' => [
                 'en' => 'Guidelines',
                 'ar' => 'الإرشادات'
@@ -655,22 +659,6 @@ class LanguageTranslationSeeder extends Seeder
             'navbar_search_form_placeholder' => [
                 'en' => 'Type keyword and hit enter',
                 'ar' => 'اكتب كلمة مفتاحية واضغط إنتر'
-            ],
-            'privacy_popup_title' => [
-                'en' => 'Privacy Policy',
-                'ar' => 'سياسة الخصوصية'
-            ],
-            'privacy_popup_description' => [
-                'en' => 'Please read our privacy policy to understand how we use your data. Continuing means you agree to our policy.',
-                'ar' => 'يرجى قراءة سياسة الخصوصية لفهم كيفية استخدامنا لبياناتك. الاستمرار يعني موافقتك على السياسة.'
-            ],
-            'privacy_popup_button_read_more' => [
-                'en' => 'Privacy Policy',
-                'ar' => 'سياسة الخصوصية'
-            ],
-            'privacy_popup_button' => [
-                'en' => 'Agree',
-                'ar' => 'موافق'
             ],
             'recaptcha_error' => [
                 'en' => 'Security verification failed. Please try again.',

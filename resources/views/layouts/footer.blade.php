@@ -5,7 +5,6 @@
     
     $emails = json_decode(getSetting('emails')->value);
     $phones = json_decode(getSetting('phones')->value);
-    $address = getSetting('address');
     $googleMapsUrl = getSetting('google_maps_url');
 
     $facebookUrl = getSetting('social_facebook_url');
@@ -53,16 +52,16 @@
                             </h4>
                             
                             <p>
-                                @if($address)
-                                    @if($googleMapsUrl && !empty($googleMapsUrl->value))
-                                        <a href="{{$googleMapsUrl->value}}" target="_blank" class="text-primary">
-                                            {{$address->value}}
-                                        </a>
-                                    @else
-                                        {{$address->value}}
-                                    @endif
-                                    <br /> 
+                                @if($googleMapsUrl && !empty($googleMapsUrl->value))
+                                    <a href="{{$googleMapsUrl->value}}" target="_blank" class="text-primary">
+                                        {{getLanguageKeyLocalTranslation('footer_address_placeholder')}}
+                                    </a>
+                                @else
+                                    {{getLanguageKeyLocalTranslation('footer_address_placeholder')}}
                                 @endif
+
+                                <br /> 
+
                                 @if($emails && is_array($emails))
                                     @foreach ($emails as $email)
                                         <a href="mailto:{{$email}}" class="text-primary">
@@ -74,8 +73,8 @@
                                 @if($phones && is_array($phones))
                                     @if($emails && is_array($emails))<br />@endif
                                     @foreach ($phones as $phone)
-                                        <a href="https://wa.me/{{ preg_replace('/\D+/', '', $phone) }}" class="text-primary">
-                                            {{$phone}}
+                                        <a href="https://wa.me/{{ preg_replace('/\D+/', '', $phone) }}" class="text-primary" dir="ltr">
+                                            {{$phone}} <i class="uil uil-whatsapp" style="color: #25D366;"></i>
                                         </a>
                                         @if(!$loop->last)<br />@endif
                                     @endforeach
@@ -149,6 +148,12 @@
                                 @if($snapchatUrl && !empty($snapchatUrl->value))
                                     <a href="{{$snapchatUrl->value}}">
                                         <i class="uil uil-snapchat-ghost"></i>
+                                    </a>
+                                @endif
+
+                                @if(!empty($googleMapsUrl->value))
+                                    <a href="{{$googleMapsUrl->value}}">
+                                        <i class="uil uil-map-marker"></i>
                                     </a>
                                 @endif
                             </nav>
