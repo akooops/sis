@@ -581,31 +581,31 @@ p {
    EVENTS SECTION
    ============================================================================= */
 
-.events-section {
+.articles-section {
     background-color: var(--bs-light);
 }
 
-.events-section h2 {
+.articles-section h2 {
     font-size: 25px;
     line-height: 35px;
     text-transform: uppercase;
     font-weight: 900;
 }
 
-.events-section .swiper-container .swiper-slide {
+.articles-section .swiper-container .swiper-slide {
     background-color: #fff;
 }
 
-.events-section .swiper-container .swiper-slide figure {
+.articles-section .swiper-container .swiper-slide figure {
     height: 250px;
 }
 
-.events-section .swiper-container .swiper-slide figure img {
+.articles-section .swiper-container .swiper-slide figure img {
     height: 100% !important;
     object-fit: cover;
 }
 
-.events-section .swiper-container .swiper-slide h3 a {
+.articles-section .swiper-container .swiper-slide h3 a {
     color: var(--bs-primary);
     font-size: 18px;
     font-style: normal;
@@ -614,7 +614,7 @@ p {
     text-transform: uppercase;
 }
 
-.events-section .swiper-container .swiper-slide .arrow {
+.articles-section .swiper-container .swiper-slide .arrow {
     font-size: 36px;
     color: var(--bs-primary);
     display: inline-block;

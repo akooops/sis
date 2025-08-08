@@ -193,20 +193,20 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => 'اعرف المزيد'
             ],
             'index_page_welcome_section_subtitle' => [
-                'en' => 'Welcome to Saud International School! We\'re thrilled to have you join our diverse community where we provide a challenging and inspiring educational environment. Together, we\'ll explore our internationally recognized curriculum enhanced with cutting-edge technology and enriching extra-curricular activities designed to help you thrive and discover your potential.',
-                'ar' => 'مرحباً بكم في مدارس سعود العالمية! نحن متحمسون لانضمامكم إلى مجتمعنا المتنوع حيث نوفر بيئة تعليمية تحدي وملهمة. معاً، سنستكشف منهجنا المعترف به دولياً والمعزز بأحدث التقنيات والأنشطة اللامنهجية الإثرائية المصممة لمساعدتكم على الازدهار واكتشاف إمكاناتكم.'
+                'en' => 'Welcome to Saud International School, We\'re thrilled to have you join our diverse community where we provide a challenging and inspiring educational environment. Together, we\'ll explore our internationally recognized curriculum enhanced with cutting-edge technology and enriching extra-curricular activities designed to help you thrive and discover your potential.',
+                'ar' => 'مرحباً بكم في مدارس سعود العالمية، نحن متحمسون لانضمامكم إلى مجتمعنا المتنوع حيث نوفر بيئة تعليمية تحدي وملهمة. معاً، سنستكشف منهجنا المعترف به دولياً والمعزز بأحدث التقنيات والأنشطة اللامنهجية الإثرائية المصممة لمساعدتكم على الازدهار واكتشاف إمكاناتكم.'
             ],
             'index_page_welcome_section_title' => [
                 'en' => 'Welcome to Saud international schools',
                 'ar' => 'مرحباً بكم في مدارس سعود العالمية'
             ],
-            'index_page_events_section_cta' => [
-                'en' => 'View more events',
-                'ar' => 'عرض المزيد من الفعاليات'
+            'index_page_articles_section_cta' => [
+                'en' => 'View more news',
+                'ar' => 'عرض المزيد من الأخبار'
             ],
-            'index_page_events_section_title' => [
-                'en' => 'Latest events',
-                'ar' => 'أحدث الفعاليات'
+            'index_page_articles_section_title' => [
+                'en' => 'Latest news',
+                'ar' => 'أحدث الأخبار'
             ],
             'index_page_academics_levels_section_cta' => [
                 'en' => 'Learn more',

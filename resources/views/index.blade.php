@@ -193,11 +193,11 @@
 </section>
 <!-- /section -->
 
-<section class="wrapper events-section mb-8">
+<section class="wrapper articles-section mb-8">
     <div class="container pb-12">
         <div class="row text-center mb-6">
             <h2 class="text-primary" data-aos="fade-up" data-aos-duration="1000">
-                {{getLanguageKeyLocalTranslation('index_page_events_section_title')}}
+                {{getLanguageKeyLocalTranslation('index_page_articles_section_title')}}
             </h2>
         </div>
 
@@ -214,18 +214,18 @@
 
             <div class="swiper mb-8">
                 <div class="swiper-wrapper">
-                    @foreach ($events as $event)   
+                    @foreach ($articles as $article)   
                     <div class="swiper-slide">
                         <figure class="hover-scale mb-5">
-                            <a href="{{route('event', ['slug' => $event->slug])}}">
-                                <img src="{{$event->thumbnailUrl}}" alt="" />
+                            <a href="{{route('article', ['slug' => $article->slug])}}">
+                                <img src="{{$article->thumbnailUrl}}" alt="" />
                             </a>
                         </figure>
 
                         <div class="px-8">
                             <h3 class="pt-8 pb-2">
-                                <a href="{{route('event', ['slug' => $event->slug])}}">
-                                    {{$event->getLocalTranslation('title')}}
+                                <a href="{{route('article', ['slug' => $article->slug])}}">
+                                    {{$article->getLocalTranslation('title')}}
                                 </a>
                             </h3>
 
@@ -240,10 +240,10 @@
         </div>
         <!-- /.swiper-container -->
 
-        <div class="d-flex justify-content-center justify-content-lg-end px-0 px-lg-8">
-              <a href="{{route('events')}}" class="btn btn-primary rounded text-center">
+        <div class="d-flex justify-content-center px-0 px-lg-8">
+              <a href="{{route('articles')}}" class="btn btn-primary rounded text-center">
                     <i class="uil uil-angle-right-b me-2"></i>
-                    {{getLanguageKeyLocalTranslation('index_page_events_section_cta')}}
+                    {{getLanguageKeyLocalTranslation('index_page_articles_section_cta')}}
               </a>
         </div>
     </div>
