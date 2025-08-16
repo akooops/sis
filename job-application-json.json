@@ -1,0 +1,39 @@
+{
+    "application": {
+        "nationality": "fds",
+        "address": "fds",
+        "skills": "hgf,hgfhgf,hgfhgfh",
+        "education": [
+            {
+                "institution": "df",
+                "degree": "gfd",
+                "field_of_study": "FDSFDS",
+                "start_year": 1951,
+                "end_year": 1953,
+                "description": "gfd"
+            }
+        ],
+        "experiences": [
+            {
+                "company_name": "hgf",
+                "job_title": "MAS",
+                "start_year": 1950,
+                "end_year": null,
+                "is_current": 1,
+                "description": "hgf"
+            }
+        ],
+        "languages": [
+            {
+                "name": "fdgfhjkl",
+                "proficiency": "intermediate"
+            }
+        ],
+        "job_posting": {
+            "name": "Experienced Teacher Needed",
+            "employment_type": "full_time",
+            "is_remote": 0,
+            "required_years_of_experience": 5
+        }
+    }
+}

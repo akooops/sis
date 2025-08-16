@@ -79,10 +79,6 @@
                             {{$article->getLocalTranslation('title')}}
                         </h2>
 
-                        <p>
-                            {{$article->getLocalTranslation('description')}}
-                        </p>
-
                         <hr class="mt-2 mb-4">
 
                         <div class="post-content">

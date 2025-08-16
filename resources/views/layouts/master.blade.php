@@ -35,7 +35,7 @@
 
     @if($googleAnalyticsIdSetting && !empty($googleAnalyticsIdSetting->value))
         <!-- Google tag (gtag.js) -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id={{ $googleAnalyticsIdSetting }}"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ $googleAnalyticsIdSetting->value }}"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
