@@ -298,7 +298,10 @@
                                                     AI Score: {getAiScoreText(jobApplication.ai_score)}
                                                 </span>
                                             </div>
-                                        {/if}
+                                            <span class="text-sm text-secondary-foreground">
+                                                Ai explanation: {jobApplication?.ai_score_explanation}
+                                            </span>
+                                        {/if}     
                                     </div>
                                     <div class="flex-shrink-0">
                                         <div class="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center">

@@ -19,6 +19,7 @@ use App\Models\VisitTimeSlot;
 use App\Services\FileService;
 use App\Services\IndexService;
 use App\Services\NotificationService;
+use App\Services\JobApplicationScoringService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -97,6 +98,9 @@ class JobApplicationsController extends Controller
 
         // Create notification
         $this->notificationService->createJobApplicationNotification($application);
+
+        // Queue for scoring
+        JobApplicationScoringService::queueForScoring($application);
 
         return response()->json([
                 'status' => 'success',

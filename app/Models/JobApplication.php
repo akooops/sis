@@ -18,6 +18,11 @@ class JobApplication extends Model
         'ai_scored_at' => 'datetime',
     ];
 
+    public const AI_SCORE_STATUS_PENDING = 'pending';
+    public const AI_SCORE_STATUS_PROCESSING = 'processing';
+    public const AI_SCORE_STATUS_COMPLETED = 'completed';
+    public const AI_SCORE_STATUS_FAILED = 'failed';
+
     //Relationships
     public function jobPosting()
     {

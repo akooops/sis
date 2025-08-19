@@ -1,0 +1,37 @@
+{
+  "application": {
+    "nationality": "Saudi Arabian",
+    "address": "Riyadh, Saudi Arabia", 
+    "skills": "Mathematics Teaching,Curriculum Development,Student Assessment",
+    "education": [
+      {
+        "institution": "King Saud University",
+        "degree": "Bachelor", 
+        "field_of_study": "Mathematics Education",
+        "start_year": 2018,
+        "end_year": 2022,
+        "description": "Specialized in secondary mathematics education with focus on modern teaching methods"
+      }
+    ],
+    "experiences": [
+      {
+        "company_name": "Al-Faisal International School",
+        "job_title": "Mathematics Teacher", 
+        "start_year": 2022,
+        "end_year": null,
+        "is_current": 1,
+        "description": "Teaching grades 9-12 mathematics, developing lesson plans and assessments"
+      }
+    ],
+    "languages": [
+      {"name": "Arabic", "proficiency": "native"},
+      {"name": "English", "proficiency": "advanced"}
+    ],
+    "job_posting": {
+      "name": "High School Mathematics Teacher",
+      "employment_type": "full_time", 
+      "is_remote": 0,
+      "required_years_of_experience": 3
+    }
+  }
+}
