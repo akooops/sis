@@ -48,15 +48,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 /*
 |--------------------------------------------------------------------------
 | Admin Authentication Routes
 |--------------------------------------------------------------------------
 */
+
+Route::get('/test-queue', function () {
+    $jobApplication = \App\Models\JobApplication::find(24);
+    \App\Services\JobApplicationScoringService::queueForScoring($jobApplication);
+
+    return response()->json(['message' => 'Job application queued for scoring']);
+});
 
 Route::prefix('admin')->middleware(['force.admin.english', 'handle.inertia'])->group(function () {
     Route::get('auth/login', [AuthController::class, 'showLoginForm'])->middleware('guest')->name('admin.auth.login');

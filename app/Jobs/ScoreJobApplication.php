@@ -47,6 +47,9 @@ class ScoreJobApplication implements ShouldQueue
                     'ai_score_status' => JobApplication::AI_SCORE_STATUS_FAILED,
                     'ai_score_explanation' => 'API request failed: ' . $response->status()
                 ]);
+
+                // Dispatch the next job
+                self::dispatch($this->jobApplication);
             }
 
         } catch (\Exception $e) {
@@ -54,27 +57,9 @@ class ScoreJobApplication implements ShouldQueue
                 'ai_score_status' => JobApplication::AI_SCORE_STATUS_FAILED,
                 'ai_score_explanation' => 'Error: ' . $e->getMessage()
             ]);
-        } finally {
-            // After processing current job, check for next pending application
-            $this->processNextPendingApplication();
-        }
-    }
 
-    /**
-     * Process the next pending application if any
-     */
-    private function processNextPendingApplication(): void
-    {
-        $nextApplication = JobApplication::whereNull('ai_scored_at')
-            ->whereIn('ai_score_status', [JobApplication::AI_SCORE_STATUS_PENDING, JobApplication::AI_SCORE_STATUS_FAILED])
-            ->first();
-
-        if ($nextApplication) {
-            // Mark as processing to prevent duplicate jobs
-            $nextApplication->update(['ai_score_status' => JobApplication::AI_SCORE_STATUS_PROCESSING]);
-            
             // Dispatch the next job
-            self::dispatch($nextApplication);
+            self::dispatch($this->jobApplication);
         }
     }
 

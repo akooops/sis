@@ -10,6 +10,7 @@ use App\Models\Article;
 use App\Models\Banner;
 use App\Models\Event;
 use App\Models\Grade;
+use App\Models\JobApplication;
 use App\Models\JobPosting;
 use App\Models\Page;
 use App\Models\Program;
@@ -53,6 +54,7 @@ class JobApplicationsController extends Controller
             'nationality' => $request->input('personal.nationality'),
             'address' => $request->input('personal.address'),
             'skills' => $request->input('skills'), 
+            'ai_score_status' => JobApplication::AI_SCORE_STATUS_PENDING,
         ]);
 
         foreach ($request->input('education') as $educationData) {
