@@ -310,13 +310,27 @@
                                             <td>
                                                 <span class="text-sm font-medium text-mono">#{language.id}</span>
                                             </td>
+
                                             <td>
-                                                <span class="text-sm font-medium text-mono hover:text-primary">
-                                                    {language.name} <span class="kt-badge kt-badge-outline kt-badge-primary">
-                                                        {language.code}
-                                                    </span>
-                                                </span>
+                                                <div class="flex items-center gap-3">
+                                                    <div class="flex-shrink-0">
+                                                        <img 
+                                                            src={language.flagUrl} 
+                                                            alt={language.name}
+                                                            class="w-10 h-10 rounded-lg object-cover"
+                                                        />
+                                                    </div>
+                                                    <div class="flex flex-col gap-1">
+                                                        <span class="text-sm font-medium text-mono hover:text-primary">
+                                                            {language.name} 
+                                                            <span class="kt-badge kt-badge-outline kt-badge-primary">
+                                                                {language.code}
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </td>
+                                            
                                             <td>
                                                 {#if language.is_default}
                                                     <span class="kt-badge kt-badge-outline kt-badge-success">

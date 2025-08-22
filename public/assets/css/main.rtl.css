@@ -137,10 +137,16 @@ p {
     font-size: 15px;
 }
 
-.languages-dropdown .dropdown-item {
-    text-transform: uppercase;
-    font-weight: 600;
-    font-size: 15px;
+.languages-list {
+    padding: 0;
+}
+
+.languages-list img {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid #eee;
 }
 
 .navbar-cta-container {
@@ -203,10 +209,6 @@ p {
     font-weight: 600;
     font-size: 15px;
     color: var(--bs-primary);
-}
-
-.languages-dropdown{
-    inset: 0px auto 0px auto !important;
 }
 
 /* =============================================================================

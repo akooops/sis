@@ -125,26 +125,21 @@
                         @endif
                     @endforeach
                 @endif
-
-                @if(count($languages) >= 0)
-                    <li class="nav-item mt-2 dropdown">
-                        <a class="nav-link dropdown-toggle py-0" href="" data-bs-toggle="dropdown">               
-                            {{getLanguageKeyLocalTranslation('navbar_change_language_nav_link')}}
-                        </a>
-
-                        <ul class="languages-dropdown dropdown-menu py-0">
-                            @foreach ($languages as $language)
-                                @if($language->code != app()->getLocale())
-                                    <a class="dropdown-item" href="{{route('locale.switch', ['locale' => $language->code])}}">
-                                        {{$language->name}}
-                                    </a>
-                                @endif
-                            @endforeach  
-                        </ul>
-                    </li>
-                @endif
             </ul>
             <!-- /.navbar-nav -->
+
+            
+        
+            <div class="offcanvas-footer">
+                <ul class="languages-list me-0">
+                    @foreach ($languages as $language)
+                        <a href="{{route('locale.switch', ['locale' => $language->code])}}">
+                            <img src="{{$language->flagUrl}}" alt="{{$language->name}}">
+                        </a>
+                    @endforeach
+                </ul>
+            </div>
+            <!-- /.offcanvas-footer -->
         </div>
         <!-- /.offcanvas-body -->
     </div>

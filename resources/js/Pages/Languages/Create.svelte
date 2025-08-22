@@ -28,7 +28,8 @@
         name: '',
         code: '',
         is_default: false,
-        is_rtl: false
+        is_rtl: false,
+        file: null
     };
 
     // Form errors
@@ -36,6 +37,22 @@
 
     // Loading state
     let loading = false;
+
+    // File preview
+    let filePreview = null;
+
+    // Handle file input change
+    function handleFileChange(event) {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            form.file = file;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                filePreview = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
 
     // Handle form submission
     function handleSubmit() {
@@ -46,6 +63,7 @@
         formData.append('code', form.code);
         formData.append('is_default', form.is_default ? 1 : 0);
         formData.append('is_rtl', form.is_rtl ? 1 : 0);
+        formData.append('file', form.file);
 
         router.post(route('admin.languages.store'), formData, {
             onError: (err) => {
@@ -171,7 +189,38 @@
                         </div>
                     </div>
                 </div>
-            
+
+                <!-- Language Flag Card -->
+                <div class="kt-card">
+                    <div class="kt-card-header">
+                        <h4 class="kt-card-title">Language Flag</h4>
+                    </div>
+                    <div class="kt-card-content">
+                        <div class="grid gap-4">
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="file">
+                                    Upload File <span class="text-destructive">*</span>
+                                </label>
+
+                                <input
+                                    id="file"
+                                    type="file"
+                                    class="kt-input"
+                                    accept="image/*"
+                                    on:change={handleFileChange}
+                                />
+                                {#if filePreview}
+                                    <div class="mt-2">
+                                        <img src={filePreview} alt="Preview" class="w-32 h-32 object-cover rounded-lg border" />
+                                    </div>
+                                {/if}
+                                {#if errors.file}
+                                    <p class="text-sm text-destructive">{errors.file}</p>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Form Actions -->
                 <div class="flex items-center justify-end gap-3">

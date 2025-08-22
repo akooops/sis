@@ -61,6 +61,17 @@
                     <div class="flex flex-col lg:flex-row gap-6 w-full">
                         <!-- Language Details -->
                         <div class="grid gap-4 w-full">
+                            <!-- Language Flag -->
+                            <div class="flex">
+                                <figure class="figure">
+                                    <img 
+                                        src={language?.flagUrl} 
+                                        alt={language?.name}
+                                        class="rounded-lg w-32 h-32 object-cover"
+                                    />
+                                </figure>
+                            </div>
+
                             <div class="flex flex-col gap-2">
                                 <h4 class="text-sm font-semibold text-mono">Language Name</h4>
                                 <p class="text-sm text-secondary-foreground">{language?.name}</p>

@@ -636,10 +636,6 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'View Details',
                 'ar' => 'عرض التفاصيل'
             ],
-            'navbar_change_language_nav_link' => [
-                'en' => 'Change language',
-                'ar' => 'تغيير اللغة'
-            ],
             'navbar_search_form_placeholder' => [
                 'en' => 'Type keyword and hit enter',
                 'ar' => 'اكتب كلمة مفتاحية واضغط إنتر'

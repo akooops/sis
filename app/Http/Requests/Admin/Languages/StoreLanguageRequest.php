@@ -26,6 +26,7 @@ class StoreLanguageRequest extends FormRequest
             'code' => 'required|string|max:255|regex:/^[a-z]{2}(-[A-Z]{2})?$/|unique:languages,code',
             'is_rtl' => 'required|boolean',
             'is_default' => 'required|boolean',
+            'file' => 'required|file|image', 
         ];
     }
 }

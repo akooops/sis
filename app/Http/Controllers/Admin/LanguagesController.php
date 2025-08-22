@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\Languages\UpdateLanguageRequest;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 use App\Models\Language;
+use App\Models\Media;
 use Illuminate\Support\Facades\Route;
 
 class LanguagesController extends Controller
@@ -73,6 +74,38 @@ class LanguagesController extends Controller
 
         $language = Language::create($request->validated());
     
+        if ($request->hasFile('file')) {
+            // Get MIME type
+            $mimeType = $request->file('file')->getMimeType();
+            
+            // Determine file category using match expression
+            $type = match (true) {
+                str_starts_with($mimeType, 'image/') => 'image',
+                str_starts_with($mimeType, 'video/') => 'video',
+                str_starts_with($mimeType, 'audio/') => 'audio',
+                default => 'document',
+            };
+
+            $media = Media::create(array_merge(
+                $request->validated(),
+                [
+                    'type' => $type
+                ]
+            ));
+
+            $defaultLanguage = Language::where([
+                'is_default' => true,
+            ])->first();
+
+            foreach($media->getTranslatableFields() as $field){
+                $media->setTranslation($field, $defaultLanguage->code, $request->input($field));    
+            }
+            
+            $file = $this->fileService->upload($request->file('file'), 'App\\Models\\Media', $media->id);
+        }
+    
+        $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Language', $language->id, true);
+
         cache()->forget("all-languages");
 
         return inertia('Languages/Index', [
@@ -120,6 +153,35 @@ class LanguagesController extends Controller
         }
 
         $language->update($request->validated());
+
+        $media = null;
+
+        if ($request->hasFile('file')) {
+            // Get MIME type
+            $mimeType = $request->file('file')->getMimeType();
+            
+            // Determine file category using match expression
+            $type = match (true) {
+                str_starts_with($mimeType, 'image/') => 'image',
+                str_starts_with($mimeType, 'video/') => 'video',
+                str_starts_with($mimeType, 'audio/') => 'audio',
+                default => 'document',
+            };
+
+            $media = Media::create(array_merge(
+                $request->validated(),
+                [
+                    'type' => $type
+                ]
+            ));
+            
+            $file = $this->fileService->upload($request->file('file'), 'App\\Models\\Media', $media->id);
+        }
+    
+        if($media){
+            if($language->file) $language->file->detach();
+            $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Language', $language->id, true);
+        }
         
         cache()->forget("all-languages");
 

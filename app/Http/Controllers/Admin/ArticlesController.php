@@ -233,16 +233,7 @@ class ArticlesController extends Controller
     {
         $article->delete();
 
-        if (request()->expectsJson() || request()->hasHeader('X-Requested-With')) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Article deleted successfully',
-            ]);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Article deleted successfully',
-        ]);
+        return redirect()->route('admin.articles.index')
+                        ->with('success','Article deleted successfully');
     }
 }
