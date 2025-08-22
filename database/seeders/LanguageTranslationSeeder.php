@@ -640,22 +640,6 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Change language',
                 'ar' => 'تغيير اللغة'
             ],
-            'navbar_inquiries_nav_link' => [
-                'en' => 'Inquire',
-                'ar' => 'استفسار'
-            ],
-            'navbar_visits_nav_link' => [
-                'en' => 'Visit',
-                'ar' => 'زيارة'
-            ],
-            'navbar_applications_nav_link' => [
-                'en' => 'Enroll',
-                'ar' => 'تسجيل'
-            ],
-            'navbar_school_fees_nav_link' => [
-                'en' => 'Fees',
-                'ar' => 'الرسوم'
-            ],
             'navbar_search_form_placeholder' => [
                 'en' => 'Type keyword and hit enter',
                 'ar' => 'اكتب كلمة مفتاحية واضغط إنتر'

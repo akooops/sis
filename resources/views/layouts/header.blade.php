@@ -1,13 +1,11 @@
 @php
     $headerPrimaryMenu = getMenu('header_primary_menu');
+
+    $ctaMenu = getMenu('cta_menu');
     $servicesMenu = getMenu('services_menu');
 
     $languages = getLanguages();
     $currentLanguage = getCurrentLanguage();
-
-    $schoolFeesPage = getPageBySlug('school-fees');
-    $inquiriesPage = getPageBySlug('inquiries');
-    $visitsPage = getPageBySlug('visits');
 @endphp
 
 <header class="wrapper">
@@ -45,31 +43,16 @@
 
                 <div class="navbar-other d-flex col-6 col-lg-4 justify-content-end">
                     <ul class="navbar-nav flex-row align-items-center rounded ps-0 mx-0 ps-md-6 bg-white">
-                        @if($schoolFeesPage)
-                            <li class="nav-item d-none d-md-block me-6">
-                                <a class="nav-link" href="{{route('page', ['slug' => $schoolFeesPage->slug])}}">
-                                    {{getLanguageKeyLocalTranslation('navbar_school_fees_nav_link')}}
-                                </a>
-                            </li>
-                        @else
-                            <li class="nav-item d-none d-md-block me-6">
-                                <a class="nav-link" href="{{route('page', ['slug' => $visitsPage->slug])}}">
-                                    {{getLanguageKeyLocalTranslation('navbar_visits_nav_link')}}
-                                </a>
-                            </li>
+
+                        @if($ctaMenu)
+                            @foreach ($ctaMenu->items as $ctaMenuItem)
+                                <li class="nav-item d-none d-md-block me-6">
+                                    <a class="nav-link" href="{{$ctaMenuItem->url}}">
+                                        {{$ctaMenuItem->getLocalTranslation('title')}}
+                                    </a>
+                                </li>
+                            @endforeach
                         @endif
-
-                            <li class="nav-item d-none d-md-block me-6">
-                                <a class="nav-link" href="{{route('page', ['slug' => $inquiriesPage->slug])}}">
-                                {{getLanguageKeyLocalTranslation('navbar_inquiries_nav_link')}}
-                            </a>
-                        </li>
-
-                        <li class="nav-item d-none d-md-block me-6">
-                            <a class="nav-link" href="https://eregistration.sis.edu.sa" target="_blank" rel="noopener noreferrer">
-                                {{getLanguageKeyLocalTranslation('navbar_applications_nav_link')}}
-                            </a>
-                        </li>
 
                         <div class="d-flex bg-primary py-1 navbar-cta-container">
                             <li class="nav-item mx-2">
