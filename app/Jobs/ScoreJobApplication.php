@@ -31,15 +31,36 @@ class ScoreJobApplication implements ShouldQueue
             // Process current application
             $applicationData = $this->formatApplicationData($this->jobApplication);
 
-            $response = Http::post(config('services.job_application_scoring_ai_model.url') . '/api/score-cv', [
-                'application' => $applicationData
+            // Call Ollama directly
+            $instruction = "Rate this job application against the job posting on a scale of 1-10 and provide a brief explanation for the Saudi HR market context.";
+            $inputData = "Job Application Data: " . json_encode($applicationData);
+            
+            $prompt = "Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.\n\n### Instruction:\n{$instruction}\n\n### Input:\n{$inputData}\n\n### Response:\n";
+
+            $response = Http::post(config('services.job_application_scoring_ai_model.url') . '/api/generate', [
+                'model' => config('services.job_application_scoring_ai_model.model'),
+                'prompt' => $prompt,
+                'stream' => false,
+                'options' => [
+                    'temperature' => 0.7,
+                    'top_p' => 0.9,
+                    'top_k' => 40,
+                    'num_ctx' => 4096
+                ]
             ]);
 
             if ($response->successful()) {
+                $responseData = $response->json();
+                $output = $responseData['response'] ?? '';
+                
+                // Extract numerical score from the response
+                preg_match('/Score:\s*(\d+)\/10/', $output, $matches);
+                $score = $matches[1] ?? null;
+                
                 $this->jobApplication->update([
                     'ai_scored_at' => now(),
-                    'ai_score' => $response->json()['score'] ?? null,
-                    'ai_score_explanation' => $response->json()['explanation'] ?? null,
+                    'ai_score' => $score,
+                    'ai_score_explanation' => $output,
                     'ai_score_status' => JobApplication::AI_SCORE_STATUS_COMPLETED
                 ]);
             } else {
