@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Achievement;
+use App\Models\AchievementCategory;
 use App\Models\Album;
 use App\Models\Article;
 use App\Models\Banner;
@@ -345,6 +347,45 @@ class PagesController extends Controller
         return view('calendars', [
             'page' => $page,
             'calendars' => $calendars
+        ]);
+    }
+
+    public function achievements(Request $request)
+    {
+        $page = Page::where([
+            'slug' => 'achievements',
+            'status' => 'published'
+        ])->first();
+
+        if (!$page) abort(404);
+
+        $categories = AchievementCategory::all();
+        $achievements = Achievement::with('category')
+            ->where('status', 'published')
+            ->orderBy('achievement_date', 'desc');
+
+        if ($request->has('category')) {
+            $achievements->whereHas('category', function ($query) use ($request) {
+                $query->where('slug', $request->category);
+            });
+        }
+
+        if ($request->has('year')) {
+            $achievements->whereYear('achievement_date', $request->year);
+        }
+
+        $achievements = $achievements->get();
+
+        $years = Achievement::selectRaw('YEAR(achievement_date) as year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        return view('achievements', [
+            'page' => $page,
+            'categories' => $categories,
+            'achievements' => $achievements,
+            'years' => $years
         ]);
     }
 }

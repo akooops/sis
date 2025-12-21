@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AlbumsController;
+use App\Http\Controllers\Admin\AchievementCategoriesController;
+use App\Http\Controllers\Admin\AchievementsController;
 use App\Http\Controllers\Admin\ArticlesController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BannersController;
@@ -172,6 +174,26 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::patch('albums/{album}', [AlbumsController::class, 'update'])->middleware('check.permission:admin.albums.update')->name('admin.albums.update');
     Route::delete('albums/{album}', [AlbumsController::class, 'destroy'])->middleware('check.permission:admin.albums.destroy')->name('admin.albums.destroy');
 
+    // Achievement Categories
+    Route::get('achievement-categories', [AchievementCategoriesController::class, 'index'])->middleware('check.permission:admin.achievement-categories.index')->name('admin.achievement-categories.index');
+    Route::get('achievement-categories/create', [AchievementCategoriesController::class, 'create'])->middleware('check.permission:admin.achievement-categories.store')->name('admin.achievement-categories.create');
+    Route::post('achievement-categories', [AchievementCategoriesController::class, 'store'])->middleware('check.permission:admin.achievement-categories.store')->name('admin.achievement-categories.store');
+    Route::get('achievement-categories/{achievementCategory}', [AchievementCategoriesController::class, 'show'])->middleware('check.permission:admin.achievement-categories.show')->name('admin.achievement-categories.show');
+    Route::get('achievement-categories/{achievementCategory}/edit', [AchievementCategoriesController::class, 'edit'])->middleware('check.permission:admin.achievement-categories.update')->name('admin.achievement-categories.edit');
+    Route::patch('achievement-categories/{achievementCategory}/update-translation', [AchievementCategoriesController::class, 'updateTranslation'])->middleware('check.permission:admin.achievement-categories.update')->name('admin.achievement-categories.update-translation');
+    Route::patch('achievement-categories/{achievementCategory}', [AchievementCategoriesController::class, 'update'])->middleware('check.permission:admin.achievement-categories.update')->name('admin.achievement-categories.update');
+    Route::delete('achievement-categories/{achievementCategory}', [AchievementCategoriesController::class, 'destroy'])->middleware('check.permission:admin.achievement-categories.destroy')->name('admin.achievement-categories.destroy');
+
+    // Achievements
+    Route::get('achievements', [AchievementsController::class, 'index'])->middleware('check.permission:admin.achievements.index')->name('admin.achievements.index');
+    Route::get('achievements/create', [AchievementsController::class, 'create'])->middleware('check.permission:admin.achievements.store')->name('admin.achievements.create');
+    Route::post('achievements', [AchievementsController::class, 'store'])->middleware('check.permission:admin.achievements.store')->name('admin.achievements.store');
+    Route::get('achievements/{achievement}', [AchievementsController::class, 'show'])->middleware('check.permission:admin.achievements.show')->name('admin.achievements.show');
+    Route::get('achievements/{achievement}/edit', [AchievementsController::class, 'edit'])->middleware('check.permission:admin.achievements.update')->name('admin.achievements.edit');
+    Route::patch('achievements/{achievement}/update-translation', [AchievementsController::class, 'updateTranslation'])->middleware('check.permission:admin.achievements.update')->name('admin.achievements.update-translation');
+    Route::patch('achievements/{achievement}', [AchievementsController::class, 'update'])->middleware('check.permission:admin.achievements.update')->name('admin.achievements.update');
+    Route::delete('achievements/{achievement}', [AchievementsController::class, 'destroy'])->middleware('check.permission:admin.achievements.destroy')->name('admin.achievements.destroy');
+
     // Events
     Route::get('events', [EventsController::class, 'index'])->middleware('check.permission:admin.events.index')->name('admin.events.index');
     Route::get('events/create', [EventsController::class, 'create'])->middleware('check.permission:admin.events.store')->name('admin.events.create');
@@ -325,6 +347,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/forms', [ControllersPagesController::class, 'forms'])->name('forms');
     Route::get('/guidelines', [ControllersPagesController::class, 'guidelines'])->name('guidelines');
     Route::get('/calendars', [ControllersPagesController::class, 'calendars'])->name('calendars');
+    Route::get('/achievements', [ControllersPagesController::class, 'achievements'])->name('achievements');
 
     Route::get('/{slug}', [ControllersPagesController::class, 'page'])->name('page');
     Route::get('/program/{slug}', [ControllersPagesController::class, 'program'])->name('program');

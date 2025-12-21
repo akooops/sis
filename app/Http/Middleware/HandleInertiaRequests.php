@@ -40,6 +40,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user() ? $request->user() : null,
                 'permissions' => $request->user() ? $request->user()->permissions() : null,
+                'enable_permissions' => config('app.enable_permissions'),
             ],
             'flash' => [
                 'success' => $request->session()->get('success'),

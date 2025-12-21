@@ -168,6 +168,40 @@
                 </div>
             </div>
 
+            <!-- Achievements Management -->
+            <div class="mb-5">
+                <h3 class="text-sm text-muted-foreground uppercase ps-5 inline-block mb-3">
+                    Achievements Management
+                </h3>
+                <div class="kt-menu flex flex-col w-full gap-1.5 px-3.5" data-kt-menu="true" data-kt-menu-accordion-expand-all="false" id="sidebar_primary_menu">
+                    {#if hasPermission('admin.achievement-categories.index')}
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link gap-2.5 py-2 px-2.5 rounded-md {isActiveRoute('admin.achievement-categories.index') ? 'kt-menu-item-active:bg-accent/60' : ''} kt-menu-link-hover:bg-accent/60" href={route('admin.achievement-categories.index')}>
+                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
+                                <i class="ki-outline ki-category"></i>
+                            </span>
+                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono">
+                                Categories
+                            </span>
+                        </a>
+                    </div>
+                    {/if}
+                    
+                    {#if hasPermission('admin.achievements.index')}
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link gap-2.5 py-2 px-2.5 rounded-md {isActiveRoute('admin.achievements.index') || isActiveRoute('admin.achievement-categories.index') ? 'kt-menu-item-active:bg-accent/60' : ''} kt-menu-link-hover:bg-accent/60" href={route('admin.achievements.index')}>
+                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
+                                <i class="ki-outline ki-award"></i>
+                            </span>
+                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono">
+                                Achievements
+                            </span>
+                        </a>
+                    </div>
+                    {/if}
+                </div>
+            </div>
+
             <!-- Jobs Management -->
             <div class="mb-5">
                 <h3 class="text-sm text-muted-foreground uppercase ps-5 inline-block mb-3">

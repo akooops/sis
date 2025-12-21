@@ -89,6 +89,13 @@ class PagesSeeder extends Seeder
                 'menu_id' => null,
             ],
             [
+                'name' => 'Achievements',
+                'slug' => 'achievements',
+                'is_system_page' => true,
+                'status' => 'published',
+                'menu_id' => null,
+            ],
+            [
                 'name' => 'Error',
                 'slug' => 'error',
                 'is_system_page' => true,
@@ -270,6 +277,20 @@ class PagesSeeder extends Seeder
                 'content' => [
                     'en' => 'Find all the important school calendars including events, schedules, and important dates. All calendars are available for download.',
                     'ar' => 'ابحث عن جميع التقويمات المدرسية المهمة بما في ذلك الفعاليات والجداول والتواريخ المهمة. جميع التقويمات متاحة للتحميل.'
+                ]
+            ],
+            'achievements' => [
+                'title' => [
+                    'en' => 'School Achievements',
+                    'ar' => 'إنجازات المدرسة'
+                ],
+                'description' => [
+                    'en' => 'Celebrating the success of our students and school community throughout the years.',
+                    'ar' => 'الاحتفال بنجاح طلابنا ومجتمعنا المدرسي على مر السنين.'
+                ],
+                'content' => [
+                    'en' => 'Our school takes pride in the remarkable achievements of our students in academics, sports, and various competitions. Explore our track record of excellence.',
+                    'ar' => 'تفتخر مدرستنا بالإنجازات الرائعة لطلابنا في المجالات الأكاديمية والرياضية والمسابقات المختلفة. استكشف سجلنا المتميز من التميز.'
                 ]
             ],
             'error' => [

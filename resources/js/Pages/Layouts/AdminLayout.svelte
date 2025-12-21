@@ -10,7 +10,8 @@
 
   // Global utility functions for admin components
   function hasPermission(permission) {
-    if (!$page.props.auth.permissions) return false;
+    if (!$page.props.auth.enable_permissions) return true;
+    
     return $page.props.auth.permissions.some(p => p === permission);
   }
 
