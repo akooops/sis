@@ -364,22 +364,26 @@ class PagesController extends Controller
             ->where('status', 'published')
             ->orderBy('achievement_date', 'desc');
 
+        $category = $this->indexService->checkIfEmpty($request->query('category'));
+        $year = $this->indexService->checkIfEmpty($request->query('year'));
+        $search = $this->indexService->checkIfSearchEmpty($request->query('search'));   
+
         // Apply filters
-        if ($request->has('category')) {
-            $achievementsQuery->whereHas('category', function ($query) use ($request) {
-                $query->where('slug', $request->category);
+        if ($category) {
+            $achievementsQuery->whereHas('category', function ($query) use ($category) {
+                $query->where('slug', $category);
             });
         }
 
-        if ($request->has('year')) {
-            $achievementsQuery->whereYear('achievement_date', $request->year);
+        if ($year) {
+            $achievementsQuery->whereYear('achievement_date', $year);
         }
 
-        if ($request->has('search')) {
-            $achievementsQuery->where(function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhereHas('category', function ($q) use ($request) {
-                        $q->where('name', 'like', '%' . $request->search . '%');
+        if ($search) {
+            $achievementsQuery->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhereHas('category', function ($q) use ($search) {
+                        $q->where('name', 'like', '%' . $search . '%');
                     });
             });
         }

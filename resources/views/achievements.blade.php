@@ -130,7 +130,7 @@
                                     </div>
                                     
                                     <!-- Achievements Slider for this Year -->
-                                    <div class="swiper-container px-2" 
+                                    <div class="swiper-container px-0 px-lg-2" 
                                         data-margin="20" 
                                         data-autoplay="true" 
                                         data-autoplaytime="5000" 
@@ -214,16 +214,6 @@
                             <div class="timeline-content"></div>
                         </div>
                     </div>
-                @else
-                    <div class="text-center py-10 card shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="icon-shape bg-soft-primary rounded-circle mb-4">
-                                <i class="uil uil-award fs-30 text-primary"></i>
-                            </div>
-                            <h4>{{getLanguageKeyLocalTranslation('achievements_page_no_results_title')}}</h4>
-                            <p>{{getLanguageKeyLocalTranslation('achievements_page_no_results_description')}}</p>
-                        </div>
-                    </div>
                 @endif
             </div>
             <!-- /column -->
@@ -235,7 +225,7 @@
                     </h4>
                     <form class="search-form" action="{{route('achievements')}}">
                         <div class="mb-0">
-                            <input name="search" value="{{request()->get('search')}}" id="search-form" type="text" class="form-control">
+                            <input name="search" value="{{request()->get('search')}}" placeholder="{{getLanguageKeyLocalTranslation('sidebar_achievements_search_placeholder')}}" id="search-form" type="text" class="form-control">
                         </div>
                     </form>
                     <!-- /.search-form -->
@@ -287,14 +277,6 @@
                     </form>
                 </div>
                 <!-- /.widget -->
-
-                @if(request('category') || request('year') || request('search'))
-                    <div class="widget">
-                        <a href="{{ route('achievements') }}" class="btn btn-outline-primary w-100 rounded-pill">
-                            {{getLanguageKeyLocalTranslation('sidebar_achievements_clear_filters')}}
-                        </a>
-                    </div>
-                @endif
             </aside>
             <!-- /column .sidebar -->
         </div>

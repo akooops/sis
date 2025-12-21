@@ -1314,6 +1314,44 @@ footer .copyright p {
     position: relative;
 }
 
+@media (max-width: 767.98px) {
+    .timeline-item {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding-bottom: 2rem;
+        position: relative;
+    }
+    
+    /* First row: Year badge alone (full width) */
+    .timeline-item > .timeline-date {
+        flex: 0 0 100%;
+        width: 100%;
+        padding-top: 0;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Second row: Line and content side by side using flex */
+    .timeline-item > .timeline-line {
+        flex: 0 0 2px;
+        width: 2px;
+        position: relative;
+        align-self: stretch;
+        min-height: 100%;
+    }
+    
+    .timeline-item > .timeline-content {
+        flex: 1 1 calc(100% - 2px - 1rem);
+        padding-left: 1rem;
+        min-width: 0;
+    }
+    
+    .timeline-item > .timeline-content > .timeline-content-mobile-date {
+        display: none;
+    }
+}
+
 .timeline-date {
     flex: 0 0 75px;
     display: flex;
@@ -1342,6 +1380,29 @@ footer .copyright p {
     flex-direction: column;
     align-items: center;
     width: 2px;
+    align-self: stretch;
+}
+
+@media (max-width: 767.98px) {
+    .timeline-line {
+        width: 2px;
+        height: auto;
+        align-self: flex-start;
+        padding-left: 0;
+    }
+    
+    .timeline-line .timeline-vertical-line {
+        width: 2px;
+        height: 100%;
+        top: 0.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .timeline-line .timeline-dot {
+        margin-top: 0.5rem;
+        margin-left: 0;
+    }
 }
 
 .timeline-dot {
@@ -1449,6 +1510,28 @@ footer .copyright p {
 
 .timeline-content-mobile-date {
     display: none;
+}
+
+@media (max-width: 767.98px) {
+    .timeline-content-mobile-date {
+        display: flex;
+        margin-bottom: 0.5rem;
+    }
+    
+    .timeline-content {
+        width: 100%;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .timeline-content-mobile-date {
+        display: flex;
+        margin-bottom: 0.5rem;
+    }
+    
+    .timeline-content {
+        width: 100%;
+    }
 }
 
 @media (min-width: 1400px) {
