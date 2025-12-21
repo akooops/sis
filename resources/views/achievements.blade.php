@@ -3,11 +3,6 @@
 @section('description', $page->getLocalTranslation('description'))
 @section('canonical', route('achievements'))
 @section('css')
-<style>
-    .avatar.object-cover {
-        object-fit: cover;
-    }
-</style>
 @endsection
 @section('content')
 <section class="wrapper banners-section">
@@ -107,69 +102,118 @@
 
         <div class="row pt-6" data-aos="fade-up" data-aos-duration="2000">
             <div class="col-lg-8">
-                <!-- Achievements by Year -->
                 @if($achievementsByYear->count() > 0)
-                    @foreach($achievementsByYear as $year => $yearAchievements)
-                        <div class="mb-12" data-aos="fade-up" data-aos-duration="1000">
-                            <!-- Year Bubble -->
-                            <div class="mb-6">
-                                <span class="badge bg-primary text-white rounded-pill px-6 py-3 fs-18 fw-bold">
-                                    {{ $year }}
-                                </span>
-                            </div>
+                    <div class="timeline-container">
+                        @foreach($achievementsByYear as $yearIndex => $yearAchievements)
+                            @php
+                                $year = $yearIndex;
+                                $isFirstYear = $loop->first;
+                            @endphp
                             
-                            <!-- Achievements Slider for this Year -->
-                            <div class="swiper-container" 
-                                data-margin="20" 
-                                data-autoplay="true" 
-                                data-autoplaytime="5000" 
-                                data-dots="false" 
-                                data-nav="true" 
-                                data-items-xl="3" 
-                                data-items-md="2" 
-                                data-items-xs="1"
-                                data-loop="true">
-                                
-                                <div class="swiper">
-                                    <div class="swiper-wrapper">
-                                        @foreach($yearAchievements as $achievement)
-                                            <div class="swiper-slide">
-                                                <a href="{{ $achievement->url }}" class="shadow-lg lift h-100 d-block p-5 d-flex flex-row">
-                                                    <div>
-                                                        @if($achievement->thumbnailUrl)
-                                                            <img src="{{ $achievement->thumbnailUrl }}" alt="{{ $achievement->getLocalTranslation('title') }}" class="avatar w-11 h-11 rounded-circle object-cover me-4" style="object-fit: cover;">
-                                                        @else
-                                                            <span class="avatar bg-primary text-white w-11 h-11 fs-20 me-4">
-                                                                {{ strtoupper(substr($achievement->getLocalTranslation('title'), 0, 2)) }}
-                                                            </span>
-                                                        @endif
-                                                    </div>
-                                                    <div>
-                                                        @if($achievement->category)
-                                                            <span class="badge bg-pale-blue text-blue rounded py-1 mb-2">
-                                                                {{ $achievement->category->getLocalTranslation('title') }}
-                                                            </span>
-                                                        @endif
-                                                        <h4 class="mb-1">{{ $achievement->getLocalTranslation('title') }}</h4>
-                                                        @if($achievement->getLocalTranslation('done_by'))
-                                                            <p class="mb-0 text-body">
-                                                                <i class="uil uil-user me-1"></i>
-                                                                {{ $achievement->getLocalTranslation('done_by') }}
-                                                            </p>
-                                                        @endif
-                                                    </div>
-                                                </a>
-                                            </div>
-                                            <!--/.swiper-slide -->
-                                        @endforeach
-                                    </div>
-                                    <!--/.swiper-wrapper -->
+                            <div class="timeline-item">
+                                <!-- Left Side (Year) -->
+                                <div class="timeline-date">
+                                    <span class="badge bg-primary text-white px-4 py-2 fs-14 fw-bold" style="border-radius: 6px;">{{ $year }}</span>
                                 </div>
-                                <!-- /.swiper -->
+                                
+                                <!-- Center Line & Node -->
+                                <div class="timeline-line">
+                                    <div class="timeline-dot {{ $isFirstYear ? '' : 'inactive' }}"></div>
+                                    <div class="timeline-vertical-line"></div>
+                                </div>
+                                
+                                <!-- Right Side (Slider) -->
+                                <div class="timeline-content">
+                                    <!-- Mobile Year -->
+                                    <div class="timeline-content-mobile-date">
+                                        <span class="badge bg-primary text-white px-4 py-2 fs-14 fw-bold" style="border-radius: 6px;">{{ $year }}</span>
+                                    </div>
+                                    
+                                    <!-- Achievements Slider for this Year -->
+                                    <div class="swiper-container px-2" 
+                                        data-margin="20" 
+                                        data-autoplay="true" 
+                                        data-autoplaytime="5000" 
+                                        data-dots="true" 
+                                        data-nav="false" 
+                                        data-items-xl="2" 
+                                        data-items-lg="1" 
+                                        data-items-md="1" 
+                                        data-items-xs="1"
+                                        data-loop="true">
+                                        
+                                        <div class="swiper">
+                                            <div class="swiper-wrapper pb-2 px-2">
+                                                @foreach($yearAchievements as $achievement)
+                                                    <div class="swiper-slide">
+                                                        <div class="card">
+                                                            @if($achievement->thumbnailUrl)
+                                                                <figure class="hover-scale">
+                                                                    <a href="{{ $achievement->url }}">
+                                                                        <img src="{{ $achievement->thumbnailUrl }}" alt="{{ $achievement->getLocalTranslation('title') }}" />
+                                                                    </a>
+                                                                </figure>
+                                                            @endif
+
+                                                            <div class="card-body">
+                                                                @if($achievement->category)
+                                                                    <span class="badge bg-primary rounded py-1 mb-2">
+                                                                        {{ $achievement->category->getLocalTranslation('title') }}
+                                                                    </span>
+                                                                @endif
+                                                                <h2>
+                                                                    <a href="{{ $achievement->url }}">
+                                                                        {{ $achievement->getLocalTranslation('title') }}
+                                                                    </a>
+                                                                </h2>
+
+                                                                <p class="mb-0">
+                                                                    {{ $achievement->getLocalTranslation('description') }}
+                                                                </p>
+                                                            </div>
+                                                            <!--/.card-body -->
+                                                            
+                                                            <div class="card-footer">
+                                                                <ul class="post-meta d-flex mb-0">
+                                                                    <li class="post-date">
+                                                                        <i class="uil uil-calendar-alt"></i>
+                                                                        <span>{{ \Carbon\Carbon::parse($achievement->achievement_date)->format('Y-m-d') }}</span>
+                                                                    </li>
+                                                                    @if($achievement->getLocalTranslation('done_by'))
+                                                                        <li class="ms-3">
+                                                                            <i class="uil uil-user"></i>
+                                                                            <span>{{ $achievement->getLocalTranslation('done_by') }}</span>
+                                                                        </li>
+                                                                    @endif
+                                                                </ul>
+                                                                <!-- /.post-meta -->
+                                                            </div>
+                                                            <!-- /.card-footer -->
+                                                        </div>
+                                                        <!-- /.card -->
+                                                    </div>
+                                                    <!--/.swiper-slide -->
+                                                @endforeach
+                                            </div>
+                                            <!--/.swiper-wrapper -->
+                                        </div>
+                                        <!-- /.swiper -->
+                                    </div>
+                                    <!-- /.swiper-container -->
+                                </div>
                             </div>
-                            <!-- /.swiper-container -->
+                        @endforeach
+                        
+                        <!-- Timeline End Indicator -->
+                        <div class="timeline-item" style="padding-bottom: 0;">
+                            <div class="timeline-date"></div>
+                            <div class="timeline-line">
+                                <div class="timeline-dot inactive" style="width: 0.5rem; height: 0.5rem; margin-top: 0;"></div>
+                                <div class="timeline-vertical-line" style="display: none;"></div>
+                            </div>
+                            <div class="timeline-content"></div>
                         </div>
-                    @endforeach
+                    </div>
                 @else
                     <div class="text-center py-10 card shadow-sm border-0">
                         <div class="card-body">
@@ -191,7 +235,7 @@
                     </h4>
                     <form class="search-form" action="{{route('achievements')}}">
                         <div class="mb-0">
-                            <input name="search" value="{{request()->get('search')}}" type="text" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('sidebar_achievements_search_placeholder')}}" onchange="this.form.submit()">
+                            <input name="search" value="{{request()->get('search')}}" id="search-form" type="text" class="form-control">
                         </div>
                     </form>
                     <!-- /.search-form -->

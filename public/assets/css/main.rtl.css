@@ -1302,6 +1302,155 @@ footer .copyright p {
     }
 }
 
+/* Achievements Timeline Styles - RTL */
+.timeline-container {
+    position: relative;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 1rem;
+    padding-bottom: 3.5rem;
+    position: relative;
+}
+
+.timeline-date {
+    flex: 0 0 75px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.timeline-date-label {
+    color: #3f78e0;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.timeline-date-time {
+    color: #6b7280;
+    font-size: 0.75rem;
+}
+
+.timeline-line {
+    flex: 0 0 auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 2px;
+}
+
+.timeline-dot {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--bs-gold);
+    border: 4px solid #fff;
+    z-index: 10;
+    transition: all 0.3s;
+    position: relative;
+    animation: radarPulse 2s ease-in-out infinite;
+}
+
+.timeline-dot::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--bs-gold);
+    opacity: 0.6;
+    animation: radarWave 2s ease-in-out infinite;
+}
+
+.timeline-dot.inactive {
+    background: #d1d5db;
+    animation: none;
+}
+
+.timeline-dot.inactive::before {
+    display: none;
+}
+
+.timeline-container figure {
+    height: 200px;
+}
+
+.timeline-container img {
+    height: 100% !important;
+    object-fit: cover;
+}
+
+.timeline-container h2 {
+    font-size: 22px;
+    line-height: 35px;
+    text-transform: uppercase;
+    font-weight: 900;
+    color: var(--bs-primary);
+}
+
+.timeline-container h2 a {
+    color: var(--bs-primary);
+}
+
+.timeline-container h2 a:hover {
+    color: var(--bs-secondary);
+}
+
+.timeline-container h3 {
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 42px;
+    color: var(--bs-primary);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+@keyframes radarPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(224, 182, 93, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(224, 182, 93, 0);
+    }
+}
+
+@keyframes radarWave {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2.5);
+        opacity: 0;
+    }
+}
+
+.timeline-vertical-line {
+    width: 2px;
+    height: 100%;
+    background: #e5e7eb;
+    position: absolute;
+    top: 0.5rem;
+    z-index: 0;
+}
+
+.timeline-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.timeline-content-mobile-date {
+    display: none;
+}
+
 @media (min-width: 1400px) {
     .welcome-section .shape {
         height: 500px;

@@ -664,6 +664,10 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Security verification failed. Please try again.',
                 'ar' => 'فشل التحقق الأمني. يرجى المحاولة مرة أخرى.'
             ],
+            'sidebar_achievements_search_title' => [
+                'en' => 'Search',
+                'ar' => 'بحث'
+            ],
             'sidebar_achievements_all_categories' => [
                 'en' => 'All Categories',
                 'ar' => 'جميع الفئات'
