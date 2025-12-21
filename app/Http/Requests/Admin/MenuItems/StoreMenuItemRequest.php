@@ -37,7 +37,6 @@ class StoreMenuItemRequest extends FormRequest
                     'App\Models\Article',
                     'App\Models\Album',
                     'App\Models\Event',
-                    'App\Models\Grade',
                     'App\Models\JobPosting'
                 ])
             ],

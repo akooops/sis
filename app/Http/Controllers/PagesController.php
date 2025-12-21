@@ -360,23 +360,39 @@ class PagesController extends Controller
         if (!$page) abort(404);
 
         $categories = AchievementCategory::all();
-        $achievements = Achievement::with('category')
+        $achievementsQuery = Achievement::with('category')
             ->where('status', 'published')
             ->orderBy('achievement_date', 'desc');
 
+        // Apply filters
         if ($request->has('category')) {
-            $achievements->whereHas('category', function ($query) use ($request) {
+            $achievementsQuery->whereHas('category', function ($query) use ($request) {
                 $query->where('slug', $request->category);
             });
         }
 
         if ($request->has('year')) {
-            $achievements->whereYear('achievement_date', $request->year);
+            $achievementsQuery->whereYear('achievement_date', $request->year);
         }
 
-        $achievements = $achievements->get();
+        if ($request->has('search')) {
+            $achievementsQuery->where(function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->search . '%')
+                    ->orWhereHas('category', function ($q) use ($request) {
+                        $q->where('name', 'like', '%' . $request->search . '%');
+                    });
+            });
+        }
+
+        $achievements = $achievementsQuery->get();
+
+        // Group achievements by year
+        $achievementsByYear = $achievements->groupBy(function ($achievement) {
+            return \Carbon\Carbon::parse($achievement->achievement_date)->format('Y');
+        })->sortKeysDesc();
 
         $years = Achievement::selectRaw('YEAR(achievement_date) as year')
+            ->where('status', 'published')
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year');
@@ -385,6 +401,7 @@ class PagesController extends Controller
             'page' => $page,
             'categories' => $categories,
             'achievements' => $achievements,
+            'achievementsByYear' => $achievementsByYear,
             'years' => $years
         ]);
     }

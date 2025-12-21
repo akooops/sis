@@ -101,7 +101,6 @@
             'Article': 'App\\Models\\Article',
             'Album': 'App\\Models\\Album',
             'Event': 'App\\Models\\Event',
-            'Grade': 'App\\Models\\Grade',
             'JobPosting': 'App\\Models\\JobPosting'
         };
         
@@ -248,7 +247,6 @@
                                             <option value="Article">Article</option>
                                             <option value="Album">Album</option>
                                             <option value="Event">Event</option>
-                                            <option value="Grade">Grade</option>
                                             <option value="JobPosting">Job</option>
                                         </select>
                                         {#if errors.linkable_type}
@@ -438,43 +436,6 @@
                                                                             id: event.id,
                                                                             text: event.name,
                                                                             slug: event.slug
-                                                                        };
-                                                                    })
-                                                                };
-                                                            },
-                                                            cache: true
-                                                        }}
-                                                    />
-                                                {/key}
-                                            {/if}
-
-                                            <!-- Grade Select2 -->
-                                            {#if form.linkable_type === 'Grade'}
-                                                {#key `grade-${form.linkable_type}`}
-                                                    <Select2
-                                                        bind:this={linkableIdSelectComponent}
-                                                        id="linkable-id-grade"
-                                                        placeholder="Select grade..."
-                                                        bind:value={form.linkable_id}
-                                                        on:select={handleLinkableItemSelect}
-                                                        on:clear={handleLinkableItemClear}
-                                                        ajax={{
-                                                            url: route('admin.grades.index'),
-                                                            dataType: 'json',
-                                                            delay: 300,
-                                                            data: function(params) {
-                                                                return {
-                                                                    search: params.term,
-                                                                    perPage: 10
-                                                                };
-                                                            },
-                                                            processResults: function(data) {
-                                                                return {
-                                                                    results: data.grades.map(function(grade) {
-                                                                        return {
-                                                                            id: grade.id,
-                                                                            text: grade.name,
-                                                                            slug: grade.slug
                                                                         };
                                                                     })
                                                                 };

@@ -29,23 +29,6 @@
     
     const pageTitle = 'Menu Item Details';
 
-    // Get linkable type display name
-    function getLinkableTypeDisplay(type) {
-        if (!type) return 'N/A';
-        
-        const typeMap = {
-            'App\\Models\\Page': 'Page',
-            'App\\Models\\Program': 'Program',
-            'App\\Models\\Article': 'Article',
-            'App\\Models\\Album': 'Album',
-            'App\\Models\\Event': 'Event',
-            'App\\Models\\Grade': 'Grade',
-            'App\\Models\\JobPosting': 'Job'
-        };
-        
-        return typeMap[type] || type;
-    }
-
     // Get translation for a field and language
     function getTranslation(field, languageCode) {
         if (translations && translations[field] && translations[field][languageCode]) {

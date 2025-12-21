@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin\Achievements;
 
 use App\Models\Media;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreAchievementRequest extends FormRequest
 {
@@ -22,7 +23,18 @@ class StoreAchievementRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'done_by' => 'required|string|max:255',
-            'linkable_type' => 'nullable|string',
+            'linkable_type' => [
+                'nullable',
+                'required_with:linkable_id',
+                Rule::in([
+                    'App\Models\Page',
+                    'App\Models\Program', 
+                    'App\Models\Article',
+                    'App\Models\Album',
+                    'App\Models\Event',
+                    'App\Models\JobPosting'
+                ])
+            ],
             'linkable_id' => 'nullable|integer',
             'url' => 'nullable|url|max:255',
             'file' => 'nullable|file|image',

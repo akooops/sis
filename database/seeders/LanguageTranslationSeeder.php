@@ -24,6 +24,26 @@ class LanguageTranslationSeeder extends Seeder
 
         // Complete translation keys and values (alphabetically ordered)
         $keys = [
+            'achievements_page_accordion_title' => [
+                'en' => 'Browse Achievements',
+                'ar' => 'تصفح الإنجازات'
+            ],
+            'achievements_page_description' => [
+                'en' => 'Discover our remarkable achievements and milestones that showcase our commitment to excellence and continuous growth.',
+                'ar' => 'اكتشف إنجازاتنا الرائعة والمعالم البارزة التي تظهر التزامنا بالتميز والنمو المستمر.'
+            ],
+            'achievements_page_no_results_description' => [
+                'en' => 'Try adjusting your search filters or check back later.',
+                'ar' => 'حاول تعديل فلاتر البحث الخاصة بك أو تحقق مرة أخرى لاحقًا.'
+            ],
+            'achievements_page_no_results_title' => [
+                'en' => 'No achievements found',
+                'ar' => 'لم يتم العثور على إنجازات'
+            ],
+            'achievements_page_subtitle' => [
+                'en' => 'Achievements',
+                'ar' => 'الإنجازات'
+            ],
             'albums_videos_title' => [
                 'en' => 'Videos',
                 'ar' => 'الفيديوهات'
@@ -643,6 +663,34 @@ class LanguageTranslationSeeder extends Seeder
             'recaptcha_error' => [
                 'en' => 'Security verification failed. Please try again.',
                 'ar' => 'فشل التحقق الأمني. يرجى المحاولة مرة أخرى.'
+            ],
+            'sidebar_achievements_all_categories' => [
+                'en' => 'All Categories',
+                'ar' => 'جميع الفئات'
+            ],
+            'sidebar_achievements_all_years' => [
+                'en' => 'All Years',
+                'ar' => 'جميع السنوات'
+            ],
+            'sidebar_achievements_categories_title' => [
+                'en' => 'Categories',
+                'ar' => 'الفئات'
+            ],
+            'sidebar_achievements_clear_filters' => [
+                'en' => 'Clear All Filters',
+                'ar' => 'مسح جميع الفلاتر'
+            ],
+            'sidebar_achievements_search_placeholder' => [
+                'en' => 'Search achievements...',
+                'ar' => 'ابحث عن الإنجازات...'
+            ],
+            'sidebar_achievements_search_title' => [
+                'en' => 'Search',
+                'ar' => 'بحث'
+            ],
+            'sidebar_achievements_years_title' => [
+                'en' => 'Filter by Year',
+                'ar' => 'تصفية حسب السنة'
             ],
             'sidebar_popular_article_title' => [
                 'en' => 'Popular articles',

@@ -67,9 +67,6 @@ class MenuItem extends Model
                 case 'event':
                     return route('event', ['slug' => $this->linkable->slug]);
                     
-                case 'grade':
-                    return route('grade', ['slug' => $this->linkable->slug]);
-                    
                 case 'jobposting':
                     return route('job', ['slug' => $this->linkable->slug]);
                     

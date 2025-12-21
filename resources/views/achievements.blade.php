@@ -2,166 +2,53 @@
 @section('title', $page->getLocalTranslation('title'))
 @section('description', $page->getLocalTranslation('description'))
 @section('canonical', route('achievements'))
-
 @section('css')
 <style>
-    .timeline {
-        position: relative;
-        padding: 20px 0;
-    }
-    .timeline::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background: #e9ecef;
-        left: 31px;
-    }
-    .timeline-item {
-        position: relative;
-        margin-bottom: 50px;
-        padding-left: 80px;
-    }
-    .timeline-icon {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        background: #fff;
-        border: 2px solid #e9ecef;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1;
-        transition: all 0.3s ease;
-        overflow: hidden;
-    }
-    .timeline-icon img {
-        width: 100%;
-        height: 100%;
+    .avatar.object-cover {
         object-fit: cover;
-    }
-    .timeline-item:hover .timeline-icon {
-        border-color: #3f78e0;
-        transform: scale(1.1);
-    }
-    .timeline-date {
-        font-size: 0.85rem;
-        color: #6c757d;
-        margin-bottom: 5px;
-        font-weight: 600;
-        text-transform: uppercase;
-        display: block;
-    }
-    .timeline-content {
-        background: #fff;
-        padding: 24px;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-        transition: all 0.3s ease;
-        border: 1px solid #f1f3f5;
-    }
-    .timeline-item:hover .timeline-content {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-    .timeline-title {
-        margin-bottom: 12px;
-        font-weight: 700;
-        font-size: 1.25rem;
-    }
-    .timeline-category {
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.7rem;
-        font-weight: 700;
-        background: rgba(63, 120, 224, 0.1);
-        color: #3f78e0;
-        margin-bottom: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    .sidebar .widget {
-        margin-bottom: 40px;
-        background: #fff;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-    }
-    .widget-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #f0f0f0;
-    }
-    .filter-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    .filter-item {
-        margin-bottom: 10px;
-    }
-    .filter-item:last-child {
-        margin-bottom: 0;
-    }
-    .filter-link {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 15px;
-        border-radius: 8px;
-        color: #495057;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        background: #f8f9fa;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-    .filter-link:hover, .filter-link.active {
-        background: #3f78e0;
-        color: #fff !important;
-    }
-    .filter-count {
-        font-size: 0.75rem;
-        background: #e9ecef;
-        padding: 2px 8px;
-        border-radius: 10px;
-        color: #6c757d;
-    }
-    .filter-link:hover .filter-count, .filter-link.active .filter-count {
-        background: rgba(255,255,255,0.2);
-        color: #fff;
     }
 </style>
 @endsection
-
 @section('content')
 <section class="wrapper banners-section">
-    <div class="swiper-container">
+    <div class="swiper-container" 
+        data-margin="0" 
+        data-autoplay="true" 
+        data-autoplaytime="7000" 
+        data-nav="true" 
+        data-dots="true" 
+        data-items="1">
+        
         <div class="swiper">
             <div class="swiper-wrapper">
                 <div class="swiper-slide bg-overlay">
                     <div class="banner-img" style="background-image: url('{{ $page->thumbnailUrl }}')"></div>
+
                     <div class="container h-100">
-                        <div class="row h-100 align-items-end px-8 px-lg-0 pb-16">
-                            <div class="col-12 col-lg-8">
-                                <h1 class="mb-0 text-white animate__animated animate__slideInDown animate__delay-1s">
-                                    {{$page->getLocalTranslation('title')}}
-                                </h1>
-                            </div>
+                        <div class="row h-100 align-items-end px-8 px-lg-0 pb-16">           
+                            <div class="row px-0 px-lg-4">
+                                <div class="col-12 col-lg-8 px-0">
+                                    <h1 class="mb-0 animate__animated animate__slideInDown animate__delay-1s">
+                                        {{$page->getLocalTranslation('title')}}
+                                    </h1>
+                                </div>
+                                <!--/.col -->
+                            </div>     
+                            <!--/.row -->      
                         </div>
+                        <!--/.row -->
                     </div>
+                    <!--/.container -->
                 </div>
+                <!--/.swiper-slide -->            
             </div>
+            <!--/.swiper-wrapper -->
         </div>
+        <!-- /.swiper -->
     </div>
+    <!-- /.swiper-container -->
 </section>
+<!-- /section -->
 
 @if($page->menu)
 <section class="wrapper page-menu-section">
@@ -174,6 +61,7 @@
                         : $menuItem->url;
                     $currentUrl = url()->current();
                 @endphp
+
                 <li class="nav-item text-nowrap">
                     <a class="nav-link py-2 {{ $currentUrl === $menuUrl ? 'active' : '' }}" href="{{ $menuUrl }}">
                         {{$menuItem->getLocalTranslation('title')}}
@@ -186,115 +74,191 @@
 @endif
 
 <section class="wrapper">
-    <div class="container py-3 py-md-5">
-        <nav class="d-inline-block" aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item">
-                    <a class="text-uppercase" href="{{route('index')}}">
-                        {{getLanguageKeyLocalTranslation('breadcrumbs_index_page_title')}}
-                    </a>
-                </li>
-                <li class="breadcrumb-item text-uppercase active" aria-current="page">
-                    {{$page->getLocalTranslation('title')}}
-                </li>
-            </ol>
-        </nav>
-    </div>
+   <div class="container py-3 py-md-5">
+      <nav class="d-inline-block" aria-label="breadcrumb">
+         <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">
+                <a class="text-uppercase" href="{{route('index')}}">
+                    {{getLanguageKeyLocalTranslation('breadcrumbs_index_page_title')}}
+                </a>
+            </li>
+            
+            <li class="breadcrumb-item text-uppercase active" aria-current="page">
+                {{$page->getLocalTranslation('title')}}
+            </li>
+         </ol>
+      </nav>
+      <!-- /nav -->
+   </div>
+   <!-- /.container -->
 </section>
 
-<section class="wrapper">
-    <div class="container pt-6 pb-12" data-aos="fade-up" data-aos-duration="1000">
-        <div class="row gx-lg-12">
+<section class="wrapper page-content-section">
+   <div class="container pt-6 pb-12">
+        <h2 data-aos="fade-up" data-aos-duration="1000">
+            {{$page->getLocalTranslation('title')}}
+        </h2>
+
+        <hr class="mt-2 mb-4" data-aos="fade-up" data-aos-duration="1500">
+
+        <div class="w-100 mb-6" data-aos="fade-up" data-aos-duration="2000">
+            <p class="lead">{{getLanguageKeyLocalTranslation('achievements_page_description')}}</p>
+        </div>
+
+        <div class="row pt-6" data-aos="fade-up" data-aos-duration="2000">
             <div class="col-lg-8">
-                <div class="timeline">
-                    @forelse($achievements as $achievement)
-                        <div class="timeline-item">
-                            <div class="timeline-icon">
-                                <img src="{{ $achievement->thumbnailUrl }}" alt="">
-                            </div>
-                            <div class="timeline-content">
-                                <span class="timeline-date">
-                                    <i class="uil uil-calendar-alt me-1"></i>
-                                    {{ \Carbon\Carbon::parse($achievement->achievement_date)->format('F Y') }}
-                                </span>
-                                <div class="timeline-category">
-                                    {{ $achievement->category->getLocalTranslation('name') }}
-                                </div>
-                                <h3 class="timeline-title">
-                                    <a href="{{ $achievement->url }}" class="link-dark">{{ $achievement->getLocalTranslation('title') }}</a>
-                                </h3>
-                                @if($achievement->getLocalTranslation('done_by'))
-                                    <p class="text-muted small mb-3">
-                                        <i class="uil uil-user me-1 text-primary"></i> <strong>{{ $achievement->getLocalTranslation('done_by') }}</strong>
-                                    </p>
-                                @endif
-                                <p class="mb-0 text-secondary">
-                                    {{ $achievement->getLocalTranslation('description') }}
-                                </p>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center py-10 card shadow-sm border-0">
-                             <div class="card-body">
-                                <div class="icon-shape bg-soft-primary rounded-circle mb-4">
-                                     <i class="uil uil-award fs-30 text-primary"></i>
-                                </div>
-                                <h4>No achievements found</h4>
-                                <p>Try adjusting your search filters or check back later.</p>
-                             </div>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-
-            <aside class="col-lg-4 sidebar mt-10 mt-lg-0">
-                <div class="widget">
-                    <h4 class="widget-title">Categories</h4>
-                    <ul class="filter-list">
-                        <li class="filter-item">
-                            <a href="{{ route('achievements', request()->only('year')) }}" class="filter-link {{ !request('category') ? 'active' : '' }}">
-                                All Categories
-                            </a>
-                        </li>
-                        @foreach($categories as $cat)
-                            <li class="filter-item">
-                                <a href="{{ route('achievements', array_merge(request()->only('year'), ['category' => $cat->slug])) }}" 
-                                   class="filter-link {{ request('category') == $cat->slug ? 'active' : '' }}">
-                                    {{ $cat->getLocalTranslation('name') }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-
-                <div class="widget">
-                    <h4 class="widget-title">Filter by Year</h4>
-                    <ul class="filter-list">
-                        <li class="filter-item">
-                            <a href="{{ route('achievements', request()->only('category')) }}" class="filter-link {{ !request('year') ? 'active' : '' }}">
-                                All Years
-                            </a>
-                        </li>
-                        @foreach($years as $year)
-                            <li class="filter-item">
-                                <a href="{{ route('achievements', array_merge(request()->only('category'), ['year' => $year])) }}" 
-                                   class="filter-link {{ request('year') == $year ? 'active' : '' }}">
+                <!-- Achievements by Year -->
+                @if($achievementsByYear->count() > 0)
+                    @foreach($achievementsByYear as $year => $yearAchievements)
+                        <div class="mb-12" data-aos="fade-up" data-aos-duration="1000">
+                            <!-- Year Bubble -->
+                            <div class="mb-6">
+                                <span class="badge bg-primary text-white rounded-pill px-6 py-3 fs-18 fw-bold">
                                     {{ $year }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
+                                </span>
+                            </div>
+                            
+                            <!-- Achievements Slider for this Year -->
+                            <div class="swiper-container" 
+                                data-margin="20" 
+                                data-autoplay="true" 
+                                data-autoplaytime="5000" 
+                                data-dots="false" 
+                                data-nav="true" 
+                                data-items-xl="3" 
+                                data-items-md="2" 
+                                data-items-xs="1"
+                                data-loop="true">
+                                
+                                <div class="swiper">
+                                    <div class="swiper-wrapper">
+                                        @foreach($yearAchievements as $achievement)
+                                            <div class="swiper-slide">
+                                                <a href="{{ $achievement->url }}" class="shadow-lg lift h-100 d-block p-5 d-flex flex-row">
+                                                    <div>
+                                                        @if($achievement->thumbnailUrl)
+                                                            <img src="{{ $achievement->thumbnailUrl }}" alt="{{ $achievement->getLocalTranslation('title') }}" class="avatar w-11 h-11 rounded-circle object-cover me-4" style="object-fit: cover;">
+                                                        @else
+                                                            <span class="avatar bg-primary text-white w-11 h-11 fs-20 me-4">
+                                                                {{ strtoupper(substr($achievement->getLocalTranslation('title'), 0, 2)) }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                    <div>
+                                                        @if($achievement->category)
+                                                            <span class="badge bg-pale-blue text-blue rounded py-1 mb-2">
+                                                                {{ $achievement->category->getLocalTranslation('title') }}
+                                                            </span>
+                                                        @endif
+                                                        <h4 class="mb-1">{{ $achievement->getLocalTranslation('title') }}</h4>
+                                                        @if($achievement->getLocalTranslation('done_by'))
+                                                            <p class="mb-0 text-body">
+                                                                <i class="uil uil-user me-1"></i>
+                                                                {{ $achievement->getLocalTranslation('done_by') }}
+                                                            </p>
+                                                        @endif
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            <!--/.swiper-slide -->
+                                        @endforeach
+                                    </div>
+                                    <!--/.swiper-wrapper -->
+                                </div>
+                                <!-- /.swiper -->
+                            </div>
+                            <!-- /.swiper-container -->
+                        </div>
+                    @endforeach
+                @else
+                    <div class="text-center py-10 card shadow-sm border-0">
+                        <div class="card-body">
+                            <div class="icon-shape bg-soft-primary rounded-circle mb-4">
+                                <i class="uil uil-award fs-30 text-primary"></i>
+                            </div>
+                            <h4>{{getLanguageKeyLocalTranslation('achievements_page_no_results_title')}}</h4>
+                            <p>{{getLanguageKeyLocalTranslation('achievements_page_no_results_description')}}</p>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            <!-- /column -->
 
-                @if(request('category') || request('year'))
-                    <div class="mt-5">
+            <aside class="col-lg-4 sidebar">
+                <div class="widget">
+                    <h4 class="widget-title mb-3">
+                        {{getLanguageKeyLocalTranslation('sidebar_achievements_search_title')}}
+                    </h4>
+                    <form class="search-form" action="{{route('achievements')}}">
+                        <div class="mb-0">
+                            <input name="search" value="{{request()->get('search')}}" type="text" class="form-control" placeholder="{{getLanguageKeyLocalTranslation('sidebar_achievements_search_placeholder')}}" onchange="this.form.submit()">
+                        </div>
+                    </form>
+                    <!-- /.search-form -->
+                </div>
+                <!-- /.widget -->
+
+                <div class="widget">
+                    <h4 class="widget-title mb-3">
+                        {{getLanguageKeyLocalTranslation('sidebar_achievements_categories_title')}}
+                    </h4>
+                    <form action="{{route('achievements')}}" method="get">
+                        @if(request('search'))
+                            <input type="hidden" name="search" value="{{request()->get('search')}}">
+                        @endif
+                        @if(request('year'))
+                            <input type="hidden" name="year" value="{{request()->get('year')}}">
+                        @endif
+                        <select name="category" class="form-select" onchange="this.form.submit()">
+                            <option value="">{{getLanguageKeyLocalTranslation('sidebar_achievements_all_categories')}}</option>
+                            @foreach ($categories as $cat)
+                                <option value="{{ $cat->slug }}" {{ request('category') == $cat->slug ? 'selected' : '' }}>
+                                    {{ $cat->getLocalTranslation('title') }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
+                <!-- /.widget -->
+
+                <div class="widget">
+                    <h4 class="widget-title mb-3">
+                        {{getLanguageKeyLocalTranslation('sidebar_achievements_years_title')}}
+                    </h4>
+                    <form action="{{route('achievements')}}" method="get">
+                        @if(request('search'))
+                            <input type="hidden" name="search" value="{{request()->get('search')}}">
+                        @endif
+                        @if(request('category'))
+                            <input type="hidden" name="category" value="{{request()->get('category')}}">
+                        @endif
+                        <select name="year" class="form-select" onchange="this.form.submit()">
+                            <option value="">{{getLanguageKeyLocalTranslation('sidebar_achievements_all_years')}}</option>
+                            @foreach($years as $year)
+                                <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>
+                                    {{ $year }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
+                <!-- /.widget -->
+
+                @if(request('category') || request('year') || request('search'))
+                    <div class="widget">
                         <a href="{{ route('achievements') }}" class="btn btn-outline-primary w-100 rounded-pill">
-                            Clear All Filters
+                            {{getLanguageKeyLocalTranslation('sidebar_achievements_clear_filters')}}
                         </a>
                     </div>
                 @endif
             </aside>
+            <!-- /column .sidebar -->
         </div>
+        <!-- /.row -->
     </div>
+    <!-- /.container -->
 </section>
+
+@endsection
+@section('script')
 @endsection
