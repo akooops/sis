@@ -127,8 +127,6 @@
                 @endif
             </ul>
             <!-- /.navbar-nav -->
-
-            
         
             <div class="offcanvas-footer">
                 <ul class="languages-list me-0">
