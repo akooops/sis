@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\VisitBookingsController;
 use App\Http\Controllers\Admin\VisitServicesController;
 use App\Http\Controllers\Admin\VisitTimeSlotsController;
 use App\Http\Controllers\Admin\CalendarsController;
+use App\Http\Controllers\Admin\PartnersController;
 use App\Http\Controllers\ContactSubmissionsController as ControllersContactSubmissionsController;
 use App\Http\Controllers\InquiriesController as ControllersInquiriesController;
 use App\Http\Controllers\JobApplicationsController as ControllersJobApplicationsController;
@@ -259,6 +260,15 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::patch('calendars/{calendar}/update-translation', [CalendarsController::class, 'updateTranslation'])->middleware('check.permission:admin.calendars.update')->name('admin.calendars.update-translation');
     Route::patch('calendars/{calendar}', [CalendarsController::class, 'update'])->middleware('check.permission:admin.calendars.update')->name('admin.calendars.update');
     Route::delete('calendars/{calendar}', [CalendarsController::class, 'destroy'])->middleware('check.permission:admin.calendars.destroy')->name('admin.calendars.destroy');
+
+    // Partners
+    Route::get('partners', [PartnersController::class, 'index'])->middleware('check.permission:admin.partners.index')->name('admin.partners.index');
+    Route::get('partners/create', [PartnersController::class, 'create'])->middleware('check.permission:admin.partners.store')->name('admin.partners.create');
+    Route::post('partners', [PartnersController::class, 'store'])->middleware('check.permission:admin.partners.store')->name('admin.partners.store');
+    Route::get('partners/{partner}', [PartnersController::class, 'show'])->middleware('check.permission:admin.partners.show')->name('admin.partners.show');
+    Route::get('partners/{partner}/edit', [PartnersController::class, 'edit'])->middleware('check.permission:admin.partners.update')->name('admin.partners.edit');
+    Route::patch('partners/{partner}', [PartnersController::class, 'update'])->middleware('check.permission:admin.partners.update')->name('admin.partners.update');
+    Route::delete('partners/{partner}', [PartnersController::class, 'destroy'])->middleware('check.permission:admin.partners.destroy')->name('admin.partners.destroy');
 
     //Settings
     Route::get('settings', [SettingsController::class, 'index'])->middleware('check.permission:admin.settings.index')->name('admin.settings.index');

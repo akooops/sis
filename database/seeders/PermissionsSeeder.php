@@ -172,6 +172,29 @@ class PermissionsSeeder extends Seeder
             'admin.job-applications.show',
             'admin.job-applications.destroy',
             
+            // Achievement Categories Management
+            'admin.achievement-categories.index',
+            'admin.achievement-categories.store',
+            'admin.achievement-categories.show',
+            'admin.achievement-categories.update',
+            'admin.achievement-categories.destroy',
+            'admin.achievement-categories.update-translation',
+            
+            // Achievements Management
+            'admin.achievements.index',
+            'admin.achievements.store',
+            'admin.achievements.show',
+            'admin.achievements.update',
+            'admin.achievements.destroy',
+            'admin.achievements.update-translation',
+            
+            // Partners Management
+            'admin.partners.index',
+            'admin.partners.store',
+            'admin.partners.show',
+            'admin.partners.update',
+            'admin.partners.destroy',
+            
             // Files Management
             'admin.files.upload',
             
@@ -240,6 +263,9 @@ class PermissionsSeeder extends Seeder
             ->orWhere('name', 'like', '%banners%')
             ->orWhere('name', 'like', '%forms%')
             ->orWhere('name', 'like', '%calendars%')
+            ->orWhere('name', 'like', '%achievements%')
+            ->orWhere('name', 'like', '%achievement-categories%')
+            ->orWhere('name', 'like', '%partners%')
             ->orWhere('name', 'like', '%files%')
             ->get();
             
