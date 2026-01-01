@@ -47,8 +47,13 @@ class PagesController extends Controller
         $programs = getPrograms();
         $articles = Article::latest()->where('status', 'published')->limit(6)->get();
         $albums = Album::latest()->where('status', 'published')->limit(6)->get();
+        $achievements = Achievement::with('category')
+            ->where('status', 'published')
+            ->orderBy('achievement_date', 'desc')
+            ->limit(6)
+            ->get();
 
-        return view('index', compact('page', 'banners', 'programs', 'articles', 'albums'));
+        return view('index', compact('page', 'banners', 'programs', 'articles', 'albums', 'achievements'));
     }
 
     public function page(Request $request, $slug = null)
@@ -360,9 +365,7 @@ class PagesController extends Controller
         if (!$page) abort(404);
 
         $categories = AchievementCategory::all();
-        $achievementsQuery = Achievement::with('category')
-            ->where('status', 'published')
-            ->orderBy('achievement_date', 'desc');
+        $achievementsQuery = Achievement::where('status', 'published')->orderBy('achievement_date', 'desc');
 
         $category = $this->indexService->checkIfEmpty($request->query('category'));
         $year = $this->indexService->checkIfEmpty($request->query('year'));

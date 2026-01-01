@@ -228,6 +228,14 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Latest news',
                 'ar' => 'أحدث الأخبار'
             ],
+            'index_page_achievements_section_title' => [
+                'en' => 'Latest achievements',
+                'ar' => 'أحدث الإنجازات'
+            ],
+            'index_page_achievements_section_cta' => [
+                'en' => 'View all achievements',
+                'ar' => 'عرض جميع الإنجازات'
+            ],
             'index_page_academics_levels_section_cta' => [
                 'en' => 'Learn more',
                 'ar' => 'اعرف المزيد'

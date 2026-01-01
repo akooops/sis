@@ -251,6 +251,95 @@
 </section>
 <!-- /section -->
 
+<section class="wrapper achievements-section">
+    <div class="container">
+        <div class="row text-center mb-6">
+            <h2 class="text-primary" data-aos="fade-up" data-aos-duration="1000">
+                {{getLanguageKeyLocalTranslation('index_page_achievements_section_title')}}
+            </h2>
+        </div>
+
+        <div class="swiper-container px-8" 
+            data-margin="20" 
+            data-dots="false" 
+            data-autoplay="true" 
+            data-autoplaytime="7000" 
+            data-items-xl="3" 
+            data-items-md="2" 
+            data-items-xs="1"
+            data-aos="fade-up" 
+            data-aos-duration="2000">
+
+            <div class="swiper mb-8">
+                <div class="swiper-wrapper">
+                    @foreach ($achievements as $achievement)   
+                    <div class="swiper-slide">
+                        <div class="card">
+                            @if($achievement->thumbnailUrl)
+                                <figure class="hover-scale">
+                                    <a href="{{ $achievement->url }}">
+                                        <img src="{{ $achievement->thumbnailUrl }}" alt="{{ $achievement->getLocalTranslation('title') }}" />
+                                    </a>
+                                </figure>
+                            @endif
+
+                            <div class="card-body">
+                                @if($achievement->category)
+                                    <span class="badge bg-primary rounded py-1 mb-2">
+                                        {{ $achievement->category->getLocalTranslation('title') }}
+                                    </span>
+                                @endif
+                                <h2>
+                                    <a href="{{ $achievement->url }}">
+                                        {{ $achievement->getLocalTranslation('title') }}
+                                    </a>
+                                </h2>
+
+                                <p class="mb-0">
+                                    {{ $achievement->getLocalTranslation('description') }}
+                                </p>
+                            </div>
+                            <!--/.card-body -->
+                            
+                            <div class="card-footer">
+                                <ul class="post-meta d-flex mb-0">
+                                    <li class="post-date">
+                                        <i class="uil uil-calendar-alt"></i>
+                                        <span>{{ \Carbon\Carbon::parse($achievement->achievement_date)->format('Y-m-d') }}</span>
+                                    </li>
+                                    @if($achievement->getLocalTranslation('done_by'))
+                                        <li class="ms-3">
+                                            <i class="uil uil-user"></i>
+                                            <span>{{ $achievement->getLocalTranslation('done_by') }}</span>
+                                        </li>
+                                    @endif
+                                </ul>
+                                <!-- /.post-meta -->
+                            </div>
+                            <!-- /.card-footer -->
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                    <!--/.swiper-slide -->
+                    @endforeach
+                </div>
+                <!--/.swiper-wrapper -->
+            </div>
+            <!-- /.swiper -->
+        </div>
+        <!-- /.swiper-container -->
+
+        <div class="d-flex justify-content-center px-0 px-lg-8">
+            <a href="{{route('achievements')}}" class="btn btn-primary rounded text-center">
+                <i class="uil uil-angle-right-b me-2"></i>
+                {{getLanguageKeyLocalTranslation('index_page_achievements_section_cta')}}
+            </a>
+        </div>
+    </div>
+    <!-- /.container -->
+</section>
+<!-- /section -->
+
 <section class="wrapper albums-section">
     <div class="overflow-hidden">
         <div class="container py-18">
