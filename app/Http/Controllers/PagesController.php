@@ -13,6 +13,7 @@ use App\Models\Event;
 use App\Models\Grade;
 use App\Models\JobPosting;
 use App\Models\Page;
+use App\Models\Partner;
 use App\Models\Program;
 use App\Models\VisitService;
 use App\Services\IndexService;
@@ -52,8 +53,9 @@ class PagesController extends Controller
             ->orderBy('achievement_date', 'desc')
             ->limit(6)
             ->get();
+        $partners = Partner::latest()->get();
 
-        return view('index', compact('page', 'banners', 'programs', 'articles', 'albums', 'achievements'));
+        return view('index', compact('page', 'banners', 'programs', 'articles', 'albums', 'achievements', 'partners'));
     }
 
     public function page(Request $request, $slug = null)

@@ -236,6 +236,10 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'View all achievements',
                 'ar' => 'عرض جميع الإنجازات'
             ],
+            'index_page_partners_section_title' => [
+                'en' => 'Our Partners',
+                'ar' => 'شركاؤنا'
+            ],
             'index_page_academics_levels_section_cta' => [
                 'en' => 'Learn more',
                 'ar' => 'اعرف المزيد'

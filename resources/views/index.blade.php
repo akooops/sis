@@ -252,7 +252,7 @@
 <!-- /section -->
 
 <section class="wrapper achievements-section">
-    <div class="container">
+    <div class="container mt-16">
         <div class="row text-center mb-6">
             <h2 class="text-primary" data-aos="fade-up" data-aos-duration="1000">
                 {{getLanguageKeyLocalTranslation('index_page_achievements_section_title')}}
@@ -389,6 +389,44 @@
         <!-- /.container -->
     </div>
     <!-- /.overflow-hidden -->
+</section>
+<!-- /section -->
+
+<section class="wrapper bg-light partners-section mt-12">
+    <div class="container py-10">
+        <div class="swiper-container clients mb-0" 
+            data-margin="30" 
+            data-loop="true" 
+            data-autoplay="true" 
+            data-autoplaytime="1" 
+            data-drag="false" 
+            data-speed="5000" 
+            data-items-lg="6" 
+            data-items-md="4" 
+            data-items-xs="2"
+            data-aos="fade-up" 
+            data-aos-duration="2000">
+            <div class="swiper">
+                <div class="swiper-wrapper ticker">
+                    @foreach ($partners as $partner)   
+                        <div class="swiper-slide px-5">
+                            @if($partner->url)
+                                <a href="{{ $partner->url }}" target="_blank" rel="noopener noreferrer">
+                                    <img src="{{ $partner->logoUrl }}" alt="{{ $partner->name }}" />
+                                </a>
+                            @else
+                                <img src="{{ $partner->logoUrl }}" alt="{{ $partner->name }}" />
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+                <!--/.swiper-wrapper -->
+            </div>
+            <!-- /.swiper -->
+        </div>
+        <!-- /.swiper-container -->
+    </div>
+    <!-- /.container -->
 </section>
 <!-- /section -->
 @endsection
