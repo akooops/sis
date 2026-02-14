@@ -23,7 +23,7 @@ trait Translatable
     {
         $language = Language::where('code', $languageCode)->first();
 
-        if (!$language) {
+        if (! $language) {
             return "{$field}.{$languageCode}";
         }
 
@@ -45,7 +45,7 @@ trait Translatable
 
         $language = Language::where('code', $languageCode)->first();
 
-        if (!$language) {
+        if (! $language) {
             return "{$field}.{$languageCode}";
         }
 
@@ -61,18 +61,21 @@ trait Translatable
         return "{$field}.{$languageCode}";
     }
 
-
     public function setTranslation(string $field, string $languageCode, $value)
     {
-        if(is_null($value)) return;
+        if (is_null($value)) {
+            return;
+        }
 
         $language = Language::where('code', $languageCode)->first();
-        if(!$language) return;
+        if (! $language) {
+            return;
+        }
 
         $this->translations()->updateOrCreate(
             [
                 'field' => $field,
-                'language_id' => $language->id
+                'language_id' => $language->id,
             ],
             ['value' => $value]
         );
@@ -81,7 +84,7 @@ trait Translatable
     public function removeTranslation(string $field, string $languageCode)
     {
         $language = Language::where('code', $languageCode)->first();
-        
+
         if ($language) {
             $this->translations()
                 ->where('field', $field)
@@ -97,7 +100,7 @@ trait Translatable
             ->with('language')
             ->get()
             ->mapWithKeys(fn ($translation) => [
-                $translation->language->code => $translation->value
+                $translation->language->code => $translation->value,
             ])
             ->toArray();
     }
@@ -123,7 +126,7 @@ trait Translatable
                     ->where('field', $field)
                     ->where('language_id', $language->id)
                     ->value('value');
-                
+
                 $result[$field][$language->code] = $translation ?: "{$field}.{$language->code}";
             }
         }

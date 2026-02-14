@@ -672,6 +672,22 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Type keyword and hit enter',
                 'ar' => 'اكتب كلمة مفتاحية واضغط إنتر'
             ],
+            'newsletters_page_collapse_title' => [
+                'en' => 'Newsletters',
+                'ar' => 'النشرات الإخبارية'
+            ],
+            'newsletters_page_table_cta' => [
+                'en' => 'Download',
+                'ar' => 'التحميل'
+            ],
+            'newsletters_page_table_header_file' => [
+                'en' => 'Newsletter',
+                'ar' => 'النشرة الإخبارية'
+            ],
+            'newsletters_page_table_header_option' => [
+                'en' => 'Options',
+                'ar' => 'الإطلاع'
+            ],
             'recaptcha_error' => [
                 'en' => 'Security verification failed. Please try again.',
                 'ar' => 'فشل التحقق الأمني. يرجى المحاولة مرة أخرى.'

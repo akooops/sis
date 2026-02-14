@@ -1,11 +1,12 @@
 <?php
 
-use App\Http\Controllers\Admin\AlbumsController;
 use App\Http\Controllers\Admin\AchievementCategoriesController;
 use App\Http\Controllers\Admin\AchievementsController;
+use App\Http\Controllers\Admin\AlbumsController;
 use App\Http\Controllers\Admin\ArticlesController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BannersController;
+use App\Http\Controllers\Admin\CalendarsController;
 use App\Http\Controllers\Admin\ContactSubmissionsController;
 use App\Http\Controllers\Admin\DashboardContoller;
 use App\Http\Controllers\Admin\EventsController;
@@ -20,8 +21,10 @@ use App\Http\Controllers\Admin\LanguagesKeysController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\MenuItemsController;
 use App\Http\Controllers\Admin\MenusController;
+use App\Http\Controllers\Admin\NewslettersController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PagesController;
+use App\Http\Controllers\Admin\PartnersController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\ProgramsController;
 use App\Http\Controllers\Admin\RolesController;
@@ -30,8 +33,6 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\VisitBookingsController;
 use App\Http\Controllers\Admin\VisitServicesController;
 use App\Http\Controllers\Admin\VisitTimeSlotsController;
-use App\Http\Controllers\Admin\CalendarsController;
-use App\Http\Controllers\Admin\PartnersController;
 use App\Http\Controllers\ContactSubmissionsController as ControllersContactSubmissionsController;
 use App\Http\Controllers\InquiriesController as ControllersInquiriesController;
 use App\Http\Controllers\JobApplicationsController as ControllersJobApplicationsController;
@@ -60,7 +61,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('admin')->middleware(['force.admin.english', 'handle.inertia'])->group(function () {
     Route::get('auth/login', [AuthController::class, 'showLoginForm'])->middleware('guest')->name('admin.auth.login');
     Route::post('auth/login', [AuthController::class, 'login'])->middleware('guest')->name('admin.auth.login');
-    
+
     // Azure AD authentication routes
     Route::get('auth/azure', [AuthController::class, 'redirectToAzure'])->middleware('guest')->name('admin.auth.azure');
     Route::get('auth/azure/callback', [AuthController::class, 'handleAzureCallback'])->name('admin.auth.azure.callback');
@@ -69,7 +70,7 @@ Route::prefix('admin')->middleware(['force.admin.english', 'handle.inertia'])->g
 Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('admin')->group(function () {
     Route::get('/', [DashboardContoller::class, 'index'])->middleware('check.permission:admin.dashboard.index')->name('admin.dashboard');
 
-    //Auth
+    // Auth
     Route::post('auth/logout', [AuthController::class, 'logout'])->name('admin.auth.logout');
 
     // Permissions
@@ -240,7 +241,6 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::patch('banners/{banner}', [BannersController::class, 'update'])->middleware('check.permission:admin.banners.update')->name('admin.banners.update');
     Route::delete('banners/{banner}', [BannersController::class, 'destroy'])->middleware('check.permission:admin.banners.destroy')->name('admin.banners.destroy');
 
-
     // Forms
     Route::get('forms', [FormsController::class, 'index'])->middleware('check.permission:admin.forms.index')->name('admin.forms.index');
     Route::get('forms/create', [FormsController::class, 'create'])->middleware('check.permission:admin.forms.store')->name('admin.forms.create');
@@ -270,7 +270,7 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::patch('partners/{partner}', [PartnersController::class, 'update'])->middleware('check.permission:admin.partners.update')->name('admin.partners.update');
     Route::delete('partners/{partner}', [PartnersController::class, 'destroy'])->middleware('check.permission:admin.partners.destroy')->name('admin.partners.destroy');
 
-    //Settings
+    // Settings
     Route::get('settings', [SettingsController::class, 'index'])->middleware('check.permission:admin.settings.index')->name('admin.settings.index');
     Route::post('settings/{setting}', [SettingsController::class, 'update'])->middleware('check.permission:admin.settings.update')->name('admin.settings.update');
 
@@ -318,7 +318,7 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::get('job-postings/{jobPosting}/job-applications/languages', [JobApplicationsController::class, 'getLanguages'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.languages');
     Route::get('job-postings/{jobPosting}/job-applications/nationalities', [JobApplicationsController::class, 'getNationalities'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.nationalities');
     Route::get('job-postings/{jobPosting}/job-applications/skills', [JobApplicationsController::class, 'getSkills'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.skills');
-    
+
     // Job postings
     Route::get('job-postings', [JobPostingsController::class, 'index'])->middleware('check.permission:admin.job-postings.index')->name('admin.job-postings.index');
     Route::get('job-postings/create', [JobPostingsController::class, 'create'])->middleware('check.permission:admin.job-postings.store')->name('admin.job-postings.create');
@@ -339,6 +339,16 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount'])->middleware('check.permission:admin.notifications.index')->name('admin.notifications.unread-count');
     Route::patch('notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead'])->middleware('check.permission:admin.notifications.index')->name('admin.notifications.mark-read');
     Route::patch('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->middleware('check.permission:admin.notifications.index')->name('admin.notifications.mark-all-read');
+
+    // Newsletters
+    Route::get('newsletters', [NewslettersController::class, 'index'])->middleware('check.permission:admin.newsletters.index')->name('admin.newsletters.index');
+    Route::get('newsletters/create', [NewslettersController::class, 'create'])->middleware('check.permission:admin.newsletters.store')->name('admin.newsletters.create');
+    Route::post('newsletters', [NewslettersController::class, 'store'])->middleware('check.permission:admin.newsletters.store')->name('admin.newsletters.store');
+    Route::get('newsletters/{newsletter}', [NewslettersController::class, 'show'])->middleware('check.permission:admin.newsletters.show')->name('admin.newsletters.show');
+    Route::get('newsletters/{newsletter}/edit', [NewslettersController::class, 'edit'])->middleware('check.permission:admin.newsletters.update')->name('admin.newsletters.edit');
+    Route::patch('newsletters/{newsletter}/update-translation', [NewslettersController::class, 'updateTranslation'])->middleware('check.permission:admin.newsletters.update')->name('admin.newsletters.update-translation');
+    Route::patch('newsletters/{newsletter}', [NewslettersController::class, 'update'])->middleware('check.permission:admin.newsletters.update')->name('admin.newsletters.update');
+    Route::delete('newsletters/{newsletter}', [NewslettersController::class, 'destroy'])->middleware('check.permission:admin.newsletters.destroy')->name('admin.newsletters.destroy');
 });
 
 Route::middleware(['set.locale'])->group(function () {
@@ -358,6 +368,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/guidelines', [ControllersPagesController::class, 'guidelines'])->name('guidelines');
     Route::get('/calendars', [ControllersPagesController::class, 'calendars'])->name('calendars');
     Route::get('/achievements', [ControllersPagesController::class, 'achievements'])->name('achievements');
+    Route::get('/newsletters', [ControllersPagesController::class, 'newsletters'])->name('newsletters');
 
     Route::get('/{slug}', [ControllersPagesController::class, 'page'])->name('page');
     Route::get('/program/{slug}', [ControllersPagesController::class, 'program'])->name('program');
@@ -377,12 +388,11 @@ Route::middleware(['set.locale'])->group(function () {
 
 Route::get('language/{locale}', function ($locale) {
     $languageCodes = Language::pluck('code')->toArray();
-    
+
     if (in_array($locale, $languageCodes)) {
         app()->setLocale($locale);
         session()->put('locale', $locale);
     }
-    
+
     return redirect()->back();
 })->name('locale.switch');
-

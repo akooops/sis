@@ -8,18 +8,17 @@ use App\Models\Album;
 use App\Models\Article;
 use App\Models\Banner;
 use App\Models\Calendar;
-use App\Models\Form;
 use App\Models\Event;
+use App\Models\Form;
 use App\Models\Grade;
 use App\Models\JobPosting;
+use App\Models\Newsletter;
 use App\Models\Page;
 use App\Models\Partner;
 use App\Models\Program;
 use App\Models\VisitService;
 use App\Services\IndexService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 
 class PagesController extends Controller
 {
@@ -39,10 +38,12 @@ class PagesController extends Controller
     {
         $page = Page::where([
             'slug' => 'home',
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
 
-        if(!$page) abort(404);
+        if (! $page) {
+            abort(404);
+        }
 
         $banners = Banner::orderBy('order')->get();
         $programs = getPrograms();
@@ -62,10 +63,12 @@ class PagesController extends Controller
     {
         $page = Page::where([
             'slug' => $slug,
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
-        
-        if(!$page) abort(404);
+
+        if (! $page) {
+            abort(404);
+        }
 
         return view('page', compact('page'));
     }
@@ -75,16 +78,18 @@ class PagesController extends Controller
 
         $page = Page::where([
             'slug' => 'visits',
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
 
-        if(!$page) abort(404);
+        if (! $page) {
+            abort(404);
+        }
 
         $visitServices = VisitService::orderBy('order')->latest()->get();
 
         return view('visits', [
             'page' => $page,
-            'visitServices' => $visitServices
+            'visitServices' => $visitServices,
         ]);
     }
 
@@ -92,13 +97,15 @@ class PagesController extends Controller
     {
         $page = Page::where([
             'slug' => 'inquiries',
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
 
-        if(!$page) abort(404);
+        if (! $page) {
+            abort(404);
+        }
 
         return view('inquiries', [
-            'page' => $page
+            'page' => $page,
         ]);
     }
 
@@ -106,13 +113,15 @@ class PagesController extends Controller
     {
         $page = Page::where([
             'slug' => 'contact',
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
 
-        if(!$page) abort(404);
+        if (! $page) {
+            abort(404);
+        }
 
         return view('contact', [
-            'page' => $page
+            'page' => $page,
         ]);
     }
 
@@ -120,25 +129,27 @@ class PagesController extends Controller
     {
         $page = Page::where([
             'slug' => 'jobs',
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
 
-        if(!$page) abort(404);
+        if (! $page) {
+            abort(404);
+        }
 
         $pageNumber = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
         $jobs = JobPosting::latest()
             ->where('status', 'published')
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->whereNull('application_deadline')
                     ->orWhere('application_deadline', '>', now());
             });
 
         if ($search) {
-            $jobs->where(function($query) use ($search) {
+            $jobs->where(function ($query) use ($search) {
                 $query->where('id', $search)
-                      ->orWhere('name', 'like', '%' . $search . '%');
+                    ->orWhere('name', 'like', '%'.$search.'%');
             });
         }
 
@@ -147,7 +158,7 @@ class PagesController extends Controller
         return view('jobs', [
             'page' => $page,
             'jobs' => $jobs,
-            'pagination' => $this->indexService->handlePagination($jobs)
+            'pagination' => $this->indexService->handlePagination($jobs),
         ]);
     }
 
@@ -155,10 +166,12 @@ class PagesController extends Controller
     {
         $job = JobPosting::where([
             'slug' => $slug,
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
-        
-        if(!$job) abort(404);
+
+        if (! $job) {
+            abort(404);
+        }
 
         return view('job', compact('job'));
     }
@@ -167,10 +180,12 @@ class PagesController extends Controller
     {
         $page = Page::where([
             'slug' => 'articles',
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
 
-        if(!$page) abort(404);
+        if (! $page) {
+            abort(404);
+        }
 
         $pageNumber = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
@@ -178,9 +193,9 @@ class PagesController extends Controller
         $articles = Article::latest()->where('status', 'published');
 
         if ($search) {
-            $articles->where(function($query) use ($search) {
+            $articles->where(function ($query) use ($search) {
                 $query->where('id', $search)
-                      ->orWhere('name', 'like', '%' . $search . '%');
+                    ->orWhere('name', 'like', '%'.$search.'%');
             });
         }
 
@@ -192,7 +207,7 @@ class PagesController extends Controller
             'page' => $page,
             'articles' => $articles,
             'popularArticles' => $popularArticles,
-            'pagination' => $this->indexService->handlePagination($articles)
+            'pagination' => $this->indexService->handlePagination($articles),
         ]);
     }
 
@@ -200,10 +215,12 @@ class PagesController extends Controller
     {
         $article = Article::where([
             'slug' => $slug,
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
-        
-        if(!$article) abort(404);
+
+        if (! $article) {
+            abort(404);
+        }
 
         $popularArticles = Article::inRandomOrder()->limit(6)->where('status', 'published')->whereNotIn('id', [$article->id])->get();
 
@@ -214,10 +231,12 @@ class PagesController extends Controller
     {
         $page = Page::where([
             'slug' => 'albums',
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
 
-        if(!$page) abort(404);
+        if (! $page) {
+            abort(404);
+        }
 
         $pageNumber = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
@@ -225,9 +244,9 @@ class PagesController extends Controller
         $albums = Album::latest()->where('status', 'published');
 
         if ($search) {
-            $albums->where(function($query) use ($search) {
+            $albums->where(function ($query) use ($search) {
                 $query->where('id', $search)
-                      ->orWhere('name', 'like', '%' . $search . '%');
+                    ->orWhere('name', 'like', '%'.$search.'%');
             });
         }
 
@@ -236,7 +255,7 @@ class PagesController extends Controller
         return view('albums', [
             'page' => $page,
             'albums' => $albums,
-            'pagination' => $this->indexService->handlePagination($albums)
+            'pagination' => $this->indexService->handlePagination($albums),
         ]);
     }
 
@@ -244,10 +263,12 @@ class PagesController extends Controller
     {
         $album = Album::where([
             'slug' => $slug,
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
-        
-        if(!$album) abort(404);
+
+        if (! $album) {
+            abort(404);
+        }
 
         return view('album', compact('album'));
     }
@@ -256,10 +277,12 @@ class PagesController extends Controller
     {
         $page = Page::where([
             'slug' => 'events',
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
 
-        if(!$page) abort(404);
+        if (! $page) {
+            abort(404);
+        }
 
         $events = Event::latest()->where('status', 'published')->get();
 
@@ -273,10 +296,12 @@ class PagesController extends Controller
     {
         $event = Event::where([
             'slug' => $slug,
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
-        
-        if(!$event) abort(404);
+
+        if (! $event) {
+            abort(404);
+        }
 
         return view('event', compact('event'));
     }
@@ -284,22 +309,27 @@ class PagesController extends Controller
     public function program(Request $request, $slug)
     {
         $program = Program::where([
-            'slug' => $slug        
+            'slug' => $slug,
         ])->first();
-        
-        if(!$program) abort(404);
+
+        if (! $program) {
+            abort(404);
+        }
 
         $programs = Program::get();
+
         return view('program', compact('program', 'programs'));
     }
 
     public function grade(Request $request, $slug)
     {
         $grade = Grade::where([
-            'slug' => $slug        
+            'slug' => $slug,
         ])->first();
-        
-        if(!$grade) abort(404);
+
+        if (! $grade) {
+            abort(404);
+        }
 
         $grades = Grade::where('program_id', $grade->program_id)->get();
 
@@ -310,16 +340,37 @@ class PagesController extends Controller
     {
         $page = Page::where([
             'slug' => 'forms',
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
 
-        if(!$page) abort(404);
+        if (! $page) {
+            abort(404);
+        }
 
         $forms = Form::get();
 
         return view('forms', [
             'page' => $page,
-            'forms' => $forms
+            'forms' => $forms,
+        ]);
+    }
+
+    public function newsletters(Request $request)
+    {
+        $page = Page::where([
+            'slug' => 'newsletters',
+            'status' => 'published',
+        ])->first();
+
+        if (! $page) {
+            abort(404);
+        }
+
+        $newsletters = Newsletter::get();
+
+        return view('newsletters', [
+            'page' => $page,
+            'newsletters' => $newsletters,
         ]);
     }
 
@@ -327,16 +378,18 @@ class PagesController extends Controller
     {
         $page = Page::where([
             'slug' => 'guidelines',
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
 
-        if(!$page) abort(404);
+        if (! $page) {
+            abort(404);
+        }
 
         $grades = Grade::with('files')->orderBy('order', 'asc')->get();
 
         return view('guidelines', [
             'page' => $page,
-            'grades' => $grades
+            'grades' => $grades,
         ]);
     }
 
@@ -344,16 +397,18 @@ class PagesController extends Controller
     {
         $page = Page::where([
             'slug' => 'calendars',
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
 
-        if(!$page) abort(404);
+        if (! $page) {
+            abort(404);
+        }
 
         $calendars = Calendar::get();
 
         return view('calendars', [
             'page' => $page,
-            'calendars' => $calendars
+            'calendars' => $calendars,
         ]);
     }
 
@@ -361,17 +416,19 @@ class PagesController extends Controller
     {
         $page = Page::where([
             'slug' => 'achievements',
-            'status' => 'published'
+            'status' => 'published',
         ])->first();
 
-        if (!$page) abort(404);
+        if (! $page) {
+            abort(404);
+        }
 
         $categories = AchievementCategory::all();
         $achievementsQuery = Achievement::where('status', 'published')->orderBy('achievement_date', 'desc');
 
         $category = $this->indexService->checkIfEmpty($request->query('category'));
         $year = $this->indexService->checkIfEmpty($request->query('year'));
-        $search = $this->indexService->checkIfSearchEmpty($request->query('search'));   
+        $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
         // Apply filters
         if ($category) {
@@ -386,9 +443,9 @@ class PagesController extends Controller
 
         if ($search) {
             $achievementsQuery->where(function ($query) use ($search) {
-                $query->where('name', 'like', '%' . $search . '%')
+                $query->where('name', 'like', '%'.$search.'%')
                     ->orWhereHas('category', function ($q) use ($search) {
-                        $q->where('name', 'like', '%' . $search . '%');
+                        $q->where('name', 'like', '%'.$search.'%');
                     });
             });
         }
@@ -411,7 +468,7 @@ class PagesController extends Controller
             'categories' => $categories,
             'achievements' => $achievements,
             'achievementsByYear' => $achievementsByYear,
-            'years' => $years
+            'years' => $years,
         ]);
     }
 }

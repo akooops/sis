@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Permission;
 use App\Models\Role;
+use Illuminate\Database\Seeder;
 
 class PermissionsSeeder extends Seeder
 {
@@ -13,57 +13,57 @@ class PermissionsSeeder extends Seeder
         $permissions = [
             // Auth & Dashboard
             'admin.dashboard.index',
-            
+
             // Permissions Management
             'admin.permissions.index',
             'admin.permissions.show',
-            
+
             // Roles Management
             'admin.roles.index',
             'admin.roles.store',
             'admin.roles.show',
             'admin.roles.update',
             'admin.roles.destroy',
-            
+
             // Users Management
             'admin.users.index',
             'admin.users.store',
             'admin.users.show',
             'admin.users.update',
             'admin.users.destroy',
-            
+
             // Languages Management
             'admin.languages.index',
             'admin.languages.store',
             'admin.languages.show',
             'admin.languages.update',
             'admin.languages.destroy',
-            
+
             // Language Keys Management
             'admin.language-keys.index',
             'admin.language-keys.update-translation',
-            
+
             // Media Management
             'admin.media.index',
             'admin.media.store',
             'admin.media.show',
             'admin.media.update',
             'admin.media.destroy',
-            
+
             // Pages Management
             'admin.pages.index',
             'admin.pages.store',
             'admin.pages.show',
             'admin.pages.update',
             'admin.pages.destroy',
-            
+
             // Articles Management
             'admin.articles.index',
             'admin.articles.store',
             'admin.articles.show',
             'admin.articles.update',
             'admin.articles.destroy',
-            
+
             // Programs Management
             'admin.programs.index',
             'admin.programs.store',
@@ -79,28 +79,28 @@ class PermissionsSeeder extends Seeder
             'admin.grades.update',
             'admin.grades.destroy',
             'admin.grades.order',
-            
+
             // Albums Management
             'admin.albums.index',
             'admin.albums.store',
             'admin.albums.show',
             'admin.albums.update',
             'admin.albums.destroy',
-            
+
             // Events Management
             'admin.events.index',
             'admin.events.store',
             'admin.events.show',
             'admin.events.update',
             'admin.events.destroy',
-            
+
             // Menus Management
             'admin.menus.index',
             'admin.menus.store',
             'admin.menus.show',
             'admin.menus.update',
             'admin.menus.destroy',
-            
+
             // Menu Items Management
             'admin.menu-items.index',
             'admin.menu-items.store',
@@ -108,7 +108,7 @@ class PermissionsSeeder extends Seeder
             'admin.menu-items.update',
             'admin.menu-items.destroy',
             'admin.menu-items.order',
-            
+
             // Banners Management
             'admin.banners.index',
             'admin.banners.store',
@@ -116,7 +116,7 @@ class PermissionsSeeder extends Seeder
             'admin.banners.update',
             'admin.banners.destroy',
             'admin.banners.order',
-            
+
             // Documents Management
             'admin.forms.index',
             'admin.forms.store',
@@ -129,8 +129,8 @@ class PermissionsSeeder extends Seeder
             'admin.calendars.store',
             'admin.calendars.show',
             'admin.calendars.update',
-            'admin.calendars.destroy',  
-            
+            'admin.calendars.destroy',
+
             // Visit Services Management
             'admin.visit-services.index',
             'admin.visit-services.store',
@@ -138,40 +138,40 @@ class PermissionsSeeder extends Seeder
             'admin.visit-services.update',
             'admin.visit-services.destroy',
             'admin.visit-services.order',
-            
+
             // Visit Time Slots Management
             'admin.visit-time-slots.index',
             'admin.visit-time-slots.store',
             'admin.visit-time-slots.update',
             'admin.visit-time-slots.destroy',
-            
+
             // Visit Bookings Management
             'admin.visit-bookings.index',
             'admin.visit-bookings.show',
             'admin.visit-bookings.destroy',
-            
+
             // Inquiries Management
             'admin.inquiries.index',
             'admin.inquiries.show',
             'admin.inquiries.destroy',
-            
+
             // Contact Submissions Management
             'admin.contact-submissions.index',
             'admin.contact-submissions.show',
             'admin.contact-submissions.destroy',
-            
+
             // Job Postings Management
             'admin.job-postings.index',
             'admin.job-postings.store',
             'admin.job-postings.show',
             'admin.job-postings.update',
             'admin.job-postings.destroy',
-            
+
             // Job Applications Management
             'admin.job-applications.index',
             'admin.job-applications.show',
             'admin.job-applications.destroy',
-            
+
             // Achievement Categories Management
             'admin.achievement-categories.index',
             'admin.achievement-categories.store',
@@ -179,7 +179,7 @@ class PermissionsSeeder extends Seeder
             'admin.achievement-categories.update',
             'admin.achievement-categories.destroy',
             'admin.achievement-categories.update-translation',
-            
+
             // Achievements Management
             'admin.achievements.index',
             'admin.achievements.store',
@@ -187,17 +187,17 @@ class PermissionsSeeder extends Seeder
             'admin.achievements.update',
             'admin.achievements.destroy',
             'admin.achievements.update-translation',
-            
+
             // Partners Management
             'admin.partners.index',
             'admin.partners.store',
             'admin.partners.show',
             'admin.partners.update',
             'admin.partners.destroy',
-            
+
             // Files Management
             'admin.files.upload',
-            
+
             // Settings Management
             'admin.settings.index',
             'admin.settings.update',
@@ -207,6 +207,13 @@ class PermissionsSeeder extends Seeder
             'admin.notifications.unread-count',
             'admin.notifications.mark-read',
             'admin.notifications.mark-all-read',
+
+            // Newsletters Management
+            'admin.newsletters.index',
+            'admin.newsletters.store',
+            'admin.newsletters.show',
+            'admin.newsletters.update',
+            'admin.newsletters.destroy',
         ];
 
         // Create permissions
@@ -245,12 +252,12 @@ class PermissionsSeeder extends Seeder
         // Assign most permissions to Admin (excluding user/role management)
         $adminPermissions = Permission::whereNotIn('name', [
             'admin.users.store',
-            'admin.users.update', 
+            'admin.users.update',
             'admin.users.destroy',
             'admin.roles.store',
             'admin.roles.update',
             'admin.roles.destroy',
-            'admin.permissions.show'
+            'admin.permissions.show',
         ])->get();
         $adminRole->permissions()->sync($adminPermissions->pluck('id'));
 
@@ -266,9 +273,10 @@ class PermissionsSeeder extends Seeder
             ->orWhere('name', 'like', '%achievements%')
             ->orWhere('name', 'like', '%achievement-categories%')
             ->orWhere('name', 'like', '%partners%')
+            ->orWhere('name', 'like', '%newsletters%')
             ->orWhere('name', 'like', '%files%')
             ->get();
-            
+
         $editorRole->permissions()->sync($editorPermissions->pluck('id'));
 
         // Assign view-only permissions to Viewer
