@@ -18,6 +18,7 @@ use App\Models\Partner;
 use App\Models\Program;
 use App\Models\VisitService;
 use App\Services\IndexService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PagesController extends Controller
@@ -54,9 +55,10 @@ class PagesController extends Controller
             ->orderBy('achievement_date', 'desc')
             ->limit(6)
             ->get();
+        $achievementsByYear = $achievements->groupBy(fn ($a) => Carbon::parse($a->achievement_date)->format('Y'))->sortKeysDesc()->take(2);
         $partners = Partner::latest()->get();
 
-        return view('index', compact('page', 'banners', 'programs', 'articles', 'albums', 'achievements', 'partners'));
+        return view('index', compact('page', 'banners', 'programs', 'articles', 'albums', 'achievements', 'achievementsByYear', 'partners'));
     }
 
     public function page(Request $request, $slug = null)
@@ -225,6 +227,22 @@ class PagesController extends Controller
         $popularArticles = Article::inRandomOrder()->limit(6)->where('status', 'published')->whereNotIn('id', [$article->id])->get();
 
         return view('article', compact('article', 'popularArticles'));
+    }
+
+    public function achievement(Request $request, $slug = null)
+    {
+        $achievement = Achievement::where([
+            'slug' => $slug,
+            'status' => 'published',
+        ])->first();
+
+        if (! $achievement) {
+            abort(404);
+        }
+
+        $sameYearAchievements = Achievement::whereYear('achievement_date', Carbon::parse($achievement->achievement_date)->year)->where('status', 'published')->whereNotIn('id', [$achievement->id])->get();
+
+        return view('achievement', compact('achievement', 'sameYearAchievements'));
     }
 
     public function albums(Request $request)
@@ -454,7 +472,7 @@ class PagesController extends Controller
 
         // Group achievements by year
         $achievementsByYear = $achievements->groupBy(function ($achievement) {
-            return \Carbon\Carbon::parse($achievement->achievement_date)->format('Y');
+            return Carbon::parse($achievement->achievement_date)->format('Y');
         })->sortKeysDesc();
 
         $years = Achievement::selectRaw('YEAR(achievement_date) as year')

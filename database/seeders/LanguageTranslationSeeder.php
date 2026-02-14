@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Language;
 use App\Models\LanguageKey;
 use App\Models\Translation;
+use Illuminate\Database\Seeder;
 
 class LanguageTranslationSeeder extends Seeder
 {
@@ -16,7 +16,7 @@ class LanguageTranslationSeeder extends Seeder
             ['code' => 'en'],
             ['name' => 'English', 'is_default' => true, 'is_rtl' => false]
         );
-        
+
         $ar = Language::updateOrCreate(
             ['code' => 'ar'],
             ['name' => 'Arabic', 'is_default' => false, 'is_rtl' => true]
@@ -26,819 +26,827 @@ class LanguageTranslationSeeder extends Seeder
         $keys = [
             'achievements_page_accordion_title' => [
                 'en' => 'Browse Achievements',
-                'ar' => 'تصفح الإنجازات'
+                'ar' => 'تصفح الإنجازات',
             ],
             'achievements_page_description' => [
                 'en' => 'Discover our remarkable achievements and milestones that showcase our commitment to excellence and continuous growth.',
-                'ar' => 'اكتشف إنجازاتنا الرائعة والمعالم البارزة التي تظهر التزامنا بالتميز والنمو المستمر.'
+                'ar' => 'اكتشف إنجازاتنا الرائعة والمعالم البارزة التي تظهر التزامنا بالتميز والنمو المستمر.',
             ],
             'achievements_page_no_results_description' => [
                 'en' => 'Try adjusting your search filters or check back later.',
-                'ar' => 'حاول تعديل فلاتر البحث الخاصة بك أو تحقق مرة أخرى لاحقًا.'
+                'ar' => 'حاول تعديل فلاتر البحث الخاصة بك أو تحقق مرة أخرى لاحقًا.',
             ],
             'achievements_page_no_results_title' => [
                 'en' => 'No achievements found',
-                'ar' => 'لم يتم العثور على إنجازات'
+                'ar' => 'لم يتم العثور على إنجازات',
             ],
             'achievements_page_subtitle' => [
                 'en' => 'Achievements',
-                'ar' => 'الإنجازات'
+                'ar' => 'الإنجازات',
             ],
             'albums_videos_title' => [
                 'en' => 'Videos',
-                'ar' => 'الفيديوهات'
+                'ar' => 'الفيديوهات',
+            ],
+            'breadcrumbs_achievements_page_title' => [
+                'en' => 'Achievements',
+                'ar' => 'الإنجازات',
             ],
             'breadcrumbs_albums_page_title' => [
                 'en' => 'Albums',
-                'ar' => 'الألبومات'
+                'ar' => 'الألبومات',
             ],
             'breadcrumbs_articles_page_title' => [
                 'en' => 'Articles',
-                'ar' => 'المقالات'
+                'ar' => 'المقالات',
             ],
             'breadcrumbs_events_page_title' => [
                 'en' => 'Events',
-                'ar' => 'الفعاليات'
+                'ar' => 'الفعاليات',
             ],
             'breadcrumbs_index_page_title' => [
                 'en' => 'Home',
-                'ar' => 'الرئيسية'
+                'ar' => 'الرئيسية',
             ],
             'breadcrumbs_jobs_page_title' => [
                 'en' => 'Jobs',
-                'ar' => 'الوظائف'
+                'ar' => 'الوظائف',
             ],
             'calendars_page_collapse_title' => [
                 'en' => 'Calendars',
-                'ar' => 'التقويمات'
+                'ar' => 'التقويمات',
             ],
             'calendars_page_table_cta' => [
                 'en' => 'Download',
-                'ar' => 'التحميل'
+                'ar' => 'التحميل',
             ],
             'calendars_page_table_header_calendar' => [
                 'en' => 'Calendar',
-                'ar' => 'التقويم'
+                'ar' => 'التقويم',
             ],
             'calendars_page_table_header_start_date' => [
                 'en' => 'Start Date',
-                'ar' => 'تاريخ البدء'
+                'ar' => 'تاريخ البدء',
             ],
             'calendars_page_table_header_end_date' => [
                 'en' => 'End Date',
-                'ar' => 'تاريخ النهاية'
+                'ar' => 'تاريخ النهاية',
             ],
             'calendars_page_table_header_option' => [
                 'en' => 'Options',
-                'ar' => 'الإطلاع'
+                'ar' => 'الإطلاع',
             ],
             'contact_page_address_title' => [
                 'en' => 'Address',
-                'ar' => 'العنوان'
+                'ar' => 'العنوان',
             ],
             'contact_page_email_input' => [
                 'en' => 'Email Address',
-                'ar' => 'البريد الإلكتروني'
+                'ar' => 'البريد الإلكتروني',
             ],
             'contact_page_email_title' => [
                 'en' => 'Email',
-                'ar' => 'البريد الإلكتروني'
+                'ar' => 'البريد الإلكتروني',
             ],
             'contact_page_message_input' => [
                 'en' => 'Your Message',
-                'ar' => 'رسالتك'
+                'ar' => 'رسالتك',
             ],
             'contact_page_name_input' => [
                 'en' => 'Full Name',
-                'ar' => 'الاسم الكامل'
+                'ar' => 'الاسم الكامل',
             ],
             'contact_page_phone_input' => [
                 'en' => 'Phone Number',
-                'ar' => 'رقم الهاتف'
+                'ar' => 'رقم الهاتف',
             ],
             'contact_page_phone_title' => [
                 'en' => 'Phone',
-                'ar' => 'رقم الهاتف'
+                'ar' => 'رقم الهاتف',
             ],
             'contact_page_subject_input' => [
                 'en' => 'Subject',
-                'ar' => 'الموضوع'
+                'ar' => 'الموضوع',
             ],
             'contact_page_submit_button' => [
                 'en' => 'Send Message',
-                'ar' => 'إرسال الرسالة'
+                'ar' => 'إرسال الرسالة',
             ],
             'contact_submission_success_message' => [
                 'en' => 'Thank you for your message! We will get back to you as soon as possible.',
-                'ar' => 'شكراً لك على رسالتك! سنتواصل معك في أقرب وقت ممكن.'
+                'ar' => 'شكراً لك على رسالتك! سنتواصل معك في أقرب وقت ممكن.',
             ],
             'forms_page_collapse_title' => [
                 'en' => 'Files',
-                'ar' => 'الملفات'
+                'ar' => 'الملفات',
             ],
             'forms_page_table_cta' => [
                 'en' => 'Download',
-                'ar' => 'التحميل'
+                'ar' => 'التحميل',
             ],
             'forms_page_table_header_file' => [
                 'en' => 'File',
-                'ar' => 'الملف'
+                'ar' => 'الملف',
             ],
             'forms_page_table_header_option' => [
                 'en' => 'Options',
-                'ar' => 'الإطلاع'
+                'ar' => 'الإطلاع',
             ],
             'error_page_button_title' => [
                 'en' => 'Home page',
-                'ar' => 'الصفحة الرئيسية'
+                'ar' => 'الصفحة الرئيسية',
             ],
             'footer_all_rights_reserved' => [
                 'en' => '© 2025 Al Awael Education Company. All rights reserved.',
-                'ar' => '© 2025 شركة الأوائل للتعليم. جميع الحقوق محفوظة.'
+                'ar' => '© 2025 شركة الأوائل للتعليم. جميع الحقوق محفوظة.',
             ],
             'footer_first_menu_title' => [
                 'en' => 'Quick links',
-                'ar' => 'روابط سريعة'
+                'ar' => 'روابط سريعة',
             ],
             'footer_get_in_touch_title' => [
                 'en' => 'Get in touch',
-                'ar' => 'تواصل معنا'
+                'ar' => 'تواصل معنا',
             ],
             'footer_nav_menu_title' => [
                 'en' => 'Follow Us',
-                'ar' => 'تابعنا'
+                'ar' => 'تابعنا',
             ],
             'footer_address_placeholder' => [
                 'en' => 'Saud International School, Abi Al Abbas Al Shafei Street, Hiteen District, Riyadh, Kingdom of Saudi Arabia.',
-                'ar' => 'مدارس سعود العالمية، شارع أبي العباس الشافعي، حي حطين، الرياض، المملكة العربية السعودية'
+                'ar' => 'مدارس سعود العالمية، شارع أبي العباس الشافعي، حي حطين، الرياض، المملكة العربية السعودية',
             ],
             'guidelines_page_collapse_title' => [
                 'en' => 'Guidelines',
-                'ar' => 'الإرشادات'
+                'ar' => 'الإرشادات',
             ],
             'guidelines_page_select_grade_placeholder' => [
                 'en' => 'Select Grade',
-                'ar' => 'اختر الدرجة'
+                'ar' => 'اختر الدرجة',
             ],
             'guidelines_page_table_header_file' => [
                 'en' => 'Files',
-                'ar' => 'الملفات'
+                'ar' => 'الملفات',
             ],
             'guidelines_page_table_cta' => [
                 'en' => 'Download',
-                'ar' => 'التحميل'
+                'ar' => 'التحميل',
             ],
             'guidelines_page_table_header_grade' => [
                 'en' => 'Grade',
-                'ar' => 'الدرجة'
+                'ar' => 'الدرجة',
             ],
             'guidelines_page_table_header_option' => [
                 'en' => 'Options',
-                'ar' => 'الإطلاع'
+                'ar' => 'الإطلاع',
             ],
             'header_services_nav_link' => [
-                'en' => 'Access Portal', 
-                'ar' => 'منصة الخدمات'
+                'en' => 'Access Portal',
+                'ar' => 'منصة الخدمات',
             ],
             'index_page_albums_section_cta' => [
                 'en' => 'View more albums',
-                'ar' => 'عرض المزيد من الألبومات'
+                'ar' => 'عرض المزيد من الألبومات',
             ],
             'index_page_albums_section_title' => [
                 'en' => 'Latest albums',
-                'ar' => 'أحدث الألبومات'
+                'ar' => 'أحدث الألبومات',
             ],
             'index_page_first_section_cta' => [
                 'en' => 'Learn more',
-                'ar' => 'اعرف المزيد'
+                'ar' => 'اعرف المزيد',
             ],
             'index_page_welcome_section_subtitle' => [
                 'en' => 'Welcome to Saud International School, We\'re thrilled to have you join our diverse community where we provide a challenging and inspiring educational environment. Together, we\'ll explore our internationally recognized curriculum enhanced with cutting-edge technology and enriching extra-curricular activities designed to help you thrive and discover your potential.',
-                'ar' => 'مرحباً بكم في مدارس سعود العالمية، نحن متحمسون لانضمامكم إلى مجتمعنا المتنوع حيث نوفر بيئة تعليمية تحدي وملهمة. معاً، سنستكشف منهجنا المعترف به دولياً والمعزز بأحدث التقنيات والأنشطة اللامنهجية الإثرائية المصممة لمساعدتكم على الازدهار واكتشاف إمكاناتكم.'
+                'ar' => 'مرحباً بكم في مدارس سعود العالمية، نحن متحمسون لانضمامكم إلى مجتمعنا المتنوع حيث نوفر بيئة تعليمية تحدي وملهمة. معاً، سنستكشف منهجنا المعترف به دولياً والمعزز بأحدث التقنيات والأنشطة اللامنهجية الإثرائية المصممة لمساعدتكم على الازدهار واكتشاف إمكاناتكم.',
             ],
             'index_page_welcome_section_title' => [
                 'en' => 'Welcome to Saud international schools',
-                'ar' => 'مرحباً بكم في مدارس سعود العالمية'
+                'ar' => 'مرحباً بكم في مدارس سعود العالمية',
             ],
             'index_page_articles_section_cta' => [
                 'en' => 'View more news',
-                'ar' => 'عرض المزيد من الأخبار'
+                'ar' => 'عرض المزيد من الأخبار',
             ],
             'index_page_articles_section_title' => [
                 'en' => 'Latest news',
-                'ar' => 'أحدث الأخبار'
+                'ar' => 'أحدث الأخبار',
             ],
             'index_page_achievements_section_title' => [
                 'en' => 'Latest achievements',
-                'ar' => 'أحدث الإنجازات'
+                'ar' => 'أحدث الإنجازات',
             ],
             'index_page_achievements_section_cta' => [
                 'en' => 'View all achievements',
-                'ar' => 'عرض جميع الإنجازات'
+                'ar' => 'عرض جميع الإنجازات',
             ],
             'index_page_partners_section_title' => [
                 'en' => 'Our Partners',
-                'ar' => 'شركاؤنا'
+                'ar' => 'شركاؤنا',
             ],
             'index_page_academics_levels_section_cta' => [
                 'en' => 'Learn more',
-                'ar' => 'اعرف المزيد'
+                'ar' => 'اعرف المزيد',
             ],
             'index_page_academics_levels_section_title' => [
                 'en' => 'Our Academic Levels',
-                'ar' => 'مستوياتنا الأكاديمية'
+                'ar' => 'مستوياتنا الأكاديمية',
             ],
             'index_page_third_section_cta' => [
                 'en' => 'Learn more',
-                'ar' => 'اعرف المزيد'
+                'ar' => 'اعرف المزيد',
             ],
             'index_page_third_section_subtitle' => [
                 'en' => 'Discover the impressive milestones and achievements that showcase our commitment to educational excellence.',
-                'ar' => 'اكتشف المعالم والإنجازات المثيرة للإعجاب التي تظهر التزامنا بالتميز التعليمي.'
+                'ar' => 'اكتشف المعالم والإنجازات المثيرة للإعجاب التي تظهر التزامنا بالتميز التعليمي.',
             ],
             'index_page_third_section_title' => [
                 'en' => 'Saud facts and figures',
-                'ar' => 'حقائق وأرقام مدارس سعود'
+                'ar' => 'حقائق وأرقام مدارس سعود',
             ],
             'inquiry_page_birthdate_input' => [
                 'en' => 'Student Birthdate',
-                'ar' => 'تاريخ ميلاد الطالب'
+                'ar' => 'تاريخ ميلاد الطالب',
             ],
             'inquiry_page_email_input' => [
                 'en' => 'Email Address',
-                'ar' => 'البريد الإلكتروني'
+                'ar' => 'البريد الإلكتروني',
             ],
             'inquiry_page_guardian_name_input' => [
                 'en' => 'Guardian Name',
-                'ar' => 'اسم ولي الأمر'
+                'ar' => 'اسم ولي الأمر',
             ],
             'inquiry_page_phone_input' => [
                 'en' => 'Phone Number',
-                'ar' => 'رقم الهاتف'
+                'ar' => 'رقم الهاتف',
             ],
             'inquiry_page_questions_input' => [
                 'en' => 'Questions or Comments',
-                'ar' => 'الأسئلة أو التعليقات'
+                'ar' => 'الأسئلة أو التعليقات',
             ],
             'inquiry_page_select_academic_year' => [
                 'en' => 'Select Academic Year',
-                'ar' => 'اختر السنة الأكاديمية'
+                'ar' => 'اختر السنة الأكاديمية',
             ],
             'inquiry_page_select_grade' => [
                 'en' => 'Select Grade',
-                'ar' => 'اختر الصف'
+                'ar' => 'اختر الصف',
             ],
             'inquiry_page_student_name_input' => [
                 'en' => 'Student Name',
-                'ar' => 'اسم الطالب'
+                'ar' => 'اسم الطالب',
             ],
             'inquiry_page_student_school_input' => [
                 'en' => 'Current School',
-                'ar' => 'المدرسة الحالية'
+                'ar' => 'المدرسة الحالية',
             ],
             'inquiry_page_submit_button' => [
                 'en' => 'Submit Inquiry',
-                'ar' => 'إرسال الاستفسار'
+                'ar' => 'إرسال الاستفسار',
             ],
             'inquiry_success_message' => [
                 'en' => 'Your inquiry has been submitted successfully! We will contact you soon.',
-                'ar' => 'تم إرسال استفسارك بنجاح! سنتواصل معك قريباً.'
+                'ar' => 'تم إرسال استفسارك بنجاح! سنتواصل معك قريباً.',
             ],
             'job_about_school' => [
                 'en' => 'About Our School',
-                'ar' => 'عن مدرستنا'
+                'ar' => 'عن مدرستنا',
             ],
             'job_add_education' => [
                 'en' => 'Add Education',
-                'ar' => 'إضافة تعليم'
+                'ar' => 'إضافة تعليم',
             ],
             'job_add_experience' => [
                 'en' => 'Add Experience',
-                'ar' => 'إضافة خبرة'
+                'ar' => 'إضافة خبرة',
             ],
             'job_add_language' => [
                 'en' => 'Add Language',
-                'ar' => 'إضافة لغة'
+                'ar' => 'إضافة لغة',
             ],
             'job_add_skills' => [
                 'en' => 'Add your skills (press Enter after each skill)',
-                'ar' => 'أضف مهاراتك (اضغط Enter بعد كل مهارة)'
+                'ar' => 'أضف مهاراتك (اضغط Enter بعد كل مهارة)',
             ],
             'job_additional_docs' => [
                 'en' => 'Additional Documents',
-                'ar' => 'مستندات إضافية'
+                'ar' => 'مستندات إضافية',
             ],
             'job_additional_formats' => [
                 'en' => 'Certificates, portfolios, etc. (Max: 5MB each)',
-                'ar' => 'الشهادات، أعمال سابقة، إلخ (الحد الأقصى: 5 ميجابايت لكل ملف)'
+                'ar' => 'الشهادات، أعمال سابقة، إلخ (الحد الأقصى: 5 ميجابايت لكل ملف)',
             ],
             'job_address' => [
                 'en' => 'Address',
-                'ar' => 'العنوان'
+                'ar' => 'العنوان',
             ],
             'job_advanced' => [
                 'en' => 'Advanced',
-                'ar' => 'متقدم'
+                'ar' => 'متقدم',
             ],
             'job_application_deadline' => [
                 'en' => 'Application Deadline',
-                'ar' => 'الموعد النهائي للتقديم'
+                'ar' => 'الموعد النهائي للتقديم',
             ],
             'job_application_error' => [
                 'en' => 'Error submitting application',
-                'ar' => 'خطأ في إرسال الطلب'
+                'ar' => 'خطأ في إرسال الطلب',
             ],
             'job_application_expired' => [
                 'en' => 'This job application has expired',
-                'ar' => 'انتهت صلاحية التقديم لهذه الوظيفة'
+                'ar' => 'انتهت صلاحية التقديم لهذه الوظيفة',
             ],
             'job_application_success' => [
                 'en' => 'Application submitted successfully!',
-                'ar' => 'تم إرسال الطلب بنجاح!'
+                'ar' => 'تم إرسال الطلب بنجاح!',
             ],
             'job_application_title' => [
                 'en' => 'Job Application',
-                'ar' => 'طلب التوظيف'
+                'ar' => 'طلب التوظيف',
             ],
             'job_apply_now' => [
                 'en' => 'Apply Now',
-                'ar' => 'تقدم الآن'
+                'ar' => 'تقدم الآن',
             ],
             'job_basic' => [
                 'en' => 'Basic',
-                'ar' => 'أساسي'
+                'ar' => 'أساسي',
             ],
             'job_browse_files' => [
                 'en' => 'browse files',
-                'ar' => 'تصفح الملفات'
+                'ar' => 'تصفح الملفات',
             ],
             'job_close_form' => [
                 'en' => 'Close',
-                'ar' => 'إغلاق'
+                'ar' => 'إغلاق',
             ],
             'job_company_name' => [
                 'en' => 'Company Name',
-                'ar' => 'اسم الشركة'
+                'ar' => 'اسم الشركة',
             ],
             'job_contact_us' => [
                 'en' => 'Contact Us',
-                'ar' => 'اتصل بنا'
+                'ar' => 'اتصل بنا',
             ],
             'job_current_job' => [
                 'en' => 'Currently working here',
-                'ar' => 'أعمل هنا حاليًا'
+                'ar' => 'أعمل هنا حاليًا',
             ],
             'job_cv_formats' => [
                 'en' => 'Supported formats: PDF, DOC, DOCX (Max: 5MB)',
-                'ar' => 'الصيغ المدعومة: PDF, DOC, DOCX (الحد الأقصى: 5 ميجابايت)'
+                'ar' => 'الصيغ المدعومة: PDF, DOC, DOCX (الحد الأقصى: 5 ميجابايت)',
             ],
             'job_cv_required' => [
                 'en' => 'CV/Resume',
-                'ar' => 'السيرة الذاتية'
+                'ar' => 'السيرة الذاتية',
             ],
             'job_date_birth' => [
                 'en' => 'Date of Birth',
-                'ar' => 'تاريخ الميلاد'
+                'ar' => 'تاريخ الميلاد',
             ],
             'job_degree' => [
                 'en' => 'Degree',
-                'ar' => 'الدرجة العلمية'
+                'ar' => 'الدرجة العلمية',
             ],
             'job_description' => [
                 'en' => 'Description',
-                'ar' => 'الوصف'
+                'ar' => 'الوصف',
             ],
             'job_description_title' => [
                 'en' => 'Job Description',
-                'ar' => 'وصف الوظيفة'
+                'ar' => 'وصف الوظيفة',
             ],
             'job_details_title' => [
                 'en' => 'Job Details',
-                'ar' => 'تفاصيل الوظيفة'
+                'ar' => 'تفاصيل الوظيفة',
             ],
             'job_documents' => [
                 'en' => 'Documents',
-                'ar' => 'المستندات'
+                'ar' => 'المستندات',
             ],
             'job_drag_additional' => [
                 'en' => 'Drag & drop additional documents or',
-                'ar' => 'اسحب وأفلت المستندات الإضافية أو'
+                'ar' => 'اسحب وأفلت المستندات الإضافية أو',
             ],
             'job_drag_cv' => [
                 'en' => 'Drag & drop your CV here or',
-                'ar' => 'اسحب وأفلت سيرتك الذاتية هنا أو'
+                'ar' => 'اسحب وأفلت سيرتك الذاتية هنا أو',
             ],
             'job_education' => [
                 'en' => 'Education',
-                'ar' => 'التعليم'
+                'ar' => 'التعليم',
             ],
             'job_email' => [
                 'en' => 'Email',
-                'ar' => 'البريد الإلكتروني'
+                'ar' => 'البريد الإلكتروني',
             ],
             'job_employment_type' => [
                 'en' => 'Employment Type',
-                'ar' => 'نوع التوظيف'
+                'ar' => 'نوع التوظيف',
             ],
             'job_end_date' => [
                 'en' => 'End Date',
-                'ar' => 'تاريخ النهاية'
+                'ar' => 'تاريخ النهاية',
             ],
             'job_end_year' => [
                 'en' => 'End Year',
-                'ar' => 'سنة النهاية'
+                'ar' => 'سنة النهاية',
             ],
             'job_experience_required' => [
                 'en' => 'Years of Experience',
-                'ar' => 'سنوات الخبرة'
+                'ar' => 'سنوات الخبرة',
             ],
             'job_field_study' => [
                 'en' => 'Field of Study',
-                'ar' => 'مجال الدراسة'
+                'ar' => 'مجال الدراسة',
             ],
             'job_first_name' => [
                 'en' => 'First Name',
-                'ar' => 'الاسم الأول'
+                'ar' => 'الاسم الأول',
             ],
             'job_institution' => [
                 'en' => 'Institution',
-                'ar' => 'المؤسسة التعليمية'
+                'ar' => 'المؤسسة التعليمية',
             ],
             'job_intermediate' => [
                 'en' => 'Intermediate',
-                'ar' => 'متوسط'
+                'ar' => 'متوسط',
             ],
             'job_job_description' => [
                 'en' => 'Job Description',
-                'ar' => 'وصف الوظيفة'
+                'ar' => 'وصف الوظيفة',
             ],
             'job_job_title' => [
                 'en' => 'Job Title',
-                'ar' => 'المسمى الوظيفي'
+                'ar' => 'المسمى الوظيفي',
             ],
             'job_language_name' => [
                 'en' => 'Language',
-                'ar' => 'اللغة'
+                'ar' => 'اللغة',
             ],
             'job_languages' => [
                 'en' => 'Languages',
-                'ar' => 'اللغات'
+                'ar' => 'اللغات',
             ],
             'job_last_name' => [
                 'en' => 'Last Name',
-                'ar' => 'الاسم الأخير'
+                'ar' => 'الاسم الأخير',
             ],
             'job_link_copied' => [
                 'en' => 'Job link copied to clipboard!',
-                'ar' => 'تم نسخ رابط الوظيفة!'
+                'ar' => 'تم نسخ رابط الوظيفة!',
             ],
             'job_name' => [
                 'en' => 'Name',
-                'ar' => 'الاسم'
+                'ar' => 'الاسم',
             ],
             'job_nationality' => [
                 'en' => 'Nationality',
-                'ar' => 'الجنسية'
+                'ar' => 'الجنسية',
             ],
             'job_native' => [
                 'en' => 'Native',
-                'ar' => 'لغة أم'
+                'ar' => 'لغة أم',
             ],
             'job_next' => [
                 'en' => 'Next',
-                'ar' => 'التالي'
+                'ar' => 'التالي',
             ],
             'job_no_skills' => [
                 'en' => 'No skills added yet. Type a skill above and press Enter.',
-                'ar' => 'لم تتم إضافة أي مهارات بعد. اكتب مهارة أعلاه واضغط Enter.'
+                'ar' => 'لم تتم إضافة أي مهارات بعد. اكتب مهارة أعلاه واضغط Enter.',
             ],
             'job_optional' => [
                 'en' => 'Optional',
-                'ar' => 'اختياري'
+                'ar' => 'اختياري',
             ],
             'job_personal_info' => [
                 'en' => 'Personal Information',
-                'ar' => 'المعلومات الشخصية'
+                'ar' => 'المعلومات الشخصية',
             ],
             'job_phone' => [
                 'en' => 'Phone',
-                'ar' => 'رقم الهاتف'
+                'ar' => 'رقم الهاتف',
             ],
             'job_positions_available' => [
                 'en' => 'Positions Available',
-                'ar' => 'المناصب المتاحة'
+                'ar' => 'المناصب المتاحة',
             ],
             'job_posted_date' => [
                 'en' => 'Posted Date',
-                'ar' => 'تاريخ النشر'
+                'ar' => 'تاريخ النشر',
             ],
             'job_previous' => [
                 'en' => 'Previous',
-                'ar' => 'السابق'
+                'ar' => 'السابق',
             ],
             'job_proficiency' => [
                 'en' => 'Proficiency Level',
-                'ar' => 'مستوى الإتقان'
+                'ar' => 'مستوى الإتقان',
             ],
             'job_required_skills_title' => [
                 'en' => 'Required Skills',
-                'ar' => 'المهارات المطلوبة'
+                'ar' => 'المهارات المطلوبة',
             ],
             'job_review_submit' => [
                 'en' => 'Review & Submit',
-                'ar' => 'المراجعة والإرسال'
+                'ar' => 'المراجعة والإرسال',
             ],
             'job_school_description' => [
                 'en' => 'Saud International Schools is committed to providing excellence in education for a diverse community.',
-                'ar' => 'تلتزم مدارس سعود العالمية بتقديم التميز في التعليم لمجتمع متنوع.'
+                'ar' => 'تلتزم مدارس سعود العالمية بتقديم التميز في التعليم لمجتمع متنوع.',
             ],
             'job_select_proficiency' => [
                 'en' => 'Select Proficiency',
-                'ar' => 'اختر مستوى الإتقان'
+                'ar' => 'اختر مستوى الإتقان',
             ],
             'job_skill_placeholder' => [
                 'en' => 'Type a skill and press Enter',
-                'ar' => 'اكتب مهارة واضغط Enter'
+                'ar' => 'اكتب مهارة واضغط Enter',
             ],
             'job_skills' => [
                 'en' => 'Skills',
-                'ar' => 'المهارات'
+                'ar' => 'المهارات',
             ],
             'job_skills_title' => [
                 'en' => 'Skills',
-                'ar' => 'المهارات'
+                'ar' => 'المهارات',
             ],
             'job_start_date' => [
                 'en' => 'Start Date',
-                'ar' => 'تاريخ البداية'
+                'ar' => 'تاريخ البداية',
             ],
             'job_start_year' => [
                 'en' => 'Start Year',
-                'ar' => 'سنة البداية'
+                'ar' => 'سنة البداية',
             ],
             'job_step_documents' => [
                 'en' => 'Documents',
-                'ar' => 'المستندات'
+                'ar' => 'المستندات',
             ],
             'job_step_education' => [
                 'en' => 'Education',
-                'ar' => 'التعليم'
+                'ar' => 'التعليم',
             ],
             'job_step_experience' => [
                 'en' => 'Experience',
-                'ar' => 'الخبرة'
+                'ar' => 'الخبرة',
             ],
             'job_step_languages' => [
                 'en' => 'Languages',
-                'ar' => 'اللغات'
+                'ar' => 'اللغات',
             ],
             'job_step_personal' => [
                 'en' => 'Personal',
-                'ar' => 'شخصي'
+                'ar' => 'شخصي',
             ],
             'job_step_review' => [
                 'en' => 'Review',
-                'ar' => 'المراجعة'
+                'ar' => 'المراجعة',
             ],
             'job_step_skills' => [
                 'en' => 'Skills',
-                'ar' => 'المهارات'
+                'ar' => 'المهارات',
             ],
             'job_submit_application' => [
                 'en' => 'Submit Application',
-                'ar' => 'إرسال الطلب'
+                'ar' => 'إرسال الطلب',
             ],
             'job_work_experience' => [
                 'en' => 'Work Experience',
-                'ar' => 'الخبرة العملية'
+                'ar' => 'الخبرة العملية',
             ],
             'job_work_type' => [
                 'en' => 'Work Type',
-                'ar' => 'نوع العمل'
+                'ar' => 'نوع العمل',
             ],
             'job_years' => [
                 'en' => 'years',
-                'ar' => 'سنوات'
+                'ar' => 'سنوات',
             ],
             'jobs_breadcrumb' => [
                 'en' => 'Jobs',
-                'ar' => 'الوظائف'
+                'ar' => 'الوظائف',
             ],
             'jobs_closing_soon' => [
                 'en' => 'Closing Soon',
-                'ar' => 'ينتهي قريباً'
+                'ar' => 'ينتهي قريباً',
             ],
             'jobs_deadline' => [
                 'en' => 'Deadline',
-                'ar' => 'الموعد النهائي'
+                'ar' => 'الموعد النهائي',
             ],
             'jobs_full_time' => [
                 'en' => 'Full Time',
-                'ar' => 'دوام كامل'
+                'ar' => 'دوام كامل',
             ],
             'jobs_internship' => [
                 'en' => 'Internship',
-                'ar' => 'تدريب'
+                'ar' => 'تدريب',
             ],
             'jobs_no_jobs_available' => [
                 'en' => 'No job openings available at the moment',
-                'ar' => 'لا توجد وظائف شاغرة متاحة في الوقت الحالي'
+                'ar' => 'لا توجد وظائف شاغرة متاحة في الوقت الحالي',
             ],
             'jobs_onsite' => [
                 'en' => 'On-site',
-                'ar' => 'في الموقع'
+                'ar' => 'في الموقع',
             ],
             'jobs_part_time' => [
                 'en' => 'Part Time',
-                'ar' => 'دوام جزئي'
+                'ar' => 'دوام جزئي',
             ],
             'jobs_remote' => [
                 'en' => 'Remote',
-                'ar' => 'عن بُعد'
+                'ar' => 'عن بُعد',
             ],
             'jobs_search_button' => [
                 'en' => 'Search',
-                'ar' => 'بحث'
+                'ar' => 'بحث',
             ],
             'jobs_search_placeholder' => [
                 'en' => 'Search for job positions, keywords...',
-                'ar' => 'ابحث عن الوظائف، الكلمات المفتاحية...'
+                'ar' => 'ابحث عن الوظائف، الكلمات المفتاحية...',
             ],
             'jobs_view_details' => [
                 'en' => 'View Details',
-                'ar' => 'عرض التفاصيل'
+                'ar' => 'عرض التفاصيل',
             ],
             'navbar_search_form_placeholder' => [
                 'en' => 'Type keyword and hit enter',
-                'ar' => 'اكتب كلمة مفتاحية واضغط إنتر'
+                'ar' => 'اكتب كلمة مفتاحية واضغط إنتر',
             ],
             'newsletters_page_collapse_title' => [
                 'en' => 'Newsletters',
-                'ar' => 'النشرات الإخبارية'
+                'ar' => 'النشرات الإخبارية',
             ],
             'newsletters_page_table_cta' => [
                 'en' => 'Download',
-                'ar' => 'التحميل'
+                'ar' => 'التحميل',
             ],
             'newsletters_page_table_header_file' => [
                 'en' => 'Newsletter',
-                'ar' => 'النشرة الإخبارية'
+                'ar' => 'النشرة الإخبارية',
             ],
             'newsletters_page_table_header_option' => [
                 'en' => 'Options',
-                'ar' => 'الإطلاع'
+                'ar' => 'الإطلاع',
             ],
             'recaptcha_error' => [
                 'en' => 'Security verification failed. Please try again.',
-                'ar' => 'فشل التحقق الأمني. يرجى المحاولة مرة أخرى.'
+                'ar' => 'فشل التحقق الأمني. يرجى المحاولة مرة أخرى.',
             ],
             'sidebar_achievements_search_title' => [
                 'en' => 'Search',
-                'ar' => 'بحث'
+                'ar' => 'بحث',
             ],
             'sidebar_achievements_all_categories' => [
                 'en' => 'All Categories',
-                'ar' => 'جميع الفئات'
+                'ar' => 'جميع الفئات',
             ],
             'sidebar_achievements_all_years' => [
                 'en' => 'All Years',
-                'ar' => 'جميع السنوات'
+                'ar' => 'جميع السنوات',
             ],
             'sidebar_achievements_categories_title' => [
                 'en' => 'Categories',
-                'ar' => 'الفئات'
+                'ar' => 'الفئات',
             ],
             'sidebar_achievements_clear_filters' => [
                 'en' => 'Clear All Filters',
-                'ar' => 'مسح جميع الفلاتر'
+                'ar' => 'مسح جميع الفلاتر',
             ],
             'sidebar_achievements_search_placeholder' => [
                 'en' => 'Search achievements...',
-                'ar' => 'ابحث عن الإنجازات...'
+                'ar' => 'ابحث عن الإنجازات...',
             ],
             'sidebar_achievements_search_title' => [
                 'en' => 'Search',
-                'ar' => 'بحث'
+                'ar' => 'بحث',
             ],
             'sidebar_achievements_years_title' => [
                 'en' => 'Filter by Year',
-                'ar' => 'تصفية حسب السنة'
+                'ar' => 'تصفية حسب السنة',
+            ],
+            'sidebar_achievements_same_year_title' => [
+                'en' => 'Achievements in the same year',
+                'ar' => 'إنجازات في نفس السنة',
             ],
             'sidebar_popular_article_title' => [
                 'en' => 'Popular articles',
-                'ar' => 'أشهر المقالات'
+                'ar' => 'أشهر المقالات',
             ],
             'visit_page_step_1' => [
                 'en' => 'Service',
-                'ar' => 'الخدمة'
+                'ar' => 'الخدمة',
             ],
             'visit_page_step_2' => [
                 'en' => 'Time',
-                'ar' => 'الوقت'
+                'ar' => 'الوقت',
             ],
             'visit_page_step_3' => [
                 'en' => 'Confirm',
-                'ar' => 'تأكيد'
+                'ar' => 'تأكيد',
             ],
             'visit_pages_available_slots' => [
                 'en' => 'Available',
-                'ar' => 'متاح'
+                'ar' => 'متاح',
             ],
             'visit_pages_booking_error' => [
                 'en' => 'An error occurred while processing your booking. Please try again.',
-                'ar' => 'حدث خطأ أثناء معالجة حجزك. يرجى المحاولة مرة أخرى.'
+                'ar' => 'حدث خطأ أثناء معالجة حجزك. يرجى المحاولة مرة أخرى.',
             ],
             'visit_pages_booking_success' => [
                 'en' => 'Your booking has been confirmed successfully, our service will contact you soon!',
-                'ar' => 'تم تأكيد حجزك بنجاح، سيقوم فريقنا بالإتصال بكم قريبا!'
+                'ar' => 'تم تأكيد حجزك بنجاح، سيقوم فريقنا بالإتصال بكم قريبا!',
             ],
             'visit_pages_capacity_error' => [
                 'en' => 'Only few spot(s) remaining in this time slot. You requested more than our capacity.',
-                'ar' => 'تبقت مقاعد قليلة، لقد قمت بحجز أكثر من طاقة إستيعابنا.'
+                'ar' => 'تبقت مقاعد قليلة، لقد قمت بحجز أكثر من طاقة إستيعابنا.',
             ],
             'visit_pages_fully_booked' => [
                 'en' => 'Fully Booked',
-                'ar' => 'محجوز بالكامل'
+                'ar' => 'محجوز بالكامل',
             ],
             'visit_pages_insufficient_capacity' => [
                 'en' => 'Insufficient Capacity',
-                'ar' => 'سعة غير كافية'
+                'ar' => 'سعة غير كافية',
             ],
             'visit_pages_reserved_slots' => [
                 'en' => 'Reserved',
-                'ar' => 'محجوز'
+                'ar' => 'محجوز',
             ],
             'visit_pages_selected_service' => [
                 'en' => 'Selected service',
-                'ar' => 'الخدمة المختارة'
+                'ar' => 'الخدمة المختارة',
             ],
             'visit_pages_slot_fully_booked_error' => [
                 'en' => 'The selected time slot is fully booked. Please choose another time slot.',
-                'ar' => 'الوقت المحدد محجوز بالكامل. يرجى اختيار وقت آخر.'
+                'ar' => 'الوقت المحدد محجوز بالكامل. يرجى اختيار وقت آخر.',
             ],
             'visit_pages_slot_reserved_error' => [
                 'en' => 'This time slot is already reserved. Please select another time.',
-                'ar' => 'هذا الوقت محجوز بالفعل. يرجى اختيار وقت آخر.'
+                'ar' => 'هذا الوقت محجوز بالفعل. يرجى اختيار وقت آخر.',
             ],
             'visit_pages_spots_available' => [
                 'en' => 'spots available',
-                'ar' => 'مقاعد متاحة'
+                'ar' => 'مقاعد متاحة',
             ],
             'visit_pages_spots_remaining' => [
                 'en' => 'spots remaining',
-                'ar' => 'مقاعد متبقية'
+                'ar' => 'مقاعد متبقية',
             ],
             'visit_pages_visitors_count' => [
                 'en' => 'Visitors',
-                'ar' => 'الزوار'
+                'ar' => 'الزوار',
             ],
             'visits_page_confirm_button' => [
                 'en' => 'Confirm booking',
-                'ar' => 'تأكيد الحجز'
+                'ar' => 'تأكيد الحجز',
             ],
             'visits_page_confirmation_title' => [
                 'en' => 'Please, confirm details',
-                'ar' => 'من فضلك قم بالتأكيد'
+                'ar' => 'من فضلك قم بالتأكيد',
             ],
             'visits_page_date_time' => [
                 'en' => 'Date & Time',
-                'ar' => 'التاريخ والوقت'
+                'ar' => 'التاريخ والوقت',
             ],
             'visits_page_email_input' => [
                 'en' => 'Enter your email',
-                'ar' => 'قم بإدخال بريدك الإلكتروني'
+                'ar' => 'قم بإدخال بريدك الإلكتروني',
             ],
             'visits_page_name_input' => [
                 'en' => 'Enter your name',
-                'ar' => 'قم بإدخال إسمك'
+                'ar' => 'قم بإدخال إسمك',
             ],
             'visits_page_phone_input' => [
                 'en' => 'Enter your phone',
-                'ar' => 'قم بإدخال رقم الهاتف'
+                'ar' => 'قم بإدخال رقم الهاتف',
             ],
             'visits_page_read_more_cta' => [
                 'en' => 'Read more',
-                'ar' => 'تعرف على المزيد'
+                'ar' => 'تعرف على المزيد',
             ],
             'visits_page_select_button' => [
                 'en' => 'Select',
-                'ar' => 'إختيار'
+                'ar' => 'إختيار',
             ],
             'visits_page_student_grade_input' => [
                 'en' => 'Enter student grade',
-                'ar' => 'قم بإدخال المستوى الدراسي للتلميذ'
+                'ar' => 'قم بإدخال المستوى الدراسي للتلميذ',
             ],
             'visits_page_student_name_input' => [
                 'en' => 'Enter student name',
-                'ar' => 'قم بإدخال إسم التلميذ'
+                'ar' => 'قم بإدخال إسم التلميذ',
             ],
             'visits_page_student_school_input' => [
                 'en' => 'Enter student school',
-                'ar' => 'قم بإدخال المدرسة الحالية للتميذ'
+                'ar' => 'قم بإدخال المدرسة الحالية للتميذ',
             ],
             'website_title' => [
                 'en' => 'Saud International Schools',
-                'ar' => 'مدارس سعود العالمية'
+                'ar' => 'مدارس سعود العالمية',
             ],
         ];
 

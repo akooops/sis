@@ -149,7 +149,7 @@
                                                         <div class="card">
                                                             @if($achievement->thumbnailUrl)
                                                                 <figure class="hover-scale">
-                                                                    <a href="{{ $achievement->url }}">
+                                                                    <a href="{{ route('achievement', ['slug' => $achievement->slug]) }}">
                                                                         <img src="{{ $achievement->thumbnailUrl }}" alt="{{ $achievement->getLocalTranslation('title') }}" />
                                                                     </a>
                                                                 </figure>
@@ -162,7 +162,7 @@
                                                                     </span>
                                                                 @endif
                                                                 <h2>
-                                                                    <a href="{{ $achievement->url }}">
+                                                                    <a href="{{ route('achievement', ['slug' => $achievement->slug]) }}">
                                                                         {{ $achievement->getLocalTranslation('title') }}
                                                                     </a>
                                                                 </h2>

@@ -15,8 +15,9 @@ class UpdateAchievementTranslationRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'description' => 'required|string',
             'done_by' => 'required|string|max:255',
+            'description' => 'required|string',
+            'content' => 'required|string',
             'language_id' => 'required|exists:languages,id',
         ];
     }

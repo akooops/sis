@@ -377,6 +377,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/events/{slug}', [ControllersPagesController::class, 'event'])->name('event');
     Route::get('/grades/{slug}', [ControllersPagesController::class, 'grade'])->name('grade');
     Route::get('/jobs/{slug}', [ControllersPagesController::class, 'job'])->name('job');
+    Route::get('/achievements/{slug}', [ControllersPagesController::class, 'achievement'])->name('achievement');
 
     Route::post('visit-services/{visitService}/visit-bookings', [ControllersVisitBookingsController::class, 'visitBookings'])->name('visit-bookings.store');
     Route::post('inquiries', [ControllersInquiriesController::class, 'storeInquiries'])->name('inquiries.store');
