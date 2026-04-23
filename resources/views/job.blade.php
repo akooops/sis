@@ -417,11 +417,20 @@
                                 @{{ errors['skills'] }}
                             </div>
                             <div class="mb-3">
-                                <input v-model="newSkill" 
-                                       @keyup.enter="addSkill" 
-                                       type="text" 
-                                       class="form-control"
-                                       placeholder="{{getLanguageKeyLocalTranslation('job_add_skills')}}">
+                                <div class="row g-2">
+                                    <div class="col-md-8">
+                                        <input v-model="newSkill" 
+                                               @keyup.enter="addSkill" 
+                                               type="text" 
+                                               class="form-control"
+                                               placeholder="{{getLanguageKeyLocalTranslation('job_add_skills')}}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" @click="addSkill" class="btn btn-outline-primary w-100">
+                                            <i class="uil uil-plus me-1"></i>Add Skill
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="skills-container">
                                 <span v-for="(skill, index) in applicationForm.skills" :key="index" class="skill-tag">
@@ -929,11 +938,18 @@ createApp({
             }
         },
 
-        addSkill() {
-            if (this.newSkill.trim() && !this.applicationForm.skills.includes(this.newSkill.trim())) {
-                this.applicationForm.skills.push(this.newSkill.trim());
-                this.newSkill = '';
+        addSkillByValue(skillValue) {
+            const normalizedSkill = (skillValue || '').trim();
+            if (!normalizedSkill || this.applicationForm.skills.includes(normalizedSkill)) {
+                return;
             }
+
+            this.applicationForm.skills.push(normalizedSkill);
+        },
+
+        addSkill() {
+            this.addSkillByValue(this.newSkill);
+            this.newSkill = '';
         },
         
         removeSkill(index) {
