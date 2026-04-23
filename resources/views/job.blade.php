@@ -261,23 +261,21 @@
                                         <div v-if="errors[`education.${index}.field_of_study`]" class="invalid-feedback">@{{ errors[`education.${index}.field_of_study`] }}</div>
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <input v-model="education.start_year" 
-                                               type="number" 
-                                               min="1950" 
-                                               max="2030" 
-                                               class="form-control"
-                                               :class="{ 'is-invalid': errors[`education.${index}.start_year`] }"
-                                               placeholder="{{getLanguageKeyLocalTranslation('job_start_year')}}">
+                                        <select v-model="education.start_year"
+                                                class="form-select"
+                                                :class="{ 'is-invalid': errors[`education.${index}.start_year`] }">
+                                            <option value="">{{getLanguageKeyLocalTranslation('job_start_year')}}</option>
+                                            <option v-for="year in years" :key="`education-start-${index}-${year}`" :value="year">@{{ year }}</option>
+                                        </select>
                                         <div v-if="errors[`education.${index}.start_year`]" class="invalid-feedback">@{{ errors[`education.${index}.start_year`] }}</div>
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <input v-model="education.end_year" 
-                                               type="number" 
-                                               min="1950" 
-                                               max="2030" 
-                                               class="form-control"
-                                               :class="{ 'is-invalid': errors[`education.${index}.end_year`] }"
-                                               placeholder="{{getLanguageKeyLocalTranslation('job_end_year')}}">
+                                        <select v-model="education.end_year"
+                                                class="form-select"
+                                                :class="{ 'is-invalid': errors[`education.${index}.end_year`] }">
+                                            <option value="">{{getLanguageKeyLocalTranslation('job_end_year')}}</option>
+                                            <option v-for="year in years" :key="`education-end-${index}-${year}`" :value="year">@{{ year }}</option>
+                                        </select>
                                         <div v-if="errors[`education.${index}.end_year`]" class="invalid-feedback">@{{ errors[`education.${index}.end_year`] }}</div>
                                     </div>
                                     <div class="col-12 mb-3">
@@ -325,24 +323,22 @@
                                         <div v-if="errors[`experience.${index}.job_title`]" class="invalid-feedback">@{{ errors[`experience.${index}.job_title`] }}</div>
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <input v-model="experience.start_year" 
-                                               type="number" 
-                                               min="1950" 
-                                               max="2030" 
-                                               class="form-control"
-                                               :class="{ 'is-invalid': errors[`experience.${index}.start_year`] }"
-                                               placeholder="{{getLanguageKeyLocalTranslation('job_start_year')}}">
+                                        <select v-model="experience.start_year"
+                                                class="form-select"
+                                                :class="{ 'is-invalid': errors[`experience.${index}.start_year`] }">
+                                            <option value="">{{getLanguageKeyLocalTranslation('job_start_year')}}</option>
+                                            <option v-for="year in years" :key="`experience-start-${index}-${year}`" :value="year">@{{ year }}</option>
+                                        </select>
                                         <div v-if="errors[`experience.${index}.start_year`]" class="invalid-feedback">@{{ errors[`experience.${index}.start_year`] }}</div>
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <input v-model="experience.end_year" 
-                                               type="number" 
-                                               min="1950" 
-                                               max="2030" 
-                                               class="form-control"
-                                               :class="{ 'is-invalid': errors[`experience.${index}.end_year`] }"
-                                               :disabled="experience.is_current"
-                                               placeholder="{{getLanguageKeyLocalTranslation('job_end_year')}}">
+                                        <select v-model="experience.end_year"
+                                                class="form-select"
+                                                :class="{ 'is-invalid': errors[`experience.${index}.end_year`] }"
+                                                :disabled="experience.is_current">
+                                            <option value="">{{getLanguageKeyLocalTranslation('job_end_year')}}</option>
+                                            <option v-for="year in years" :key="`experience-end-${index}-${year}`" :value="year">@{{ year }}</option>
+                                        </select>
                                         <div v-if="errors[`experience.${index}.end_year`]" class="invalid-feedback">@{{ errors[`experience.${index}.end_year`] }}</div>
                                     </div>
                                     <div class="col-md-6 mb-3 d-flex align-items-end">
@@ -630,6 +626,8 @@
 
 <script>
 const { createApp } = Vue;
+const currentYear = new Date().getFullYear();
+const yearOptions = Array.from({ length: currentYear - 1950 + 1 }, (_, i) => String(currentYear - i));
 
 createApp({
     data() {
@@ -639,6 +637,7 @@ createApp({
             applicationInProgress: false,
             iti: null,
             newSkill: '',
+            years: yearOptions,
             
             applicationForm: {
                 job_posting_id: {{ $isGeneralApplication ? 'null' : $job->id }},
