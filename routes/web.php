@@ -309,7 +309,17 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::get('contact-submissions/{contactSubmission}', [ContactSubmissionsController::class, 'show'])->middleware('check.permission:admin.contact-submissions.show')->name('admin.contact-submissions.show');
     Route::delete('contact-submissions/{contactSubmission}', [ContactSubmissionsController::class, 'destroy'])->middleware('check.permission:admin.contact-submissions.destroy')->name('admin.contact-submissions.destroy');
 
-    // Job applications filters
+    // Job applications filters (all applications)
+    Route::get('job-applications/education-institutions', [JobApplicationsController::class, 'getEducationInstitutions'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.all.filters.education-institutions');
+    Route::get('job-applications/education-degrees', [JobApplicationsController::class, 'getEducationDegrees'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.all.filters.education-degrees');
+    Route::get('job-applications/education-fields', [JobApplicationsController::class, 'getEducationFields'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.all.filters.education-fields');
+    Route::get('job-applications/work-companies', [JobApplicationsController::class, 'getWorkCompanies'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.all.filters.work-companies');
+    Route::get('job-applications/work-titles', [JobApplicationsController::class, 'getWorkTitles'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.all.filters.work-titles');
+    Route::get('job-applications/languages', [JobApplicationsController::class, 'getLanguages'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.all.filters.languages');
+    Route::get('job-applications/nationalities', [JobApplicationsController::class, 'getNationalities'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.all.filters.nationalities');
+    Route::get('job-applications/skills', [JobApplicationsController::class, 'getSkills'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.all.filters.skills');
+
+    // Job applications filters (per posting)
     Route::get('job-postings/{jobPosting}/job-applications/education-institutions', [JobApplicationsController::class, 'getEducationInstitutions'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.education-institutions');
     Route::get('job-postings/{jobPosting}/job-applications/education-degrees', [JobApplicationsController::class, 'getEducationDegrees'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.education-degrees');
     Route::get('job-postings/{jobPosting}/job-applications/education-fields', [JobApplicationsController::class, 'getEducationFields'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.filters.education-fields');
@@ -329,7 +339,11 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::patch('job-postings/{jobPosting}', [JobPostingsController::class, 'update'])->middleware('check.permission:admin.job-postings.update')->name('admin.job-postings.update');
     Route::delete('job-postings/{jobPosting}', [JobPostingsController::class, 'destroy'])->middleware('check.permission:admin.job-postings.destroy')->name('admin.job-postings.destroy');
 
-    // Job applciations
+    // Job applciations (all applications)
+    Route::get('job-applications', [JobApplicationsController::class, 'index'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.all.index');
+    Route::get('job-applications/export', [JobApplicationsController::class, 'export'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.all.export');
+
+    // Job applciations (per posting)
     Route::get('job-postings/{jobPosting}/job-applications', [JobApplicationsController::class, 'index'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.index');
     Route::get('job-postings/{jobPosting}/job-applications/export', [JobApplicationsController::class, 'export'])->middleware('check.permission:admin.job-applications.index')->name('admin.job-applications.export');
     Route::get('job-applications/{jobApplication}', [JobApplicationsController::class, 'show'])->middleware('check.permission:admin.job-applications.show')->name('admin.job-applications.show');
@@ -376,6 +390,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::get('/albums/{slug}', [ControllersPagesController::class, 'album'])->name('album');
     Route::get('/events/{slug}', [ControllersPagesController::class, 'event'])->name('event');
     Route::get('/grades/{slug}', [ControllersPagesController::class, 'grade'])->name('grade');
+    Route::get('/jobs/apply', [ControllersPagesController::class, 'jobApplication'])->name('jobs.apply');
     Route::get('/jobs/{slug}', [ControllersPagesController::class, 'job'])->name('job');
     Route::get('/achievements/{slug}', [ControllersPagesController::class, 'achievement'])->name('achievement');
 
@@ -384,6 +399,7 @@ Route::middleware(['set.locale'])->group(function () {
     Route::post('contact', [ControllersContactSubmissionsController::class, 'storeContactSubmission'])->name('contact-submissions.store');
 
     Route::post('/job-applications/validate', [ControllersJobApplicationsController::class, 'validateApplication'])->name('job-applications.validate');
+    Route::post('/job-applications', [ControllersJobApplicationsController::class, 'storeGeneralApplication'])->name('job-applications.store-general');
     Route::post('/job-postings/{jobPosting}/job-applications', [ControllersJobApplicationsController::class, 'storeApplication'])->name('job-applications.store');
 });
 

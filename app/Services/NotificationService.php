@@ -76,16 +76,17 @@ class NotificationService
     public function createJobApplicationNotification(JobApplication $jobApplication)
     {
         $jobPosting = $jobApplication->jobPosting;
+        $jobPostingName = $jobPosting?->name ?? 'General Submission';
         
         return Notification::create([
             'type' => Notification::TYPE_JOB_APPLICATION,
             'title' => 'New Job Application',
-            'message' => "New job application from {$jobApplication->first_name} {$jobApplication->last_name} for {$jobPosting->name}",
+            'message' => "New job application from {$jobApplication->first_name} {$jobApplication->last_name} for {$jobPostingName}",
             'url' => route('admin.job-applications.show', $jobApplication->id),
             'data' => [
                 'job_application_id' => $jobApplication->id,
                 'applicant_name' => "{$jobApplication->first_name} {$jobApplication->last_name}",
-                'job_posting_name' => $jobPosting->name,
+                'job_posting_name' => $jobPostingName,
                 'email' => $jobApplication->email,
             ],
         ]);

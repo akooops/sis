@@ -117,10 +117,10 @@ class ScoreJobApplication implements ShouldQueue
                 ];
             }),
             'job_posting' => [
-                'name' => $jobApplication->jobPosting->name,
-                'employment_type' => $jobApplication->jobPosting->employment_type,
-                'is_remote' => $jobApplication->jobPosting->is_remote,
-                'required_years_of_experience' => $jobApplication->jobPosting->required_years_of_experience,
+                'name' => $jobApplication->jobPosting?->name,
+                'employment_type' => $jobApplication->jobPosting?->employment_type,
+                'is_remote' => $jobApplication->jobPosting?->is_remote,
+                'required_years_of_experience' => $jobApplication->jobPosting?->required_years_of_experience,
             ],
         ];
     }

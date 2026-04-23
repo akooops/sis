@@ -104,6 +104,11 @@
         <hr class="mt-2 mb-4" data-aos="fade-up" data-aos-duration="2000">
 
         <div class="row justify-content-center" data-aos="fade-up" data-aos-duration="2500">
+            <div class="col-12 mb-4 d-flex justify-content-start">
+                <a href="{{ route('jobs.apply') }}" class="btn btn-outline-primary">
+                    <i class="uil uil-file-alt me-1"></i>{{getLanguageKeyLocalTranslation('job_apply_now')}}
+                </a>
+            </div>
             <!-- Search Form -->
             <form action="{{route('jobs')}}" method="GET" class="row g-3">
                 <div class="col-md-9">

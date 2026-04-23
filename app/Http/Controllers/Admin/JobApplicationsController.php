@@ -4,21 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\JobApplication;
 use App\Models\JobPosting;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class JobApplicationsController extends Controller
 {
-    public function index(Request $request, JobPosting $jobPosting)
+    public function index(Request $request, ?JobPosting $jobPosting = null)
     {
         $perPage = $this->indexService->limitPerPage($request->query('perPage', 10));
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
         $jobApplications = JobApplication::with(['cv', 'education', 'experiences', 'languages'])
-            ->where('job_posting_id', $jobPosting->id)
             ->latest();
+
+        $this->applyJobPostingScope($jobApplications, $jobPosting);
 
         // Apply filters
         if ($search) {
@@ -163,13 +163,15 @@ class JobApplicationsController extends Controller
     /**
      * Get education institutions for Select2 dropdown
      */
-    public function getEducationInstitutions(Request $request, JobPosting $jobPosting)
+    public function getEducationInstitutions(Request $request, ?JobPosting $jobPosting = null)
     {
         $search = $request->get('search', '');
         
         $institutions = DB::table('job_application_education')
             ->join('job_applications', 'job_application_education.job_application_id', '=', 'job_applications.id')
-            ->where('job_applications.job_posting_id', $jobPosting->id)
+            ->when($jobPosting, function ($query) use ($jobPosting) {
+                $query->where('job_applications.job_posting_id', $jobPosting->id);
+            })
             ->where('institution', 'like', '%' . $search . '%')
             ->select('institution as text', 'institution as id')
             ->distinct()
@@ -189,13 +191,15 @@ class JobApplicationsController extends Controller
     /**
      * Get education degrees for Select2 dropdown
      */
-    public function getEducationDegrees(Request $request, JobPosting $jobPosting)
+    public function getEducationDegrees(Request $request, ?JobPosting $jobPosting = null)
     {
         $search = $request->get('search', '');
         
         $degrees = DB::table('job_application_education')
             ->join('job_applications', 'job_application_education.job_application_id', '=', 'job_applications.id')
-            ->where('job_applications.job_posting_id', $jobPosting->id)
+            ->when($jobPosting, function ($query) use ($jobPosting) {
+                $query->where('job_applications.job_posting_id', $jobPosting->id);
+            })
             ->where('degree', 'like', '%' . $search . '%')
             ->select('degree as text', 'degree as id')
             ->distinct()
@@ -215,13 +219,15 @@ class JobApplicationsController extends Controller
     /**
      * Get education fields for Select2 dropdown
      */
-    public function getEducationFields(Request $request, JobPosting $jobPosting)
+    public function getEducationFields(Request $request, ?JobPosting $jobPosting = null)
     {
         $search = $request->get('search', '');
         
         $fields = DB::table('job_application_education')
             ->join('job_applications', 'job_application_education.job_application_id', '=', 'job_applications.id')
-            ->where('job_applications.job_posting_id', $jobPosting->id)
+            ->when($jobPosting, function ($query) use ($jobPosting) {
+                $query->where('job_applications.job_posting_id', $jobPosting->id);
+            })
             ->where('field_of_study', 'like', '%' . $search . '%')
             ->select('field_of_study as text', 'field_of_study as id')
             ->distinct()
@@ -241,13 +247,15 @@ class JobApplicationsController extends Controller
     /**
      * Get work companies for Select2 dropdown
      */
-    public function getWorkCompanies(Request $request, JobPosting $jobPosting)
+    public function getWorkCompanies(Request $request, ?JobPosting $jobPosting = null)
     {
         $search = $request->get('search', '');
         
         $companies = DB::table('job_application_experiences')
             ->join('job_applications', 'job_application_experiences.job_application_id', '=', 'job_applications.id')
-            ->where('job_applications.job_posting_id', $jobPosting->id)
+            ->when($jobPosting, function ($query) use ($jobPosting) {
+                $query->where('job_applications.job_posting_id', $jobPosting->id);
+            })
             ->where('company_name', 'like', '%' . $search . '%')
             ->select('company_name as text', 'company_name as id')
             ->distinct()
@@ -267,13 +275,15 @@ class JobApplicationsController extends Controller
     /**
      * Get work job titles for Select2 dropdown
      */
-    public function getWorkTitles(Request $request, JobPosting $jobPosting)
+    public function getWorkTitles(Request $request, ?JobPosting $jobPosting = null)
     {
         $search = $request->get('search', '');
         
         $titles = DB::table('job_application_experiences')
             ->join('job_applications', 'job_application_experiences.job_application_id', '=', 'job_applications.id')
-            ->where('job_applications.job_posting_id', $jobPosting->id)
+            ->when($jobPosting, function ($query) use ($jobPosting) {
+                $query->where('job_applications.job_posting_id', $jobPosting->id);
+            })
             ->where('job_title', 'like', '%' . $search . '%')
             ->select('job_title as text', 'job_title as id')
             ->distinct()
@@ -293,13 +303,15 @@ class JobApplicationsController extends Controller
     /**
      * Get languages for Select2 dropdown
      */
-    public function getLanguages(Request $request, JobPosting $jobPosting)
+    public function getLanguages(Request $request, ?JobPosting $jobPosting = null)
     {
         $search = $request->get('search', '');
         
         $languages = DB::table('job_application_languages')
             ->join('job_applications', 'job_application_languages.job_application_id', '=', 'job_applications.id')
-            ->where('job_applications.job_posting_id', $jobPosting->id)
+            ->when($jobPosting, function ($query) use ($jobPosting) {
+                $query->where('job_applications.job_posting_id', $jobPosting->id);
+            })
             ->where('name', 'like', '%' . $search . '%')
             ->select('name as text', 'name as id')
             ->distinct()
@@ -319,12 +331,14 @@ class JobApplicationsController extends Controller
     /**
      * Get nationalities for Select2 dropdown
      */
-    public function getNationalities(Request $request, JobPosting $jobPosting)
+    public function getNationalities(Request $request, ?JobPosting $jobPosting = null)
     {
         $search = $request->get('search', '');
         
         $nationalities = DB::table('job_applications')
-            ->where('job_posting_id', $jobPosting->id)
+            ->when($jobPosting, function ($query) use ($jobPosting) {
+                $query->where('job_posting_id', $jobPosting->id);
+            })
             ->where('nationality', 'like', '%' . $search . '%')
             ->select('nationality as text', 'nationality as id')
             ->distinct()
@@ -344,13 +358,15 @@ class JobApplicationsController extends Controller
     /**
      * Get skills for Select2 dropdown
      */
-    public function getSkills(Request $request, JobPosting $jobPosting)
+    public function getSkills(Request $request, ?JobPosting $jobPosting = null)
     {
         $search = $request->get('search', '');
         
         // Get all skills from job applications, split by comma and flatten
         $skillsData = DB::table('job_applications')
-            ->where('job_posting_id', $jobPosting->id)
+            ->when($jobPosting, function ($query) use ($jobPosting) {
+                $query->where('job_posting_id', $jobPosting->id);
+            })
             ->whereNotNull('skills')
             ->where('skills', '!=', '')
             ->pluck('skills');
@@ -402,10 +418,12 @@ class JobApplicationsController extends Controller
                         ->with('success', 'Job application deleted successfully');
     }
 
-    public function export(Request $request, JobPosting $jobPosting)
+    public function export(Request $request, ?JobPosting $jobPosting = null)
     {
         $jobApplications = JobApplication::with(['education', 'experiences', 'languages'])
-            ->where('job_posting_id', $jobPosting->id);
+            ->latest();
+
+        $this->applyJobPostingScope($jobApplications, $jobPosting);
 
         $search = $request->query('search');
 
@@ -572,7 +590,7 @@ class JobApplicationsController extends Controller
             
             // Add metadata at the top of CSV
             fputcsv($file, ['Job Posting Export Report']);
-            fputcsv($file, ['Job Posting', $jobPosting->name]);
+            fputcsv($file, ['Job Posting', $jobPosting?->name ?? 'All / General']);
             fputcsv($file, ['Export Date', date('Y-m-d H:i:s')]);
             fputcsv($file, ['Total Applications', count($jobApplications)]);
             fputcsv($file, []); // Empty row
@@ -647,5 +665,12 @@ class JobApplicationsController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    protected function applyJobPostingScope($query, ?JobPosting $jobPosting = null): void
+    {
+        if ($jobPosting) {
+            $query->where('job_posting_id', $jobPosting->id);
+        }
     }
 }

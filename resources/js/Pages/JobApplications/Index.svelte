@@ -11,7 +11,7 @@
     export let pagination;
 
     // Define breadcrumbs for this page
-    const breadcrumbs = [
+    const breadcrumbs = jobPosting?.id ? [
         {
             title: 'Job Postings',
             url: route('admin.job-postings.index'),
@@ -20,6 +20,12 @@
         {
             title: jobPosting?.getLocalTranslation?.('title') || jobPosting?.name || 'Job',
             url: route('admin.job-applications.index', { jobPosting: jobPosting?.id }),
+            active: true
+        }
+    ] : [
+        {
+            title: 'Job Applications',
+            url: route('admin.job-applications.all.index'),
             active: true
         }
     ];
@@ -51,6 +57,25 @@
     let languageProficiency = '';
     let nationality = '';
     let skills = '';
+    const isScopedToPosting = !!jobPosting?.id;
+
+    function getIndexRoute() {
+        return isScopedToPosting
+            ? route('admin.job-applications.index', { jobPosting: jobPosting.id })
+            : route('admin.job-applications.all.index');
+    }
+
+    function getExportRoute() {
+        return isScopedToPosting
+            ? route('admin.job-applications.export', { jobPosting: jobPosting.id })
+            : route('admin.job-applications.all.export');
+    }
+
+    function getFilterRoute(scopedRouteName, allRouteName) {
+        return isScopedToPosting
+            ? route(scopedRouteName, { jobPosting: jobPosting.id })
+            : route(allRouteName);
+    }
 
     // Fetch applications data
     async function fetchApplications() {
@@ -113,9 +138,7 @@
                 params.append('skills', skills);
             }
 
-            const response = await fetch(route('admin.job-applications.index', {
-                jobPosting: jobPosting.id
-            }) + '?' + params.toString(), {
+            const response = await fetch(getIndexRoute() + '?' + params.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -223,12 +246,12 @@
         if (nationality) params.append('nationality', nationality);
         if (skills) params.append('skills', skills);
         
-        const baseUrl = route('admin.job-applications.export', { jobPosting: jobPosting.id });
+        const baseUrl = getExportRoute();
         exportUrl = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
     }
 
     // Export URL variable
-    let exportUrl = route('admin.job-applications.export', { jobPosting: jobPosting.id });
+    let exportUrl = getExportRoute();
 
     // Handle pagination
     function goToPage(page) {
@@ -345,14 +368,16 @@
                 <div class="flex flex-col gap-1">
                     <h1 class="text-2xl font-bold text-mono">Job Applications</h1>
                     <p class="text-sm text-secondary-foreground">
-                        Applications for: {jobPosting?.name}
+                        {isScopedToPosting ? `Applications for: ${jobPosting?.name}` : 'All applications including general submissions'}
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="{route('admin.job-postings.index')}" class="kt-btn kt-btn-outline">
-                        <i class="ki-filled ki-arrow-left text-base"></i>
-                        Back to Jobs
-                    </a>
+                    {#if isScopedToPosting}
+                        <a href="{route('admin.job-postings.index')}" class="kt-btn kt-btn-outline">
+                            <i class="ki-filled ki-arrow-left text-base"></i>
+                            Back to Jobs
+                        </a>
+                    {/if}
 
                     <a href="{exportUrl}" class="kt-btn kt-btn-success">
                         <i class="ki-filled ki-download text-base"></i>
@@ -430,7 +455,7 @@
                                         on:clear={() => { educationInstitution = ''; handleFilterChange(); }}
                                         data={[]}
                                         ajax={{
-                                            url: route('admin.job-applications.filters.education-institutions', { jobPosting: jobPosting.id }),
+                                            url: getFilterRoute('admin.job-applications.filters.education-institutions', 'admin.job-applications.all.filters.education-institutions'),
                                             dataType: 'json',
                                             delay: 300,
                                             data: function(params) {
@@ -458,7 +483,7 @@
                                         on:clear={() => { educationDegree = ''; handleFilterChange(); }}
                                         data={[]}
                                         ajax={{
-                                            url: route('admin.job-applications.filters.education-degrees', { jobPosting: jobPosting.id }),
+                                            url: getFilterRoute('admin.job-applications.filters.education-degrees', 'admin.job-applications.all.filters.education-degrees'),
                                             dataType: 'json',
                                             delay: 300,
                                             data: function(params) {
@@ -486,7 +511,7 @@
                                         on:clear={() => { educationField = ''; handleFilterChange(); }}
                                         data={[]}
                                         ajax={{
-                                            url: route('admin.job-applications.filters.education-fields', { jobPosting: jobPosting.id }),
+                                            url: getFilterRoute('admin.job-applications.filters.education-fields', 'admin.job-applications.all.filters.education-fields'),
                                             dataType: 'json',
                                             delay: 300,
                                             data: function(params) {
@@ -541,7 +566,7 @@
                                         on:clear={() => { workCompany = ''; handleFilterChange(); }}
                                         data={[]}
                                         ajax={{
-                                            url: route('admin.job-applications.filters.work-companies', { jobPosting: jobPosting.id }),
+                                            url: getFilterRoute('admin.job-applications.filters.work-companies', 'admin.job-applications.all.filters.work-companies'),
                                             dataType: 'json',
                                             delay: 300,
                                             data: function(params) {
@@ -569,7 +594,7 @@
                                         on:clear={() => { workTitle = ''; handleFilterChange(); }}
                                         data={[]}
                                         ajax={{
-                                            url: route('admin.job-applications.filters.work-titles', { jobPosting: jobPosting.id }),
+                                            url: getFilterRoute('admin.job-applications.filters.work-titles', 'admin.job-applications.all.filters.work-titles'),
                                             dataType: 'json',
                                             delay: 300,
                                             data: function(params) {
@@ -624,7 +649,7 @@
                                         on:clear={() => { languageName = ''; handleFilterChange(); }}
                                         data={[]}
                                         ajax={{
-                                            url: route('admin.job-applications.filters.languages', { jobPosting: jobPosting.id }),
+                                            url: getFilterRoute('admin.job-applications.filters.languages', 'admin.job-applications.all.filters.languages'),
                                             dataType: 'json',
                                             delay: 300,
                                             data: function(params) {
@@ -670,7 +695,7 @@
                                         on:clear={() => { nationality = ''; handleFilterChange(); }}
                                         data={[]}
                                         ajax={{
-                                            url: route('admin.job-applications.filters.nationalities', { jobPosting: jobPosting.id }),
+                                            url: getFilterRoute('admin.job-applications.filters.nationalities', 'admin.job-applications.all.filters.nationalities'),
                                             dataType: 'json',
                                             delay: 300,
                                             data: function(params) {
@@ -698,7 +723,7 @@
                                         on:clear={() => { skills = ''; handleFilterChange(); }}
                                         data={[]}
                                         ajax={{
-                                            url: route('admin.job-applications.filters.skills', { jobPosting: jobPosting.id }),
+                                            url: getFilterRoute('admin.job-applications.filters.skills', 'admin.job-applications.all.filters.skills'),
                                             dataType: 'json',
                                             delay: 300,
                                             data: function(params) {
@@ -806,7 +831,7 @@
                                                 </div>
                                                 <h3 class="text-lg font-semibold text-mono mb-2">No applications found</h3>
                                                 <p class="text-sm text-secondary-foreground mb-4">
-                                                    {search || aiScoreFilter ? 'No applications match your search criteria.' : 'No applications have been submitted for this job posting yet.'}
+                                                    {search || aiScoreFilter ? 'No applications match your search criteria.' : (isScopedToPosting ? 'No applications have been submitted for this job posting yet.' : 'No applications have been submitted yet.')}
                                                 </p>
                                             </div>
                                         </td>
@@ -862,7 +887,7 @@
                                             <td class="text-center">
                                                 <div class="kt-menu flex-inline" data-kt-menu="true">
                                                     <div class="kt-menu-item" data-kt-menu-item-offset="0, 10px" data-kt-menu-item-placement="bottom-end" data-kt-menu-item-placement-rtl="bottom-start" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click">
-                                                        <button class="kt-menu-toggle kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
+                                                        <button class="kt-menu-toggle kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" aria-label="Open application actions">
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">

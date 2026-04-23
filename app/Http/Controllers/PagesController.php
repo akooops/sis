@@ -178,6 +178,19 @@ class PagesController extends Controller
         return view('job', compact('job'));
     }
 
+    public function jobApplication(Request $request)
+    {
+        $jobsPage = Page::where([
+            'slug' => 'jobs',
+            'status' => 'published',
+        ])->first();
+
+        return view('job', [
+            'job' => null,
+            'jobsPage' => $jobsPage,
+        ]);
+    }
+
     public function articles(Request $request)
     {
         $page = Page::where([

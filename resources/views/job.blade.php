@@ -1,7 +1,22 @@
 @extends('layouts.master')
-@section('title', $job->getLocalTranslation('title'))
-@section('description', $job->getLocalTranslation('description'))
-@section('canonical', route('job', ['slug' => $job->slug]))
+@php
+    $isGeneralApplication = !isset($job) || !$job;
+    $pageTitle = $isGeneralApplication
+        ? getLanguageKeyLocalTranslation('job_application_title')
+        : $job->getLocalTranslation('title');
+    $pageDescription = $isGeneralApplication
+        ? getLanguageKeyLocalTranslation('job_application_title')
+        : $job->getLocalTranslation('description');
+    $pageCanonical = $isGeneralApplication
+        ? route('jobs.apply')
+        : route('job', ['slug' => $job->slug]);
+    $bannerImage = $isGeneralApplication
+        ? ($jobsPage->thumbnailUrl ?? '/assets/img/photos/bg1.jpg')
+        : $job->thumbnailUrl;
+@endphp
+@section('title', $pageTitle)
+@section('description', $pageDescription)
+@section('canonical', $pageCanonical)
 @section('css')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/css/intlTelInput.min.css"/>
 @endsection
@@ -20,14 +35,14 @@
         <div class="swiper">
             <div class="swiper-wrapper">
                 <div class="swiper-slide bg-overlay">
-                    <div class="banner-img" style="background-image: url('{{ $job->thumbnailUrl }}')"></div>
+                    <div class="banner-img" style="background-image: url('{{ $bannerImage }}')"></div>
 
                     <div class="container h-100">
                         <div class="row h-100 align-items-end px-8 px-lg-0 pb-16">           
                             <div class="row px-0 px-lg-4">
                                 <div class="col-12 col-lg-8 px-0">
                                     <h1 class="mb-0 animate__animated animate__slideInDown animate__delay-1s">
-                                        {{$job->getLocalTranslation('title')}}
+                                        {{$pageTitle}}
                                     </h1>
                                 </div>
                                 <!--/.col -->
@@ -59,7 +74,7 @@
                 </a>
             </li>
             <li class="breadcrumb-item text-uppercase active" aria-current="page">
-                {{$job->getLocalTranslation('title')}}
+                {{$pageTitle}}
             </li>
          </ol>
       </nav>
@@ -77,18 +92,23 @@
                         <h2 class="mb-3">
                             {{getLanguageKeyLocalTranslation('job_description_title')}}
                         </h2>
-                        
-                        <div class="mb-4">
-                            <p>{{$job->getLocalTranslation('description')}}</p>
-                        </div>
+                        @if(!$isGeneralApplication)
+                            <div class="mb-4">
+                                <p>{{$job->getLocalTranslation('description')}}</p>
+                            </div>
 
-                        <div class="mb-6">
-                            {!! $job->getLocalTranslation('content') !!}
-                        </div>
+                            <div class="mb-6">
+                                {!! $job->getLocalTranslation('content') !!}
+                            </div>
+                        @else
+                            <div class="mb-6">
+                                <p>{{getLanguageKeyLocalTranslation('job_application_title')}}</p>
+                            </div>
+                        @endif
                         
                         <!-- Application Actions -->
                         <div class="d-flex align-items-center">
-                            @if($job->application_deadline && $job->application_deadline < now())
+                            @if(!$isGeneralApplication && $job->application_deadline && $job->application_deadline < now())
                                 <div class="alert alert-warning mb-0">
                                     <i class="uil uil-exclamation-triangle me-2"></i>
                                     {{getLanguageKeyLocalTranslation('job_application_expired')}}
@@ -520,82 +540,84 @@
 
             <!-- Sidebar -->
             <div class="col-lg-4">
-                <div class="card shadow-lg mb-4">
-                    <div class="card-body">
-                        <h2 class="h3 mb-4">{{getLanguageKeyLocalTranslation('job_details_title')}}</h2>
-                        <ul class="list-unstyled mb-0">
-                            @if($job->required_years_of_experience)
-                            <li class="mb-3">
-                                <i class="uil uil-clock text-primary me-2"></i>
-                                <strong>{{getLanguageKeyLocalTranslation('job_experience_required')}}:</strong>
-                                <span class="ms-2">{{ $job->required_years_of_experience }}+ {{getLanguageKeyLocalTranslation('job_years')}}</span>
-                            </li>
-                            @endif
+                @if(!$isGeneralApplication)
+                    <div class="card shadow-lg mb-4">
+                        <div class="card-body">
+                            <h2 class="h3 mb-4">{{getLanguageKeyLocalTranslation('job_details_title')}}</h2>
+                            <ul class="list-unstyled mb-0">
+                                @if($job->required_years_of_experience)
+                                <li class="mb-3">
+                                    <i class="uil uil-clock text-primary me-2"></i>
+                                    <strong>{{getLanguageKeyLocalTranslation('job_experience_required')}}:</strong>
+                                    <span class="ms-2">{{ $job->required_years_of_experience }}+ {{getLanguageKeyLocalTranslation('job_years')}}</span>
+                                </li>
+                                @endif
 
-                            <li class="mb-3">
-                                <i class="uil uil-briefcase text-primary me-2"></i>
+                                <li class="mb-3">
+                                    <i class="uil uil-briefcase text-primary me-2"></i>
+                                    
+                                    <strong>{{getLanguageKeyLocalTranslation('job_employment_type')}}:</strong>
+                                    <span class="ms-2">
+                                        @if($job->employment_type == 'full_time')
+                                            {{getLanguageKeyLocalTranslation('jobs_full_time')}}
+                                        @elseif($job->employment_type == 'part_time')
+                                            {{getLanguageKeyLocalTranslation('jobs_part_time')}}
+                                        @else
+                                            {{getLanguageKeyLocalTranslation('jobs_internship')}}
+                                        @endif
+                                    </span>
+                                </li>
+
+                                <li class="mb-3">
+                                    <i class="uil uil-{{ $job->is_remote ? 'laptop' : 'building' }} text-primary me-2"></i>
+                                    <strong>{{getLanguageKeyLocalTranslation('job_work_type')}}:</strong>
+                                    <span class="ms-2">
+                                        @if($job->is_remote)
+                                            {{getLanguageKeyLocalTranslation('jobs_remote')}}
+                                        @else
+                                            {{getLanguageKeyLocalTranslation('jobs_onsite')}}
+                                        @endif
+                                    </span>
+                                </li>
                                 
-                                <strong>{{getLanguageKeyLocalTranslation('job_employment_type')}}:</strong>
-                                <span class="ms-2">
-                                    @if($job->employment_type == 'full_time')
-                                        {{getLanguageKeyLocalTranslation('jobs_full_time')}}
-                                    @elseif($job->employment_type == 'part_time')
-                                        {{getLanguageKeyLocalTranslation('jobs_part_time')}}
-                                    @else
-                                        {{getLanguageKeyLocalTranslation('jobs_internship')}}
-                                    @endif
-                                </span>
-                            </li>
+                                <li class="mb-3">
+                                    <i class="uil uil-users-alt text-primary me-2"></i>
+                                    <strong>{{getLanguageKeyLocalTranslation('job_positions_available')}}:</strong>
+                                    <span class="ms-2">{{ $job->number_of_positions }}</span>
+                                </li>
 
-                            <li class="mb-3">
-                                <i class="uil uil-{{ $job->is_remote ? 'laptop' : 'building' }} text-primary me-2"></i>
-                                <strong>{{getLanguageKeyLocalTranslation('job_work_type')}}:</strong>
-                                <span class="ms-2">
-                                    @if($job->is_remote)
-                                        {{getLanguageKeyLocalTranslation('jobs_remote')}}
-                                    @else
-                                        {{getLanguageKeyLocalTranslation('jobs_onsite')}}
-                                    @endif
-                                </span>
-                            </li>
-                            
-                            <li class="mb-3">
-                                <i class="uil uil-users-alt text-primary me-2"></i>
-                                <strong>{{getLanguageKeyLocalTranslation('job_positions_available')}}:</strong>
-                                <span class="ms-2">{{ $job->number_of_positions }}</span>
-                            </li>
+                                @if($job->getLocalTranslation('required_skills'))
+                                <li class="mb-3">
+                                    <i class="uil uil-star text-primary me-2"></i>
+                                    <strong>{{getLanguageKeyLocalTranslation('job_skills_title')}}:</strong>
+                                    <div class="mt-2">
+                                        @php
+                                            $skills = explode(',', $job->getLocalTranslation('required_skills'));
+                                        @endphp
+                                        @foreach(array_filter(array_map('trim', $skills)) as $skill)
+                                            <span class="badge bg-light text-dark me-1 mb-1">{{ $skill }}</span>
+                                        @endforeach
+                                    </div>
+                                </li>
+                                @endif
 
-                            @if($job->getLocalTranslation('required_skills'))
-                            <li class="mb-3">
-                                <i class="uil uil-star text-primary me-2"></i>
-                                <strong>{{getLanguageKeyLocalTranslation('job_skills_title')}}:</strong>
-                                <div class="mt-2">
-                                    @php
-                                        $skills = explode(',', $job->getLocalTranslation('required_skills'));
-                                    @endphp
-                                    @foreach(array_filter(array_map('trim', $skills)) as $skill)
-                                        <span class="badge bg-light text-dark me-1 mb-1">{{ $skill }}</span>
-                                    @endforeach
-                                </div>
-                            </li>
-                            @endif
+                                @if($job->application_deadline)
+                                <li class="mb-3">
+                                    <i class="uil uil-calendar-alt text-primary me-2"></i>
+                                    <strong>{{getLanguageKeyLocalTranslation('job_application_deadline')}}:</strong>
+                                    <span class="ms-2">{{ $job->application_deadline }}</span>
+                                </li>
+                                @endif
 
-                            @if($job->application_deadline)
-                            <li class="mb-3">
-                                <i class="uil uil-calendar-alt text-primary me-2"></i>
-                                <strong>{{getLanguageKeyLocalTranslation('job_application_deadline')}}:</strong>
-                                <span class="ms-2">{{ $job->application_deadline }}</span>
-                            </li>
-                            @endif
-
-                            <li class="mb-0">
-                                <i class="uil uil-calendar-plus text-primary me-2"></i>
-                                <strong>{{getLanguageKeyLocalTranslation('job_posted_date')}}:</strong>
-                                <span class="ms-2">{{ $job->created_at }}</span>
-                            </li>
-                        </ul>
+                                <li class="mb-0">
+                                    <i class="uil uil-calendar-plus text-primary me-2"></i>
+                                    <strong>{{getLanguageKeyLocalTranslation('job_posted_date')}}:</strong>
+                                    <span class="ms-2">{{ $job->created_at }}</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -619,7 +641,7 @@ createApp({
             newSkill: '',
             
             applicationForm: {
-                job_posting_id: {{ $job->id }},
+                job_posting_id: {{ $isGeneralApplication ? 'null' : $job->id }},
                 personal: {
                     first_name: '',
                     last_name: '',
@@ -1010,7 +1032,7 @@ createApp({
                 }
                 
                 // Submit to dedicated storage route
-                const response = await fetch('{{ route("job-applications.store", $job->id) }}', {
+                const response = await fetch('{{ $isGeneralApplication ? route("job-applications.store-general") : route("job-applications.store", $job->id) }}', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -1087,7 +1109,7 @@ createApp({
             });
 
             this.applicationForm = {
-                job_posting_id: {{ $job->id }},
+                job_posting_id: {{ $isGeneralApplication ? 'null' : $job->id }},
                 personal: {
                     first_name: '',
                     last_name: '',

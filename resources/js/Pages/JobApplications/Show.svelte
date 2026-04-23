@@ -10,15 +10,32 @@
     console.log(jobApplication);
     
     // Define breadcrumbs for this job application
-    const breadcrumbs = [
+    const isScopedToPosting = !!jobApplication?.job_posting?.id;
+    const backToApplicationsUrl = isScopedToPosting
+        ? route('admin.job-applications.index', { jobPosting: jobApplication?.job_posting?.id })
+        : route('admin.job-applications.all.index');
+    const jobTitle = jobApplication?.job_posting?.getLocalTranslation?.('title') || jobApplication?.job_posting?.name || 'General Submission';
+
+    const breadcrumbs = isScopedToPosting ? [
         {
             title: 'Job Applications',
-            url: route('admin.job-applications.index', { jobPosting: jobApplication?.job_posting?.id }),
+            url: backToApplicationsUrl,
             active: false
         },
         {
-            title: jobApplication?.job_posting?.getLocalTranslation?.('title') || jobApplication?.job_posting?.name || 'Job',
-            url: route('admin.job-applications.index', { jobPosting: jobApplication?.job_posting?.id }),
+            title: jobTitle,
+            url: backToApplicationsUrl,
+            active: false
+        },
+        {
+            title: `Application #${jobApplication?.id}` || 'Application Details',
+            url: route('admin.job-applications.show', { jobApplication: jobApplication?.id }),
+            active: true
+        }
+    ] : [
+        {
+            title: 'Job Applications',
+            url: backToApplicationsUrl,
             active: false
         },
         {
@@ -106,7 +123,7 @@
                 </p>
             </div>
             <div class="flex items-center gap-3">
-                <a href="{route('admin.job-applications.index', { jobPosting: jobApplication?.job_posting?.id })}" class="kt-btn kt-btn-outline">
+                <a href="{backToApplicationsUrl}" class="kt-btn kt-btn-outline">
                     <i class="ki-filled ki-arrow-left text-base"></i>
                     Back to applications
                 </a>
@@ -289,7 +306,7 @@
                                             {jobApplication?.first_name} {jobApplication?.last_name}
                                             <br>
                                             <span class="text-lg text-secondary-foreground">
-                                                {jobApplication?.job_posting?.getLocalTranslation?.('title') || jobApplication?.job_posting?.name}
+                                                {jobTitle}
                                             </span>
                                         </h2>
                                         {#if jobApplication?.ai_score}

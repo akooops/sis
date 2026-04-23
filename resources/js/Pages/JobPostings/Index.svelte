@@ -243,6 +243,12 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
+                    {#if hasPermission('admin.job-applications.index')}
+                    <a href="{route('admin.job-applications.all.index')}" class="kt-btn kt-btn-outline">
+                        <i class="ki-filled ki-abstract-26 text-base"></i>
+                        All Applications
+                    </a>
+                    {/if}
                     {#if hasPermission('admin.job-postings.store')}
                     <a href="{route('admin.job-postings.create')}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-plus text-base"></i>

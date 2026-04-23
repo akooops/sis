@@ -46,14 +46,25 @@ class JobApplicationsController extends Controller
 
     public function storeApplication(StoreJobApplicationRequest $request, JobPosting $jobPosting)
     {
-        $application = $jobPosting->jobApplications()->create([
+        return $this->store($request, $jobPosting);
+    }
+
+    public function storeGeneralApplication(StoreJobApplicationRequest $request)
+    {
+        return $this->store($request, null);
+    }
+
+    protected function store(StoreJobApplicationRequest $request, ?JobPosting $jobPosting = null)
+    {
+        $application = JobApplication::create([
             'first_name' => $request->input('personal.first_name'),
             'last_name' => $request->input('personal.last_name'),
             'email' => $request->input('personal.email'),
             'phone' => $request->input('personal.phone'),
             'nationality' => $request->input('personal.nationality'),
             'address' => $request->input('personal.address'),
-            'skills' => $request->input('skills'), 
+            'skills' => $request->input('skills'),
+            'job_posting_id' => $jobPosting?->id,
             'ai_score_status' => JobApplication::AI_SCORE_STATUS_PENDING,
         ]);
 
