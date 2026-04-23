@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\MenuItemsController;
 use App\Http\Controllers\Admin\MenusController;
 use App\Http\Controllers\Admin\NewslettersController;
+use App\Http\Controllers\Admin\NationalitiesController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PagesController;
 use App\Http\Controllers\Admin\PartnersController;
@@ -139,6 +140,16 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::patch('articles/{article}/update-translation', [ArticlesController::class, 'updateTranslation'])->middleware('check.permission:admin.articles.update')->name('admin.articles.update-translation');
     Route::patch('articles/{article}', [ArticlesController::class, 'update'])->middleware('check.permission:admin.articles.update')->name('admin.articles.update');
     Route::delete('articles/{article}', [ArticlesController::class, 'destroy'])->middleware('check.permission:admin.articles.destroy')->name('admin.articles.destroy');
+
+    // Nationalities
+    Route::get('nationalities', [NationalitiesController::class, 'index'])->middleware('check.permission:admin.nationalities.index')->name('admin.nationalities.index');
+    Route::get('nationalities/create', [NationalitiesController::class, 'create'])->middleware('check.permission:admin.nationalities.store')->name('admin.nationalities.create');
+    Route::post('nationalities', [NationalitiesController::class, 'store'])->middleware('check.permission:admin.nationalities.store')->name('admin.nationalities.store');
+    Route::get('nationalities/{nationality}', [NationalitiesController::class, 'show'])->middleware('check.permission:admin.nationalities.show')->name('admin.nationalities.show');
+    Route::get('nationalities/{nationality}/edit', [NationalitiesController::class, 'edit'])->middleware('check.permission:admin.nationalities.update')->name('admin.nationalities.edit');
+    Route::patch('nationalities/{nationality}/update-translation', [NationalitiesController::class, 'updateTranslation'])->middleware('check.permission:admin.nationalities.update')->name('admin.nationalities.update-translation');
+    Route::patch('nationalities/{nationality}', [NationalitiesController::class, 'update'])->middleware('check.permission:admin.nationalities.update')->name('admin.nationalities.update');
+    Route::delete('nationalities/{nationality}', [NationalitiesController::class, 'destroy'])->middleware('check.permission:admin.nationalities.destroy')->name('admin.nationalities.destroy');
 
     // Program
     Route::get('programs/order', [ProgramsController::class, 'orderPage'])->middleware('check.permission:admin.programs.order')->name('admin.programs.order-page');

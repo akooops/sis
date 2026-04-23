@@ -205,11 +205,14 @@
                                     <div v-if="errors['personal.phone']" class="invalid-feedback">@{{ errors['personal.phone'] }}</div>
                                 </div>
                                 <div class="col-12 mb-3">
-                                    <input v-model.trim="applicationForm.personal.nationality" 
-                                           type="text" 
-                                           class="form-control"
-                                           :class="{ 'is-invalid': errors['personal.nationality'] }"
-                                        placeholder="{{getLanguageKeyLocalTranslation('job_nationality')}}">
+                                    <select v-model="applicationForm.personal.nationality"
+                                            class="form-select"
+                                            :class="{ 'is-invalid': errors['personal.nationality'] }">
+                                        <option value="">{{getLanguageKeyLocalTranslation('job_nationality')}}</option>
+                                        <option v-for="nationality in nationalities" :key="nationality.code" :value="nationality.code">
+                                            @{{ nationality.title }}
+                                        </option>
+                                    </select>
                                     <div v-if="errors['personal.nationality']" class="invalid-feedback">@{{ errors['personal.nationality'] }}</div>
                                 </div>
                                 <div class="col-12 mb-3">
@@ -638,6 +641,7 @@ createApp({
             iti: null,
             newSkill: '',
             years: yearOptions,
+            nationalities: @json($nationalities ?? []),
             
             applicationForm: {
                 job_posting_id: {{ $isGeneralApplication ? 'null' : $job->id }},

@@ -6,6 +6,7 @@ use App\Rules\CheckInternationalPhoneNumber;
 use App\Rules\ReCaptcha;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Str;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
@@ -63,7 +64,7 @@ class ValidateJobApplicationStepRequest extends FormRequest
                 'max:20',
                 new CheckInternationalPhoneNumber(),
             ],
-            'personal.nationality' => 'required|string|max:255',
+            'personal.nationality' => 'required|string|size:2|exists:nationalities,code',
             'personal.address' => 'required|string|max:500',
         ];
     }
@@ -149,7 +150,7 @@ class ValidateJobApplicationStepRequest extends FormRequest
                 'max:20',
                 new CheckInternationalPhoneNumber(),
             ],
-            'personal.nationality' => 'required|string|max:255',
+            'personal.nationality' => 'required|string|size:2|exists:nationalities,code',
             'personal.address' => 'required|string|max:500',
             
             // Education
@@ -186,6 +187,12 @@ class ValidateJobApplicationStepRequest extends FormRequest
     
     protected function prepareForValidation()
     {
+        if ($this->has('personal.nationality') && !empty($this->input('personal.nationality'))) {
+            $this->merge([
+                'personal.nationality' => Str::upper($this->input('personal.nationality')),
+            ]);
+        }
+
         if ($this->has('personal.phone') && !empty($this->input('personal.phone'))) {
             $phoneUtil = PhoneNumberUtil::getInstance();
             try {

@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PermissionsSeeder::class);
         $this->call(InitAdminAccountSeeder::class);
         $this->call(LanguageTranslationSeeder::class);
+        $this->call(NationalitySeeder::class);
         $this->call(SettingsSeeder::class);
         $this->call(PagesSeeder::class);
         $this->call(MenusSeeder::class);

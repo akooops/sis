@@ -64,6 +64,13 @@ class PermissionsSeeder extends Seeder
             'admin.articles.update',
             'admin.articles.destroy',
 
+            // Nationalities Management
+            'admin.nationalities.index',
+            'admin.nationalities.store',
+            'admin.nationalities.show',
+            'admin.nationalities.update',
+            'admin.nationalities.destroy',
+
             // Programs Management
             'admin.programs.index',
             'admin.programs.store',
@@ -263,6 +270,7 @@ class PermissionsSeeder extends Seeder
 
         // Assign content management permissions to Editor
         $editorPermissions = Permission::where('name', 'like', '%articles%')
+            ->orWhere('name', 'like', '%nationalities%')
             ->orWhere('name', 'like', '%pages%')
             ->orWhere('name', 'like', '%albums%')
             ->orWhere('name', 'like', '%events%')

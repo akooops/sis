@@ -442,6 +442,30 @@
                             </a>
                         </div>
                     {/if}
+
+                    {#if hasPermission("admin.nationalities.index")}
+                        <div class="kt-menu-item">
+                            <a
+                                class="kt-menu-link gap-2.5 py-2 px-2.5 rounded-md {isActiveRoute(
+                                    'admin.nationalities.index',
+                                )
+                                    ? 'kt-menu-item-active:bg-accent/60'
+                                    : ''} kt-menu-link-hover:bg-accent/60"
+                                href={route("admin.nationalities.index")}
+                            >
+                                <span
+                                    class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono"
+                                >
+                                    <i class="ki-outline ki-geolocation"></i>
+                                </span>
+                                <span
+                                    class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono"
+                                >
+                                    Nationalities
+                                </span>
+                            </a>
+                        </div>
+                    {/if}
                 </div>
             </div>
 

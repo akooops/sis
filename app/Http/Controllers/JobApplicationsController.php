@@ -9,6 +9,7 @@ use App\Models\Album;
 use App\Models\Article;
 use App\Models\Banner;
 use App\Models\Event;
+use App\Models\Nationality;
 use App\Models\Grade;
 use App\Models\JobApplication;
 use App\Models\JobPosting;
@@ -56,12 +57,14 @@ class JobApplicationsController extends Controller
 
     protected function store(StoreJobApplicationRequest $request, ?JobPosting $jobPosting = null)
     {
+        $nationality = Nationality::where('code', Str::upper($request->input('personal.nationality')))->first();
+
         $application = JobApplication::create([
             'first_name' => $request->input('personal.first_name'),
             'last_name' => $request->input('personal.last_name'),
             'email' => $request->input('personal.email'),
             'phone' => $request->input('personal.phone'),
-            'nationality' => $request->input('personal.nationality'),
+            'nationality' => $nationality->name ?? $request->input('personal.nationality'),
             'address' => $request->input('personal.address'),
             'skills' => $request->input('skills'),
             'job_posting_id' => $jobPosting?->id,

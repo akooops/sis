@@ -12,6 +12,8 @@ use App\Models\Event;
 use App\Models\Form;
 use App\Models\Grade;
 use App\Models\JobPosting;
+use App\Models\Language;
+use App\Models\Nationality;
 use App\Models\Newsletter;
 use App\Models\Page;
 use App\Models\Partner;
@@ -20,6 +22,7 @@ use App\Models\VisitService;
 use App\Services\IndexService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PagesController extends Controller
 {
@@ -175,7 +178,9 @@ class PagesController extends Controller
             abort(404);
         }
 
-        return view('job', compact('job'));
+        $nationalities = $this->getLocalizedNationalities();
+
+        return view('job', compact('job', 'nationalities'));
     }
 
     public function jobApplication(Request $request)
@@ -188,7 +193,36 @@ class PagesController extends Controller
         return view('job', [
             'job' => null,
             'jobsPage' => $jobsPage,
+            'nationalities' => $this->getLocalizedNationalities(),
         ]);
+    }
+
+    protected function getLocalizedNationalities(): array
+    {
+        $locale = app()->getLocale();
+        $defaultLanguageCode = Language::where('is_default', true)->value('code') ?? 'en';
+
+        return Nationality::query()
+            ->orderBy('code')
+            ->get()
+            ->map(function (Nationality $nationality) use ($locale, $defaultLanguageCode) {
+                $title = $nationality->getTranslation('title', $locale);
+                if (Str::startsWith($title, 'title.')) {
+                    $title = $nationality->getTranslation('title', $defaultLanguageCode);
+                }
+
+                if (Str::startsWith($title, 'title.')) {
+                    $title = $nationality->code;
+                }
+
+                return [
+                    'code' => $nationality->code,
+                    'name' => $nationality->name,
+                    'title' => $title,
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     public function articles(Request $request)
