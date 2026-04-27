@@ -28,7 +28,7 @@ class Setting extends Model
     {
         parent::boot();
 
-        static::saving(function ($setting) {    
+        static::saving(function ($setting) {
             $setting->value = json_encode($setting->value);
 
             if ($setting->is_encrypted) {

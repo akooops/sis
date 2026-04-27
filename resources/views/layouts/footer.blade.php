@@ -2,7 +2,7 @@
     $footerPrograms = getPrograms();
 
     $footerMenu = getMenu('footer_primary_menu');
-    
+
     $emails = json_decode(getSetting('emails')->value);
     $phones = json_decode(getSetting('phones')->value);
     $googleMapsUrl = getSetting('google_maps_url');
@@ -21,7 +21,8 @@
             <div class="d-flex col-12 col-lg-2 mb-8 mb-lg-0 justify-content-center justify-content-lg-start">
                 <div class="widget">
                     <a href="{{route('index')}}">
-                        <img class="logo" src="{{ URL::asset('assets/img/logo.png')}}" alt="{{getLanguageKeyLocalTranslation('website_title')}}">
+                        <img class="logo" src="{{ URL::asset('assets/img/logo.png')}}"
+                            alt="{{getLanguageKeyLocalTranslation('website_title')}}">
                     </a>
                 </div>
             </div>
@@ -50,7 +51,7 @@
                             <h4 class="widget-title mb-3">
                                 {{getLanguageKeyLocalTranslation('footer_get_in_touch_title')}}
                             </h4>
-                            
+
                             <p>
                                 @if($googleMapsUrl && !empty($googleMapsUrl->value))
                                     <a href="{{$googleMapsUrl->value}}" target="_blank" class="text-primary">
@@ -60,7 +61,7 @@
                                     {{getLanguageKeyLocalTranslation('footer_address_placeholder')}}
                                 @endif
 
-                                <br /> 
+                                <br />
 
                                 @if($emails && is_array($emails))
                                     @foreach ($emails as $email)
@@ -73,7 +74,8 @@
                                 @if($phones && is_array($phones))
                                     @if($emails && is_array($emails))<br />@endif
                                     @foreach ($phones as $phone)
-                                        <a href="https://wa.me/{{ preg_replace('/\D+/', '', $phone) }}" class="text-primary" dir="ltr">
+                                        <a href="https://wa.me/{{ preg_replace('/\D+/', '', $phone) }}" class="text-primary"
+                                            dir="ltr">
                                             {{$phone}} <i class="uil uil-whatsapp" style="color: #25D366;"></i>
                                         </a>
                                         @if(!$loop->last)<br />@endif
@@ -84,7 +86,7 @@
                         <!-- /.widget -->
                     </div>
                     <!-- /column -->
-                    
+
                     <div class="col-lg-2 mb-8 mb-lg-0 text-center text-lg-start">
                         <div class="widget ps-0 ps-lg-4">
                             <h4 class="widget-title mb-3">
@@ -95,8 +97,7 @@
                                 @if($footerMenu)
                                     @foreach ($footerMenu->items as $footerMenuItem)
                                         <li class="nav-item">
-                                            <a
-                                                href="{{$footerMenuItem->url}}">
+                                            <a href="{{$footerMenuItem->url}}">
                                                 {{$footerMenuItem->getLocalTranslation('title')}}
                                             </a>
                                         </li>
@@ -165,7 +166,7 @@
                 </div>
                 <!--/.row -->
             </div>
-             <!-- /column -->
+            <!-- /column -->
         </div>
         <!--/.row -->
 

@@ -444,16 +444,16 @@
     <div class="container py-10">
         <div class="swiper-container clients mb-0" 
             data-margin="30" 
-            data-loop="true" 
-            data-autoplay="true" 
-            data-autoplaytime="1" 
+			data-loop="true" 
+			data-autoplay="true" 
+			data-autoplaytime="1" 
             data-drag="false" 
+			data-nav="false"
             data-speed="5000" 
-            data-items-lg="6" 
-            data-items-md="4" 
-            data-items-xs="2"
-            data-aos="fade-up" 
-            data-aos-duration="2000">
+            data-items="5" 
+            data-items-lg="5" 
+            data-items-md="3" 
+            data-items-xs="2">
             <div class="swiper">
                 <div class="swiper-wrapper ticker">
                     @foreach ($partners as $partner)   

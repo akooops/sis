@@ -1,46 +1,46 @@
 /* Font Faces */
 @font-face {
-  font-family: 'Mulish';
-  src: url('fonts/Mulish/Mulish-Light.ttf') format('truetype');
-  font-weight: 300;
-  font-style: normal;
+    font-family: 'Mulish';
+    src: url('fonts/Mulish/Mulish-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 'Mulish';
-  src: url('fonts/Mulish/Mulish-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
+    font-family: 'Mulish';
+    src: url('fonts/Mulish/Mulish-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 'Mulish';
-  src: url('fonts/Mulish/Mulish-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
+    font-family: 'Mulish';
+    src: url('fonts/Mulish/Mulish-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 'Mulish';
-  src: url('fonts/Mulish/Mulish-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
+    font-family: 'Mulish';
+    src: url('fonts/Mulish/Mulish-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
 }
 
 @font-face {
-  font-family: 'Mulish';
-  src: url('fonts/Mulish/Mulish-Black.ttf') format('truetype');
-  font-weight: 900;
-  font-style: normal;
+    font-family: 'Mulish';
+    src: url('fonts/Mulish/Mulish-Black.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
 }
 
 /* CSS Variables */
 :root {
-  --bs-font-sans-serif: "Mulish", sans-serif;
-  --bs-navbar-color: #2A5D91;
-  --bs-secondary: #3c70a3;
-  --bs-light: #EEF8FF;
-  --bs-gold: #E0B65D;
+    --bs-font-sans-serif: "Mulish", sans-serif;
+    --bs-navbar-color: #2A5D91;
+    --bs-secondary: #3c70a3;
+    --bs-light: #EEF8FF;
+    --bs-gold: #E0B65D;
 }
 
 /* Global Styles */
@@ -70,7 +70,7 @@ p {
 
 .btn:hover {
     background-position: left bottom;
-    color: white; 
+    color: white;
     border: none;
 }
 
@@ -205,8 +205,8 @@ p {
 }
 
 .banners-section .swiper-container .swiper-controls .swiper-pagination {
-    bottom: 1.8rem;    
-} 
+    bottom: 1.8rem;
+}
 
 .banners-section .swiper-container .bg-overlay::before {
     content: '';
@@ -328,12 +328,12 @@ p {
     width: 100%;
     height: 100%;
     background: var(--bs-secondary);
-    transition: left 0.4s ease; 
+    transition: left 0.4s ease;
     z-index: 1;
 }
 
 .welcome-section .btn:hover::before {
-    left: 0; 
+    left: 0;
 }
 
 .welcome-section .btn:hover {
@@ -388,6 +388,7 @@ p {
     width: 60%;
     object-fit: contain;
 }
+
 /* =============================================================================
    GRADES SECTION
    ============================================================================= */
@@ -436,7 +437,7 @@ p {
     font-weight: 450;
     line-height: 33px;
     text-transform: uppercase;
-    margin-bottom: 20px;    
+    margin-bottom: 20px;
 }
 
 .grades-section .btn {
@@ -498,7 +499,7 @@ p {
 }
 
 .grades-section .swiper-container .bg-overlay:hover::after {
-    opacity: 1; 
+    opacity: 1;
 }
 
 /* =============================================================================
@@ -551,7 +552,7 @@ p {
 
 .albums-section {
     position: relative;
-    overflow: visible; 
+    overflow: visible;
 }
 
 .albums-section h2 {
@@ -652,10 +653,6 @@ p {
     border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.swiper-container.clients .swiper-wrapper {
-    justify-content: center;
-}
-
 .swiper-container.clients .swiper-slide {
     display: flex;
     align-items: center;
@@ -732,7 +729,7 @@ footer .widget p {
     font-style: normal;
     font-weight: 400;
     line-height: 30px;
-} 
+}
 
 footer .nav-item a {
     color: var(--bs-primary);
@@ -817,7 +814,7 @@ footer .copyright p {
     letter-spacing: 0.5px;
     text-align: center;
     transition: all 0.3s ease;
-    display: none; 
+    display: none;
     align-items: center;
     justify-content: center;
     height: 48px;
@@ -935,9 +932,9 @@ footer .copyright p {
     overflow: hidden;
     background: linear-gradient(to right, var(--bs-primary) 50%, white 50%);
     background-size: 200% 100%;
-    background-position: right bottom;  
+    background-position: right bottom;
     transition: all 0.4s ease;
-    color: var(--bs-dark); 
+    color: var(--bs-dark);
     text-transform: uppercase;
     font-size: 15px;
     font-weight: 450;
@@ -946,7 +943,7 @@ footer .copyright p {
 
 .visit-service-container .counter-controls .btn:hover {
     background-position: left bottom;
-    color: white; 
+    color: white;
     transform: unset;
 }
 
@@ -1093,13 +1090,13 @@ footer .copyright p {
    CALENDAR & FORM COMPONENTS
    ============================================================================= */
 
-.fc-daygrid-event {  
+.fc-daygrid-event {
     cursor: pointer;
     background-color: #2A5D91;
     color: #fff;
 }
 
-.fc-daygrid-event:hover {  
+.fc-daygrid-event:hover {
     background-color: #2A5D91;
 }
 
@@ -1227,11 +1224,11 @@ footer .copyright p {
         border-top-right-radius: 0.3rem;
         border-bottom-right-radius: 0.3rem;
     }
-        
+
     .navbar-offcanvas-menu {
         width: 420px !important;
     }
-    
+
     .welcome-section .shape {
         height: 500px;
     }
@@ -1250,15 +1247,15 @@ footer .copyright p {
     .navbar.navbar-scrolled .logo {
         height: 72px;
     }
-    
+
     .navbar-container {
         margin-top: 40px;
     }
-    
+
     .navbar.navbar-scrolled .navbar-container {
         margin-top: 12px;
     }
-    
+
     .banners-section h1,
     .banners-section h2 {
         font-size: 55px;
@@ -1309,9 +1306,9 @@ footer .copyright p {
     }
 
     .step-indicator .step {
-        display: flex; 
+        display: flex;
         padding: 12px 30px 12px 20px;
-        border-radius: 0; 
+        border-radius: 0;
         min-width: 120px;
     }
 
@@ -1426,31 +1423,31 @@ footer .copyright p {
         padding-bottom: 2rem;
         position: relative;
     }
-    
+
     /* First row: Year badge alone (full width) */
-    .timeline-item > .timeline-date {
+    .timeline-item>.timeline-date {
         flex: 0 0 100%;
         width: 100%;
         padding-top: 0;
         margin-bottom: 0.5rem;
     }
-    
+
     /* Second row: Line and content side by side using flex */
-    .timeline-item > .timeline-line {
+    .timeline-item>.timeline-line {
         flex: 0 0 2px;
         width: 2px;
         position: relative;
         align-self: stretch;
         min-height: 100%;
     }
-    
-    .timeline-item > .timeline-content {
+
+    .timeline-item>.timeline-content {
         flex: 1 1 calc(100% - 2px - 1rem);
         padding-left: 1rem;
         min-width: 0;
     }
-    
-    .timeline-item > .timeline-content > .timeline-content-mobile-date {
+
+    .timeline-item>.timeline-content>.timeline-content-mobile-date {
         display: none;
     }
 }
@@ -1562,9 +1559,12 @@ footer .copyright p {
 
 
 @keyframes radarPulse {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 0 0 0 rgba(224, 182, 93, 0.7);
     }
+
     50% {
         box-shadow: 0 0 0 8px rgba(224, 182, 93, 0);
     }
@@ -1575,6 +1575,7 @@ footer .copyright p {
         transform: translate(-50%, -50%) scale(1);
         opacity: 0.6;
     }
+
     100% {
         transform: translate(-50%, -50%) scale(2.5);
         opacity: 0;
@@ -1604,7 +1605,7 @@ footer .copyright p {
         display: flex;
         margin-bottom: 0.5rem;
     }
-    
+
     .timeline-content {
         width: 100%;
     }
@@ -1615,7 +1616,7 @@ footer .copyright p {
         display: flex;
         margin-bottom: 0.5rem;
     }
-    
+
     .timeline-content {
         width: 100%;
     }
