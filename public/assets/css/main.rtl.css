@@ -589,21 +589,6 @@ p {
     object-fit: cover;
 }
 
-.albums-section::before {
-    content: "";
-    display: block;
-    background: url(../img/hash.png) no-repeat;
-    width: 350px;
-    height: 450px;
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-40%);
-    z-index: -1;
-    background-size: 100%;
-    background-position: left;
-}
-
 /* =============================================================================
    ACHIEVEMENTS SECTION
    ============================================================================= */
@@ -1309,11 +1294,6 @@ footer .copyright p {
     .albums-section h2 {
         font-size: 36px;
         line-height: 60px;
-    }
-
-    .albums-section::before {
-        width: 469px;
-        height: 666px;
     }
 
     footer .widget {
