@@ -107,7 +107,7 @@
                             </p>
                         </div>
 
-                        <a href="{{$pathwayAmericanUrl && !empty($pathwayAmericanUrl->value) ? $pathwayAmericanUrl : '#'}}" class="btn py-1 rounded">
+                        <a href="{{$pathwayAmericanUrl && !empty($pathwayAmericanUrl->value) ? $pathwayAmericanUrl->value : '#'}}" class="btn py-1 rounded">
                             <span class="mx-4">{{getLanguageKeyLocalTranslation('index_page_pathway_american_cta')}}</span>
                                 <i class="uil uil-arrow-right"></i>
                         </a>
@@ -132,7 +132,7 @@
                             </p>
                         </div>
 
-                        <a href="{{$pathwayBritishUrl && !empty($pathwayBritishUrl->value) ? $pathwayBritishUrl : '#'}}" class="btn py-1 rounded">
+                        <a href="{{$pathwayBritishUrl && !empty($pathwayBritishUrl->value) ? $pathwayBritishUrl->value : '#'}}" class="btn py-1 rounded">
                             <span class="mx-4">{{getLanguageKeyLocalTranslation('index_page_pathway_british_cta')}}</span>
                             <i class="uil uil-arrow-right"></i>
                         </a>
