@@ -6,6 +6,12 @@
 @endsection
 @section('content')
 
+@php
+    $pathwayAmericanUrl = getSetting('pathway_american_url');
+    $pathwayBritishUrl = getSetting('pathway_british_url');
+@endphp
+
+
 <section class="wrapper banners-section">
     <div class="swiper-container" 
         data-margin="0" 
@@ -73,26 +79,67 @@
 </section>
 <!-- /section -->
 
-<section class="wrapper welcome-section">
-    <div class="container pt-12 pb-6">
-        <div class="row align-items-center">
-            <div class="col-lg-6 position-relative" data-aos="fade-right" data-aos-duration="1000">
-                <div class="shape rellax"></div>
-                
-                <figure>
-                    <img class="ms-4 ms-sm-6" src="{{ URL::asset('assets/img/home-1-welcome.png')}}" alt="">
-                </figure>
+<section class="wrapper pathway-section">
+    <div class="container px-8 px-lg-12 px-xl-16 py-16">
+        <div class="row text-center mb-8 px-8 px-lg-16 px-xl-20">
+            <h2 class="text-primary mb-2" data-aos="fade-up" data-aos-duration="1000">
+                {{getLanguageKeyLocalTranslation('index_page_pathway_section_title')}}
+            </h2>
+
+            <p class="mt-2 mb-0" data-aos="fade-up" data-aos-duration="1500">
+                {{getLanguageKeyLocalTranslation('index_page_pathway_section_subtitle')}}
+            </p>
+        </div>
+        <!--/.row -->
+
+        <div class="row" data-aos="fade-up" data-aos-duration="1500">
+            <div class="col-lg-6 my-4">
+                <div class="card">
+                    <div class="card-body pathway-american">
+                        <div class="px-4">
+                            <h3 class="mb-6">
+                                <span class="stream-name">{{getLanguageKeyLocalTranslation('index_page_pathway_american_title')}}</span>
+                                <span class="stream-label">{{getLanguageKeyLocalTranslation('index_page_pathway_american_label')}}</span>
+                            </h3>
+    
+                            <p>
+                                {{getLanguageKeyLocalTranslation('index_page_pathway_american_content')}}
+                            </p>
+                        </div>
+
+                        <a href="{{$pathwayAmericanUrl}}" class="btn py-1 rounded">
+                            <span class="mx-4">{{getLanguageKeyLocalTranslation('index_page_pathway_american_cta')}}</span>
+                                <i class="uil uil-arrow-right"></i>
+                        </a>
+                    </div>
+                    <!--/.card-body -->
+                </div>
+                <!--/.card -->
             </div>
             <!--/column -->
 
-            <div class="col-lg-6 mt-12 mt-lg-0 text-center text-lg-start">
-                <h2 class="text-primary mb-0" data-aos="fade-left" data-aos-duration="1000">
-                    {{getLanguageKeyLocalTranslation('index_page_welcome_section_title')}}
-                </h2>
-                
-                <p class="mt-4 mb-8" data-aos="fade-left" data-aos-duration="1500">
-                    {{getLanguageKeyLocalTranslation('index_page_welcome_section_subtitle')}}
-                </p>
+            <div class="col-lg-6 my-4">
+                <div class="card">
+                    <div class="card-body pathway-british">
+                        <div class="px-4">
+                            <h3 class="mb-6">
+                                <span class="stream-name">{{getLanguageKeyLocalTranslation('index_page_pathway_british_title')}}</span>
+                                <span class="stream-label">{{getLanguageKeyLocalTranslation('index_page_pathway_british_label')}}</span>
+                            </h3>
+    
+                            <p>
+                                {{getLanguageKeyLocalTranslation('index_page_pathway_british_content')}}
+                            </p>
+                        </div>
+
+                        <a href="{{$pathwayBritishUrl}}" class="btn py-1 rounded">
+                            <span class="mx-4">{{getLanguageKeyLocalTranslation('index_page_pathway_british_cta')}}</span>
+                            <i class="uil uil-arrow-right"></i>
+                        </a>
+                    </div>
+                    <!--/.card-body -->
+                </div>
+                <!--/.card -->
             </div>
             <!--/column -->
         </div>

@@ -144,6 +144,26 @@ class SettingsSeeder extends Seeder
                 'options' => null,
             ],
 
+            // Academic Pathways
+            [
+                'key' => 'pathway_american_url',
+                'type' => 'text',
+                'value' => '',
+                'description' => 'URL for the American academic pathway page',
+                'group' => 'pathway',
+                'is_encrypted' => false,
+                'options' => null,
+            ],
+            [
+                'key' => 'pathway_british_url',
+                'type' => 'text',
+                'value' => '',
+                'description' => 'URL for the British academic pathway page',
+                'group' => 'pathway',
+                'is_encrypted' => false,
+                'options' => null,
+            ],
+
             // Contact Information
             [
                 'key' => 'emails',
@@ -179,7 +199,6 @@ class SettingsSeeder extends Seeder
                 ['key' => $setting['key']],
                 [
                     'type' => $setting['type'],
-                    'value' => $setting['value'],
                     'description' => $setting['description'],
                     'group' => $setting['group'],
                     'is_encrypted' => $setting['is_encrypted'],

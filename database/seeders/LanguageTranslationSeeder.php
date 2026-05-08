@@ -216,13 +216,45 @@ class LanguageTranslationSeeder extends Seeder
                 'en' => 'Learn more',
                 'ar' => 'اعرف المزيد',
             ],
-            'index_page_welcome_section_subtitle' => [
-                'en' => 'Welcome to Saud International School, We\'re thrilled to have you join our diverse community where we provide a challenging and inspiring educational environment. Together, we\'ll explore our internationally recognized curriculum enhanced with cutting-edge technology and enriching extra-curricular activities designed to help you thrive and discover your potential.',
-                'ar' => 'مرحباً بكم في مدارس سعود العالمية، نحن متحمسون لانضمامكم إلى مجتمعنا المتنوع حيث نوفر بيئة تعليمية تحدي وملهمة. معاً، سنستكشف منهجنا المعترف به دولياً والمعزز بأحدث التقنيات والأنشطة اللامنهجية الإثرائية المصممة لمساعدتكم على الازدهار واكتشاف إمكاناتكم.',
+            'index_page_pathway_section_title' => [
+                'en' => 'Choose Your Academic Pathway',
+                'ar' => 'اختر مسارك الأكاديمي',
             ],
-            'index_page_welcome_section_title' => [
-                'en' => 'Welcome to Saud international schools',
-                'ar' => 'مرحباً بكم في مدارس سعود العالمية',
+            'index_page_pathway_section_subtitle' => [
+                'en' => 'Globally Recognized. Structured for Your Child\'s Future.',
+                'ar' => 'معترف به عالمياً، ومصمم لمستقبل طفلك.',
+            ],
+            'index_page_pathway_american_label' => [
+                'en' => 'Stream',
+                'ar' => 'الأمريكي',
+            ],
+            'index_page_pathway_american_title' => [
+                'en' => 'American',
+                'ar' => 'المسار',
+            ],
+            'index_page_pathway_american_content' => [
+                'en' => 'Continuous pathway from Pre-K to Grade 12, Leads to American High School Diploma, and Cognia Accredited',
+                'ar' => 'مسار متواصل من مرحلة ما قبل الروضة حتى الصف الثاني عشر، يؤدي إلى دبلوم الثانوية الأمريكية، ومعتمد من Cognia',
+            ],
+            'index_page_pathway_american_cta' => [
+                'en' => 'Explore American Pathway',
+                'ar' => 'استكشف المسار الأمريكي',
+            ],
+            'index_page_pathway_british_label' => [
+                'en' => 'Stream',
+                'ar' => 'البريطاني',
+            ],
+            'index_page_pathway_british_title' => [
+                'en' => 'British',
+                'ar' => 'المسار',
+            ],
+            'index_page_pathway_british_content' => [
+                'en' => 'IGCSE (Grades 9–10), A Levels (Grades 11–12), and internationally recognized qualifications',
+                'ar' => 'شهادة IGCSE (الصفين التاسع والعاشر), المستويات المتقدمة A Levels (الصفين الحادي عشر والثاني عشر), ومؤهلات معترف بها دولياً',
+            ],
+            'index_page_pathway_british_cta' => [
+                'en' => 'Explore British Pathway',
+                'ar' => 'استكشف المسار البريطاني',
             ],
             'index_page_articles_section_cta' => [
                 'en' => 'View more news',

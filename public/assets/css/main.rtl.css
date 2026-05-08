@@ -297,75 +297,103 @@ p {
 }
 
 /* =============================================================================
-   WELCOME SECTION
+   PATHWAY SECTION
    ============================================================================= */
-
-.welcome-section {
+.pathway-section {
     background-color: var(--bs-light);
 }
 
-.welcome-section h2 {
-    font-size: 25px;
-    line-height: 35px;
+.pathway-section h2 {
+    font-size: 32px;
+    line-height: 40px;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+.pathway-section p {
+    font-size: 16px;
+    line-height: 26px;
+}
+
+.pathway-section h3 {
     text-transform: uppercase;
     font-weight: 900;
+    font-size: 32px;
+    line-height: 40px;
 }
 
-.welcome-section .shape {
-    background-color: var(--bs-primary);
-    position: absolute;
-    width: 80%;
-    height: 420px;
-    right: -124px;
-    top: 50px;
+.pathway-section .card .stream-label {
+    font-size: 24px;
 }
 
-.welcome-section img {
-    width: 90%;
-}
-
-.welcome-section .btn {
+.pathway-section .stream-label {
     position: relative;
-    overflow: hidden;
-    background: var(--bs-primary);
-    color: white;
-    border: 1px solid var(--bs-primary);
-    text-transform: uppercase;
-    font-size: 15px;
-    font-weight: 450;
-    font-family: "DINNext", sans-serif;
-    transition: border-color 0.4s ease;
+    display: inline-block;
+    padding-bottom: 16px;
+    line-height: 1;
 }
 
-.welcome-section .btn::before {
+.pathway-section .stream-label::after {
     content: '';
     position: absolute;
-    top: 0;
-    right: -100%;
-    width: 100%;
-    height: 100%;
-    background: var(--bs-secondary);
-    transition: right 0.4s ease;
-    z-index: 1;
-}
-
-.welcome-section .btn:hover::before {
+    bottom: 0;
     right: 0;
+    width: 40%;
+    height: 3px;
+    background: currentColor;
+    border-radius: 2px;
 }
 
-.welcome-section .btn:hover {
-    border-color: var(--bs-secondary);
+.pathway-american h3 {
+    color: var(--bs-green);
+}
+
+.pathway-british h3 {
+    color: var(--bs-primary);
+}
+
+.pathway-section .card p {
+    font-size: 15px;
+    line-height: 26px;
+    color: var(--bs-dark);
+    padding: 6px 0;
+}
+
+.pathway-section .btn {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    text-transform: uppercase;
+    font-size: 12px;
+    border: 2px solid;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.pathway-american .btn {
+    color: var(--bs-success);
+    border-color: var(--bs-success);
+}
+
+.pathway-american .btn:hover {
+    background: var(--bs-success);
     color: #fff;
+    border-color: var(--bs-success);
 }
 
-.welcome-section .btn span,
-.welcome-section .btn i {
-    position: relative;
-    z-index: 2;
+.pathway-british .btn {
+    color: var(--bs-primary);
+    border-color: var(--bs-primary);
 }
 
-.welcome-section .btn i {
-    font-size: 20px;
+.pathway-british .btn:hover {
+    background: var(--bs-primary);
+    color: #fff;
+    border-color: var(--bs-primary);
+}
+
+.pathway-section .btn i {
+    font-size: 18px;
 }
 
 /* =============================================================================
@@ -1218,6 +1246,48 @@ footer .copyright p {
 /* =============================================================================
    RESPONSIVE DESIGN
    ============================================================================= */
+   
+@media (min-width: 576px) {
+    .pathway-section h3 {
+        text-transform: uppercase;
+        font-weight: 900;
+        font-size: 36px;
+        line-height: 40px;
+    }
+    
+    .pathway-section .card .stream-label {
+        font-size: 24px;
+    }
+
+    .pathway-section .stream-label {
+        position: static;
+        display: inline;
+        padding-bottom: 0;
+        line-height: inherit;
+    }
+
+    .pathway-section .stream-label::after {
+        content: none;
+    }
+
+    .pathway-section .stream-name {
+        position: relative;
+        display: inline-block;
+        padding-bottom: 16px;
+        line-height: 1;
+    }
+
+    .pathway-section .stream-name::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 40%;
+        height: 3px;
+        background: currentColor;
+        border-radius: 2px;
+    }
+}
 
 @media (min-width: 768px) {
     .navbar-cta-container {
@@ -1231,8 +1301,27 @@ footer .copyright p {
         width: 420px !important;
     }
 
-    .welcome-section .shape {
-        height: 500px;
+    .pathway-section h2 {
+        font-size: 44px;
+        line-height: 52px;
+    }
+
+    .pathway-section .row.text-center p {
+        font-size: 20px;
+        line-height: 30px;
+    }
+
+    .pathway-section .card p {
+        font-size: 16px;
+        line-height: 27px;
+    }
+
+    .pathway-section .btn {
+        font-size: 15px;
+    }
+
+    .pathway-section .btn i {
+        font-size: 20px;
     }
 }
 
@@ -1264,13 +1353,19 @@ footer .copyright p {
         line-height: 52px;
     }
 
-    .welcome-section h2 {
-        font-size: 32px;
-        line-height: 52px;
+    .pathway-section h2 {
+        font-size: 48px;
+        line-height: 71px;
     }
 
-    .welcome-section .shape {
-        height: 360px;
+    .pathway-section .row.text-center p {
+        font-size: 22px;
+        line-height: 32px;
+    }
+
+    .pathway-section .card p {
+        font-size: 19px;
+        line-height: 32px;
     }
 
     .grades-section .swiper .swiper-wrapper {
@@ -1355,18 +1450,13 @@ footer .copyright p {
         font-size: 20px;
     }
 
-    .welcome-section h2 {
-        font-size: 48px;
-        line-height: 60px;
+    .pathway-section h2 {
+        font-size: 60px;
     }
 
     .grades-section h2 {
         font-size: 48px;
         line-height: 60px;
-    }
-
-    .welcome-section .shape {
-        height: 420px;
     }
 
     .articles-section h2 {
@@ -1629,11 +1719,5 @@ footer .copyright p {
 
     .timeline-content {
         width: 100%;
-    }
-}
-
-@media (min-width: 1400px) {
-    .welcome-section .shape {
-        height: 500px;
     }
 }
