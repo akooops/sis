@@ -287,7 +287,7 @@ p {
 }
 
 .pathway-section h2 {
-    font-size: 28px;
+    font-size: 32px;
     line-height: 40px;
     text-transform: uppercase;
     font-weight: 800;
@@ -301,7 +301,7 @@ p {
 .pathway-section h3 {
     text-transform: uppercase;
     font-weight: 900;
-    font-size: 32px;
+    font-size: 28px;
     line-height: 40px;
 }
 
@@ -325,6 +325,16 @@ p {
     height: 3px;
     background: currentColor;
     border-radius: 2px;
+}
+
+.pathway-section .card {
+    height: 100%;
+}
+
+.pathway-stream {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .pathway-stream h3 {
@@ -352,6 +362,7 @@ p {
 .pathway-stream .btn {
     color: var(--stream-color);
     border-color: var(--stream-color);
+    margin-top: auto;
 }
 
 .pathway-stream .btn:hover {
