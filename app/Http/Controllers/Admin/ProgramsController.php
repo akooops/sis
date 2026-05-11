@@ -129,6 +129,7 @@ class ProgramsController extends Controller
         $file = $this->fileService->duplicateMediaFile($media, 'App\\Models\\Program', $program->id, true);
 
         cache()->forget("all-programs");
+        cache()->forget("program-with-streams-{$program->id}");
 
         return inertia('Programs/Index', [
             'success' => 'Program created successfully!'
@@ -219,6 +220,7 @@ class ProgramsController extends Controller
         }
 
         cache()->forget("all-programs");
+        cache()->forget("program-with-streams-{$program->id}");
 
         return inertia('Programs/Index', [
             'success' => 'Program updated successfully!'
@@ -231,6 +233,8 @@ class ProgramsController extends Controller
         foreach($program->getTranslatableFields() as $field){
             $program->setTranslation($field, $language->code, $request->input($field));    
         }
+
+        cache()->forget("program-with-streams-{$program->id}");
 
         return response()->json([
             'status' => 'success',
@@ -246,10 +250,13 @@ class ProgramsController extends Controller
      */
     public function destroy(Program $program)
     {
+        $programId = $program->id;
+
         $program->delete();
 
         cache()->forget("all-programs");
-        
+        cache()->forget("program-with-streams-{$programId}");
+
         return redirect()->route('admin.programs.index')
                         ->with('success','Program deleted successfully');
     }

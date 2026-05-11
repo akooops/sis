@@ -38,7 +38,8 @@
     // Form data for basic stream info
     let form = {
         name: programStream?.name || '',
-        slug: programStream?.slug || ''
+        slug: programStream?.slug || '',
+        color: programStream?.color || '#0d6efd'
     };
 
     // Form errors
@@ -64,11 +65,13 @@
             const title = translations?.title?.[language.code] || '';
             const description = translations?.description?.[language.code] || '';
             const content = translations?.content?.[language.code] || '';
+            const cta = translations?.cta?.[language.code] || '';
 
             translationForms[language.code] = {
                 title: title,
                 description: description,
-                content: content
+                content: content,
+                cta: cta
             };
             translationErrors[language.code] = {};
             translationLoading[language.code] = false;
@@ -133,6 +136,7 @@
         formData.append('language_id', languageId);
         formData.append('title', translationForms[languageCode].title);
         formData.append('description', translationForms[languageCode].description);
+        formData.append('cta', translationForms[languageCode].cta);
 
         const summernoteContent = summernoteEditors[languageCode]?.getValue?.() || translationForms[languageCode].content;
         formData.append('content', summernoteContent);
@@ -274,6 +278,33 @@
                                                 <p class="text-sm text-destructive">{errors.slug}</p>
                                             {/if}
                                         </div>
+
+                                        <!-- Stream Color -->
+                                        <div class="flex flex-col gap-2">
+                                            <label class="text-sm font-medium text-mono" for="color">
+                                                Stream Color <span class="text-destructive">*</span>
+                                            </label>
+                                            <div class="flex items-center gap-3">
+                                                <input
+                                                    id="color"
+                                                    type="color"
+                                                    class="kt-input h-10 w-16 p-1 {errors.color ? 'kt-input-error' : ''}"
+                                                    bind:value={form.color}
+                                                />
+                                                <input
+                                                    type="text"
+                                                    class="kt-input {errors.color ? 'kt-input-error' : ''}"
+                                                    placeholder="#0d6efd"
+                                                    bind:value={form.color}
+                                                />
+                                            </div>
+                                            <p class="text-xs text-secondary-foreground">
+                                                Used for the stream title, underline and CTA button on the homepage pathway section.
+                                            </p>
+                                            {#if errors.color}
+                                                <p class="text-sm text-destructive">{errors.color}</p>
+                                            {/if}
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -360,6 +391,23 @@
                                             ></textarea>
                                             {#if translationErrors[language.code]?.description}
                                                 <p class="text-sm text-destructive">{translationErrors[language.code].description[0]}</p>
+                                            {/if}
+                                        </div>
+
+                                        <!-- Stream CTA -->
+                                        <div class="flex flex-col gap-2">
+                                            <label class="text-sm font-medium text-mono" for="cta-{language.id}">
+                                                CTA <span class="text-destructive">*</span>
+                                            </label>
+                                            <input
+                                                id="cta-{language.id}"
+                                                type="text"
+                                                class="kt-input {translationErrors[language.code]?.cta ? 'kt-input-error' : ''}"
+                                                placeholder="Enter stream call-to-action text"
+                                                bind:value={translationForms[language.code].cta}
+                                            />
+                                            {#if translationErrors[language.code]?.cta}
+                                                <p class="text-sm text-destructive">{translationErrors[language.code].cta[0]}</p>
                                             {/if}
                                         </div>
 

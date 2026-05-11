@@ -34,6 +34,7 @@ class UpdateSettingRequest extends FormRequest
             'menu' => ['exists:menus,id'],
             'album' => ['exists:albums,id'],
             'event' => ['exists:events,id'],
+            'program' => ['exists:programs,id'],
             default => ['string'],
         };
 

@@ -217,44 +217,16 @@ class LanguageTranslationSeeder extends Seeder
                 'ar' => 'اعرف المزيد',
             ],
             'index_page_pathway_section_title' => [
-                'en' => 'Choose Your Academic Pathway',
-                'ar' => 'اختر مسارك الأكاديمي',
+                'en' => 'Academic Pathways',
+                'ar' => 'المسارات الدراسية',
             ],
             'index_page_pathway_section_subtitle' => [
                 'en' => 'Globally Recognized. Structured for Your Child\'s Future.',
                 'ar' => 'معترف به عالمياً، ومصمم لمستقبل طفلك.',
             ],
-            'index_page_pathway_american_label' => [
+            'index_page_pathway_stream_label' => [
                 'en' => 'Stream',
-                'ar' => 'الأمريكي',
-            ],
-            'index_page_pathway_american_title' => [
-                'en' => 'American',
                 'ar' => 'المسار',
-            ],
-            'index_page_pathway_american_content' => [
-                'en' => 'Continuous pathway from Pre-K to Grade 12, Leads to American High School Diploma, and Cognia Accredited',
-                'ar' => 'مسار متواصل من مرحلة ما قبل الروضة حتى الصف الثاني عشر، يؤدي إلى دبلوم الثانوية الأمريكية، ومعتمد من Cognia',
-            ],
-            'index_page_pathway_american_cta' => [
-                'en' => 'Explore American Pathway',
-                'ar' => 'استكشف المسار الأمريكي',
-            ],
-            'index_page_pathway_british_label' => [
-                'en' => 'Stream',
-                'ar' => 'البريطاني',
-            ],
-            'index_page_pathway_british_title' => [
-                'en' => 'British',
-                'ar' => 'المسار',
-            ],
-            'index_page_pathway_british_content' => [
-                'en' => 'IGCSE (Grades 9–10), A Levels (Grades 11–12), and internationally recognized qualifications',
-                'ar' => 'شهادة IGCSE (الصفين التاسع والعاشر), المستويات المتقدمة A Levels (الصفين الحادي عشر والثاني عشر), ومؤهلات معترف بها دولياً',
-            ],
-            'index_page_pathway_british_cta' => [
-                'en' => 'Explore British Pathway',
-                'ar' => 'استكشف المسار البريطاني',
             ],
             'index_page_articles_section_cta' => [
                 'en' => 'View more news',

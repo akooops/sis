@@ -90,6 +90,8 @@ class ProgramStreamsController extends Controller
             $programStream->setTranslation($field, $defaultLanguage->code, $request->input($field));
         }
 
+        cache()->forget("program-with-streams-{$program->id}");
+
         return inertia('ProgramStreams/Index', [
             'success' => 'Stream created successfully!',
             'program' => $program,
@@ -152,6 +154,8 @@ class ProgramStreamsController extends Controller
             ]
         ));
 
+        cache()->forget("program-with-streams-{$programStream->program_id}");
+
         return inertia('ProgramStreams/Index', [
             'success' => 'Stream updated successfully!',
             'program' => $programStream->program,
@@ -165,6 +169,8 @@ class ProgramStreamsController extends Controller
         foreach ($programStream->getTranslatableFields() as $field) {
             $programStream->setTranslation($field, $language->code, $request->input($field));
         }
+
+        cache()->forget("program-with-streams-{$programStream->program_id}");
 
         return response()->json([
             'status' => 'success',
@@ -183,6 +189,8 @@ class ProgramStreamsController extends Controller
         $programId = $programStream->program_id;
 
         $programStream->delete();
+
+        cache()->forget("program-with-streams-{$programId}");
 
         return redirect()->route('admin.program-streams.index', ['program' => $programId])
             ->with('success', 'Stream deleted successfully');
@@ -209,6 +217,8 @@ class ProgramStreamsController extends Controller
                     'order' => $item['order'],
                 ]);
         }
+
+        cache()->forget("program-with-streams-{$program->id}");
 
         return response()->json([
             'status' => 'success',

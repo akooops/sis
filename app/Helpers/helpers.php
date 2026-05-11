@@ -30,6 +30,16 @@ function getPrograms() {
     });
 }
 
+function getProgramWithStreams($id) {
+    if (! $id) {
+        return null;
+    }
+
+    return cache()->remember("program-with-streams-{$id}", 3600, function() use ($id) {
+        return Program::with('streams')->find($id);
+    });
+}
+
 function getMenu($name) {
     return cache()->remember("menu-{$name}", 3600, function() use ($name) {
         return Menu::where('name', $name)->first();

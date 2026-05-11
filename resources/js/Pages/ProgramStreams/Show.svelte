@@ -97,6 +97,17 @@
                             </div>
 
                             <div class="flex flex-col gap-2">
+                                <h4 class="text-sm font-semibold text-mono">Stream Color</h4>
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="inline-block w-6 h-6 rounded border border-border"
+                                        style="background-color: {programStream?.color}"
+                                    ></span>
+                                    <p class="text-sm text-secondary-foreground">{programStream?.color}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-2">
                                 <h4 class="text-sm font-semibold text-mono">Created At</h4>
                                 <p class="text-sm text-secondary-foreground">
                                     {programStream?.created_at ? new Date(programStream.created_at).toLocaleDateString('en-US', {
@@ -166,6 +177,15 @@
                                     </h4>
                                     <p class="text-sm text-secondary-foreground p-3 bg-muted/50 rounded-lg">
                                         {getTranslation('description', language.code)}
+                                    </p>
+                                </div>
+
+                                <div class="flex flex-col gap-2">
+                                    <h4 class="text-sm font-semibold text-mono">
+                                        Stream {language.name} CTA
+                                    </h4>
+                                    <p class="text-sm text-secondary-foreground p-3 bg-muted/50 rounded-lg">
+                                        {getTranslation('cta', language.code)}
                                     </p>
                                 </div>
 

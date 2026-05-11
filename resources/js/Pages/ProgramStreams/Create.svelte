@@ -38,9 +38,11 @@
     let form = {
         name: '',
         slug: '',
+        color: '#0d6efd',
         title: '',
         description: '',
-        content: ''
+        content: '',
+        cta: ''
     };
 
     // Form errors
@@ -182,6 +184,33 @@
                                     <p class="text-sm text-destructive">{errors.slug}</p>
                                 {/if}
                             </div>
+
+                            <!-- Stream Color -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="color">
+                                    Stream Color <span class="text-destructive">*</span>
+                                </label>
+                                <div class="flex items-center gap-3">
+                                    <input
+                                        id="color"
+                                        type="color"
+                                        class="kt-input h-10 w-16 p-1 {errors.color ? 'kt-input-error' : ''}"
+                                        bind:value={form.color}
+                                    />
+                                    <input
+                                        type="text"
+                                        class="kt-input {errors.color ? 'kt-input-error' : ''}"
+                                        placeholder="#0d6efd"
+                                        bind:value={form.color}
+                                    />
+                                </div>
+                                <p class="text-xs text-secondary-foreground">
+                                    Used for the stream title, underline and CTA button on the homepage pathway section.
+                                </p>
+                                {#if errors.color}
+                                    <p class="text-sm text-destructive">{errors.color}</p>
+                                {/if}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -224,6 +253,23 @@
                                 ></textarea>
                                 {#if errors.description}
                                     <p class="text-sm text-destructive">{errors.description}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Stream CTA -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="cta">
+                                    Stream CTA <span class="text-destructive">*</span>
+                                </label>
+                                <input
+                                    id="cta"
+                                    type="text"
+                                    class="kt-input {errors.cta ? 'kt-input-error' : ''}"
+                                    placeholder="Enter stream call-to-action text"
+                                    bind:value={form.cta}
+                                />
+                                {#if errors.cta}
+                                    <p class="text-sm text-destructive">{errors.cta}</p>
                                 {/if}
                             </div>
 

@@ -22,6 +22,6 @@ class ProgramStream extends Model
     //Accessors & Mutators
     public function getTranslatableFields(): array
     {
-        return ['title', 'description', 'content'];
+        return ['title', 'description', 'content', 'cta'];
     }
 }

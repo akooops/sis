@@ -146,6 +146,15 @@ class SettingsSeeder extends Seeder
 
             // Academic Pathways
             [
+                'key' => 'pathway_program_id',
+                'type' => 'program',
+                'value' => '',
+                'description' => 'Program whose streams power the "Choose Your Academic Pathway" section on the homepage',
+                'group' => 'pathway',
+                'is_encrypted' => false,
+                'options' => null,
+            ],
+            [
                 'key' => 'pathway_american_url',
                 'type' => 'text',
                 'value' => '',

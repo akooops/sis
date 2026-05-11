@@ -24,6 +24,7 @@ class UpdateProgramStreamRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:500|unique:program_streams,slug,'.$programStream->id,
+            'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
         ];
     }
 }

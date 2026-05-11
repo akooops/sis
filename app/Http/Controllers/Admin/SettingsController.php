@@ -26,7 +26,7 @@ class SettingsController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $settings = Setting::with('page')->orderBy('group')->orderBy('key');
+        $settings = Setting::with(['page', 'program'])->orderBy('group')->orderBy('key');
 
         if ($search) {
             $settings->where(function($query) use ($search) {

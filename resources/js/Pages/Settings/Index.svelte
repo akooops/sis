@@ -120,7 +120,7 @@
         // Handle different value types
         if (setting.type === 'array') {
             setting.value = Array.isArray(newValue) ? newValue : [newValue];
-        } else if (setting.type === 'page') {
+        } else if (setting.type === 'page' || setting.type === 'program') {
             setting.value = newValue.data?.id || newValue;
         } else {
             setting.value = newValue;
@@ -151,6 +151,12 @@
 
     // Toggle page selection mode
     function togglePageSelection(setting) {
+        setting.showingSelect = !setting.showingSelect;
+        settings = settings; // Trigger reactivity
+    }
+
+    // Toggle program selection mode
+    function toggleProgramSelection(setting) {
         setting.showingSelect = !setting.showingSelect;
         settings = settings; // Trigger reactivity
     }
@@ -442,6 +448,61 @@
                                                                                 results: data.pages.map(page => ({
                                                                                     id: page.id,
                                                                                     text: page.name
+                                                                                }))
+                                                                            };
+                                                                        },
+                                                                        cache: true
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        {/if}
+                                                    {:else if setting.type === 'program'}
+                                                        {#if setting.program && !setting.showingSelect}
+                                                            <div class="flex items-center gap-2 flex-1">
+                                                                <span class="kt-badge kt-badge-outline kt-badge-success flex-1 text-left">
+                                                                    <i class="ki-filled ki-element-11 text-sm me-1"></i>
+                                                                    {setting.program.name}
+                                                                </span>
+                                                                <button
+                                                                    class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost"
+                                                                    on:click={() => toggleProgramSelection(setting)}
+                                                                    title="Change program selection"
+                                                                >
+                                                                    <i class="ki-filled ki-cross text-sm"></i>
+                                                                </button>
+                                                            </div>
+                                                        {:else}
+                                                            <div class="flex-1">
+                                                                <Select2
+                                                                    id="program-select-{setting.id}"
+                                                                    placeholder="Select a program..."
+                                                                    bind:value={setting.value}
+                                                                    on:select={(e) => {
+                                                                        handleValueChange(setting, e.detail);
+                                                                        // Update the program data for the badge
+                                                                        setting.program = {
+                                                                            id: e.detail.data.id,
+                                                                            name: e.detail.data.text
+                                                                        };
+                                                                        setting.showingSelect = false;
+                                                                        settings = settings; // Trigger reactivity
+                                                                    }}
+                                                                    data={[]}
+                                                                    ajax={{
+                                                                        url: route('admin.programs.index'),
+                                                                        dataType: 'json',
+                                                                        delay: 300,
+                                                                        data: function(params) {
+                                                                            return {
+                                                                                search: params.term,
+                                                                                perPage: 10
+                                                                            };
+                                                                        },
+                                                                        processResults: function(data) {
+                                                                            return {
+                                                                                results: data.programs.map(program => ({
+                                                                                    id: program.id,
+                                                                                    text: program.name
                                                                                 }))
                                                                             };
                                                                         },

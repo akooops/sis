@@ -7,8 +7,12 @@
 @section('content')
 
 @php
-    $pathwayAmericanUrl = getSetting('pathway_american_url');
-    $pathwayBritishUrl = getSetting('pathway_british_url');
+    $currentLanguage = getCurrentLanguage();
+
+    $pathwayProgramSetting = getSetting('pathway_program_id');
+    $pathwayProgram = $pathwayProgramSetting && !empty($pathwayProgramSetting->value)
+        ? getProgramWithStreams($pathwayProgramSetting->value)
+        : null;
 @endphp
 
 
@@ -92,58 +96,42 @@
         </div>
         <!--/.row -->
 
-        <div class="row" data-aos="fade-up" data-aos-duration="1500">
-            <div class="col-lg-6 my-4">
-                <div class="card">
-                    <div class="card-body pathway-american">
-                        <div class="px-4">
-                            <h3 class="mb-6">
-                                <span class="stream-name">{{getLanguageKeyLocalTranslation('index_page_pathway_american_title')}}</span>
-                                <span class="stream-label">{{getLanguageKeyLocalTranslation('index_page_pathway_american_label')}}</span>
-                            </h3>
-    
-                            <p>
-                                {{getLanguageKeyLocalTranslation('index_page_pathway_american_content')}}
-                            </p>
+        @if ($pathwayProgram && $pathwayProgram->has_streams && $pathwayProgram->streams->count() > 0)
+            <div class="row" data-aos="fade-up" data-aos-duration="1500">
+                @foreach ($pathwayProgram->streams as $stream)
+                    <div class="col-lg-6 my-4">
+                        <div class="card">
+                            <div class="card-body pathway-stream" style="--stream-color: {{ $stream->color }};">
+                                <div class="px-4">
+                                    <h3 class="mb-6">
+                                        @if ($currentLanguage && $currentLanguage->is_rtl)
+                                            <span class="stream-label">{{ getLanguageKeyLocalTranslation('index_page_pathway_stream_label') }}</span>
+                                            <span class="stream-name">{{ $stream->getLocalTranslation('title') }}</span>
+                                        @else
+                                            <span class="stream-name">{{ $stream->getLocalTranslation('title') }}</span>
+                                            <span class="stream-label">{{ getLanguageKeyLocalTranslation('index_page_pathway_stream_label') }}</span>
+                                        @endif
+                                    </h3>
+
+                                    <p>
+                                        {!! nl2br(e($stream->getLocalTranslation('description'))) !!}
+                                    </p>
+                                </div>
+
+                                <a href="{{ route('program', ['slug' => $pathwayProgram->slug]) }}?stream={{ $stream->slug }}" class="btn py-1 rounded">
+                                    <span class="mx-4">{{ $stream->getLocalTranslation('cta') }}</span>
+                                    <i class="uil uil-arrow-right"></i>
+                                </a>
+                            </div>
+                            <!--/.card-body -->
                         </div>
-
-                        <a href="{{$pathwayAmericanUrl && !empty($pathwayAmericanUrl->value) ? $pathwayAmericanUrl->value : '#'}}" class="btn py-1 rounded">
-                            <span class="mx-4">{{getLanguageKeyLocalTranslation('index_page_pathway_american_cta')}}</span>
-                                <i class="uil uil-arrow-right"></i>
-                        </a>
+                        <!--/.card -->
                     </div>
-                    <!--/.card-body -->
-                </div>
-                <!--/.card -->
+                    <!--/column -->
+                @endforeach
             </div>
-            <!--/column -->
-
-            <div class="col-lg-6 my-4">
-                <div class="card">
-                    <div class="card-body pathway-british">
-                        <div class="px-4">
-                            <h3 class="mb-6">
-                                <span class="stream-name">{{getLanguageKeyLocalTranslation('index_page_pathway_british_title')}}</span>
-                                <span class="stream-label">{{getLanguageKeyLocalTranslation('index_page_pathway_british_label')}}</span>
-                            </h3>
-    
-                            <p>
-                                {{getLanguageKeyLocalTranslation('index_page_pathway_british_content')}}
-                            </p>
-                        </div>
-
-                        <a href="{{$pathwayBritishUrl && !empty($pathwayBritishUrl->value) ? $pathwayBritishUrl->value : '#'}}" class="btn py-1 rounded">
-                            <span class="mx-4">{{getLanguageKeyLocalTranslation('index_page_pathway_british_cta')}}</span>
-                            <i class="uil uil-arrow-right"></i>
-                        </a>
-                    </div>
-                    <!--/.card-body -->
-                </div>
-                <!--/.card -->
-            </div>
-            <!--/column -->
-        </div>
-        <!--/.row -->
+            <!--/.row -->
+        @endif
     </div>
     <!-- /.container -->
 </section>

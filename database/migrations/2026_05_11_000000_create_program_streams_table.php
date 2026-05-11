@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('program_id')->constrained('programs')->cascadeOnDelete();
             $table->string('name');
             $table->string('slug')->unique();
+            $table->string('color', 7)->default('#0d6efd');
             $table->integer('order')->default(0);
             $table->timestamps();
         });

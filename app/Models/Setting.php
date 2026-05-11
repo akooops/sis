@@ -23,6 +23,11 @@ class Setting extends Model
         return $this->belongsTo(Page::class, 'value', 'id');
     }
 
+    public function program()
+    {
+        return $this->belongsTo(Program::class, 'value', 'id');
+    }
+
     //Boot
     protected static function boot()
     {

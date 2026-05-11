@@ -24,9 +24,11 @@ class StoreProgramStreamRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:500|unique:program_streams,slug',
+            'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'title' => 'required|string|max:1000',
             'description' => 'required|string|max:3000',
             'content' => 'required|string',
+            'cta' => 'required|string|max:255',
         ];
     }
 }

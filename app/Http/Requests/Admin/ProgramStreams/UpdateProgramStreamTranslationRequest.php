@@ -25,6 +25,7 @@ class UpdateProgramStreamTranslationRequest extends FormRequest
             'title' => 'required|string|max:1000',
             'description' => 'required|string|max:3000',
             'content' => 'required|string',
+            'cta' => 'required|string|max:255',
             'language_id' => 'required|exists:languages,id',
         ];
     }
