@@ -342,8 +342,8 @@ p {
 }
 
 .pathway-section .card p {
-    font-size: 15px;
-    line-height: 26px;
+    font-size: 14px;
+    line-height: 32px;
     color: var(--bs-dark);
     padding: 6px 0;
 }
@@ -1290,11 +1290,6 @@ footer .copyright p {
         line-height: 30px;
     }
 
-    .pathway-section .card p {
-        font-size: 16px;
-        line-height: 27px;
-    }
-
     .pathway-section .btn {
         font-size: 15px;
     }
@@ -1339,11 +1334,6 @@ footer .copyright p {
 
     .pathway-section .row.text-center p {
         font-size: 22px;
-        line-height: 32px;
-    }
-
-    .pathway-section .card p {
-        font-size: 19px;
         line-height: 32px;
     }
 
