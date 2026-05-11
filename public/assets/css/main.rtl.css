@@ -344,12 +344,8 @@ p {
     border-radius: 2px;
 }
 
-.pathway-american h3 {
-    color: var(--bs-green);
-}
-
-.pathway-british h3 {
-    color: var(--bs-primary);
+.pathway-stream h3 {
+    color: var(--stream-color);
 }
 
 .pathway-section .card p {
@@ -370,26 +366,15 @@ p {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-.pathway-american .btn {
-    color: var(--bs-success);
-    border-color: var(--bs-success);
+.pathway-stream .btn {
+    color: var(--stream-color);
+    border-color: var(--stream-color);
 }
 
-.pathway-american .btn:hover {
-    background: var(--bs-success);
+.pathway-stream .btn:hover {
+    background: var(--stream-color);
     color: #fff;
-    border-color: var(--bs-success);
-}
-
-.pathway-british .btn {
-    color: var(--bs-primary);
-    border-color: var(--bs-primary);
-}
-
-.pathway-british .btn:hover {
-    background: var(--bs-primary);
-    color: #fff;
-    border-color: var(--bs-primary);
+    border-color: var(--stream-color);
 }
 
 .pathway-section .btn i {
