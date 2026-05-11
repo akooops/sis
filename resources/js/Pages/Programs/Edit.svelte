@@ -31,6 +31,7 @@
     let form = {
         name: program?.name || '',
         slug: program?.slug || '',
+        has_streams: program?.has_streams ? true : false,
         media_option: 'upload',
         file: null,
         media_id: ''
@@ -151,11 +152,16 @@
     // Handle basic form submission
     function handleSubmit() {
         loading = true;
-        
+
         const formData = new FormData();
-        
+
         // Add form fields
         Object.keys(form).forEach(key => {
+            if (key === 'has_streams') {
+                formData.append(key, form.has_streams ? '1' : '0');
+                return;
+            }
+
             if (form[key] !== null && form[key] !== '') {
                 if (key === 'file' && form.file) {
                     formData.append(key, form.file);
@@ -348,6 +354,24 @@
                                             {#if errors.slug}
                                                 <p class="text-sm text-destructive">{errors.slug}</p>
                                             {/if}
+                                        </div>
+
+                                        <!-- Has Streams Toggle -->
+                                        <div class="flex flex-col gap-2">
+                                            <div class="flex items-center gap-2">
+                                                <input
+                                                    class="kt-switch"
+                                                    type="checkbox"
+                                                    id="has-streams-switch"
+                                                    bind:checked={form.has_streams}
+                                                />
+                                                <label class="kt-label" for="has-streams-switch">
+                                                    This program has streams
+                                                </label>
+                                            </div>
+                                            <p class="text-xs text-secondary-foreground">
+                                                When enabled, content is managed per stream (e.g. American, British) instead of on the program itself.
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -598,27 +622,33 @@
                                             {/if}
                                         </div>
 
-                                        <!-- Program Content -->
-                                        <div class="flex flex-col gap-2">
-                                            <label class="text-sm font-medium text-mono" for="content-{language.id}">
-                                                Content <span class="text-destructive">*</span>
-                                            </label>
-                                            <Summernote
-                                                bind:this={summernoteEditors[language.code]}
-                                                id="content-{language.id}"
-                                                bind:value={translationForms[language.code].content}
-                                                placeholder="Enter program content"
-                                                height={400}
-                                                minHeight={300}
-                                                maxHeight={600}
-                                                on:change={(event) => {
-                                                    translationForms[language.code].content = event.detail.contents;
-                                                }}
-                                            />
-                                            {#if translationErrors[language.code]?.content}
-                                                <p class="text-sm text-destructive">{translationErrors[language.code].content[0]}</p>
-                                            {/if}
-                                        </div>
+                                        <!-- Program Content (managed per-stream when the program has streams) -->
+                                        {#if !program?.has_streams}
+                                            <div class="flex flex-col gap-2">
+                                                <label class="text-sm font-medium text-mono" for="content-{language.id}">
+                                                    Content <span class="text-destructive">*</span>
+                                                </label>
+                                                <Summernote
+                                                    bind:this={summernoteEditors[language.code]}
+                                                    id="content-{language.id}"
+                                                    bind:value={translationForms[language.code].content}
+                                                    placeholder="Enter program content"
+                                                    height={400}
+                                                    minHeight={300}
+                                                    maxHeight={600}
+                                                    on:change={(event) => {
+                                                        translationForms[language.code].content = event.detail.contents;
+                                                    }}
+                                                />
+                                                {#if translationErrors[language.code]?.content}
+                                                    <p class="text-sm text-destructive">{translationErrors[language.code].content[0]}</p>
+                                                {/if}
+                                            </div>
+                                        {:else}
+                                            <p class="text-sm text-secondary-foreground">
+                                                Content for this language will be managed per stream.
+                                            </p>
+                                        {/if}
 
                                         <!-- Form Actions -->
                                         <div class="flex items-center justify-end gap-3 pt-4">

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Admin\Programs;
+namespace App\Http\Requests\Admin\ProgramStreams;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateProgramTranslationRequest extends FormRequest
+class StoreProgramStreamRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,14 +21,12 @@ class UpdateProgramTranslationRequest extends FormRequest
      */
     public function rules(): array
     {
-        $program = $this->route('program');
-
         return [
-            'title' => 'required|string|max:255',
-            'subtitle' => 'nullable|string|max:3000',
-            'description' => 'required|string',
-            'content' => $program && $program->has_streams ? 'nullable|string' : 'required|string',
-            'language_id' => 'required|exists:languages,id',
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:500|unique:program_streams,slug',
+            'title' => 'required|string|max:1000',
+            'description' => 'required|string|max:3000',
+            'content' => 'required|string',
         ];
     }
 }

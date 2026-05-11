@@ -383,7 +383,26 @@ class PagesController extends Controller
 
         $programs = Program::get();
 
-        return view('program', compact('program', 'programs'));
+        // Resolve the active stream from the `?stream=` query param so the
+        // matching tab can be auto-selected on first paint, falling back to
+        // the first ordered stream when no/invalid slug is supplied.
+        $activeStream = null;
+
+        if ($program->has_streams) {
+            $program->load('streams');
+
+            $streamSlug = $request->query('stream');
+
+            if ($streamSlug) {
+                $activeStream = $program->streams->firstWhere('slug', $streamSlug);
+            }
+
+            if (! $activeStream) {
+                $activeStream = $program->streams->first();
+            }
+        }
+
+        return view('program', compact('program', 'programs', 'activeStream'));
     }
 
     public function grade(Request $request, $slug)

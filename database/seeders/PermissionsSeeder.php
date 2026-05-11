@@ -79,6 +79,14 @@ class PermissionsSeeder extends Seeder
             'admin.programs.destroy',
             'admin.programs.order',
 
+            // Program Streams Management
+            'admin.program-streams.index',
+            'admin.program-streams.store',
+            'admin.program-streams.show',
+            'admin.program-streams.update',
+            'admin.program-streams.destroy',
+            'admin.program-streams.order',
+
             // Grades Management
             'admin.grades.index',
             'admin.grades.store',

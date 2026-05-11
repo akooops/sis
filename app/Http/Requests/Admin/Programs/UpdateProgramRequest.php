@@ -19,12 +19,13 @@ class UpdateProgramRequest extends FormRequest
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
-    {        
+    {
         $program = $this->route('program');
 
         return [
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:500|unique:programs,slug,'.$program->id,
+            'has_streams' => 'nullable|boolean',
             'file' => 'nullable|file|image',
             'media_id' => 'nullable|exists:media,id',
         ];

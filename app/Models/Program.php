@@ -17,6 +17,10 @@ class Program extends Model
 
     protected $appends = ['thumbnailUrl'];
 
+    protected $casts = [
+        'has_streams' => 'boolean',
+    ];
+
     //Relationships
     public function file()
     {
@@ -25,6 +29,11 @@ class Program extends Model
 
     public function grades(){
         return $this->hasMany(Grade::class, 'program_id', 'id')->orderBy('order');;
+    }
+
+    public function streams()
+    {
+        return $this->hasMany(ProgramStream::class, 'program_id', 'id')->orderBy('order');
     }
 
     //Accessors & Mutators

@@ -91,13 +91,58 @@
 
             <hr class="mt-2 mb-4" data-aos="fade-up" data-aos-duration="1500">
 
-            <div class="w-100" data-aos="fade-up" data-aos-duration="2000">
-                {!! $program->getLocalTranslation('content') !!}
-            </div>
+            @if ($program->has_streams && $program->streams->count() > 0)
+                <ul class="nav nav-tabs nav-tabs-basic" data-aos="fade-up" data-aos-duration="2000">
+                    @foreach ($program->streams as $stream)
+                        <li class="nav-item">
+                            <a class="nav-link {{ optional($activeStream)->id === $stream->id ? 'active' : '' }}"
+                               data-bs-toggle="tab"
+                               data-stream-slug="{{ $stream->slug }}"
+                               href="#stream-{{ $stream->slug }}">
+                                {{ $stream->getLocalTranslation('title') }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+
+                <div class="tab-content mt-4 mt-md-5" data-aos="fade-up" data-aos-duration="2000">
+                    @foreach ($program->streams as $stream)
+                        <div class="tab-pane fade {{ optional($activeStream)->id === $stream->id ? 'show active' : '' }}"
+                             id="stream-{{ $stream->slug }}">
+                            {!! $stream->getLocalTranslation('content') !!}
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="w-100" data-aos="fade-up" data-aos-duration="2000">
+                    {!! $program->getLocalTranslation('content') !!}
+                </div>
+            @endif
         </div>
     </div>
 </section>
 
 @endsection
 @section('script')
+    @if ($program->has_streams && $program->streams->count() > 0)
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Keep the `?stream=` query param in sync with the active tab so
+                // the URL stays shareable and the back/forward buttons make sense.
+                document.querySelectorAll('[data-bs-toggle="tab"][data-stream-slug]').forEach(function (tab) {
+                    tab.addEventListener('shown.bs.tab', function (event) {
+                        var slug = event.target.getAttribute('data-stream-slug');
+
+                        if (!slug) {
+                            return;
+                        }
+
+                        var url = new URL(window.location.href);
+                        url.searchParams.set('stream', slug);
+                        window.history.replaceState({}, '', url.toString());
+                    });
+                });
+            });
+        </script>
+    @endif
 @endsection

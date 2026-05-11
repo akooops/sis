@@ -83,7 +83,13 @@ class ProgramsController extends Controller
         ])->first();
 
         foreach($program->getTranslatableFields() as $field){
-            $program->setTranslation($field, $defaultLanguage->code, $request->input($field));    
+            // Programs that use streams keep their content per-stream, so we
+            // skip seeding the program-level content translation in that case.
+            if ($field === 'content' && $program->has_streams) {
+                continue;
+            }
+
+            $program->setTranslation($field, $defaultLanguage->code, $request->input($field));
         }
 
         $media = null;

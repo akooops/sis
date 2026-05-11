@@ -4,6 +4,9 @@
     import { onMount, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
 
+    // Props from the server
+    export let program;
+
     // Define breadcrumbs for this page
     const breadcrumbs = [
         {
@@ -12,16 +15,21 @@
             active: false
         },
         {
-            title: 'Index',
-            url: route('admin.programs.index'),
+            title: program?.name || 'Program',
+            url: route('admin.program-streams.index', { program: program?.id }),
+            active: false
+        },
+        {
+            title: 'Streams',
+            url: route('admin.program-streams.index', { program: program?.id }),
             active: true
         }
     ];
     
-    const pageTitle = 'Programs';
+    const pageTitle = 'Streams';
 
     // Reactive variables
-    let programs = [];
+    let programStreams = [];
     let pagination = {};
     let loading = true;
     let search = '';
@@ -29,17 +37,12 @@
     let currentPage = 1;
     let searchTimeout;
 
-    // Fetch programs data
-    async function fetchPrograms() {
+    // Fetch streams data
+    async function fetchProgramStreams() {
         loading = true;
         try {
-            const params = new URLSearchParams({
-                page: currentPage,
-                perPage: perPage,
-                search: search
-            });
-            
-            const response = await fetch(route('admin.programs.index', {
+            const response = await fetch(route('admin.program-streams.index', {
+                program: program.id,
                 page: currentPage,
                 perPage: perPage,
                 search: search
@@ -50,7 +53,7 @@
             });
             
             const data = await response.json();
-            programs = data.programs;
+            programStreams = data.programStreams;
             pagination = data.pagination;
             
             // Wait for DOM to update, then initialize menus
@@ -59,7 +62,7 @@
                 window.KTMenu.init();
             }
         } catch (error) {
-            console.error('Error fetching programs:', error);
+            console.error('Error fetching streams:', error);
         } finally {
             loading = false;
         }
@@ -67,15 +70,13 @@
 
     // Handle search with debouncing
     function handleSearch() {
-        // Clear existing timeout
         if (searchTimeout) {
             clearTimeout(searchTimeout);
         }
-        
-        // Set new timeout for 500ms
+
         searchTimeout = setTimeout(() => {
             currentPage = 1;
-            fetchPrograms();
+            fetchProgramStreams();
         }, 500);
     }
 
@@ -89,7 +90,7 @@
     function goToPage(page) {
         if (page && page !== currentPage) {
             currentPage = page;
-            fetchPrograms();
+            fetchProgramStreams();
         }
     }
 
@@ -97,12 +98,12 @@
     function handlePerPageChange(newPerPage) {
         perPage = newPerPage;
         currentPage = 1;
-        fetchPrograms();
+        fetchProgramStreams();
     }
 
-    // Delete program
-    async function deleteProgram(programId) {
-        if (!confirm('Are you sure you want to delete this program? This action cannot be undone.')) {
+    // Delete stream
+    async function deleteProgramStream(programStreamId) {
+        if (!confirm('Are you sure you want to delete this stream? This action cannot be undone.')) {
             return;
         }
 
@@ -111,7 +112,7 @@
             formData.append('_method', 'DELETE');
             formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
 
-            const response = await fetch(route('admin.programs.destroy', { program: programId }), {
+            const response = await fetch(route('admin.program-streams.destroy', { programStream: programStreamId }), {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -120,19 +121,17 @@
             });
 
             if (response.ok) {
-                // Show success toast
                 KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Program deleted successfully!",
+                    message: "Stream deleted successfully!",
                     variant: "success",
                     position: "bottom-right",
                 });
 
-                // Refresh the programs list
-                fetchPrograms();
+                fetchProgramStreams();
             } else {
                 const errorData = await response.json().catch(() => ({}));
-                const errorMessage = errorData.message || 'Error deleting program. Please try again.';
+                const errorMessage = errorData.message || 'Error deleting stream. Please try again.';
                 
                 KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
@@ -142,7 +141,7 @@
                 });
             }
         } catch (error) {
-            console.error('Error deleting program:', error);
+            console.error('Error deleting stream:', error);
             
             KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
@@ -154,7 +153,7 @@
     }
 
     onMount(() => {
-        fetchPrograms();
+        fetchProgramStreams();
     });
 
     // Flash message handling
@@ -178,30 +177,34 @@
     <!-- Container -->
     <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
-            <!-- Program Header -->
+            <!-- Streams Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Programs Management</h1>
+                    <h1 class="text-2xl font-bold text-mono">Streams Management</h1>
                     <p class="text-sm text-secondary-foreground">
-                        Manage your website programs and content
+                        Manage streams for "{program?.name}"
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    {#if hasPermission('admin.programs.order')}
-                    <a href="{route('admin.programs.order-page')}" class="kt-btn kt-btn-outline">
-                        Order Programs
+                    <a href="{route('admin.programs.index')}" class="kt-btn kt-btn-outline">
+                        <i class="ki-filled ki-arrow-left text-base"></i>
+                        Back to Programs
+                    </a>
+                    {#if hasPermission('admin.program-streams.order')}
+                    <a href="{route('admin.program-streams.order-page', { program: program?.id })}" class="kt-btn kt-btn-outline">
+                        Order Streams
                     </a>
                     {/if}
-                    {#if hasPermission('admin.programs.store')}
-                    <a href="{route('admin.programs.create')}" class="kt-btn kt-btn-primary">
+                    {#if hasPermission('admin.program-streams.store')}
+                    <a href="{route('admin.program-streams.create', { program: program?.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-plus text-base"></i>
-                        Add New Program
+                        Add New Stream
                     </a>
                     {/if}
                 </div>
             </div>
 
-            <!-- Programs Table -->
+            <!-- Streams Table -->
             <div class="kt-card">
                 <div class="kt-card-header">
                     <div class="kt-card-toolbar">
@@ -210,7 +213,7 @@
                             <input 
                                 type="text" 
                                 class="kt-input" 
-                                placeholder="Search programs..." 
+                                placeholder="Search streams..." 
                                 bind:value={search}
                                 on:input={handleSearchInput}
                             />
@@ -233,7 +236,7 @@
                                     </th>
                                     <th class="min-w-[200px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Program</span>
+                                            <span class="kt-table-col-label">Stream</span>
                                         </span>
                                     </th>
                                     <th class="min-w-[150px]">
@@ -250,7 +253,6 @@
                             </thead>
                             <tbody>
                                 {#if loading}
-                                    <!-- Loading skeleton rows -->
                                     {#each Array(perPage) as _, i}
                                         <tr>
                                             <td class="p-4">
@@ -276,56 +278,47 @@
                                             </td>
                                         </tr>
                                     {/each}
-                                {:else if programs.length === 0}
-                                    <!-- Empty state -->
+                                {:else if !programStreams || programStreams.length === 0}
                                     <tr>
-                                        <td colspan="8" class="p-10">
+                                        <td colspan="5" class="p-10">
                                             <div class="flex flex-col items-center justify-center text-center">
                                                 <div class="mb-4">
-                                                    <i class="ki-filled ki-document text-4xl text-muted-foreground"></i>
+                                                    <i class="ki-filled ki-element-11 text-4xl text-muted-foreground"></i>
                                                 </div>
-                                                <h3 class="text-lg font-semibold text-mono mb-2">No programs found</h3>
+                                                <h3 class="text-lg font-semibold text-mono mb-2">No streams found</h3>
                                                 <p class="text-sm text-secondary-foreground mb-4">
-                                                    {search ? 'No programs match your search criteria.' : 'Get started by creating your first program.'}
+                                                    {search ? 'No streams match your search criteria.' : 'Get started by creating your first stream.'}
                                                 </p>
-                                                {#if hasPermission('admin.programs.store')}
-                                                <a href="{route('admin.programs.create')}" class="kt-btn kt-btn-primary">
+                                                {#if hasPermission('admin.program-streams.store')}
+                                                <a href="{route('admin.program-streams.create', { program: program?.id })}" class="kt-btn kt-btn-primary">
                                                     <i class="ki-filled ki-plus text-base"></i>
-                                                    Create First Program
+                                                    Create First Stream
                                                 </a>
                                                 {/if}
                                             </div>
                                         </td>
                                     </tr>
                                 {:else}
-                                    <!-- Actual data rows -->
-                                    {#each programs as program}
+                                    {#each programStreams as programStream}
                                         <tr class="hover:bg-muted/50">
                                             <td>
-                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={program.id}/>
+                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={programStream.id}/>
                                             </td>
                                             <td>
-                                                <span class="text-sm font-medium text-mono">#{program.id}</span>
+                                                <span class="text-sm font-medium text-mono">#{programStream.id}</span>
                                             </td>
                                             <td>
                                                 <div class="flex items-center gap-3">
-                                                    <div class="flex-shrink-0">
-                                                        <img 
-                                                            src={program.thumbnailUrl} 
-                                                            alt={program.name}
-                                                            class="w-10 h-10 rounded-lg object-cover"
-                                                        />
-                                                    </div>
                                                     <div class="flex flex-col gap-1">
                                                         <span class="text-sm font-medium text-mono hover:text-primary">
-                                                            {program.name}
+                                                            {programStream.name}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
                                                 <span class="kt-badge kt-badge-outline kt-badge-primary">
-                                                    {program.slug}
+                                                    {programStream.slug}
                                                 </span>
                                             </td>
                                             <td class="text-center">
@@ -335,29 +328,9 @@
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
-                                                            {#if hasPermission('admin.grades.index')}
+                                                            {#if hasPermission('admin.program-streams.show')}
                                                             <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.grades.index', { program_id: program.id, program_name: program.name })}>
-                                                                    <span class="kt-menu-icon">
-                                                                        <i class="ki-filled ki-abstract-26"></i>
-                                                                    </span>
-                                                                    <span class="kt-menu-title">Grades</span>
-                                                                </a>
-                                                            </div>
-                                                            {/if}
-                                                            {#if program.has_streams && hasPermission('admin.program-streams.index')}
-                                                            <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.program-streams.index', { program: program.id })}>
-                                                                    <span class="kt-menu-icon">
-                                                                        <i class="ki-filled ki-element-11"></i>
-                                                                    </span>
-                                                                    <span class="kt-menu-title">Streams</span>
-                                                                </a>
-                                                            </div>
-                                                            {/if}
-                                                            {#if hasPermission('admin.programs.show')}
-                                                            <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.programs.show', { program: program.id })}>
+                                                                <a class="kt-menu-link" href={route('admin.program-streams.show', { programStream: programStream.id })}>
                                                                     <span class="kt-menu-icon">
                                                                         <i class="ki-filled ki-search-list"></i>
                                                                     </span>
@@ -365,9 +338,9 @@
                                                                 </a>
                                                             </div>
                                                             {/if}
-                                                            {#if hasPermission('admin.programs.update')}
+                                                            {#if hasPermission('admin.program-streams.update')}
                                                             <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.programs.edit', { program: program.id })}>
+                                                                <a class="kt-menu-link" href={route('admin.program-streams.edit', { programStream: programStream.id })}>
                                                                     <span class="kt-menu-icon">
                                                                         <i class="ki-filled ki-pencil"></i>
                                                                     </span>
@@ -375,10 +348,10 @@
                                                                 </a>
                                                             </div>
                                                             {/if}
-                                                            {#if hasPermission('admin.programs.destroy')}
+                                                            {#if hasPermission('admin.program-streams.destroy')}
                                                                 <div class="kt-menu-separator"></div>
                                                                 <div class="kt-menu-item">
-                                                                    <button class="kt-menu-link" on:click={() => deleteProgram(program.id)}>
+                                                                    <button class="kt-menu-link" on:click={() => deleteProgramStream(programStream.id)}>
                                                                         <span class="kt-menu-icon">
                                                                             <i class="ki-filled ki-trash"></i>
                                                                         </span>

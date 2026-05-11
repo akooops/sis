@@ -25,11 +25,12 @@ class StoreProgramRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:500|unique:programs,slug',
+            'has_streams' => 'nullable|boolean',
             'title' => 'required|string|max:1000',
             'subtitle' => 'nullable|string|max:3000',
             'description' => 'required|string|max:3000',
-            'content' => 'required|string',
-            'file' => 'nullable|file|image', 
+            'content' => 'nullable|required_unless:has_streams,1|string',
+            'file' => 'nullable|file|image',
             'media_id' => 'nullable|exists:media,id',
         ];
     }

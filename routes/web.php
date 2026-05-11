@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\PagesController;
 use App\Http\Controllers\Admin\PartnersController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\ProgramsController;
+use App\Http\Controllers\Admin\ProgramStreamsController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UsersController;
@@ -163,6 +164,19 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::patch('programs/{program}/update-translation', [ProgramsController::class, 'updateTranslation'])->middleware('check.permission:admin.programs.update')->name('admin.programs.update-translation');
     Route::patch('programs/{program}', [ProgramsController::class, 'update'])->middleware('check.permission:admin.programs.update')->name('admin.programs.update');
     Route::delete('programs/{program}', [ProgramsController::class, 'destroy'])->middleware('check.permission:admin.programs.destroy')->name('admin.programs.destroy');
+
+    // Program Streams
+    Route::get('programs/{program}/streams/order', [ProgramStreamsController::class, 'orderPage'])->middleware('check.permission:admin.program-streams.order')->name('admin.program-streams.order-page');
+    Route::post('programs/{program}/streams/order', [ProgramStreamsController::class, 'order'])->middleware('check.permission:admin.program-streams.order')->name('admin.program-streams.order');
+
+    Route::get('programs/{program}/streams', [ProgramStreamsController::class, 'index'])->middleware('check.permission:admin.program-streams.index')->name('admin.program-streams.index');
+    Route::get('programs/{program}/streams/create', [ProgramStreamsController::class, 'create'])->middleware('check.permission:admin.program-streams.store')->name('admin.program-streams.create');
+    Route::post('programs/{program}/streams', [ProgramStreamsController::class, 'store'])->middleware('check.permission:admin.program-streams.store')->name('admin.program-streams.store');
+    Route::get('program-streams/{programStream}', [ProgramStreamsController::class, 'show'])->middleware('check.permission:admin.program-streams.show')->name('admin.program-streams.show');
+    Route::get('program-streams/{programStream}/edit', [ProgramStreamsController::class, 'edit'])->middleware('check.permission:admin.program-streams.update')->name('admin.program-streams.edit');
+    Route::patch('program-streams/{programStream}/update-translation', [ProgramStreamsController::class, 'updateTranslation'])->middleware('check.permission:admin.program-streams.update')->name('admin.program-streams.update-translation');
+    Route::patch('program-streams/{programStream}', [ProgramStreamsController::class, 'update'])->middleware('check.permission:admin.program-streams.update')->name('admin.program-streams.update');
+    Route::delete('program-streams/{programStream}', [ProgramStreamsController::class, 'destroy'])->middleware('check.permission:admin.program-streams.destroy')->name('admin.program-streams.destroy');
 
     // Grades
     Route::get('grades/order', [GradesController::class, 'orderPage'])->middleware('check.permission:admin.grades.order')->name('admin.grades.order-page');

@@ -28,6 +28,7 @@
     let form = {
         name: '',
         slug: '',
+        has_streams: false,
         media_option: 'upload',
         file: null,
         media_id: '',
@@ -126,14 +127,24 @@
         loading = true;
 
         // Ensure form.content is up-to-date from Summernote
-        if (summernoteComponent && summernoteComponent.getValue) {
+        if (!form.has_streams && summernoteComponent && summernoteComponent.getValue) {
             form.content = summernoteComponent.getValue();
         }
-        
+
         const formData = new FormData();
-        
+
         // Add form fields
         Object.keys(form).forEach(key => {
+            if (key === 'has_streams') {
+                formData.append(key, form.has_streams ? '1' : '0');
+                return;
+            }
+
+            // Skip content field when the program uses streams (managed per-stream)
+            if (form.has_streams && key === 'content') {
+                return;
+            }
+
             if (form[key] !== null && form[key] !== '') {
                 if (key === 'file' && form.file) {
                     formData.append(key, form.file);
@@ -235,6 +246,24 @@
                                 {#if errors.slug}
                                     <p class="text-sm text-destructive">{errors.slug}</p>
                                 {/if}
+                            </div>
+
+                            <!-- Has Streams Toggle -->
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-2">
+                                    <input
+                                        class="kt-switch"
+                                        type="checkbox"
+                                        id="has-streams-switch"
+                                        bind:checked={form.has_streams}
+                                    />
+                                    <label class="kt-label" for="has-streams-switch">
+                                        This program has streams
+                                    </label>
+                                </div>
+                                <p class="text-xs text-secondary-foreground">
+                                    When enabled, content is managed per stream (e.g. American, British) instead of on the program itself.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -420,27 +449,33 @@
                                 {/if}
                             </div>
 
-                            <!-- Program Content -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="summernote-editor">
-                                    Program Content <span class="text-destructive">*</span>
-                                </label>
-                                <Summernote
-                                    bind:this={summernoteComponent}
-                                    id="summernote-editor"
-                                    bind:value={form.content}
-                                    placeholder="Enter program content"
-                                    height={400}
-                                    minHeight={300}
-                                    maxHeight={600}
-                                    on:change={(event) => {
-                                        form.content = event.detail.contents;
-                                    }}
-                                />
-                                {#if errors.content}
-                                    <p class="text-sm text-destructive">{errors.content}</p>
-                                {/if}
-                            </div>
+                            <!-- Program Content (managed per-stream when the program has streams) -->
+                            {#if !form.has_streams}
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-medium text-mono" for="summernote-editor">
+                                        Program Content <span class="text-destructive">*</span>
+                                    </label>
+                                    <Summernote
+                                        bind:this={summernoteComponent}
+                                        id="summernote-editor"
+                                        bind:value={form.content}
+                                        placeholder="Enter program content"
+                                        height={400}
+                                        minHeight={300}
+                                        maxHeight={600}
+                                        on:change={(event) => {
+                                            form.content = event.detail.contents;
+                                        }}
+                                    />
+                                    {#if errors.content}
+                                        <p class="text-sm text-destructive">{errors.content}</p>
+                                    {/if}
+                                </div>
+                            {:else}
+                                <p class="text-sm text-secondary-foreground">
+                                    Program content will be managed per stream.
+                                </p>
+                            {/if}
                         </div>
                     </div>
                 </div>
