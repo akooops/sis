@@ -1337,6 +1337,13 @@ footer .copyright p {
         line-height: 32px;
     }
 
+    .pathway-section .card p {
+        font-size: 16px;
+        line-height: 32px;
+        color: var(--bs-dark);
+        padding: 6px 0;
+    }    
+
     .grades-section .swiper .swiper-wrapper {
         height: 500px;
     }

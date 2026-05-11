@@ -84,8 +84,8 @@
 <!-- /section -->
 
 <section class="wrapper pathway-section">
-    <div class="container px-8 px-lg-12 px-xl-16 py-16">
-        <div class="row text-center mb-8 px-8 px-lg-16 px-xl-20">
+    <div class="container px-8 py-16">
+        <div class="row text-center mb-8 px-8">
             <h2 class="text-primary mb-2" data-aos="fade-up" data-aos-duration="1000">
                 {{getLanguageKeyLocalTranslation('index_page_pathway_section_title')}}
             </h2>
@@ -102,7 +102,7 @@
                     <div class="col-lg-6 my-4">
                         <div class="card">
                             <div class="card-body pathway-stream" style="--stream-color: {{ $stream->color }};">
-                                <div class="px-4">
+                                <div>
                                     <h3 class="mb-6">
                                         @if ($currentLanguage && $currentLanguage->is_rtl)
                                             <span class="stream-label">{{ getLanguageKeyLocalTranslation('index_page_pathway_stream_label') }}</span>
