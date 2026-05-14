@@ -679,6 +679,10 @@ p {
     border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+.clients .swiper-wrapper {
+    cursor: default !important;
+}
+
 .swiper-container.clients .swiper-slide {
     display: flex;
     align-items: center;
