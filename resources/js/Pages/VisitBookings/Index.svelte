@@ -218,14 +218,6 @@
                         Manage visit bookings and appointments for "{visitService?.name}"
                     </p>
                 </div>
-                <div class="flex items-center gap-3">
-                    {#if hasPermission('admin.visit-bookings.store')}
-                    <a href="{route('admin.visit-bookings.create')}" class="kt-btn kt-btn-primary">
-                        <i class="ki-filled ki-plus text-base"></i>
-                        Add New Visit Booking
-                    </a>
-                    {/if}
-                </div>
             </div>
 
             <!-- Visit Bookings Table -->

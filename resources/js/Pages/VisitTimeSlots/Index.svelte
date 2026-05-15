@@ -30,6 +30,17 @@
         capacity: 10
     };
 
+    // Bulk creation form data
+    const defaultBulkFormData = () => ({
+        start_date: '',
+        end_date: '',
+        days_of_week: [],
+        start_time: '',
+        end_time: '',
+        capacity: 10
+    });
+    let bulkFormData = defaultBulkFormData();
+
     // Form errors
     let errors = {};
 
@@ -37,12 +48,35 @@
     let isEditMode = false;
     let editingTimeSlot = null;
 
+    // Create mode: 'single' or 'bulk' (only relevant when !isEditMode)
+    let createMode = 'single';
+
+    const daysOfWeek = [
+        { value: 0, label: 'Sun' },
+        { value: 1, label: 'Mon' },
+        { value: 2, label: 'Tue' },
+        { value: 3, label: 'Wed' },
+        { value: 4, label: 'Thu' },
+        { value: 5, label: 'Fri' },
+        { value: 6, label: 'Sat' }
+    ];
+
+    function toggleBulkDay(dayValue) {
+        if (bulkFormData.days_of_week.includes(dayValue)) {
+            bulkFormData.days_of_week = bulkFormData.days_of_week.filter(d => d !== dayValue);
+        } else {
+            bulkFormData.days_of_week = [...bulkFormData.days_of_week, dayValue];
+        }
+    }
+
     function openDrawer(date = null, endDate = null) {
         // Reset to create mode
         isEditMode = false;
         editingTimeSlot = null;
         errors = {};
-        
+        createMode = 'single';
+        bulkFormData = defaultBulkFormData();
+
         if (date) {
             const startDate = new Date(date);
             let endDateTime;
@@ -87,6 +121,8 @@
         isEditMode = true;
         editingTimeSlot = timeSlot;
         errors = {};
+        createMode = 'single';
+        bulkFormData = defaultBulkFormData();
         
         // Format dates for Flatpickr (Y-m-d H:i format)
         const formatDateForFlatpickr = (dateString) => {
@@ -117,16 +153,23 @@
             // Clear previous errors
             errors = {};
 
-            const url = isEditMode 
-                ? route('admin.visit-time-slots.update', editingTimeSlot.id)
-                : route('admin.visit-time-slots.store', visitService.id);
-            
+            const isBulkCreate = !isEditMode && createMode === 'bulk';
+
+            let url;
+            if (isEditMode) {
+                url = route('admin.visit-time-slots.update', editingTimeSlot.id);
+            } else if (isBulkCreate) {
+                url = route('admin.visit-time-slots.bulk-store', visitService.id);
+            } else {
+                url = route('admin.visit-time-slots.store', visitService.id);
+            }
+
             const method = 'POST'; // Always POST, use _method for PATCH
 
             // Prepare request body
             let requestBody;
             let headers;
-            
+
             if (isEditMode) {
                 // For PATCH requests, use FormData with _method
                 const patchFormData = new FormData();
@@ -141,7 +184,8 @@
                 };
             } else {
                 // For POST requests, use JSON
-                requestBody = JSON.stringify(formData);
+                const payload = isBulkCreate ? bulkFormData : formData;
+                requestBody = JSON.stringify(payload);
                 headers = {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -157,7 +201,16 @@
 
             if (response.ok) {
                 // Show success toast
-                const message = isEditMode ? "Time slot updated successfully!" : "Time slot created successfully!";
+                let message;
+                if (isEditMode) {
+                    message = 'Time slot updated successfully!';
+                } else if (isBulkCreate) {
+                    const data = await response.clone().json().catch(() => ({}));
+                    message = data.message || 'Time slots created successfully!';
+                } else {
+                    message = 'Time slot created successfully!';
+                }
+
                 KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
                     message: message,
@@ -170,18 +223,20 @@
                 if (dismissButton) {
                     dismissButton.click();
                 }
-                
+
                 // Reset form data and state
                 formData = {
                     starts_at: '',
                     ends_at: '',
                     capacity: 10
                 };
-                
+                bulkFormData = defaultBulkFormData();
+
                 isEditMode = false;
                 editingTimeSlot = null;
+                createMode = 'single';
                 errors = {};
-                
+
                 // Refresh calendar data with current visible date range
                 if (window.calendar) {
                     const currentView = window.calendar.view;
@@ -193,9 +248,10 @@
                 // Handle error response
                 const errorData = await response.json();
                 errors = errorData.errors || {};
-                
+
                 // Show error toast
-                const errorMessage = errorData.message || `Error ${isEditMode ? 'updating' : 'creating'} time slot. Please try again.`;
+                const action = isEditMode ? 'updating' : 'creating';
+                const errorMessage = errorData.message || `Error ${action} time slot. Please try again.`;
                 KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
                     message: errorMessage,
@@ -205,7 +261,7 @@
             }
         } catch (error) {
             console.error(`Error ${isEditMode ? 'updating' : 'creating'} time slot:`, error);
-            
+
             // Show network error toast
             KTToast.show({
                 icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
@@ -426,60 +482,188 @@
     <!-- Time Slot Drawer -->
     <div class="hidden kt-drawer kt-drawer-end card flex-col max-w-[90%] w-[450px] top-5 bottom-5 end-5 rounded-xl border border-border" data-kt-drawer="true" data-kt-drawer-container="body" id="time_slot_drawer">
         <div class="flex items-center justify-between gap-2.5 text-sm text-mono font-semibold px-5 py-2.5 border-b border-b-border">
-            {isEditMode ? 'Edit Time Slot' : 'Add Time Slot'}
+            {isEditMode ? 'Edit Time Slot' : (createMode === 'bulk' ? 'Add Time Slots (Bulk)' : 'Add Time Slot')}
             <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-dim shrink-0" data-kt-drawer-dismiss="true">
                 <i class="ki-filled ki-cross"></i>
             </button>
         </div>
-        
-        <div class="p-5">
+
+        <div class="p-5 overflow-y-auto">
+            {#if !isEditMode}
+                <!-- Mode tabs (only when creating) -->
+                <div class="flex items-center gap-1 p-1 mb-5 bg-muted rounded-lg">
+                    <button
+                        type="button"
+                        class="flex-1 px-3 py-1.5 text-sm font-medium rounded-md transition-colors {createMode === 'single' ? 'bg-background text-mono shadow-sm' : 'text-secondary-foreground hover:text-mono'}"
+                        on:click={() => { createMode = 'single'; errors = {}; }}
+                    >
+                        Single
+                    </button>
+                    <button
+                        type="button"
+                        class="flex-1 px-3 py-1.5 text-sm font-medium rounded-md transition-colors {createMode === 'bulk' ? 'bg-background text-mono shadow-sm' : 'text-secondary-foreground hover:text-mono'}"
+                        on:click={() => { createMode = 'bulk'; errors = {}; }}
+                    >
+                        Bulk (Range)
+                    </button>
+                </div>
+            {/if}
+
             <form on:submit|preventDefault={handleSubmit} class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-mono mb-2">Start Time</label>
-                    <Flatpickr
-                        bind:value={formData.starts_at}
-                        placeholder="Select start date and time"
-                        config={{
-                            enableTime: true,
-                            dateFormat: 'Y-m-d H:i',
-                            time_24hr: false,
-                        }}
-                    />
-                    {#if errors.starts_at}
-                        <p class="text-sm text-destructive mt-1">{errors.starts_at}</p>
-                    {/if}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-mono mb-2">End Time</label>
-                    <Flatpickr
-                        bind:value={formData.ends_at}
-                        placeholder="Select end date and time"
-                        config={{
-                            enableTime: true,
-                            dateFormat: 'Y-m-d H:i',
-                            time_24hr: false,
-                        }}
-                    />
-                    {#if errors.ends_at}
-                        <p class="text-sm text-destructive mt-1">{errors.ends_at}</p>
-                    {/if}
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-mono mb-2">Capacity</label>
-                    <input 
-                        type="number" 
-                        bind:value={formData.capacity}
-                        min="1"
-                        class="kt-input w-full {errors.capacity ? 'kt-input-error' : ''}"
-                        required
-                    />
-                    {#if errors.capacity}
-                        <p class="text-sm text-destructive mt-1">{errors.capacity}</p>
-                    {/if}
-                </div>
-                
+                {#if isEditMode || createMode === 'single'}
+                    <!-- Single time slot form -->
+                    <div>
+                        <label class="block text-sm font-medium text-mono mb-2">Start Time</label>
+                        <Flatpickr
+                            bind:value={formData.starts_at}
+                            placeholder="Select start date and time"
+                            config={{
+                                enableTime: true,
+                                dateFormat: 'Y-m-d H:i',
+                                time_24hr: false,
+                            }}
+                        />
+                        {#if errors.starts_at}
+                            <p class="text-sm text-destructive mt-1">{errors.starts_at}</p>
+                        {/if}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-mono mb-2">End Time</label>
+                        <Flatpickr
+                            bind:value={formData.ends_at}
+                            placeholder="Select end date and time"
+                            config={{
+                                enableTime: true,
+                                dateFormat: 'Y-m-d H:i',
+                                time_24hr: false,
+                            }}
+                        />
+                        {#if errors.ends_at}
+                            <p class="text-sm text-destructive mt-1">{errors.ends_at}</p>
+                        {/if}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-mono mb-2">Capacity</label>
+                        <input
+                            type="number"
+                            bind:value={formData.capacity}
+                            min="1"
+                            class="kt-input w-full {errors.capacity ? 'kt-input-error' : ''}"
+                            required
+                        />
+                        {#if errors.capacity}
+                            <p class="text-sm text-destructive mt-1">{errors.capacity}</p>
+                        {/if}
+                    </div>
+                {:else}
+                    <!-- Bulk creation form -->
+                    <p class="text-sm text-secondary-foreground">
+                        Pick a date range, select the days of the week to include, and a start/end time. A time slot will be created for each matching day.
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-mono mb-2">From Date</label>
+                            <Flatpickr
+                                bind:value={bulkFormData.start_date}
+                                placeholder="Start date"
+                                config={{
+                                    enableTime: false,
+                                    dateFormat: 'Y-m-d',
+                                }}
+                            />
+                            {#if errors.start_date}
+                                <p class="text-sm text-destructive mt-1">{errors.start_date}</p>
+                            {/if}
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-mono mb-2">To Date</label>
+                            <Flatpickr
+                                bind:value={bulkFormData.end_date}
+                                placeholder="End date"
+                                config={{
+                                    enableTime: false,
+                                    dateFormat: 'Y-m-d',
+                                }}
+                            />
+                            {#if errors.end_date}
+                                <p class="text-sm text-destructive mt-1">{errors.end_date}</p>
+                            {/if}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-mono mb-2">Days of Week</label>
+                        <div class="flex flex-wrap gap-2">
+                            {#each daysOfWeek as day}
+                                <button
+                                    type="button"
+                                    class="kt-btn kt-btn-sm {bulkFormData.days_of_week.includes(day.value) ? 'kt-btn-primary' : 'kt-btn-outline'}"
+                                    on:click={() => toggleBulkDay(day.value)}
+                                >
+                                    {day.label}
+                                </button>
+                            {/each}
+                        </div>
+                        {#if errors.days_of_week}
+                            <p class="text-sm text-destructive mt-1">{errors.days_of_week}</p>
+                        {/if}
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-mono mb-2">Start Time</label>
+                            <Flatpickr
+                                bind:value={bulkFormData.start_time}
+                                placeholder="Start time"
+                                config={{
+                                    enableTime: true,
+                                    noCalendar: true,
+                                    dateFormat: 'H:i',
+                                    time_24hr: false,
+                                }}
+                            />
+                            {#if errors.start_time}
+                                <p class="text-sm text-destructive mt-1">{errors.start_time}</p>
+                            {/if}
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-mono mb-2">End Time</label>
+                            <Flatpickr
+                                bind:value={bulkFormData.end_time}
+                                placeholder="End time"
+                                config={{
+                                    enableTime: true,
+                                    noCalendar: true,
+                                    dateFormat: 'H:i',
+                                    time_24hr: false,
+                                }}
+                            />
+                            {#if errors.end_time}
+                                <p class="text-sm text-destructive mt-1">{errors.end_time}</p>
+                            {/if}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-mono mb-2">Capacity (per slot)</label>
+                        <input
+                            type="number"
+                            bind:value={bulkFormData.capacity}
+                            min="1"
+                            class="kt-input w-full {errors.capacity ? 'kt-input-error' : ''}"
+                            required
+                        />
+                        {#if errors.capacity}
+                            <p class="text-sm text-destructive mt-1">{errors.capacity}</p>
+                        {/if}
+                    </div>
+                {/if}
+
                 <div class="flex gap-3 pt-4">
                     <button id="cancel-button" type="button" class="kt-btn kt-btn-outline flex-1" data-kt-drawer-dismiss="true">
                         Cancel
@@ -490,7 +674,13 @@
                         </button>
                     {/if}
                     <button type="submit" class="kt-btn kt-btn-primary flex-1">
-                        {isEditMode ? 'Update Time Slot' : 'Create Time Slot'}
+                        {#if isEditMode}
+                            Update Time Slot
+                        {:else if createMode === 'bulk'}
+                            Create Time Slots
+                        {:else}
+                            Create Time Slot
+                        {/if}
                     </button>
                 </div>
             </form>
