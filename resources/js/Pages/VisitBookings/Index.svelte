@@ -371,12 +371,6 @@
                                                 <p class="text-sm text-secondary-foreground mb-4">
                                                     {search || selectedTimeSlotId ? 'No visit bookings match your search criteria.' : 'Get started by creating your first visit booking.'}
                                                 </p>
-                                                {#if hasPermission('admin.visit-bookings.store')}
-                                                <a href="{route('admin.visit-bookings.create')}" class="kt-btn kt-btn-primary">
-                                                    <i class="ki-filled ki-plus text-base"></i>
-                                                    Create First Visit Booking
-                                                </a>
-                                                {/if}
                                             </div>
                                         </td>
                                     </tr>
