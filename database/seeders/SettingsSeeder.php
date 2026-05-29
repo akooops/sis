@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Setting;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class SettingsSeeder extends Seeder
 {
@@ -86,7 +85,6 @@ class SettingsSeeder extends Seeder
                 'is_encrypted' => false,
                 'options' => null,
             ],
-
 
             // Social Media URLs
             [
@@ -199,6 +197,35 @@ class SettingsSeeder extends Seeder
                 'description' => 'School physical address',
                 'group' => 'contact',
                 'is_encrypted' => false,
+                'options' => null,
+            ],
+
+            // E-Registration Settings
+            [
+                'key' => 'eregistration_api_url',
+                'type' => 'text',
+                'value' => '',
+                'description' => 'E-Registration API URL',
+                'group' => 'eregistration',
+                'is_encrypted' => false,
+                'options' => null,
+            ],
+            [
+                'key' => 'eregistration_public_api_key',
+                'type' => 'text',
+                'value' => '',
+                'description' => 'E-Registration public API key',
+                'group' => 'eregistration',
+                'is_encrypted' => true,
+                'options' => null,
+            ],
+            [
+                'key' => 'eregistration_secret_api_key',
+                'type' => 'text',
+                'value' => '',
+                'description' => 'E-Registration secret API key',
+                'group' => 'eregistration',
+                'is_encrypted' => true,
                 'options' => null,
             ],
         ];

@@ -13,6 +13,7 @@ use App\Models\Program;
 use App\Models\VisitBooking;
 use App\Models\VisitService;
 use App\Models\VisitTimeSlot;
+use App\Services\ERegistrationService;
 use App\Services\IndexService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
@@ -22,10 +23,14 @@ use Illuminate\Support\Str;
 class VisitBookingsController extends Controller
 {
     protected $notificationService;
+    protected $eRegistrationService;
 
-    public function __construct(NotificationService $notificationService)
-    {
+    public function __construct(
+        NotificationService $notificationService,
+        ERegistrationService $eRegistrationService
+    ) {
         $this->notificationService = $notificationService;
+        $this->eRegistrationService = $eRegistrationService;
     }
 
     public function visitBookings(StoreVisitBookingRequest $request, VisitService $visitService)
@@ -39,8 +44,9 @@ class VisitBookingsController extends Controller
             ]
         ));
 
-        // Create notification
         $this->notificationService->createVisitBookingNotification($booking);
+
+        $this->eRegistrationService->sendVisitBooking($booking);
 
         return response()->json([
                 'status' => 'success',
