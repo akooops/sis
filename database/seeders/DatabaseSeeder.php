@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -12,12 +11,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(PermissionsSeeder::class);
-        $this->call(InitAdminAccountSeeder::class);
-        $this->call(LanguageTranslationSeeder::class);
-        $this->call(NationalitySeeder::class);
-        $this->call(SettingsSeeder::class);
-        $this->call(PagesSeeder::class);
-        $this->call(MenusSeeder::class);
+        $this->call([
+            PermissionsSeeder::class,
+            RolesSeeder::class,
+            UserSeeder::class,
+        ]);
+
+        if (app()->environment('local')) {
+
+        }
+
+        if (app()->environment('production')) {
+
+        }
     }
 }

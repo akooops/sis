@@ -2,44 +2,26 @@
 
 namespace App\Models;
 
-use App\Traits\HasFiles;
-use App\Traits\Translatable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\URL;
+use App\States\Media\MediaScanState;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
+use Spatie\ModelStates\HasStates;
 
-class Media extends Model
+/**
+ * App-specific media model:
+ *  - ULID primary key (HasUlids), matching the rest of the schema.
+ *  - `state` scan status (HasStates) so an unattached upload can be tracked
+ *    through pending -> clean/infected without a separate table.
+ */
+class Media extends BaseMedia
 {
-    use HasFactory, Translatable, HasFiles;
+    use HasStates, HasUlids;
 
-    //Properties
-    protected $guarded = ['id'];
-
-    protected $appends = ['mediaUrl'];
-
-    protected $casts = [
-        'is_main' => 'boolean',
-    ];
-
-    //Relationships
-    public function file()
+    public function __construct(array $attributes = [])
     {
-        return $this->morphOne(File::class, 'model');
-    }
+        // Merge (not replace) so Spatie's JSON casts are preserved.
+        $this->mergeCasts(['state' => MediaScanState::class]);
 
-    public function mediable()
-    {
-        return $this->morphTo();
-    }
-        
-    //Accessors & Mutators   
-    public function getMediaUrlAttribute()
-    {
-        return ($this->file) ? $this->file->url : URL::to('assets/admin/images/default-thumbnail.jpg');
-    }
-
-    public function getTranslatableFields(): array
-    {
-        return ['title', 'description'];
+        parent::__construct($attributes);
     }
 }

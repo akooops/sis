@@ -14,7 +14,7 @@ class HandleInertiaRequests extends Middleware
      *
      * @var string
      */
-    protected $rootView = 'admin.app';
+    protected $rootView = 'app';
 
     /**
      * Determines the current asset version.
@@ -41,10 +41,6 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user() ? $request->user() : null,
                 'permissions' => $request->user() ? $request->user()->permissions() : null,
                 'enable_permissions' => config('app.enable_permissions'),
-            ],
-            'flash' => [
-                'success' => $request->session()->get('success'),
-                'error' => $request->session()->get('error'),
             ],
         ];
     }

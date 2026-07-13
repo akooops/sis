@@ -2,114 +2,106 @@
 
 namespace App\Models;
 
-use App\Models\BaseModel;
-use App\Models\File;
-use App\Models\Permission;
-use App\Models\Role;
-use App\Models\UserRole;
-use App\Traits\HasFiles;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasMedia
 {
-    use HasApiTokens, HasFactory, Notifiable, HasFiles;
-    
-    //Properties
+    use HasApiTokens, HasFactory, HasUlids, InteractsWithMedia, Notifiable, SoftDeletes;
+
+    // Attributes
     protected $guarded = ['id'];
+
+    protected $appends = ['avatar_url'];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'verified_at' => 'datetime',
     ];
 
-    protected $appends = ['fullname', 'avatarUrl'];
-
-    //Relationships
-    public function file()
+    // Media
+    public function registerMediaCollections(): void
     {
-        return $this->morphOne(File::class, 'model');
+        $this->addMediaCollection('avatar')->singleFile();
     }
 
-    public function roles()
+    // Spatie never auto-deletes this model's media;, we use observers to frees it on force delete.
+    public function shouldDeletePreservingMedia(): bool
     {
-        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id')
-            ->using(UserRole::class)
-            ->withTimestamps();
+        return true;
     }
 
-    public function permissions()
+    // Relationships
+    public function userRoles(): HasMany
+    {
+        return $this->hasMany(UserRole::class);
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'user_roles');
+    }
+
+    // Roles
+    /**
+     * Set the user's roles to exactly the given ids.
+     *
+     * @param  array<int, string>  $roleIds
+     */
+    public function syncRoles(array $roleIds): void
+    {
+        $this->userRoles()
+            ->whereNotIn('role_id', $roleIds)
+            ->delete();
+
+        foreach ($roleIds as $roleId) {
+            $this->userRoles()->firstOrCreate(['role_id' => $roleId]);
+        }
+    }
+
+    // Permissions
+    // A user acts on the web channel, so only web-enabled permissions count.
+    public function permissions(): array
+    {
+        $roleIds = $this->roles()->pluck('roles.id');
+
+        return Permission::where('supports_web', true)
+            ->whereHas('roles', function ($query) use ($roleIds) {
+                $query->whereIn('roles.id', $roleIds);
+            })->distinct()->pluck('code')->all();
+    }
+
+    public function hasPermission(string $permission): bool
     {
         return $this->roles()
-            ->with('permissions')
-            ->get()
-            ->pluck('permissions')
-            ->flatten()
-            ->unique('id')
-            ->values()
-            ->pluck('name');
+            ->whereHas('permissions', function ($query) use ($permission) {
+                $query->where('permissions.code', $permission)
+                    ->where('permissions.supports_web', true);
+            })->exists();
     }
-    
-    //Scopes
 
-    //Accessors & Mutators
-    public function getFullnameAttribute()
+    public function hasPermissions(array $permissions): bool
     {
-        return "{$this->firstname} {$this->lastname}";
+        return array_diff(array_unique($permissions), $this->permissions()) === [];
     }
 
-    public function getAvatarUrlAttribute()
+    // Accessors
+    public function getAvatarUrlAttribute(): string
     {
-        // If user has a profile image, return it
-        return ($this->file) ? $this->file->url : URL::to('assets/admin/images/default-avatar.jpg');
+        return $this->getFirstMediaUrl('avatar') ?: URL::to('assets/media/avatars/blank.png');
     }
-
-    //Custom Methods
-    public function hasRole($role)
-    {
-        return $this->roles()->where('id', $role)
-            ->orWhere('name', $role)
-            ->exists();
-    }
-
-    public function hasPermission($permission, $module = null)
-    {
-        $query = $this->roles()
-            ->join('role_permissions', 'roles.id', '=', 'role_permissions.role_id')
-            ->join('permissions', 'role_permissions.permission_id', '=', 'permissions.id')
-            ->where('permissions.name', $permission);
-    
-        if ($module) {
-            $query->where('permissions.module_id', $module);
-        }
-            
-        return $query->exists();
-    }
-    
-    public function hasAnyPermission($permissions, $module = null)
-    {
-        $query = $this->roles()
-            ->join('role_permissions', 'roles.id', '=', 'role_permissions.role_id')
-            ->join('permissions', 'role_permissions.permission_id', '=', 'permissions.id')
-            ->whereIn('permissions.name', (array) $permissions);
-
-        if ($module) {
-            $query->where('permissions.module_id', $module);
-        }
-
-        return $query->exists();
-    }
-}   
+}

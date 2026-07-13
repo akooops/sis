@@ -37,9 +37,4 @@ return [
         'redirect' => env('AZURE_REDIRECT_URI'),
         'tenant' => env('AZURE_TENANT_ID'),
     ],
-
-    'job_application_scoring_ai_model' => [
-        'url' => env('JOB_APPLICATION_SCORING_AI_MODEL_URL', 'http://localhost:8000'),
-        'model' => env('JOB_APPLICATION_SCORING_AI_MODEL_NAME', 'saudi-hr-model'),
-    ],
 ];

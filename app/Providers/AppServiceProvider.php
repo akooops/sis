@@ -2,9 +2,19 @@
 
 namespace App\Providers;
 
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Blade;
+use App\Models\Student;
+use App\Models\Guardian;
+use App\Models\School;
+use App\Models\User;
+use App\Models\Order;
+use App\Models\Payment;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderLine;
+use App\Observers\UserObserver;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\Relations\Relation;
+
+use Illuminate\Support\Facades\View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        
     }
 
     /**
@@ -21,17 +31,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Blade::if('haspermission', function ($permission) {
-            if (!config('app.enable_permissions')) {
-                return true;
-            }
-            
-            $user = auth()->user();
-            if (!$user) {
-                return false;
-            }
-            
-            return $user->hasPermission($permission);
-        });
+        User::observe(UserObserver::class);
     }
 }
