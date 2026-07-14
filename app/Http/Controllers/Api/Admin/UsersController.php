@@ -26,6 +26,7 @@ class UsersController extends ApiController
                 AllowedFilter::partial('lastname'),
                 AllowedFilter::partial('username'),
                 $this->search(['firstname', 'lastname', 'username', 'email']),
+                $this->relatedId('role', 'roles'),
                 AllowedFilter::trashed(),
             ])
             ->allowedSorts(['id', 'firstname', 'lastname', 'username', 'email', 'created_at'])

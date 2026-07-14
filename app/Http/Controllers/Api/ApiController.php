@@ -24,18 +24,35 @@ abstract class ApiController extends Controller
 
     /**
      * A general "search" filter (?filter[search]=…) that matches the given
-     * columns with a LIKE, independent of the per-field filters.
+     * columns with a LIKE, independent of the per-field filters. The model's
+     * primary key is always matched too, so pasting an id (or its clipped #head)
+     * finds the record.
      *
      * @param  array<int, string>  $columns
      */
-    protected function search(array $columns): AllowedFilter
+    protected function search(array $columns, bool $withId = true): AllowedFilter
     {
-        return AllowedFilter::callback('search', function ($query, $value) use ($columns) {
-            $query->where(function ($query) use ($columns, $value) {
+        return AllowedFilter::callback('search', function ($query, $value) use ($columns, $withId) {
+            $query->where(function ($query) use ($columns, $withId, $value) {
                 foreach ($columns as $column) {
                     $query->orWhere($column, 'like', "%{$value}%");
                 }
+                if ($withId) {
+                    $query->orWhere($query->getModel()->getKeyName(), 'like', "%{$value}%");
+                }
             });
+        });
+    }
+
+    /**
+     * An exact filter (?filter[<name>]=<id>) that matches records related to a
+     * given id through a relationship — e.g. users by role id, roles by
+     * permission id, or (in domain modules) students by their guardian id.
+     */
+    protected function relatedId(string $name, string $relation): AllowedFilter
+    {
+        return AllowedFilter::callback($name, function ($query, $value) use ($relation) {
+            $query->whereHas($relation, fn ($related) => $related->whereKey($value));
         });
     }
 

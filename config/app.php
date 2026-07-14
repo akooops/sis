@@ -87,6 +87,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Right-to-Left Locales
+    |--------------------------------------------------------------------------
+    |
+    | Locales listed here render the UI in RTL. Shared with the frontend via
+    | HandleInertiaRequests (i18n.dir) and used by the root blade template to
+    | set the initial <html dir>.
+    |
+    */
+
+    'rtl_locales' => ['ar', 'fa', 'he', 'ur'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    |
+    | Locales the UI can switch between (Topbar locale switcher). Each must have
+    | matching lang/{code}/{admin,user}/ catalogs.
+    |
+    */
+
+    'supported_locales' => ['en', 'ar'],
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Fallback Locale
     |--------------------------------------------------------------------------
     |

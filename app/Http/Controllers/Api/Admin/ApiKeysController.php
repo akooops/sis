@@ -22,6 +22,7 @@ class ApiKeysController extends ApiController
                 AllowedFilter::partial('name'),
                 AllowedFilter::exact('prefix'),
                 $this->search(['name', 'prefix']),
+                $this->relatedId('permission', 'permissions'),
                 AllowedFilter::trashed(),
             ])
             ->allowedSorts(['id', 'name', 'last_used_at', 'expires_at', 'created_at'])

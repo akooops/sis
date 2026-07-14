@@ -14,7 +14,7 @@ class RolesSeeder extends Seeder
     public function run(): void
     {
         $ownerRole = Role::updateOrCreate(
-            ['name' => 'owner'],
+            ['name' => 'Owner', 'code' => 'owner'],
             ['is_default' => false],
         );
 

@@ -1,0 +1,18 @@
+/**
+ * Brand tokens — the ONE place to rebrand.
+ *
+ * Overrides Metronic's default palette (config.ktui.css) with the app brand.
+ * Because @theme maps --color-primary -> var(--primary), changing these values
+ * re-skins every `primary` utility and kt-* component. Loaded last so it wins.
+ */
+
+:root {
+    /* Novonordisk brand blue (previously set via public/assets/css/main.css). */
+    --primary: #001965;
+    --primary-foreground: oklch(1 0 0);
+}
+
+.dark {
+    --primary: #001965;
+    --primary-foreground: oklch(1 0 0);
+}

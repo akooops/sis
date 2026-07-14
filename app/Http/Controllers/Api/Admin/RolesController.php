@@ -22,6 +22,7 @@ class RolesController extends ApiController
                 AllowedFilter::exact('is_default'),
                 AllowedFilter::partial('name'),
                 $this->search(['name']),
+                $this->relatedId('permission', 'permissions'),
                 AllowedFilter::trashed(),
             ])
             ->allowedSorts(['id', 'name', 'is_default', 'created_at'])
