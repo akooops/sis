@@ -69,7 +69,7 @@
 
 <svelte:head><title>Novonordisk — {$t('roles.title')}</title></svelte:head>
 
-<AdminLayout breadcrumbs={[{ label: $t('roles.title') }]}>
+<AdminLayout title={$t('roles.title')}>
     <IndexCard {showForm} {toolbar} {form} {table} />
     <Filters bind:open={filtersOpen} config={filterConfig} values={list.params.filter} onapply={(v) => list.setFilters(v)} />
     <RolePermissionsDrawer bind:open={permsOpen} role={permsRole} />

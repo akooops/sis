@@ -24,7 +24,14 @@ class MediaController extends ApiController
         $media = QueryBuilder::for(Media::class)
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::callback('type', fn ($query, $value) => $query->where('custom_properties->type', $value)),
+                // Accepts a single type or a comma-separated list (e.g. images,videos)
+                // so a restricted picker can show "all of its allowed types".
+                AllowedFilter::callback('type', function ($query, $value) {
+                    $types = array_filter(array_map('trim', is_array($value) ? $value : explode(',', (string) $value)));
+                    if ($types) {
+                        $query->whereIn('custom_properties->type', $types);
+                    }
+                }),
                 AllowedFilter::callback('clean', fn ($query, $value) => filter_var($value, FILTER_VALIDATE_BOOLEAN)
                     ? $query->whereState('state', Clean::class)
                     : $query),

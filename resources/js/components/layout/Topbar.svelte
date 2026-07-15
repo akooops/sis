@@ -20,6 +20,7 @@
         en: { label: 'English', flag: 'united-states' },
         ar: { label: 'العربية', flag: 'saudi-arabia' },
     };
+    
     const locales = Object.keys(localeMeta);
 
     function setLocale(loc) {
@@ -40,7 +41,7 @@
 <header
     class="kt-header fixed top-0 z-10 start-0 end-0 flex items-stretch shrink-0 bg-background"
     data-kt-sticky="true"
-    data-kt-sticky-class="border-b border-border"
+    data-kt-sticky-class="shadow-sm"
     data-kt-sticky-name="header"
     id="header"
 >

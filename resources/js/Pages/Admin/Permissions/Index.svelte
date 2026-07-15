@@ -45,7 +45,7 @@
 
 <svelte:head><title>Novonordisk — {$t('permissions.title')}</title></svelte:head>
 
-<AdminLayout breadcrumbs={[{ label: $t('permissions.title') }]}>
+<AdminLayout title={$t('permissions.title')}>
     <IndexCard showForm={false} {toolbar} {form} {table} />
     <Filters bind:open={filtersOpen} config={filterConfig} values={list.params.filter} onapply={(v) => list.setFilters(v)} />
     <DetailDrawer bind:open={viewOpen} title={$t('permissions.title')} id={viewing?.id} fields={viewFields} createdAt={viewing?.created_at} updatedAt={viewing?.updated_at} />

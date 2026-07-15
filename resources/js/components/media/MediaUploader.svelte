@@ -4,20 +4,30 @@
      * endpoint. Calls `onuploaded(mediaData)` with the returned reference.
      */
     import Spinner from '@/components/ui/Spinner.svelte';
-    import { uploadFile, mediaConfig, acceptFor } from '@/lib/upload';
+    import { uploadFile, mediaConfig, acceptFor, acceptForTypes, typeForFile, MEDIA_TYPES } from '@/lib/upload';
     import { t } from '@/lib/i18n';
 
-    let { type = 'images', onuploaded } = $props();
+    // `accept` restricts to a subset of types (e.g. ['images']); default = all.
+    let { accept = null, onuploaded } = $props();
 
     let uploading = $state(false);
     let error = $state(null);
     let dragging = $state(false);
 
     const cfg = mediaConfig();
+    const allowedTypes = $derived(accept?.length ? accept : MEDIA_TYPES);
+    const singleType = $derived(allowedTypes.length === 1 ? allowedTypes[0] : null);
+    const inputAccept = $derived(singleType ? acceptFor(singleType) : acceptForTypes(allowedTypes));
 
     async function handle(files) {
         const file = files?.[0];
         if (!file) return;
+        // A single-type uploader forces that type; a multi-type one infers it.
+        const type = singleType ?? typeForFile(file.name, allowedTypes);
+        if (!type) {
+            error = $t('common.media.unsupported');
+            return;
+        }
         uploading = true;
         error = null;
         try {
@@ -46,7 +56,7 @@
         handle(e.dataTransfer.files);
     }}
 >
-    <input type="file" class="hidden" accept={acceptFor(type)} onchange={(e) => handle(e.currentTarget.files)} disabled={uploading} />
+    <input type="file" class="hidden" accept={inputAccept} onchange={(e) => handle(e.currentTarget.files)} disabled={uploading} />
     {#if uploading}
         <Spinner />
         <span class="text-sm text-secondary-foreground">{$t('common.media.scanning')}</span>

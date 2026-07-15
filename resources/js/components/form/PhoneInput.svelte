@@ -31,7 +31,8 @@
                 value = full;
                 return;
             }
-            const digits = (el.value || '').replace(/\D/g, '');
+            // Strip the national trunk "0" (e.g. Algeria 0665… → +213665…).
+            const digits = (el.value || '').replace(/\D/g, '').replace(/^0+/, '');
             const dial = iti.getSelectedCountryData()?.dialCode;
             value = digits ? (dial ? `+${dial}${digits}` : `+${digits}`) : '';
         };

@@ -12,9 +12,13 @@
 
 <div class="kt-tabs kt-tabs-line" role="tablist">
     {#each tabs as tab (tab.id)}
+        <!-- `data-kt-tab-toggle` is required for Metronic's active styling
+             (`&[data-kt-tab-toggle].active`); the class alone isn't enough. KTUI's
+             JS only binds containers with `data-kt-tabs`, so this stays CSS-only. -->
         <button
             type="button"
             role="tab"
+            data-kt-tab-toggle
             class="kt-tab-toggle {active === tab.id ? 'active' : ''}"
             aria-selected={active === tab.id}
             onclick={() => (active = tab.id)}

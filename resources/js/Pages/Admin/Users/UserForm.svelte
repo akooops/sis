@@ -47,7 +47,7 @@
 
 <form class="flex w-full flex-col gap-5" onsubmit={submit}>
     <Field label={$t('users.fields.avatar')}>
-        <MediaPicker type="images" bind:value={form.data.avatar} previewUrl={user?.avatar_url} />
+        <MediaPicker accept={['images']} bind:value={form.data.avatar} previewUrl={user?.avatar_url} />
     </Field>
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <Field label={$t('users.fields.firstname')} error={form.errors.firstname} required>

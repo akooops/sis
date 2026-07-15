@@ -90,7 +90,7 @@
 
 <svelte:head><title>Novonordisk — {$t('api_keys.title')}</title></svelte:head>
 
-<AdminLayout breadcrumbs={[{ label: $t('api_keys.title') }]}>
+<AdminLayout title={$t('api_keys.title')}>
     <IndexCard {showForm} {toolbar} {form} {table} />
     <Filters bind:open={filtersOpen} config={filterConfig} values={list.params.filter} onapply={(v) => list.setFilters(v)} />
     <ApiKeyPermissionsDrawer bind:open={permsOpen} apiKey={permsKey} />

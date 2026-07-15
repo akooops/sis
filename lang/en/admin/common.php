@@ -32,6 +32,10 @@ return [
         'logout' => 'Log out',
     ],
 
+    'breadcrumbs' => [
+        'index' => 'Index',
+    ],
+
     'nav' => [
         'dashboard' => 'Dashboard',
         'access_control' => 'Access Control',
@@ -77,6 +81,7 @@ return [
         'scanning' => 'Scanning…',
         'select' => 'Select',
         'remove' => 'Remove',
+        'unsupported' => 'Unsupported file type.',
     ],
 
     'detail' => [

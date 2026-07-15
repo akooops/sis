@@ -30,6 +30,10 @@ return [
         'logout' => 'تسجيل الخروج',
     ],
 
+    'breadcrumbs' => [
+        'index' => 'الفهرس',
+    ],
+
     'nav' => [
         'dashboard' => 'لوحة التحكم',
         'access_control' => 'التحكم في الوصول',
@@ -75,6 +79,7 @@ return [
         'scanning' => 'جارٍ الفحص…',
         'select' => 'اختيار',
         'remove' => 'إزالة',
+        'unsupported' => 'نوع ملف غير مدعوم.',
     ],
 
     'detail' => [

@@ -21,6 +21,14 @@ return [
         'audio' => 'Audio',
     ],
 
+    'tabs' => [
+        'all' => 'All',
+        'images' => 'Images',
+        'audio' => 'Audio',
+        'videos' => 'Videos',
+        'documents' => 'Documents',
+    ],
+
     'actions' => [
         'detach' => 'Free (detach)',
     ],

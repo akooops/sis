@@ -44,6 +44,18 @@ return [
             'throw' => false,
         ],
 
+        /*
+         * Holding area for freshly uploaded files until the malware scan clears
+         * them (see App\Jobs\ScanUpload). Never web-readable, and deliberately
+         * NOT a parent of the "public" disk root.
+         */
+        'quarantine' => [
+            'driver' => 'local',
+            'root' => storage_path('app/quarantine'),
+            'visibility' => 'private',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

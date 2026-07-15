@@ -85,7 +85,7 @@
 
 <svelte:head><title>Novonordisk — {$t('users.title')}</title></svelte:head>
 
-<AdminLayout breadcrumbs={[{ label: $t('users.title') }]}>
+<AdminLayout title={$t('users.title')}>
     <IndexCard {showForm} {toolbar} {form} {table} />
 
     <Filters bind:open={filtersOpen} config={filterConfig} values={list.params.filter} onapply={(v) => list.setFilters(v)} />

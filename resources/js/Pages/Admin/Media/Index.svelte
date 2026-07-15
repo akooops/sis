@@ -1,29 +1,42 @@
 <script>
-    /** Media library index — Metronic list card; browse + detach (free) attached media. */
+    /** Media library index — Metronic list card; browse media as cards + detach. */
     import AdminLayout from '@/layouts/AdminLayout.svelte';
     import IndexCard from '@/components/data/IndexCard.svelte';
-    import DataTable from '@/components/data/DataTable.svelte';
     import SearchBar from '@/components/data/SearchBar.svelte';
-    import Filters from '@/components/data/Filters.svelte';
+    import Pagination from '@/components/data/Pagination.svelte';
     import ExportButton from '@/components/data/ExportButton.svelte';
-    import Badge from '@/components/ui/Badge.svelte';
-    import DateTime from '@/components/ui/DateTime.svelte';
+    import Skeleton from '@/components/ui/Skeleton.svelte';
+    import EmptyState from '@/components/ui/EmptyState.svelte';
     import Dropdown from '@/components/ui/Dropdown.svelte';
-    import IdBadge from '@/components/data/IdBadge.svelte';
     import DetailDrawer from '@/components/data/DetailDrawer.svelte';
+    import MediaThumb from '@/components/media/MediaThumb.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
     import { hasPermission } from '@/lib/permissions';
+    import { MEDIA_TYPES } from '@/lib/upload';
     import { formatFileSize } from '@/lib/format';
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
     import { confirm } from '@/lib/confirm';
     import { t } from '@/lib/i18n';
 
-    const list = useIndex('api.v1.admin.media.index', { perPage: 20, sort: '-created_at', pollMs: 0 });
-    let filtersOpen = $state(false);
+    const list = useIndex('api.v1.admin.media.index', { perPage: 15, sort: '-created_at', pollMs: 0 });
     let viewOpen = $state(false);
     let viewing = $state(null);
     const view = (m) => { viewing = m; viewOpen = true; };
+
+    // Type filter tabs (All + each media type). '' = all.
+    let activeType = $state(list.params.filter?.type ?? '');
+    const typeTabs = $derived([
+        { id: '', label: $t('media.tabs.all') },
+        ...MEDIA_TYPES.map((ty) => ({ id: ty, label: $t(`media.tabs.${ty}`) })),
+    ]);
+    function selectType(ty) {
+        activeType = ty;
+        const filter = { ...list.params.filter };
+        if (ty) filter.type = ty;
+        else delete filter.type;
+        list.setFilters(filter);
+    }
 
     const viewFields = $derived(
         viewing
@@ -37,28 +50,6 @@
             : [],
     );
 
-    const columns = $derived([
-        { key: 'id', label: $t('common.detail.id'), width: '90px', truncate: false },
-        { key: 'name', label: $t('media.fields.name'), sortable: true, truncate: false },
-        { key: 'type', label: $t('media.fields.type'), truncate: false },
-        { key: 'size', label: $t('media.fields.size'), sortable: true },
-        { key: 'status', label: $t('media.fields.status'), truncate: false },
-        { key: 'attached', label: $t('media.fields.attached'), truncate: false },
-    ]);
-    const filterConfig = $derived([
-        {
-            key: 'type',
-            type: 'select',
-            label: $t('media.fields.type'),
-            options: [
-                { value: 'images', label: $t('media.types.images') },
-                { value: 'documents', label: $t('media.types.documents') },
-                { value: 'videos', label: $t('media.types.videos') },
-                { value: 'audio', label: $t('media.types.audio') },
-            ],
-        },
-    ]);
-
     async function detach(m) {
         if (!(await confirm({ variant: 'destructive' }))) return;
         try {
@@ -71,16 +62,14 @@
 
 <svelte:head><title>Novonordisk — {$t('media.title')}</title></svelte:head>
 
-<AdminLayout breadcrumbs={[{ label: $t('media.title') }]}>
+<AdminLayout title={$t('media.title')}>
     <IndexCard showForm={false} {toolbar} {form} {table} />
-    <Filters bind:open={filtersOpen} config={filterConfig} values={list.params.filter} onapply={(v) => list.setFilters(v)} />
     <DetailDrawer bind:open={viewOpen} title={$t('media.title')} id={viewing?.id} fields={viewFields} createdAt={viewing?.created_at} updatedAt={viewing?.updated_at} />
 </AdminLayout>
 
 {#snippet toolbar()}
     <div class="flex items-center gap-2">
         <SearchBar placeholder={$t('media.search')} value={list.search} onsearch={(v) => list.setSearch(v)} />
-        <button class="kt-btn kt-btn-sm kt-btn-ghost" onclick={() => (filtersOpen = true)} aria-label={$t('common.actions.filter')}><i class="ki-filled ki-filter"></i></button>
         <ExportButton rows={list.rows} columns={[
             { key: 'name', label: 'Name' },
             { key: 'type', label: 'Type' },
@@ -93,41 +82,75 @@
 {#snippet form()}{/snippet}
 
 {#snippet table()}
-    <DataTable {columns} rows={list.rows} loading={list.loading} meta={list.meta} sort={list.params.sort} onSort={list.toggleSort} onPageChange={list.goToPage} onPerPageChange={list.setPerPage} onRowClick={view} {cells} {rowActions} />
-{/snippet}
-
-{#snippet cells(row, column)}
-    {#if column.key === 'id'}
-        <IdBadge id={row.id} onclick={() => view(row)} />
-    {:else if column.key === 'name'}
-        <div class="flex items-center gap-3">
-            <div class="flex size-9 items-center justify-center overflow-hidden rounded bg-muted">
-                {#if row.type === 'images' && row.url}<img src={row.url} alt="" class="size-full object-cover" />{:else}<i class="ki-filled ki-file text-muted-foreground"></i>{/if}
-            </div>
-            <span class="truncate text-sm font-medium text-mono">{row.name}</span>
+    <div class="flex flex-col gap-4 p-5">
+        <!-- Type tabs -->
+        <div class="kt-tabs kt-tabs-line overflow-x-auto" role="tablist">
+            {#each typeTabs as tt (tt.id)}
+                <button
+                    type="button"
+                    role="tab"
+                    data-kt-tab-toggle
+                    class="kt-tab-toggle {activeType === tt.id ? 'active' : ''}"
+                    aria-selected={activeType === tt.id}
+                    onclick={() => selectType(tt.id)}
+                >
+                    {tt.label}
+                </button>
+            {/each}
         </div>
-    {:else if column.key === 'type'}
-        <Badge variant="secondary">{$t(`media.types.${row.type}`)}</Badge>
-    {:else if column.key === 'size'}
-        {formatFileSize(row.size)}
-    {:else if column.key === 'status'}
-        <Badge variant={row.scan_status === 'clean' ? 'success' : row.scan_status === 'infected' ? 'destructive' : 'warning'}>{row.scan_status}</Badge>
-    {:else if column.key === 'attached'}
-        <Badge variant={row.attached ? 'info' : 'secondary'}>{row.attached ? $t('media.attached.yes') : $t('media.attached.no')}</Badge>
-    {:else if column.key === 'created_at'}
-        <DateTime value={row.created_at} />
-    {:else}
-        {row[column.key] ?? '—'}
-    {/if}
-{/snippet}
 
-{#snippet rowActions(row)}
-    {#if row.attached && hasPermission('media.detach')}
-        <Dropdown>
-            {#snippet trigger()}
-                <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" aria-label="Actions"><i class="ki-filled ki-dots-vertical"></i></button>
-            {/snippet}
-            <div class="kt-menu-item"><button class="kt-menu-link text-destructive" data-dropdown-dismiss onclick={() => detach(row)}><span class="kt-menu-icon"><i class="ki-filled ki-cross-circle"></i></span><span class="kt-menu-title">{$t('media.actions.detach')}</span></button></div>
-        </Dropdown>
-    {/if}
+        {#if list.loading}
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
+                {#each Array(12) as _}
+                    <div class="flex flex-col overflow-hidden rounded-lg border border-border">
+                        <Skeleton class="aspect-square w-full rounded-none" />
+                        <div class="p-2"><Skeleton class="h-3 w-3/4" /></div>
+                    </div>
+                {/each}
+            </div>
+        {:else if list.rows.length === 0}
+            <EmptyState icon="ki-filled ki-picture" title={$t('common.table.no_results_title')} body={$t('common.table.no_results_body')} />
+        {:else}
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
+                {#each list.rows as item (item.id)}
+                    <div class="group relative">
+                        {#if item.attached && hasPermission('media.detach')}
+                            <div class="absolute end-2 top-2 z-10 opacity-0 transition-opacity group-hover:opacity-100">
+                                <Dropdown>
+                                    {#snippet trigger()}
+                                        <button class="kt-btn kt-btn-icon kt-btn-sm rounded-md bg-background/90 shadow-sm" aria-label={$t('common.table.actions')}>
+                                            <i class="ki-filled ki-dots-vertical"></i>
+                                        </button>
+                                    {/snippet}
+                                    <div class="kt-menu-item">
+                                        <button class="kt-menu-link text-destructive" data-dropdown-dismiss onclick={() => detach(item)}>
+                                            <span class="kt-menu-icon"><i class="ki-filled ki-cross-circle"></i></span>
+                                            <span class="kt-menu-title">{$t('media.actions.detach')}</span>
+                                        </button>
+                                    </div>
+                                </Dropdown>
+                            </div>
+                        {/if}
+                        <button
+                            type="button"
+                            class="flex w-full flex-col overflow-hidden rounded-lg border border-border text-start transition-colors hover:border-primary/50"
+                            onclick={() => view(item)}
+                            title={item.name}
+                        >
+                            <div class="flex aspect-square items-center justify-center bg-muted">
+                                <MediaThumb {item} />
+                            </div>
+                            <div class="p-2">
+                                <span class="block truncate text-xs font-medium text-mono">{item.name}</span>
+                            </div>
+                        </button>
+                    </div>
+                {/each}
+            </div>
+
+            {#if list.meta && list.meta.total > 0}
+                <Pagination meta={list.meta} onPageChange={list.goToPage} onPerPageChange={list.setPerPage} />
+            {/if}
+        {/if}
+    </div>
 {/snippet}

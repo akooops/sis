@@ -14,6 +14,9 @@ import { page } from '@inertiajs/svelte';
 import { get } from 'svelte/store';
 import { api, ApiError } from './api/client';
 
+/** The media type keys, in display order. */
+export const MEDIA_TYPES = ['images', 'audio', 'videos', 'documents'];
+
 /** The shared media config, or sane defaults if not present. */
 export function mediaConfig() {
     return (
@@ -29,6 +32,30 @@ export function mediaConfig() {
 /** Comma-joined `.ext` accept string for an input of the given type. */
 export function acceptFor(type) {
     return mediaConfig().accept?.[type] ?? '';
+}
+
+/** Comma-joined `.ext` accept string spanning several types. */
+export function acceptForTypes(types) {
+    const cfg = mediaConfig();
+    return (types ?? [])
+        .map((type) => cfg.accept?.[type] ?? '')
+        .filter(Boolean)
+        .join(',');
+}
+
+/**
+ * Resolve which media type a file belongs to (by extension) within the allowed
+ * set — used when an uploader accepts more than one type.
+ * @returns {string | null} the matching type key, or null if none match.
+ */
+export function typeForFile(name, allowed = MEDIA_TYPES) {
+    const ext = fileExtension(name);
+    const cfg = mediaConfig();
+    for (const type of allowed) {
+        const exts = (cfg.allowed_types?.[type] ?? []).map((e) => e.toLowerCase());
+        if (exts.includes(ext)) return type;
+    }
+    return null;
 }
 
 /** Allowed extensions (no dot) for a type. */

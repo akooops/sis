@@ -45,7 +45,12 @@ class UploadService
 
         // Let Spatie place the file at its own computed path (id-based, honours
         // any configured prefix/path generator) instead of hardcoding a layout.
-        app(Filesystem::class)->copyToMediaLibrary($data->file->getRealPath(), $media);
+        // The target filename MUST be $media->file_name: copyToMediaLibrary would
+        // otherwise name it after the source path's basename (PHP's "phpXXXX.tmp"
+        // upload temp name), so getPathRelativeToRoot() — "{id}/{file_name}" —
+        // would point at a file that doesn't exist and every later readStream()
+        // would return null.
+        app(Filesystem::class)->copyToMediaLibrary($data->file->getRealPath(), $media, null, $media->file_name);
 
         ScanUpload::dispatch($media);
 

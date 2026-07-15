@@ -9,8 +9,15 @@
     import Toasts from '@/components/feedback/Toasts.svelte';
     import ConfirmDialog from '@/components/feedback/ConfirmDialog.svelte';
     import { initKt } from '@/lib/kt';
+    import { t } from '@/lib/i18n';
 
-    let { breadcrumbs = [], children } = $props();
+    let { title = null, breadcrumbs = null, children } = $props();
+
+    // Breadcrumbs default to "Title › Index" (the module + current page) so pages
+    // only need to pass a `title`; pass `breadcrumbs` explicitly to override.
+    const crumbs = $derived(
+        breadcrumbs ?? (title ? [{ label: title }, { label: $t('common.breadcrumbs.index') }] : []),
+    );
 
     // Initialise the Metronic chrome (sidebar accordion/collapse, topbar dropdowns,
     // sticky header, theme switch) once the shell is mounted.
@@ -23,10 +30,15 @@
     <Sidebar />
 
     <div class="kt-wrapper flex grow flex-col">
-        <Topbar {breadcrumbs} />
+        <Topbar breadcrumbs={crumbs} />
 
         <main class="grow pt-5" id="content" role="content">
             <div class="kt-container-fixed">
+                {#if title}
+                    <div class="flex flex-col justify-center gap-1 pb-5">
+                        <h1 class="text-xl font-semibold leading-none text-mono">{title}</h1>
+                    </div>
+                {/if}
                 {@render children?.()}
             </div>
         </main>
