@@ -204,7 +204,9 @@
                     <div class="flex flex-col divide-y divide-border rounded-lg border border-border">
                         {#each list.rows as row (row.id)}
                             <div class="flex items-center justify-between gap-2 px-3 py-2">
-                                {@render item(row)}
+                                <div class="min-w-0 grow">
+                                    {@render item(row)}
+                                </div>
                                 <div class="flex shrink-0 items-center">
                                     {#if form}
                                         <!-- Only a pivot with data of its own has anything to edit. -->

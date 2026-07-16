@@ -1,6 +1,7 @@
 <script>
     /** Roles → Permissions pivot drawer. */
     import PivotDrawer from '@/components/data/PivotDrawer.svelte';
+    import ClampText from '@/components/ui/ClampText.svelte';
 
     let { open = $bindable(false), role = null } = $props();
 </script>
@@ -23,8 +24,12 @@
 />
 
 {#snippet item(row)}
-    <div class="flex flex-col">
-        <span class="text-sm font-medium text-mono">{row.permission?.name ?? row.permission_id}</span>
-        <span class="text-xs text-muted-foreground">{row.permission?.code ?? ''}</span>
+    <div class="flex min-w-0 flex-col">
+        <div class="text-sm font-medium text-mono">
+            <ClampText value={row.permission?.name ?? row.permission_id} title={row.permission?.name} />
+        </div>
+        <div class="text-xs text-muted-foreground">
+            <ClampText value={row.permission?.code ?? ''} title={row.permission?.code} />
+        </div>
     </div>
 {/snippet}

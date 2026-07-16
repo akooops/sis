@@ -2,6 +2,7 @@
     /** Users → Roles pivot drawer: assign/detach roles for a user. */
     import PivotDrawer from '@/components/data/PivotDrawer.svelte';
     import Badge from '@/components/ui/Badge.svelte';
+    import ClampText from '@/components/ui/ClampText.svelte';
 
     let { open = $bindable(false), user = null } = $props();
 </script>
@@ -24,5 +25,7 @@
 />
 
 {#snippet item(row)}
-    <Badge variant="primary">{row.role?.name ?? row.role_id}</Badge>
+    <Badge variant="primary" class="max-w-full">
+        <ClampText value={row.role?.name ?? row.role_id} title={row.role?.name} />
+    </Badge>
 {/snippet}

@@ -23,7 +23,7 @@
     import { toast } from '@/lib/toast';
     import { confirm } from '@/lib/confirm';
 
-    const list = useIndex('api.v1.admin.users.index', { perPage: 15, include: 'roles', sort: '-created_at', pollMs: 20000 });
+    const list = useIndex('api.v1.admin.users.index', { perPage: 15, sort: '-created_at', pollMs: 20000 });
 
     let showForm = $state(false);
     let editing = $state(null);
