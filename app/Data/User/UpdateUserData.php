@@ -18,7 +18,6 @@ class UpdateUserData extends Data
         public string|Optional $email,
         public string|Optional $password,
         public string|Optional|null $phone,
-        // Temporary upload id from the upload endpoint (see UploadService).
         public string|Optional|null $avatar,
     ) {}
 
@@ -30,11 +29,10 @@ class UpdateUserData extends Data
         return [
             'firstname' => ['sometimes', 'string', 'max:255'],
             'lastname' => ['sometimes', 'string', 'max:255'],
-            'username' => ['sometimes', 'string', 'max:255', Rule::unique('users', 'username')->ignore($user)->whereNull('deleted_at')],
-            'email' => ['sometimes', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user)->whereNull('deleted_at')],
-            // Optional on update — only validated/changed when provided.
+            'username' => ['sometimes', 'string', 'max:255', Rule::unique('users', 'username')->ignore($user)],
+            'email' => ['sometimes', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user)],
             'password' => ['sometimes', 'string', 'min:8'],
-            'phone' => ['sometimes', 'nullable', 'string', new PhoneNumber(), Rule::unique('users', 'phone')->ignore($user)->whereNull('deleted_at')],
+            'phone' => ['sometimes', 'nullable', 'string', new PhoneNumber, Rule::unique('users', 'phone')->ignore($user)],
             'avatar' => ['sometimes', 'nullable', 'string', new CleanUpload('images')],
         ];
     }

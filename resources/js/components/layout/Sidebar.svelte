@@ -15,7 +15,6 @@
     import { adminMenu } from '@/lib/menu';
     import { hasPermission } from '@/lib/permissions';
     import { sidebarTheme, sidebarExpanded } from '@/lib/sidebar';
-    import { t } from '@/lib/i18n';
 
     const isDark = $derived($sidebarTheme === 'dark');
 
@@ -61,12 +60,12 @@
     // while it's the active section. State lives in the module store so it
     // persists across the sidebar's per-navigation remounts (no re-animation).
     function isOpen(node) {
-        const stored = $sidebarExpanded[node.labelKey];
+        const stored = $sidebarExpanded[node.label];
         return stored === undefined ? groupActive(node) : stored;
     }
     function toggle(node) {
         const next = !isOpen(node);
-        sidebarExpanded.update((e) => ({ ...e, [node.labelKey]: next }));
+        sidebarExpanded.update((e) => ({ ...e, [node.label]: next }));
     }
 
     // Collapse the whole sidebar (body class drives the demo1 layout width + the
@@ -106,7 +105,7 @@
     <div class="kt-sidebar-content flex grow shrink-0 py-5 pe-2 overflow-hidden" id="sidebar_content">
         <div class="grow shrink-0 flex flex-col ps-2 lg:ps-5 pe-1 lg:pe-3 overflow-y-auto" id="sidebar_scrollable">
             <div class="kt-menu flex flex-col grow gap-1" id="sidebar_menu">
-                {#each visibleMenu as node (node.labelKey)}
+                {#each visibleMenu as node (node.label)}
                     {#if node.children}
                         <!-- Accordion group -->
                         <div class="kt-menu-item {isOpen(node) ? 'show' : ''}">
@@ -117,7 +116,7 @@
                                 tabindex="0"
                             >
                                 <span class="kt-menu-icon items-start text-muted-foreground w-[20px]"><i class="{node.icon} text-lg"></i></span>
-                                <span class="kt-menu-title text-sm font-medium text-foreground grow">{$t(node.labelKey)}</span>
+                                <span class="kt-menu-title text-sm font-medium text-foreground grow">{node.label}</span>
                                 <span class="kt-menu-arrow text-muted-foreground w-[20px] shrink-0 flex justify-end">
                                     <i class="ki-filled {isOpen(node) ? 'ki-minus' : 'ki-plus'} text-[11px]"></i>
                                 </span>
@@ -136,7 +135,7 @@
                                                 tabindex="0"
                                             >
                                                 <span class="kt-menu-bullet w-[6px] flex shrink-0"><span class="size-[6px] rounded-full {isActive(child.route) ? 'bg-primary' : 'bg-muted-foreground/40'}"></span></span>
-                                                <span class="kt-menu-title text-2sm {isActive(child.route) ? 'font-semibold text-primary' : 'font-normal text-foreground'}">{$t(child.labelKey)}</span>
+                                                <span class="kt-menu-title text-2sm {isActive(child.route) ? 'font-semibold text-primary' : 'font-normal text-foreground'}">{child.label}</span>
                                             </a>
                                         </div>
                                     {/each}
@@ -153,7 +152,7 @@
                                 tabindex="0"
                             >
                                 <span class="kt-menu-icon items-start text-muted-foreground w-[20px]"><i class="{node.icon} text-lg"></i></span>
-                                <span class="kt-menu-title text-sm font-medium {isActive(node.route) ? 'text-primary' : 'text-foreground'}">{$t(node.labelKey)}</span>
+                                <span class="kt-menu-title text-sm font-medium {isActive(node.route) ? 'text-primary' : 'text-foreground'}">{node.label}</span>
                             </a>
                         </div>
                     {/if}

@@ -4,7 +4,6 @@
      *   <ExportButton {rows} columns={[{key,label}]} filename="users" />
      */
     import Button from '@/components/ui/Button.svelte';
-    import { t } from '@/lib/i18n';
 
     let { rows = [], columns = [], filename = 'export' } = $props();
 
@@ -35,5 +34,5 @@
 
 <Button variant="outline" size="sm" onclick={exportCsv} disabled={!rows.length}>
     <i class="ki-filled ki-exit-down"></i>
-    {$t('common.actions.export')}
+    Export
 </Button>

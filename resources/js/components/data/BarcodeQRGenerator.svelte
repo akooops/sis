@@ -7,7 +7,6 @@
     import { onMount } from 'svelte';
     import JsBarcode from 'jsbarcode';
     import QRCode from 'qrcode';
-    import { t } from '@/lib/i18n';
 
     let { value = '' } = $props();
 
@@ -81,13 +80,13 @@
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
                         <h5 class="text-sm font-semibold text-mono flex items-center gap-2">
-                            <i class="ki-filled ki-barcode text-primary"></i>{$t('common.detail.barcode')}
+                            <i class="ki-filled ki-barcode text-primary"></i>Barcode
                         </h5>
                         <div class="flex gap-1">
-                            <button type="button" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" onclick={() => download(barcodeCanvas, 'barcode')} title={$t('common.actions.download')}>
+                            <button type="button" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" onclick={() => download(barcodeCanvas, 'barcode')} title="Download">
                                 <i class="ki-filled ki-exit-down"></i>
                             </button>
-                            <button type="button" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" onclick={() => print(barcodeCanvas, $t('common.detail.barcode'))} title={$t('common.detail.print')}>
+                            <button type="button" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" onclick={() => print(barcodeCanvas, 'Barcode')} title="Print">
                                 <i class="ki-filled ki-printer"></i>
                             </button>
                         </div>
@@ -101,13 +100,13 @@
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
                         <h5 class="text-sm font-semibold text-mono flex items-center gap-2">
-                            <i class="ki-filled ki-scan-barcode text-primary"></i>{$t('common.detail.qr_code')}
+                            <i class="ki-filled ki-scan-barcode text-primary"></i>QR Code
                         </h5>
                         <div class="flex gap-1">
-                            <button type="button" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" onclick={() => download(qrCanvas, 'qrcode')} title={$t('common.actions.download')}>
+                            <button type="button" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" onclick={() => download(qrCanvas, 'qrcode')} title="Download">
                                 <i class="ki-filled ki-exit-down"></i>
                             </button>
-                            <button type="button" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" onclick={() => print(qrCanvas, $t('common.detail.qr_code'))} title={$t('common.detail.print')}>
+                            <button type="button" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" onclick={() => print(qrCanvas, 'QR Code')} title="Print">
                                 <i class="ki-filled ki-printer"></i>
                             </button>
                         </div>

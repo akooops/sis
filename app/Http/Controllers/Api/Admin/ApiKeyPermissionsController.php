@@ -20,7 +20,7 @@ class ApiKeyPermissionsController extends ApiController
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('permission_id'),
-                $this->searchRelation('permission', ['code', 'name']),
+                $this->searchRelationByColumns('permission', ['id', 'name', 'code']),
             ])
             ->allowedIncludes(['apiKey', 'permission'])
             ->allowedSorts(['created_at'])

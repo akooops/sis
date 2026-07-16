@@ -18,7 +18,6 @@ class StoreUserData extends Data
         public string $email,
         public string $password,
         public ?string $phone,
-        // Temporary upload id from the upload endpoint (see UploadService).
         public string|Optional|null $avatar,
     ) {}
 
@@ -27,10 +26,10 @@ class StoreUserData extends Data
         return [
             'firstname' => ['required', 'string', 'max:255'],
             'lastname' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', Rule::unique('users', 'username')->whereNull('deleted_at')],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->whereNull('deleted_at')],
+            'username' => ['required', 'string', 'max:255', Rule::unique('users', 'username')],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
             'password' => ['required', 'string', 'min:8'],
-            'phone' => ['nullable', 'string', new PhoneNumber(), Rule::unique('users', 'phone')->whereNull('deleted_at')],
+            'phone' => ['nullable', 'string', new PhoneNumber, Rule::unique('users', 'phone')],
             'avatar' => ['sometimes', 'nullable', 'string', new CleanUpload('images')],
         ];
     }

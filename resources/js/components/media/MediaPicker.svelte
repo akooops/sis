@@ -11,7 +11,6 @@
      */
     import Button from '@/components/ui/Button.svelte';
     import MediaLibraryModal from './MediaLibraryModal.svelte';
-    import { t } from '@/lib/i18n';
 
     let {
         value = $bindable(null),
@@ -58,10 +57,10 @@
     <div class="flex flex-wrap gap-2">
         <Button variant="outline" size="sm" onclick={openLibrary}>
             <i class="ki-filled ki-picture"></i>
-            {$t('common.media.library')}
+            Media library
         </Button>
         {#if value}
-            <Button variant="ghost" size="sm" onclick={clear}>{$t('common.media.remove')}</Button>
+            <Button variant="ghost" size="sm" onclick={clear}>Remove</Button>
         {/if}
     </div>
 </div>

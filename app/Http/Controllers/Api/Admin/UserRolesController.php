@@ -20,7 +20,7 @@ class UserRolesController extends ApiController
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('role_id'),
-                $this->searchRelation('role', ['name']),
+                $this->searchRelationByColumns('role', ['id', 'name', 'code']),
             ])
             ->allowedIncludes(['user', 'role'])
             ->allowedSorts(['created_at'])

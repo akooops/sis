@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Data\Upload\MediaData;
+use App\Data\Media\MediaData;
 use App\Http\Controllers\Api\ApiController;
 use App\Models\Media;
 use App\Services\Uploads\UploadService;
@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
+use App\Data\Media\StoreMediaData;
 
 class MediaController extends ApiController
 {
@@ -43,6 +44,11 @@ class MediaController extends ApiController
             ->appends(request()->query());
 
         return $this->respond(MediaData::collect($media, PaginatedDataCollection::class), 'Media retrieved successfully');
+    }
+
+    public function store(StoreMediaData $data): JsonResponse
+    {
+        return $this->respond(UploadService::store($data), 'File uploaded successfully', 201);
     }
 
     /**

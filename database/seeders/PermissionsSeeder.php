@@ -19,7 +19,7 @@ class PermissionsSeeder extends Seeder
         foreach ($permissions as $permission) {
             Permission::updateOrCreate(
                 [
-                    'code' => $permission['code']
+                    'code' => $permission['code'],
                 ],
                 [
                     'name' => $permission['name'],

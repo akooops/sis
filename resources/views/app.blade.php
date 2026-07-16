@@ -1,9 +1,5 @@
-@php
-    $locale = app()->getLocale();
-    $rtl = in_array($locale, config('app.rtl_locales', ['ar', 'fa', 'he', 'ur']), true);
-@endphp
 <!DOCTYPE html>
-<html class="h-full" data-kt-theme="true" data-kt-theme-mode="light" dir="{{ $rtl ? 'rtl' : 'ltr' }}" lang="{{ $locale }}">
+<html class="h-full" data-kt-theme="true" data-kt-theme-mode="light" dir="ltr" lang="en">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1">

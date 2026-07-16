@@ -21,11 +21,11 @@ return new class extends Migration
             $table->foreign('role_id')->references('id')->on('roles')->cascadeOnDelete();
 
             $table->unique(['user_id', 'role_id']);
-            
+
             $table->index('user_id');
             $table->index('role_id');
 
-            $table->timestamps();   
+            $table->timestamps();
         });
     }
 

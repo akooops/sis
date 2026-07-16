@@ -8,25 +8,31 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('activity_log', function (Blueprint $table) {
+        Schema::create('activities', function (Blueprint $table) {
             $table->ulid('id')->primary();
 
             $table->string('log_name')->nullable();
-            $table->text('description');
-            $table->nullableUlidMorphs('subject', 'subject');
             $table->string('event')->nullable();
-            $table->nullableUlidMorphs('causer', 'causer');
+
+            $table->text('description');
             $table->json('properties')->nullable();
-            $table->uuid('batch_uuid')->nullable();
-            
-            $table->timestamps();
+
+            $table->string('subject_type')->nullable();
+            $table->ulid('subject_id')->nullable();
+
+            $table->string('causer_type')->nullable();
+            $table->ulid('causer_id')->nullable();
 
             $table->index('log_name');
+            $table->index(['subject_type', 'subject_id']);
+            $table->index(['causer_type', 'causer_id']);
+
+            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('activity_log');
+        Schema::dropIfExists('activities');
     }
 };

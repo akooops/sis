@@ -10,14 +10,14 @@ class StoreRoleData extends Data
 {
     public function __construct(
         public string $name,
-        public bool $is_default = false,
+        public string $code,
     ) {}
 
     public static function rules(ValidationContext $context): array
     {
         return [
-            'name' => ['required', 'string', 'max:255', Rule::unique('roles', 'name')->whereNull('deleted_at')],
-            'is_default' => ['sometimes', 'boolean'],
+            'name' => ['required', 'string', 'max:255', Rule::unique('roles', 'name')],
+            'code' => ['required', 'string', 'max:255', Rule::unique('roles', 'code')],
         ];
     }
 }

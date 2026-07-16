@@ -20,14 +20,10 @@ class RolesController extends ApiController
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('is_default'),
-                AllowedFilter::partial('name'),
-                $this->search(['name']),
-                $this->relatedId('permission', 'permissions'),
-                AllowedFilter::trashed(),
+                $this->search(['id', 'name', 'code']),
             ])
-            ->allowedSorts(['id', 'name', 'is_default', 'created_at'])
+            ->allowedSorts(['id', 'name', 'code', 'created_at'])
             ->defaultSort('-created_at')
-            ->allowedIncludes(['permissions'])
             ->paginate($this->perPage())
             ->appends(request()->query());
 
@@ -36,7 +32,7 @@ class RolesController extends ApiController
 
     public function show(Role $role): JsonResponse
     {
-        return $this->respond(RoleData::from($role->load('permissions')), 'Role retrieved successfully');
+        return $this->respond(RoleData::from($role), 'Role retrieved successfully');
     }
 
     public function store(StoreRoleData $data): JsonResponse
@@ -58,20 +54,5 @@ class RolesController extends ApiController
         $role->delete();
 
         return $this->respond(null, 'Role deleted successfully');
-    }
-
-    public function restore(string $role): JsonResponse
-    {
-        $role = Role::onlyTrashed()->findOrFail($role);
-        $role->restore();
-
-        return $this->respond(RoleData::from($role), 'Role restored successfully');
-    }
-
-    public function forceDestroy(string $role): JsonResponse
-    {
-        Role::onlyTrashed()->findOrFail($role)->forceDelete();
-
-        return $this->respond(null, 'Role permanently deleted successfully');
     }
 }

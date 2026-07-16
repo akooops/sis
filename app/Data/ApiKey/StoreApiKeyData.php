@@ -19,7 +19,7 @@ class StoreApiKeyData extends Data
     public static function rules(ValidationContext $context): array
     {
         return [
-            'name' => ['required', 'string', 'max:255', Rule::unique('api_keys', 'name')->whereNull('deleted_at')],
+            'name' => ['required', 'string', 'max:255', Rule::unique('api_keys', 'name')],
             'allowed_ips' => ['sometimes', 'nullable', 'array'],
             'allowed_ips.*' => ['ip'],
             'expires_at' => ['sometimes', 'nullable', 'date'],

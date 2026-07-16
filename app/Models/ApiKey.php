@@ -7,17 +7,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 class ApiKey extends Model
 {
-    use HasFactory, HasUlids, SoftDeletes;
+    use HasFactory, HasUlids;
 
-    /** Separates the public prefix from the secret in a plaintext token. */
+    /* -----------------------------------------
+     1. Attributes
+    ------------------------------------------*/
+
+    // Separates the public prefix from the secret in a plaintext token.
     public const TOKEN_SEPARATOR = '-';
 
-    // Attributes
     protected $guarded = ['id'];
 
     protected $hidden = ['hash'];
@@ -31,7 +33,10 @@ class ApiKey extends Model
         'revoked_at' => 'datetime',
     ];
 
-    // Relationships
+    /* -----------------------------------------
+     2. Relationships
+    ------------------------------------------*/
+
     public function apiKeyPermissions(): HasMany
     {
         return $this->hasMany(ApiKeyPermission::class);
@@ -44,13 +49,19 @@ class ApiKey extends Model
             ->withTimestamps();
     }
 
-    // Accessors
+    /* -----------------------------------------
+     3. Accessors
+    ------------------------------------------*/
+
     public function getIsActiveAttribute(): bool
     {
         return $this->isUsable();
     }
 
-    // Lifecycle
+    /* -----------------------------------------
+     4. Methods
+    ------------------------------------------*/
+
     /**
      * Create a new key and return [model, plaintext token]. The token is only
      * available here — the database stores just its hash.
@@ -92,7 +103,6 @@ class ApiKey extends Model
         $this->forceFill(['revoked_at' => now()])->save();
     }
 
-    // Authentication
     /**
      * Resolve and authenticate a plaintext token, enforcing usability and the
      * IP allow-list, and stamping last-used. Returns null when invalid.
@@ -135,7 +145,6 @@ class ApiKey extends Model
         return $allowed === [] || ($ip !== null && in_array($ip, $allowed, true));
     }
 
-    // Permissions
     /**
      * Set the key's permissions to exactly the given ids.
      *

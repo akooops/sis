@@ -5,7 +5,7 @@
  * Usage (in a component <script>):
  *   const form = useForm({ email: '', password: '' });
  *   async function submit() {
- *       const data = await form.submit('post', route('api.v1.auth.login'));
+ *       const data = await form.submit('post', route('api.v1.admin.auth.login'));
  *       if (data) router.visit(...);   // returns null on validation error
  *   }
  *   // form.data.email (bindable), form.errors.email, form.processing

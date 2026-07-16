@@ -11,7 +11,7 @@ class UpdateRoleData extends Data
 {
     public function __construct(
         public string|Optional $name,
-        public bool|Optional $is_default,
+        public string|Optional $code,
     ) {}
 
     public static function rules(ValidationContext $context): array
@@ -19,8 +19,8 @@ class UpdateRoleData extends Data
         $role = request()->route('role');
 
         return [
-            'name' => ['sometimes', 'string', 'max:255', Rule::unique('roles', 'name')->ignore($role)->whereNull('deleted_at')],
-            'is_default' => ['sometimes', 'boolean'],
+            'name' => ['sometimes', 'string', 'max:255', Rule::unique('roles', 'name')->ignore($role)],
+            'code' => ['sometimes', 'string', 'max:255', Rule::unique('roles', 'code')->ignore($role)],
         ];
     }
 }

@@ -20,7 +20,6 @@
     import EmptyState from '@/components/ui/EmptyState.svelte';
     import ClampText from '@/components/ui/ClampText.svelte';
     import Pagination from './Pagination.svelte';
-    import { t } from '@/lib/i18n';
 
     let {
         columns = [],
@@ -88,7 +87,7 @@
                 {/each}
                 {#if rowActions}
                     <th class="w-[80px] text-center">
-                        <span class="kt-table-col whitespace-nowrap">{$t('common.table.actions')}</span>
+                        <span class="kt-table-col whitespace-nowrap">Actions</span>
                     </th>
                 {/if}
             </tr>
@@ -108,8 +107,8 @@
                     <td colspan={colspan}>
                         <EmptyState
                             icon={emptyIcon}
-                            title={emptyTitle ?? $t('common.table.no_results_title')}
-                            body={emptyBody ?? $t('common.table.no_results_body')}
+                            title={emptyTitle ?? 'No results found'}
+                            body={emptyBody ?? 'No records match your criteria.'}
                         />
                     </td>
                 </tr>

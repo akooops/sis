@@ -11,10 +11,16 @@ class RolePermission extends Model
 {
     use HasFactory, HasUlids;
 
-    // Attributes
+    /* -----------------------------------------
+     1. Attributes
+    ------------------------------------------*/
+
     protected $guarded = ['id'];
 
-    // Relationships
+    /* -----------------------------------------
+     2. Relationships
+    ------------------------------------------*/
+
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
@@ -25,7 +31,11 @@ class RolePermission extends Model
         return $this->belongsTo(Permission::class);
     }
 
-    // Accessors
+    /* -----------------------------------------
+     3. Accessors
+    ------------------------------------------*/
 
-    // Methods
+    /* -----------------------------------------
+     4. Methods
+    ------------------------------------------*/
 }

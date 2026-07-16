@@ -1,13 +1,13 @@
 /**
  * Single-endpoint upload flow.
  *
- * Files are POSTed to `POST /api/v1/uploads` which quarantines + scans them and
+ * Files are POSTed to `POST /api/v1/admin/uploads` which quarantines + scans them and
  * returns a media reference `{ id, type, name, mime, size, scan_status }`. Forms
  * then submit only that `id`; the server attaches it on save.
  *
  * The allowed size + extensions are shared from the backend via
  * `$page.props.media` (see HandleInertiaRequests), so client-side pre-checks
- * stay in sync with server enforcement (StoreUploadData).
+ * stay in sync with server enforcement (StoreMediaData).
  */
 
 import { page } from '@inertiajs/svelte';
@@ -104,5 +104,5 @@ export async function uploadFile(file, type, opts = {}) {
     form.append('type', type);
     form.append('file', file);
 
-    return api.post(route('api.v1.uploads.store'), form, { signal: opts.signal });
+    return api.post(route('api.v1.admin.uploads.store'), form, { signal: opts.signal });
 }

@@ -2,15 +2,24 @@
 
 namespace App\Services\Uploads;
 
-use App\Data\Upload\StoreUploadData;
-use App\Data\Upload\UploadData;
+use App\Data\Media\StoreMediaData;
+use App\Data\Media\UploadData;
+use App\Enums\MorphType;
 use App\Jobs\ScanUpload;
 use App\Models\Media;
 use App\States\Media\Pending;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\MediaCollections\Filesystem;
 
+/**
+ * The one place files enter, move between owners and leave the system.
+ *
+ * Storage is flat: every file sits in the same folder under a generated ULID
+ * name, and nothing about the owner or the collection is encoded in the path.
+ * That is what makes attach/detach pure database writes — no file ever moves
+ * except once, out of quarantine, when the scan clears it (App\Jobs\ScanUpload).
+ */
 class UploadService
 {
     /** Collection that holds not-yet-attached uploads. */
@@ -21,36 +30,24 @@ class UploadService
      * quarantine disk, queue it for scanning, and return a reference. Uploads
      * are not user-scoped — any authenticated caller may reference the id.
      */
-    public static function store(StoreUploadData $data): UploadData
+    public static function store(StoreMediaData $data): UploadData
     {
-        $disk = config('media-library.quarantine_disk', 'local');
+        $disk = config('uploads.quarantine_disk', 'quarantine');
 
-        $media = new Media();
+        $media = new Media;
         $media->model_type = null;
         $media->model_id = null;
         $media->collection_name = self::TEMP_COLLECTION;
-        $media->name = pathinfo($data->file->getClientOriginalName(), PATHINFO_FILENAME);
-        $media->file_name = static::sanitizeFileName($data->file->getClientOriginalName());
+        $media->name = $data->file->getClientOriginalName();
+        $media->file_name = static::generateFileName($data->file->getClientOriginalName());
         $media->mime_type = $data->file->getMimeType();
         $media->disk = $disk;
-        $media->conversions_disk = $disk;
         $media->size = $data->file->getSize();
-        $media->manipulations = [];
         $media->custom_properties = ['type' => $data->type];
-        $media->generated_conversions = [];
-        $media->responsive_images = [];
-        $media->uuid = (string) Str::uuid();
         $media->state = Pending::class;
         $media->save();
 
-        // Let Spatie place the file at its own computed path (id-based, honours
-        // any configured prefix/path generator) instead of hardcoding a layout.
-        // The target filename MUST be $media->file_name: copyToMediaLibrary would
-        // otherwise name it after the source path's basename (PHP's "phpXXXX.tmp"
-        // upload temp name), so getPathRelativeToRoot() — "{id}/{file_name}" —
-        // would point at a file that doesn't exist and every later readStream()
-        // would return null.
-        app(Filesystem::class)->copyToMediaLibrary($data->file->getRealPath(), $media, null, $media->file_name);
+        Storage::disk($disk)->putFileAs(Media::folder(), $data->file, $media->file_name);
 
         ScanUpload::dispatch($media);
 
@@ -62,15 +59,15 @@ class UploadService
      *  - Free upload (model_id null): re-own the existing row (no copy).
      *  - Already attached elsewhere: copy it onto the model.
      *
-     * For a single-file collection (e.g. avatar, thumbnail) the existing item is
-     * first freed back into the reusable pool. Multi-file collections keep all
-     * their items — removing one is done explicitly via detach().
+     * For a single-file collection (e.g. avatar) the existing item is first
+     * freed back into the reusable pool. Multi-file collections keep all their
+     * items — removing one is done explicitly via detach().
      */
-    public static function attach(string $mediaId, HasMedia $model, string $collection): void
+    public static function attach(string $mediaId, Model $model, string $collection): void
     {
         $media = Media::query()->whereKey($mediaId)->firstOrFail();
 
-        if ($model->getMediaCollection($collection)?->singleFile) {
+        if (in_array($collection, $model->singleFileCollections(), true)) {
             static::freeCollection($model, $collection);
         }
 
@@ -79,10 +76,12 @@ class UploadService
             $media->collection_name = $collection;
             $media->save();
 
+            static::log($media, 'attached', $model, $collection);
+
             return;
         }
 
-        $media->copy($model, $collection);
+        static::log(static::copy($media, $model, $collection), 'attached', $model, $collection);
     }
 
     /**
@@ -91,15 +90,64 @@ class UploadService
      */
     public static function detach(Media $media): void
     {
+        $owner = $media->model;
+        $collection = $media->collection_name;
+
         $media->forceFill([
             'model_type' => null,
             'model_id' => null,
             'collection_name' => self::TEMP_COLLECTION,
         ])->save();
+
+        static::log($media, 'detached', $owner, $collection);
+    }
+
+    /** Delete a media row and its file. */
+    public static function delete(Media $media): void
+    {
+        $media->deleteFile();
+        $media->delete();
+    }
+
+    /** Free all of a model's media (used when the owner is force-deleted). */
+    public static function freeModel(Model $model): void
+    {
+        Media::query()
+            ->where('model_type', $model->getMorphClass())
+            ->where('model_id', $model->getKey())
+            ->update([
+                'model_type' => null,
+                'model_id' => null,
+                'collection_name' => self::TEMP_COLLECTION,
+            ]);
+    }
+
+    /**
+     * Duplicate a media that is already owned by someone else, so the two models
+     * never share a file — deleting one must not blank the other.
+     */
+    protected static function copy(Media $source, Model $model, string $collection): Media
+    {
+        $copy = new Media;
+        $copy->model_type = $model->getMorphClass();
+        $copy->model_id = $model->getKey();
+        $copy->collection_name = $collection;
+        $copy->name = $source->name;
+        $copy->file_name = static::generateFileName($source->file_name);
+        $copy->mime_type = $source->mime_type;
+        $copy->disk = $source->disk;
+        $copy->size = $source->size;
+        $copy->custom_properties = $source->custom_properties;
+        $copy->state = $source->state::class;
+        $copy->save();
+
+        Storage::disk($source->disk)->copy($source->path, $copy->path);
+
+        return $copy;
     }
 
     /** Free every media in one of a model's collections. */
-    protected static function freeCollection(HasMedia $model, string $collection): void
+    protected static function freeCollection(Model $model, string $collection): void
     {
         Media::query()
             ->where('model_type', $model->getMorphClass())
@@ -112,23 +160,34 @@ class UploadService
             ]);
     }
 
-    /** Free all of a model's media (used when the owner is force-deleted). */
-    public static function freeModel(HasMedia $model): void
+    /**
+     * Record a change of owner against the file itself. The MediaObserver logs
+     * creates and deletes; attaching and detaching are not visible in a column
+     * diff worth reading, so they get their own events.
+     */
+    protected static function log(Media $media, string $event, ?Model $owner, string $collection): void
     {
-        Media::query()
-            ->where('model_type', $model->getMorphClass())
-            ->where('model_id', $model->getKey())
-            ->update([
-                'model_type' => null,
-                'model_id' => null,
-                'collection_name' => self::TEMP_COLLECTION,
-            ]);
+        activity('media')
+            ->performedOn($media)
+            ->event($event)
+            ->withProperties([
+                'model_type' => MorphType::aliasFor($owner?->getMorphClass()),
+                'model_id' => $owner?->getKey(),
+                'collection' => $collection,
+                'meta' => ['name' => $media->name, 'collection' => $collection],
+            ])
+            ->log($event);
     }
 
-    protected static function sanitizeFileName(string $name): string
+    /**
+     * All files share one folder, so the stored name must be globally unique —
+     * two people uploading "invoice.pdf" must not collide. Only the extension
+     * survives from the original; the real name lives on in media.name.
+     */
+    protected static function generateFileName(string $originalName): string
     {
-        $extension = pathinfo($name, PATHINFO_EXTENSION);
-        $base = Str::slug(pathinfo($name, PATHINFO_FILENAME)) ?: 'file';
+        $extension = Str::lower(pathinfo($originalName, PATHINFO_EXTENSION));
+        $base = (string) Str::ulid();
 
         return $extension ? "{$base}.{$extension}" : $base;
     }

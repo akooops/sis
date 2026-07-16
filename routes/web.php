@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Web\Admin\PagesController as AdminPagesController;
+use App\Http\Controllers\Web\Admin\AuthController;
+use App\Http\Controllers\Web\PagesController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -9,45 +11,31 @@ use Inertia\Inertia;
 |--------------------------------------------------------------------------
 |
 | These routes only render Inertia page shells; all data is fetched by the
-| Svelte pages from the JSON API (/api/v1/...).
+| Svelte pages from the JSON API (/api/v1/admin/...). The rendering lives in
+| App\Http\Controllers\Web, never inline here.
 |
 */
 
 /*------------------------
 | Auth (guest) pages
 |------------------------*/
-Route::middleware('guest')->prefix('auth')->group(function () {
-    Route::get('login', fn () => Inertia::render('Auth/Login'))
-        ->name('web.auth.login-page');
+Route::middleware('guest')->prefix('admin/auth')->group(function () {
+    Route::get('login', [AuthController::class, 'login'])->name('web.admin.auth.login');
 });
 
 /*------------------------
-| Locale switch (available to guests + authed users)
-|------------------------*/
-Route::post('locale', function (\Illuminate\Http\Request $request) {
-    $supported = (array) config('app.supported_locales', ['en']);
-    $locale = $request->input('locale');
-    if (in_array($locale, $supported, true)) {
-        $request->session()->put('locale', $locale);
-    }
-
-    return back();
-})->name('web.locale.set');
-
-/*------------------------
-| Admin (authenticated) pages — shells only; data comes from the JSON API
+| Admin (authenticated) pages
 |------------------------*/
 Route::middleware('auth')->prefix('admin')->group(function () {
-    Route::get('users', fn () => Inertia::render('Admin/Users/Index'))->name('web.admin.users.index');
-    Route::get('roles', fn () => Inertia::render('Admin/Roles/Index'))->name('web.admin.roles.index');
-    Route::get('permissions', fn () => Inertia::render('Admin/Permissions/Index'))->name('web.admin.permissions.index');
-    Route::get('api-keys', fn () => Inertia::render('Admin/ApiKeys/Index'))->name('web.admin.api-keys.index');
-    Route::get('media', fn () => Inertia::render('Admin/Media/Index'))->name('web.admin.media.index');
+    Route::get('users', [AdminPagesController::class, 'users'])->name('web.admin.users.index');
+    Route::get('roles', [AdminPagesController::class, 'roles'])->name('web.admin.roles.index');
+    Route::get('permissions', [AdminPagesController::class, 'permissions'])->name('web.admin.permissions.index');
+    Route::get('api-keys', [AdminPagesController::class, 'apiKeys'])->name('web.admin.api-keys.index');
+    Route::get('media', [AdminPagesController::class, 'media'])->name('web.admin.media.index');
+    Route::get('activities', [AdminPagesController::class, 'activities'])->name('web.admin.activities.index');
 });
 
 /*------------------------
 | Root
 |------------------------*/
-Route::get('/', fn () => auth()->check()
-    ? Inertia::render('Home')
-    : redirect()->route('web.auth.login-page'))->name('web.home');
+Route::get('/', [PagesController::class, 'index'])->name('web.index');

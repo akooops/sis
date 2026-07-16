@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->ulid('id')->primary();
+            $table->string('azure_ad_id')->nullable()->unique();
 
             $table->string('firstname');
             $table->string('lastname');
@@ -22,14 +23,10 @@ return new class extends Migration
             $table->string('phone', 20)->unique()->nullable();
             $table->string('password');
 
-            $table->string('azure_ad_id')->nullable()->unique();
+            $table->string('status')->default('pending')->index();
 
-            // Approval gate: null = pending admin approval, set = approved/active.
-            $table->dateTime('verified_at')->nullable();
             $table->rememberToken();
-
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

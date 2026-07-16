@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Spatie\QueryBuilder\AllowedFilter;
+use App\Enums\MorphType;
+use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
+use Carbon\Exceptions\InvalidFormatException;
 
 abstract class ApiController extends Controller
 {
@@ -49,7 +53,7 @@ abstract class ApiController extends Controller
      * given id through a relationship — e.g. users by role id, roles by
      * permission id, or (in domain modules) students by their guardian id.
      */
-    protected function relatedId(string $name, string $relation): AllowedFilter
+    protected function searchRelationById(string $name, string $relation): AllowedFilter
     {
         return AllowedFilter::callback($name, function ($query, $value) use ($relation) {
             $query->whereHas($relation, fn ($related) => $related->whereKey($value));
@@ -62,7 +66,7 @@ abstract class ApiController extends Controller
      *
      * @param  array<int, string>  $columns
      */
-    protected function searchRelation(string $relation, array $columns): AllowedFilter
+    protected function searchRelationByColumns(string $relation, array $columns): AllowedFilter
     {
         return AllowedFilter::callback('search', function ($query, $value) use ($relation, $columns) {
             $query->whereHas($relation, function ($query) use ($columns, $value) {
@@ -72,6 +76,31 @@ abstract class ApiController extends Controller
                     }
                 });
             });
+        });
+    }
+
+    /**
+     * Filter a polymorphic column by its public alias.
+     * An unknown alias matches nothing rather than being ignored — a filter the
+     * server doesn't understand must never widen the result set.
+     */
+    protected function morphType(string $name): AllowedFilter
+    {
+        return AllowedFilter::callback($name, function ($query, $value) use ($name) {
+            $query->where($name, MorphType::classFor($value) ?? '-');
+        });
+    }
+
+    protected function date(string $name, string $operator, string $boundary): AllowedFilter
+    {
+        return AllowedFilter::callback($name, function ($query, $value) use ($name, $operator, $boundary) {
+            try {
+                $date = Carbon::parse($value)->{$boundary}();
+            } catch (InvalidFormatException) {
+                throw ValidationException::withMessages([$name => __('validation.date', ['attribute' => $name])]);
+            }
+
+            $query->where('created_at', $operator, $date);
         });
     }
 }

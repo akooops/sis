@@ -2,7 +2,6 @@ import './bootstrap';
 // Keenicons as a standalone sheet (unlayered) so its icon-glyph `content` wins
 // over Tailwind's ::before reset. Fonts are bundled by Vite from the url()s.
 import '../../metronic/dist/assets/vendors/keenicons/styles.bundle.css';
-import './lib/i18n'; // side-effect: keep <html dir/lang> + date locale in sync
 
 import { createInertiaApp, router } from '@inertiajs/svelte';
 import { mount } from 'svelte';

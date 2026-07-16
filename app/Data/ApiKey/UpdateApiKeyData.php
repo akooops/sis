@@ -21,7 +21,7 @@ class UpdateApiKeyData extends Data
         $apiKey = request()->route('apiKey');
 
         return [
-            'name' => ['sometimes', 'string', 'max:255', Rule::unique('api_keys', 'name')->ignore($apiKey)->whereNull('deleted_at')],
+            'name' => ['sometimes', 'string', 'max:255', Rule::unique('api_keys', 'name')->ignore($apiKey)],
             'allowed_ips' => ['sometimes', 'nullable', 'array'],
             'allowed_ips.*' => ['ip'],
             'expires_at' => ['sometimes', 'nullable', 'date'],

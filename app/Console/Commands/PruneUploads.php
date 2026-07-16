@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Media;
+use App\Services\Uploads\UploadService;
 use Illuminate\Console\Command;
 
 class PruneUploads extends Command
@@ -13,7 +14,7 @@ class PruneUploads extends Command
 
     public function handle(): int
     {
-        $cutoff = now()->subDays((int) config('media-library.max_orphaned_files_age', 30));
+        $cutoff = now()->subDays((int) config('uploads.max_orphaned_files_age', 30));
         $count = 0;
 
         Media::query()
@@ -22,7 +23,7 @@ class PruneUploads extends Command
             ->orderBy('id')
             ->chunkById(200, function ($items) use (&$count) {
                 foreach ($items as $media) {
-                    $media->delete(); // Spatie's observer removes the underlying file.
+                    UploadService::delete($media);
                     $count++;
                 }
             });

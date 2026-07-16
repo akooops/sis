@@ -10,21 +10,11 @@
  */
 
 /**
- * The active locale used for formatting. Defaults to the browser locale; the
- * app locale (en/ar) can be applied later via `setDateLocale()` so Arabic
- * pages format their dates correctly.
- * @type {string | undefined}
+ * The locale every formatter falls back to when a caller doesn't pass one. The
+ * UI is English-only, so this is fixed rather than switchable.
+ * @type {string}
  */
-let activeLocale;
-
-/**
- * Override the locale used by every formatter (e.g. 'en', 'ar').
- * Pass `undefined` to fall back to the browser locale.
- * @param {string | undefined} locale
- */
-export function setDateLocale(locale) {
-    activeLocale = locale || undefined;
-}
+const activeLocale = 'en';
 
 /**
  * Parse an ISO string / Date / epoch into a valid Date, or null when the

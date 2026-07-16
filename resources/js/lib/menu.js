@@ -1,27 +1,33 @@
 /**
  * Admin sidebar config — single source for the Metronic accordion menu.
- * A node is either a link ({ labelKey, icon, route }) or an accordion group
- * ({ labelKey, icon, children: [...] }). Children are { labelKey, route, permission? }.
- * `labelKey` is an i18n dot-path resolved with $t in the Sidebar, so labels are
- * translated (EN/AR). Items are permission-gated; empty groups are hidden.
+ * A node is either a link ({ label, icon, route }) or an accordion group
+ * ({ label, icon, children: [...] }). Children are { label, route, permission? }.
+ * Items are permission-gated; empty groups are hidden.
  */
 export const adminMenu = [
-    { labelKey: 'common.nav.dashboard', icon: 'ki-filled ki-element-11', route: 'web.home' },
+    { label: 'Dashboard', icon: 'ki-filled ki-element-11', route: 'web.home' },
     {
-        labelKey: 'common.nav.access_control',
+        label: 'Access Control',
         icon: 'ki-filled ki-shield-tick',
         children: [
-            { labelKey: 'common.nav.users', route: 'web.admin.users.index', permission: 'users.index' },
-            { labelKey: 'common.nav.roles', route: 'web.admin.roles.index', permission: 'roles.index' },
-            { labelKey: 'common.nav.permissions', route: 'web.admin.permissions.index', permission: 'permissions.index' },
-            { labelKey: 'common.nav.api_keys', route: 'web.admin.api-keys.index', permission: 'api-keys.index' },
+            { label: 'Users', route: 'web.admin.users.index', permission: 'users.index' },
+            { label: 'Roles', route: 'web.admin.roles.index', permission: 'roles.index' },
+            { label: 'Permissions', route: 'web.admin.permissions.index', permission: 'permissions.index' },
+            { label: 'API Keys', route: 'web.admin.api-keys.index', permission: 'api-keys.index' },
         ],
     },
     {
-        labelKey: 'common.nav.content',
+        label: 'Content',
         icon: 'ki-filled ki-picture',
         children: [
-            { labelKey: 'common.nav.media', route: 'web.admin.media.index', permission: 'media.index' },
+            { label: 'Media Library', route: 'web.admin.media.index', permission: 'media.index' },
+        ],
+    },
+    {
+        label: 'System',
+        icon: 'ki-filled ki-setting-2',
+        children: [
+            { label: 'Activity Log', route: 'web.admin.activities.index', permission: 'activities.index' },
         ],
     },
 ];

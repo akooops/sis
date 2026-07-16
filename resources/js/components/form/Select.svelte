@@ -16,7 +16,6 @@
      */
     import { portal } from '@/lib/portal';
     import { api } from '@/lib/api/client';
-    import { t } from '@/lib/i18n';
 
     let {
         value = $bindable(null), // single: scalar; multiple: array
@@ -204,7 +203,7 @@
     {:else if !multiple && hasValue}
         <span class="grow truncate text-mono">{labelFor(value)}</span>
     {:else}
-        <span class="grow truncate text-muted-foreground">{placeholder ?? $t('common.actions.search')}</span>
+        <span class="grow truncate text-muted-foreground">{placeholder ?? 'Search'}</span>
     {/if}
 
     {#if clearable && hasValue}
@@ -226,7 +225,7 @@
         <div class="border-b border-border p-2">
             <div class="kt-input kt-input-sm">
                 <i class="ki-filled ki-magnifier text-muted-foreground"></i>
-                <input type="text" value={search} oninput={onSearchInput} placeholder={$t('common.actions.search')} />
+                <input type="text" value={search} oninput={onSearchInput} placeholder="Search" />
             </div>
         </div>
 
@@ -245,9 +244,9 @@
             {/each}
 
             {#if loading}
-                <div class="px-3 py-2 text-sm text-muted-foreground">{$t('common.table.loading')}</div>
+                <div class="px-3 py-2 text-sm text-muted-foreground">Loading…</div>
             {:else if listItems.length === 0}
-                <div class="px-3 py-2 text-sm text-muted-foreground">{$t('common.table.no_results_title')}</div>
+                <div class="px-3 py-2 text-sm text-muted-foreground">No results found</div>
             {/if}
         </div>
     </div>

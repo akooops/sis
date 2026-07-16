@@ -5,7 +5,7 @@
      * `header` snippet (avatar/status) and `children` (module extras), and a
      * toggle that reveals the barcode + QR code for the id.
      *
-     *   <DetailDrawer bind:open title={$t('users.singular')} id={user?.id}
+     *   <DetailDrawer bind:open title="User" id={user?.id}
      *       fields={[{ label, value }, { label, date }]}>
      *       {#snippet header()}…{/snippet}
      *   </DetailDrawer>
@@ -14,7 +14,6 @@
     import DateTime from '@/components/ui/DateTime.svelte';
     import ClampText from '@/components/ui/ClampText.svelte';
     import BarcodeQRGenerator from './BarcodeQRGenerator.svelte';
-    import { t } from '@/lib/i18n';
 
     let {
         open = $bindable(false),
@@ -23,7 +22,6 @@
         fields = [],
         createdAt = null,
         updatedAt = null,
-        deletedAt = null,
         header,
         children,
     } = $props();
@@ -35,13 +33,11 @@
         if (!open) showCodes = false;
     });
 
-    // Standard timestamp rows appended after the record's own fields. `Deleted`
-    // only shows for archived (soft-deleted) records.
+    // Standard timestamp rows appended after the record's own fields.
     const timestamps = $derived(
         [
-            createdAt ? { label: $t('common.detail.created'), date: createdAt } : null,
-            updatedAt ? { label: $t('common.detail.updated'), date: updatedAt } : null,
-            deletedAt ? { label: $t('common.detail.deleted'), date: deletedAt, danger: true } : null,
+            createdAt ? { label: 'Created', date: createdAt } : null,
+            updatedAt ? { label: 'Updated', date: updatedAt } : null,
         ].filter(Boolean),
     );
 </script>
@@ -55,7 +51,7 @@
 
             <dl class="flex flex-col divide-y divide-border rounded-lg border border-border">
                 <div class="flex items-center justify-between gap-4 px-3 py-2 text-sm">
-                    <dt class="text-muted-foreground shrink-0">{$t('common.detail.id')}</dt>
+                    <dt class="text-muted-foreground shrink-0">ID</dt>
                     <dd class="font-mono font-medium text-primary break-all text-end">#{id}</dd>
                 </div>
                 {#each fields as field}
@@ -89,7 +85,7 @@
             <div>
                 <button type="button" class="kt-btn kt-btn-sm kt-btn-secondary" onclick={() => (showCodes = !showCodes)}>
                     <i class="ki-filled ki-barcode"></i>
-                    {showCodes ? $t('common.detail.hide_codes') : $t('common.detail.show_codes')}
+                    {showCodes ? 'Hide Barcode & QR Code' : 'Show Barcode & QR Code'}
                 </button>
             </div>
 

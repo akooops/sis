@@ -9,14 +9,13 @@
     import Toasts from '@/components/feedback/Toasts.svelte';
     import ConfirmDialog from '@/components/feedback/ConfirmDialog.svelte';
     import { initKt } from '@/lib/kt';
-    import { t } from '@/lib/i18n';
 
     let { title = null, breadcrumbs = null, children } = $props();
 
     // Breadcrumbs default to "Title › Index" (the module + current page) so pages
     // only need to pass a `title`; pass `breadcrumbs` explicitly to override.
     const crumbs = $derived(
-        breadcrumbs ?? (title ? [{ label: title }, { label: $t('common.breadcrumbs.index') }] : []),
+        breadcrumbs ?? (title ? [{ label: title }, { label: 'Index' }] : []),
     );
 
     // Initialise the Metronic chrome (sidebar accordion/collapse, topbar dropdowns,

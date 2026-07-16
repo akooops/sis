@@ -11,6 +11,7 @@
     import Dropdown from '@/components/ui/Dropdown.svelte';
     import IdBadge from '@/components/data/IdBadge.svelte';
     import DetailDrawer from '@/components/data/DetailDrawer.svelte';
+    import ActivityDrawer from '@/components/activity/ActivityDrawer.svelte';
     import RoleForm from './RoleForm.svelte';
     import RolePermissionsDrawer from './RolePermissionsDrawer.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
@@ -18,7 +19,6 @@
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
     import { confirm } from '@/lib/confirm';
-    import { t } from '@/lib/i18n';
 
     const list = useIndex('api.v1.admin.roles.index', { perPage: 15, include: 'permissions', sort: '-created_at', pollMs: 20000 });
 
@@ -29,14 +29,16 @@
     let permsRole = $state(null);
     let viewOpen = $state(false);
     let viewing = $state(null);
+    let activityOpen = $state(false);
+    let activityRow = $state(null);
 
     const columns = $derived([
-        { key: 'id', label: $t('common.detail.id'), width: '90px', truncate: false },
-        { key: 'name', label: $t('roles.fields.name'), sortable: true },
-        { key: 'is_default', label: $t('roles.fields.is_default'), sortable: true, truncate: false },
-        { key: 'permissions', label: $t('roles.fields.permissions'), truncate: false },
+        { key: 'id', label: 'ID', width: '90px', truncate: false },
+        { key: 'name', label: 'Name', sortable: true },
+        { key: 'is_default', label: 'Default', sortable: true, truncate: false },
+        { key: 'permissions', label: 'Permissions', truncate: false },
     ]);
-    const filterConfig = $derived([{ key: 'is_default', type: 'boolean', label: $t('roles.fields.is_default') }]);
+    const filterConfig = $derived([{ key: 'is_default', type: 'boolean', label: 'Default' }]);
 
     const create = () => { editing = null; showForm = true; };
     const edit = (r) => { editing = r; showForm = true; };
@@ -44,43 +46,45 @@
     const saved = () => { closeForm(); list.refresh(); };
     const managePerms = (r) => { permsRole = r; permsOpen = true; };
     const view = (r) => { viewing = r; viewOpen = true; };
+    const showActivity = (r) => { activityRow = r; activityOpen = true; };
 
     const viewFields = $derived(
         viewing
             ? [
-                  { label: $t('roles.fields.name'), value: viewing.name },
-                  { label: $t('roles.fields.is_default'), value: viewing.is_default ? $t('common.filters.yes') : $t('common.filters.no') },
-                  { label: $t('roles.fields.permissions'), value: String((viewing.permissions ?? []).length) },
+                  { label: 'Name', value: viewing.name },
+                  { label: 'Default', value: viewing.is_default ? 'Yes' : 'No' },
+                  { label: 'Permissions', value: String((viewing.permissions ?? []).length) },
               ]
             : [],
     );
 
     async function remove(r) {
-        if (!(await confirm({ body: $t('common.confirm.delete_body'), variant: 'destructive' }))) return;
+        if (!(await confirm({ body: 'Are you sure you want to delete this record? This action cannot be undone.', variant: 'destructive' }))) return;
         try {
             await api.delete(route('api.v1.admin.roles.destroy', r.id));
-            toast.success($t('common.feedback.deleted'));
+            toast.success('Deleted successfully.');
             list.refresh();
         } catch (e) {
-            toast.error(e?.message ?? $t('common.feedback.error'));
+            toast.error(e?.message ?? 'Something went wrong. Please try again.');
         }
     }
 </script>
 
-<svelte:head><title>Novonordisk — {$t('roles.title')}</title></svelte:head>
+<svelte:head><title>Novonordisk — Roles</title></svelte:head>
 
-<AdminLayout title={$t('roles.title')}>
+<AdminLayout title="Roles">
     <IndexCard {showForm} {toolbar} {form} {table} />
     <Filters bind:open={filtersOpen} config={filterConfig} values={list.params.filter} onapply={(v) => list.setFilters(v)} />
     <RolePermissionsDrawer bind:open={permsOpen} role={permsRole} />
-    <DetailDrawer bind:open={viewOpen} title={$t('roles.title')} id={viewing?.id} fields={viewFields} createdAt={viewing?.created_at} updatedAt={viewing?.updated_at} deletedAt={viewing?.deleted_at} />
+    <DetailDrawer bind:open={viewOpen} title="Roles" id={viewing?.id} fields={viewFields} createdAt={viewing?.created_at} updatedAt={viewing?.updated_at} />
+    <ActivityDrawer bind:open={activityOpen} subjectType="role" subjectId={activityRow?.id} title={activityRow?.name} />
 </AdminLayout>
 
 {#snippet toolbar(inForm)}
     {#if !inForm}
         <div class="flex items-center gap-2">
-            <SearchBar placeholder={$t('roles.search')} value={list.search} onsearch={(v) => list.setSearch(v)} />
-            <button class="kt-btn kt-btn-sm kt-btn-ghost" onclick={() => (filtersOpen = true)} aria-label={$t('common.actions.filter')}>
+            <SearchBar placeholder="Search roles…" value={list.search} onsearch={(v) => list.setSearch(v)} />
+            <button class="kt-btn kt-btn-sm kt-btn-ghost" onclick={() => (filtersOpen = true)} aria-label="Filter">
                 <i class="ki-filled ki-filter"></i>
             </button>
             <ExportButton rows={list.rows} columns={[
@@ -90,10 +94,10 @@
             ]} filename="roles" />
         </div>
         {#if hasPermission('roles.store')}
-            <button class="kt-btn kt-btn-sm kt-btn-primary" onclick={create}><i class="ki-filled ki-plus"></i>{$t('roles.add')}</button>
+            <button class="kt-btn kt-btn-sm kt-btn-primary" onclick={create}><i class="ki-filled ki-plus"></i>Add role</button>
         {/if}
     {:else}
-        <button class="kt-btn kt-btn-sm kt-btn-secondary" onclick={closeForm}><i class="ki-filled ki-black-left"></i>{$t('common.actions.cancel')}</button>
+        <button class="kt-btn kt-btn-sm kt-btn-secondary" onclick={closeForm}><i class="ki-filled ki-black-left"></i>Cancel</button>
     {/if}
 {/snippet}
 
@@ -109,7 +113,7 @@
     {#if column.key === 'id'}
         <IdBadge id={row.id} onclick={() => view(row)} />
     {:else if column.key === 'is_default'}
-        {#if row.is_default}<Badge variant="info">{$t('common.filters.yes')}</Badge>{:else}<span class="text-muted-foreground">—</span>{/if}
+        {#if row.is_default}<Badge variant="info">Yes</Badge>{:else}<span class="text-muted-foreground">—</span>{/if}
     {:else if column.key === 'permissions'}
         <Badge variant="secondary">{(row.permissions ?? []).length}</Badge>
     {:else if column.key === 'created_at'}
@@ -124,15 +128,18 @@
         {#snippet trigger()}
             <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" aria-label="Actions"><i class="ki-filled ki-dots-vertical"></i></button>
         {/snippet}
-        <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => view(row)}><span class="kt-menu-icon"><i class="ki-filled ki-eye"></i></span><span class="kt-menu-title">{$t('common.actions.view')}</span></button></div>
+        <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => view(row)}><span class="kt-menu-icon"><i class="ki-filled ki-eye"></i></span><span class="kt-menu-title">View</span></button></div>
+        {#if hasPermission('activities.index')}
+            <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => showActivity(row)}><span class="kt-menu-icon"><i class="ki-filled ki-time"></i></span><span class="kt-menu-title">Activity</span></button></div>
+        {/if}
         {#if hasPermission('roles.update')}
-            <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => edit(row)}><span class="kt-menu-icon"><i class="ki-filled ki-pencil"></i></span><span class="kt-menu-title">{$t('common.actions.edit')}</span></button></div>
+            <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => edit(row)}><span class="kt-menu-icon"><i class="ki-filled ki-pencil"></i></span><span class="kt-menu-title">Edit</span></button></div>
         {/if}
         {#if hasPermission('role-permissions.index')}
-            <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => managePerms(row)}><span class="kt-menu-icon"><i class="ki-filled ki-key"></i></span><span class="kt-menu-title">{$t('roles.actions.permissions')}</span></button></div>
+            <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => managePerms(row)}><span class="kt-menu-icon"><i class="ki-filled ki-key"></i></span><span class="kt-menu-title">Manage permissions</span></button></div>
         {/if}
         {#if hasPermission('roles.destroy')}
-            <div class="kt-menu-item"><button class="kt-menu-link text-destructive" data-dropdown-dismiss onclick={() => remove(row)}><span class="kt-menu-icon"><i class="ki-filled ki-trash"></i></span><span class="kt-menu-title">{$t('common.actions.delete')}</span></button></div>
+            <div class="kt-menu-item"><button class="kt-menu-link text-destructive" data-dropdown-dismiss onclick={() => remove(row)}><span class="kt-menu-icon"><i class="ki-filled ki-trash"></i></span><span class="kt-menu-title">Delete</span></button></div>
         {/if}
     </Dropdown>
 {/snippet}

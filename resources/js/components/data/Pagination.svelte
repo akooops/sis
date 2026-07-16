@@ -4,7 +4,6 @@
      * ({ current_page, last_page, per_page, from, to, total }). Emits page and
      * per-page changes via callbacks.
      */
-    import { t } from '@/lib/i18n';
 
     let {
         meta = null,
@@ -33,7 +32,7 @@
 {#if meta}
     <div class="flex flex-col items-center justify-between gap-3 border-t border-border px-4 py-3 sm:flex-row">
         <div class="flex items-center gap-2 text-sm text-secondary-foreground">
-            <span>{$t('common.table.showing', { from: meta.from ?? 0, to: meta.to ?? 0, total: meta.total ?? 0 })}</span>
+            <span>Showing {meta.from ?? 0}–{meta.to ?? 0} of {meta.total ?? 0}</span>
             <select
                 class="kt-select kt-select-sm w-auto"
                 value={meta.per_page}
@@ -43,7 +42,7 @@
                     <option value={opt}>{opt}</option>
                 {/each}
             </select>
-            <span>{$t('common.table.per_page')}</span>
+            <span>per page</span>
         </div>
 
         <div class="flex items-center gap-1">

@@ -12,7 +12,10 @@ class Permission extends Model
 {
     use HasFactory, HasUlids;
 
-    // Attributes
+    /* -----------------------------------------
+     1. Attributes
+    ------------------------------------------*/
+
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -20,7 +23,10 @@ class Permission extends Model
         'supports_api' => 'boolean',
     ];
 
-    // Relationships
+    /* -----------------------------------------
+     2. Relationships
+    ------------------------------------------*/
+
     public function rolePermissions(): HasMany
     {
         return $this->hasMany(RolePermission::class);
@@ -45,7 +51,11 @@ class Permission extends Model
             ->withTimestamps();
     }
 
-    // Accessors
+    /* -----------------------------------------
+     3. Accessors
+    ------------------------------------------*/
 
-    // Methods
+    /* -----------------------------------------
+     4. Methods
+    ------------------------------------------*/
 }

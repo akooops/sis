@@ -2,23 +2,27 @@
 
 namespace App\Models;
 
+use App\States\User\Approved;
+use App\States\User\UserStatus;
+use App\Traits\Uploads\HasMedia;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\ModelStates\HasStates;
 
-class User extends Authenticatable implements HasMedia
+class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasUlids, InteractsWithMedia, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, HasMedia, HasStates, HasUlids, Notifiable;
 
-    // Attributes
+    /* -----------------------------------------
+     1. Attributes
+    ------------------------------------------*/
+
     protected $guarded = ['id'];
 
     protected $appends = ['avatar_url'];
@@ -30,22 +34,13 @@ class User extends Authenticatable implements HasMedia
 
     protected $casts = [
         'password' => 'hashed',
-        'verified_at' => 'datetime',
+        'status' => UserStatus::class,
     ];
 
-    // Media
-    public function registerMediaCollections(): void
-    {
-        $this->addMediaCollection('avatar')->singleFile();
-    }
+    /* -----------------------------------------
+     2. Relationships
+    ------------------------------------------*/
 
-    // Spatie never auto-deletes this model's media;, we use observers to frees it on force delete.
-    public function shouldDeletePreservingMedia(): bool
-    {
-        return true;
-    }
-
-    // Relationships
     public function userRoles(): HasMany
     {
         return $this->hasMany(UserRole::class);
@@ -56,7 +51,41 @@ class User extends Authenticatable implements HasMedia
         return $this->belongsToMany(Role::class, 'user_roles');
     }
 
-    // Roles
+    /* -----------------------------------------
+     3. Accessors
+    ------------------------------------------*/
+
+    public function getAvatarUrlAttribute(): string
+    {
+        return $this->getFirstMediaUrl('avatar') ?: URL::to('assets/media/avatars/blank.png');
+    }
+
+    /* -----------------------------------------
+     4. Methods
+    ------------------------------------------*/
+
+    /**
+     * Only an approved account may sign in — being Verified (Azure confirmed who
+     * you are) is not the same as being let in. The single source of truth for
+     * the gate; see AuthController.
+     */
+    public function canLogin(): bool
+    {
+        return $this->status instanceof Approved;
+    }
+
+    /**
+     * A user has one avatar: attaching a new one frees the old back into the
+     * reusable pool. Deleting a user frees their avatar back into the pool
+     * rather than destroying the file — see UserObserver.
+     *
+     * @return array<int, string>
+     */
+    public function singleFileCollections(): array
+    {
+        return ['avatar'];
+    }
+
     /**
      * Set the user's roles to exactly the given ids.
      *
@@ -73,7 +102,6 @@ class User extends Authenticatable implements HasMedia
         }
     }
 
-    // Permissions
     // A user acts on the web channel, so only web-enabled permissions count.
     public function permissions(): array
     {
@@ -97,11 +125,5 @@ class User extends Authenticatable implements HasMedia
     public function hasPermissions(array $permissions): bool
     {
         return array_diff(array_unique($permissions), $this->permissions()) === [];
-    }
-
-    // Accessors
-    public function getAvatarUrlAttribute(): string
-    {
-        return $this->getFirstMediaUrl('avatar') ?: URL::to('assets/media/avatars/blank.png');
     }
 }

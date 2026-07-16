@@ -9,6 +9,7 @@
     import EmptyState from '@/components/ui/EmptyState.svelte';
     import Dropdown from '@/components/ui/Dropdown.svelte';
     import DetailDrawer from '@/components/data/DetailDrawer.svelte';
+    import ActivityDrawer from '@/components/activity/ActivityDrawer.svelte';
     import MediaThumb from '@/components/media/MediaThumb.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
     import { hasPermission } from '@/lib/permissions';
@@ -17,18 +18,24 @@
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
     import { confirm } from '@/lib/confirm';
-    import { t } from '@/lib/i18n';
+
+    /** Display labels for each media type key (was `media.tabs.*` / `media.types.*`). */
+    const TAB_LABELS = { images: 'Images', audio: 'Audio', videos: 'Videos', documents: 'Documents' };
+    const TYPE_LABELS = { images: 'Image', audio: 'Audio', videos: 'Video', documents: 'Document' };
 
     const list = useIndex('api.v1.admin.media.index', { perPage: 15, sort: '-created_at', pollMs: 0 });
     let viewOpen = $state(false);
     let viewing = $state(null);
+    let activityOpen = $state(false);
+    let activityRow = $state(null);
     const view = (m) => { viewing = m; viewOpen = true; };
+    const showActivity = (m) => { activityRow = m; activityOpen = true; };
 
     // Type filter tabs (All + each media type). '' = all.
     let activeType = $state(list.params.filter?.type ?? '');
     const typeTabs = $derived([
-        { id: '', label: $t('media.tabs.all') },
-        ...MEDIA_TYPES.map((ty) => ({ id: ty, label: $t(`media.tabs.${ty}`) })),
+        { id: '', label: 'All' },
+        ...MEDIA_TYPES.map((ty) => ({ id: ty, label: TAB_LABELS[ty] })),
     ]);
     function selectType(ty) {
         activeType = ty;
@@ -41,11 +48,11 @@
     const viewFields = $derived(
         viewing
             ? [
-                  { label: $t('media.fields.name'), value: viewing.name },
-                  { label: $t('media.fields.type'), value: $t(`media.types.${viewing.type}`) },
-                  { label: $t('media.fields.size'), value: formatFileSize(viewing.size) },
-                  { label: $t('media.fields.status'), value: viewing.scan_status },
-                  { label: $t('media.fields.attached'), value: viewing.attached ? $t('media.attached.yes') : $t('media.attached.no') },
+                  { label: 'Name', value: viewing.name },
+                  { label: 'Type', value: TYPE_LABELS[viewing.type] },
+                  { label: 'Size', value: formatFileSize(viewing.size) },
+                  { label: 'Scan', value: viewing.scan_status },
+                  { label: 'Attached', value: viewing.attached ? 'In use' : 'Free' },
               ]
             : [],
     );
@@ -54,22 +61,23 @@
         if (!(await confirm({ variant: 'destructive' }))) return;
         try {
             await api.patch(route('api.v1.admin.media.detach', m.id));
-            toast.success($t('common.feedback.updated'));
+            toast.success('Updated successfully.');
             list.refresh();
-        } catch (e) { toast.error(e?.message ?? $t('common.feedback.error')); }
+        } catch (e) { toast.error(e?.message ?? 'Something went wrong. Please try again.'); }
     }
 </script>
 
-<svelte:head><title>Novonordisk — {$t('media.title')}</title></svelte:head>
+<svelte:head><title>Novonordisk — Media library</title></svelte:head>
 
-<AdminLayout title={$t('media.title')}>
+<AdminLayout title="Media library">
     <IndexCard showForm={false} {toolbar} {form} {table} />
-    <DetailDrawer bind:open={viewOpen} title={$t('media.title')} id={viewing?.id} fields={viewFields} createdAt={viewing?.created_at} updatedAt={viewing?.updated_at} />
+    <DetailDrawer bind:open={viewOpen} title="Media library" id={viewing?.id} fields={viewFields} createdAt={viewing?.created_at} updatedAt={viewing?.updated_at} />
+    <ActivityDrawer bind:open={activityOpen} subjectType="media" subjectId={activityRow?.id} title={activityRow?.name} />
 </AdminLayout>
 
 {#snippet toolbar()}
     <div class="flex items-center gap-2">
-        <SearchBar placeholder={$t('media.search')} value={list.search} onsearch={(v) => list.setSearch(v)} />
+        <SearchBar placeholder="Search media…" value={list.search} onsearch={(v) => list.setSearch(v)} />
         <ExportButton rows={list.rows} columns={[
             { key: 'name', label: 'Name' },
             { key: 'type', label: 'Type' },
@@ -109,25 +117,35 @@
                 {/each}
             </div>
         {:else if list.rows.length === 0}
-            <EmptyState icon="ki-filled ki-picture" title={$t('common.table.no_results_title')} body={$t('common.table.no_results_body')} />
+            <EmptyState icon="ki-filled ki-picture" title="No results found" body="No records match your criteria." />
         {:else}
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
                 {#each list.rows as item (item.id)}
                     <div class="group relative">
-                        {#if item.attached && hasPermission('media.detach')}
+                        {#if hasPermission('activities.index') || (item.attached && hasPermission('media.detach'))}
                             <div class="absolute end-2 top-2 z-10 opacity-0 transition-opacity group-hover:opacity-100">
                                 <Dropdown>
                                     {#snippet trigger()}
-                                        <button class="kt-btn kt-btn-icon kt-btn-sm rounded-md bg-background/90 shadow-sm" aria-label={$t('common.table.actions')}>
+                                        <button class="kt-btn kt-btn-icon kt-btn-sm rounded-md bg-background/90 shadow-sm" aria-label="Actions">
                                             <i class="ki-filled ki-dots-vertical"></i>
                                         </button>
                                     {/snippet}
-                                    <div class="kt-menu-item">
-                                        <button class="kt-menu-link text-destructive" data-dropdown-dismiss onclick={() => detach(item)}>
-                                            <span class="kt-menu-icon"><i class="ki-filled ki-cross-circle"></i></span>
-                                            <span class="kt-menu-title">{$t('media.actions.detach')}</span>
-                                        </button>
-                                    </div>
+                                    {#if hasPermission('activities.index')}
+                                        <div class="kt-menu-item">
+                                            <button class="kt-menu-link" data-dropdown-dismiss onclick={() => showActivity(item)}>
+                                                <span class="kt-menu-icon"><i class="ki-filled ki-time"></i></span>
+                                                <span class="kt-menu-title">Activity</span>
+                                            </button>
+                                        </div>
+                                    {/if}
+                                    {#if item.attached && hasPermission('media.detach')}
+                                        <div class="kt-menu-item">
+                                            <button class="kt-menu-link text-destructive" data-dropdown-dismiss onclick={() => detach(item)}>
+                                                <span class="kt-menu-icon"><i class="ki-filled ki-cross-circle"></i></span>
+                                                <span class="kt-menu-title">Free (detach)</span>
+                                            </button>
+                                        </div>
+                                    {/if}
                                 </Dropdown>
                             </div>
                         {/if}

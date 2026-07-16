@@ -22,12 +22,10 @@ class UserData extends Data
         public string $email,
         public ?string $phone,
         public ?string $avatar_url,
-        public ?string $verified_at,
+        public string $status,
+        public bool $can_login,
         public ?string $created_at,
         public ?string $updated_at,
-        public ?string $deleted_at,
-        /** @var array<int, RoleData> */
-        public Lazy|array $roles,
     ) {}
 
     public static function fromModel(User $user): self
@@ -40,15 +38,10 @@ class UserData extends Data
             email: $user->email,
             phone: $user->phone,
             avatar_url: $user->avatar_url,
-            verified_at: $user->verified_at?->toIso8601String(),
+            status: $user->status->getValue(),
+            can_login: $user->canLogin(),
             created_at: $user->created_at?->toIso8601String(),
             updated_at: $user->updated_at?->toIso8601String(),
-            deleted_at: $user->deleted_at?->toIso8601String(),
-            roles: Lazy::whenLoaded(
-                'roles',
-                $user,
-                fn () => RoleData::collect($user->roles->all()),
-            ),
         );
     }
 }

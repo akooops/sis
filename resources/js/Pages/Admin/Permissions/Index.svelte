@@ -11,7 +11,6 @@
     import IdBadge from '@/components/data/IdBadge.svelte';
     import DetailDrawer from '@/components/data/DetailDrawer.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
-    import { t } from '@/lib/i18n';
 
     const list = useIndex('api.v1.admin.permissions.index', { perPage: 20, sort: '-created_at', pollMs: 0 });
     let filtersOpen = $state(false);
@@ -22,39 +21,39 @@
     const viewFields = $derived(
         viewing
             ? [
-                  { label: $t('permissions.fields.code'), value: viewing.code },
-                  { label: $t('permissions.fields.name'), value: viewing.name },
-                  { label: $t('permissions.fields.supports_web'), value: viewing.supports_web ? $t('common.filters.yes') : $t('common.filters.no') },
-                  { label: $t('permissions.fields.supports_api'), value: viewing.supports_api ? $t('common.filters.yes') : $t('common.filters.no') },
+                  { label: 'Code', value: viewing.code },
+                  { label: 'Name', value: viewing.name },
+                  { label: 'Web', value: viewing.supports_web ? 'Yes' : 'No' },
+                  { label: 'API', value: viewing.supports_api ? 'Yes' : 'No' },
               ]
             : [],
     );
 
     const columns = $derived([
-        { key: 'id', label: $t('common.detail.id'), width: '90px', truncate: false },
-        { key: 'code', label: $t('permissions.fields.code'), sortable: true },
-        { key: 'name', label: $t('permissions.fields.name'), sortable: true },
-        { key: 'supports_web', label: $t('permissions.fields.supports_web'), truncate: false },
-        { key: 'supports_api', label: $t('permissions.fields.supports_api'), truncate: false },
+        { key: 'id', label: 'ID', width: '90px', truncate: false },
+        { key: 'code', label: 'Code', sortable: true },
+        { key: 'name', label: 'Name', sortable: true },
+        { key: 'supports_web', label: 'Web', truncate: false },
+        { key: 'supports_api', label: 'API', truncate: false },
     ]);
     const filterConfig = $derived([
-        { key: 'supports_web', type: 'boolean', label: $t('permissions.fields.supports_web') },
-        { key: 'supports_api', type: 'boolean', label: $t('permissions.fields.supports_api') },
+        { key: 'supports_web', type: 'boolean', label: 'Web' },
+        { key: 'supports_api', type: 'boolean', label: 'API' },
     ]);
 </script>
 
-<svelte:head><title>Novonordisk — {$t('permissions.title')}</title></svelte:head>
+<svelte:head><title>Novonordisk — Permissions</title></svelte:head>
 
-<AdminLayout title={$t('permissions.title')}>
+<AdminLayout title="Permissions">
     <IndexCard showForm={false} {toolbar} {form} {table} />
     <Filters bind:open={filtersOpen} config={filterConfig} values={list.params.filter} onapply={(v) => list.setFilters(v)} />
-    <DetailDrawer bind:open={viewOpen} title={$t('permissions.title')} id={viewing?.id} fields={viewFields} createdAt={viewing?.created_at} updatedAt={viewing?.updated_at} />
+    <DetailDrawer bind:open={viewOpen} title="Permissions" id={viewing?.id} fields={viewFields} createdAt={viewing?.created_at} updatedAt={viewing?.updated_at} />
 </AdminLayout>
 
 {#snippet toolbar()}
     <div class="flex items-center gap-2">
-        <SearchBar placeholder={$t('permissions.search')} value={list.search} onsearch={(v) => list.setSearch(v)} />
-        <button class="kt-btn kt-btn-sm kt-btn-ghost" onclick={() => (filtersOpen = true)} aria-label={$t('common.actions.filter')}><i class="ki-filled ki-filter"></i></button>
+        <SearchBar placeholder="Search permissions…" value={list.search} onsearch={(v) => list.setSearch(v)} />
+        <button class="kt-btn kt-btn-sm kt-btn-ghost" onclick={() => (filtersOpen = true)} aria-label="Filter"><i class="ki-filled ki-filter"></i></button>
         <ExportButton rows={list.rows} columns={[
             { key: 'code', label: 'Code' },
             { key: 'name', label: 'Name' },
@@ -74,9 +73,9 @@
     {:else if column.key === 'code'}
         <span class="font-mono text-xs text-mono">{row.code}</span>
     {:else if column.key === 'supports_web'}
-        {#if row.supports_web}<Badge variant="success">{$t('common.filters.yes')}</Badge>{:else}<span class="text-muted-foreground">—</span>{/if}
+        {#if row.supports_web}<Badge variant="success">Yes</Badge>{:else}<span class="text-muted-foreground">—</span>{/if}
     {:else if column.key === 'supports_api'}
-        {#if row.supports_api}<Badge variant="success">{$t('common.filters.yes')}</Badge>{:else}<span class="text-muted-foreground">—</span>{/if}
+        {#if row.supports_api}<Badge variant="success">Yes</Badge>{:else}<span class="text-muted-foreground">—</span>{/if}
     {:else if column.key === 'created_at'}
         <DateTime value={row.created_at} />
     {:else}

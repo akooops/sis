@@ -5,7 +5,6 @@
      *
      *   <SearchBar onsearch={(v) => list.setSearch(v)} />
      */
-    import { t } from '@/lib/i18n';
 
     let { value = $bindable(''), placeholder = null, debounceMs = 400, onsearch } = $props();
 
@@ -28,7 +27,7 @@
     <i class="ki-filled ki-magnifier text-muted-foreground"></i>
     <input
         type="text"
-        placeholder={placeholder ?? $t('common.actions.search')}
+        placeholder={placeholder ?? 'Search'}
         {value}
         oninput={handleInput}
     />

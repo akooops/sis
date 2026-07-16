@@ -11,10 +11,16 @@ class UserRole extends Model
 {
     use HasFactory, HasUlids;
 
-    // Attributes
+    /* -----------------------------------------
+     1. Attributes
+    ------------------------------------------*/
+
     protected $guarded = ['id'];
 
-    // Relationships
+    /* -----------------------------------------
+     2. Relationships
+    ------------------------------------------*/
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -25,7 +31,11 @@ class UserRole extends Model
         return $this->belongsTo(Role::class);
     }
 
-    // Accessors
+    /* -----------------------------------------
+     3. Accessors
+    ------------------------------------------*/
 
-    // Methods
+    /* -----------------------------------------
+     4. Methods
+    ------------------------------------------*/
 }

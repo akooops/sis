@@ -9,7 +9,6 @@
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
     import { confirm } from '@/lib/confirm';
-    import { t } from '@/lib/i18n';
 
     let { open = $bindable(false), user = null } = $props();
 
@@ -41,45 +40,45 @@
         saving = true;
         try {
             await api.post(route('api.v1.admin.user-roles.store', user.id), { roles: selected });
-            toast.success($t('common.feedback.updated'));
+            toast.success('Updated successfully.');
             selected = [];
             await load();
         } catch (e) {
-            toast.error(e?.message ?? $t('common.feedback.error'));
+            toast.error(e?.message ?? 'Something went wrong. Please try again.');
         } finally {
             saving = false;
         }
     }
 
     async function detach(pivot) {
-        if (!(await confirm({ title: $t('common.confirm.delete_title'), variant: 'destructive' }))) return;
+        if (!(await confirm({ title: 'Delete confirmation', variant: 'destructive' }))) return;
         try {
             await api.delete(route('api.v1.admin.user-roles.destroy', pivot.id));
-            toast.success($t('common.feedback.deleted'));
+            toast.success('Deleted successfully.');
             await load();
         } catch (e) {
-            toast.error(e?.message ?? $t('common.feedback.error'));
+            toast.error(e?.message ?? 'Something went wrong. Please try again.');
         }
     }
 </script>
 
-<Drawer bind:open title={$t('users.roles_drawer.title', { name: user ? `${user.firstname} ${user.lastname}` : '' })}>
+<Drawer bind:open title={`Roles for ${user ? `${user.firstname} ${user.lastname}` : ''}`}>
     <div class="flex flex-col gap-5">
-        <Field label={$t('users.roles_drawer.assign')}>
+        <Field label="Assign roles">
             <div class="flex items-end gap-2">
                 <div class="grow">
                     <Select resource="api.v1.admin.roles.index" labelKey="name" valueKey="id" multiple bind:value={selected} />
                 </div>
-                <Button variant="primary" onclick={assign} loading={saving} disabled={!selected.length}>{$t('common.actions.add')}</Button>
+                <Button variant="primary" onclick={assign} loading={saving} disabled={!selected.length}>Add</Button>
             </div>
         </Field>
 
         <div class="flex flex-col gap-2">
-            <span class="text-sm font-medium text-mono">{$t('users.roles_drawer.current')}</span>
+            <span class="text-sm font-medium text-mono">Assigned roles</span>
             {#if loading}
                 <div class="py-4 text-center"><Spinner /></div>
             {:else if rows.length === 0}
-                <p class="text-sm text-muted-foreground">{$t('users.roles_drawer.empty')}</p>
+                <p class="text-sm text-muted-foreground">No roles assigned yet.</p>
             {:else}
                 <div class="flex flex-col divide-y divide-border rounded-lg border border-border">
                     {#each rows as row (row.id)}

@@ -19,9 +19,15 @@
     import { untrack } from 'svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
     import { MEDIA_TYPES } from '@/lib/upload';
-    import { t } from '@/lib/i18n';
 
     let { open = $bindable(false), accept = null, initialTab = 'library', onpick } = $props();
+
+    const TYPE_TAB_LABELS = {
+        images: 'Images',
+        audio: 'Audio',
+        videos: 'Videos',
+        documents: 'Documents',
+    };
 
     const allowedTypes = $derived(accept?.length ? accept.filter((ty) => MEDIA_TYPES.includes(ty)) : MEDIA_TYPES);
     const singleType = $derived(allowedTypes.length === 1 ? allowedTypes[0] : null);
@@ -31,7 +37,7 @@
     const typeTabs = $derived(
         singleType
             ? []
-            : [{ id: '__all', label: $t('media.tabs.all') }, ...allowedTypes.map((ty) => ({ id: ty, label: $t(`media.tabs.${ty}`) }))],
+            : [{ id: '__all', label: 'All' }, ...allowedTypes.map((ty) => ({ id: ty, label: TYPE_TAB_LABELS[ty] }))],
     );
 
     let tab = $state(initialTab); // library | upload
@@ -93,11 +99,11 @@
     }
 </script>
 
-<Modal bind:open size="lg" title={$t('common.media.library')}>
+<Modal bind:open size="lg" title="Media library">
     <Tabs
         tabs={[
-            { id: 'library', label: $t('common.media.library'), icon: 'ki-filled ki-picture' },
-            { id: 'upload', label: $t('common.media.upload'), icon: 'ki-filled ki-cloud-add' },
+            { id: 'library', label: 'Media library', icon: 'ki-filled ki-picture' },
+            { id: 'upload', label: 'Upload', icon: 'ki-filled ki-cloud-add' },
         ]}
         bind:active={tab}
     />
@@ -124,9 +130,9 @@
                 <SearchBar value={list.search} onsearch={(v) => list.setSearch(v)} />
             </div>
             {#if list.loading}
-                <div class="py-10 text-center text-sm text-muted-foreground">{$t('common.table.loading')}</div>
+                <div class="py-10 text-center text-sm text-muted-foreground">Loading…</div>
             {:else if list.rows.length === 0}
-                <div class="py-10 text-center text-sm text-muted-foreground">{$t('common.table.no_results_title')}</div>
+                <div class="py-10 text-center text-sm text-muted-foreground">No results found</div>
             {:else}
                 <MediaGrid items={list.rows} selectedId={selected?.id} onselect={(i) => (selected = i)} />
                 <Pagination meta={list.meta} onPageChange={(p) => list.goToPage(p)} onPerPageChange={(n) => list.setPerPage(n)} />
@@ -137,9 +143,9 @@
     </div>
 
     {#snippet footer()}
-        <Button variant="secondary" onclick={() => (open = false)}>{$t('common.actions.cancel')}</Button>
+        <Button variant="secondary" onclick={() => (open = false)}>Cancel</Button>
         {#if tab === 'library'}
-            <Button variant="primary" disabled={!selected} onclick={confirmPick}>{$t('common.media.select')}</Button>
+            <Button variant="primary" disabled={!selected} onclick={confirmPick}>Select</Button>
         {/if}
     {/snippet}
 </Modal>

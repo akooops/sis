@@ -8,9 +8,15 @@ use App\Data\User\UserData;
 use App\Http\Controllers\Api\ApiController;
 use App\Models\User;
 use App\Services\Uploads\UploadService;
+use App\States\User\Approved;
+use App\States\User\Rejected;
+use App\States\User\UserStatus;
+use App\States\User\Verified;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
+use Spatie\ModelStates\Exceptions\TransitionNotFound;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -21,17 +27,11 @@ class UsersController extends ApiController
         $users = QueryBuilder::for(User::class)
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::partial('email'),
-                AllowedFilter::partial('firstname'),
-                AllowedFilter::partial('lastname'),
-                AllowedFilter::partial('username'),
-                $this->search(['firstname', 'lastname', 'username', 'email']),
-                $this->relatedId('role', 'roles'),
-                AllowedFilter::trashed(),
+                AllowedFilter::exact('status'),
+                $this->search(['id', 'firstname', 'lastname', 'username', 'email', 'phone']),
             ])
             ->allowedSorts(['id', 'firstname', 'lastname', 'username', 'email', 'created_at'])
             ->defaultSort('-created_at')
-            ->allowedIncludes(['roles'])
             ->paginate($this->perPage())
             ->appends(request()->query());
 
@@ -40,7 +40,7 @@ class UsersController extends ApiController
 
     public function show(User $user): JsonResponse
     {
-        return $this->respond(UserData::from($user->load('roles')), 'User retrieved successfully');
+        return $this->respond(UserData::from($user), 'User retrieved successfully');
     }
 
     public function store(StoreUserData $data): JsonResponse
@@ -52,14 +52,14 @@ class UsersController extends ApiController
             'email' => $data->email,
             'password' => $data->password,
             'phone' => $data->phone,
-            'verified_at' => now(),
+            'status' => Approved::class,
         ]);
 
         if (! $data->avatar instanceof Optional && $data->avatar) {
             UploadService::attach($data->avatar, $user, 'avatar');
         }
 
-        return $this->respond(UserData::from($user->load('roles')), 'User created successfully', 201);
+        return $this->respond(UserData::from($user), 'User created successfully', 201);
     }
 
     public function update(UpdateUserData $data, User $user): JsonResponse
@@ -70,7 +70,7 @@ class UsersController extends ApiController
             UploadService::attach($data->avatar, $user, 'avatar');
         }
 
-        return $this->respond(UserData::from($user->fresh()->load('roles')), 'User updated successfully');
+        return $this->respond(UserData::from($user->fresh()), 'User updated successfully');
     }
 
     public function destroy(User $user): JsonResponse
@@ -80,34 +80,40 @@ class UsersController extends ApiController
         return $this->respond(null, 'User deleted successfully');
     }
 
-    public function restore(string $user): JsonResponse
+    /** Let the account in. This is the only status that can sign in. */
+    public function approve(User $user): JsonResponse
     {
-        $user = User::onlyTrashed()->findOrFail($user);
-        $user->restore();
-
-        return $this->respond(UserData::from($user->load('roles')), 'User restored successfully');
+        return $this->transition($user, Approved::class, 'User approved successfully');
     }
 
-    public function forceDestroy(string $user): JsonResponse
+    /** Refuse the account. */
+    public function reject(User $user): JsonResponse
     {
-        User::onlyTrashed()->findOrFail($user)->forceDelete();
-
-        return $this->respond(null, 'User permanently deleted successfully');
+        return $this->transition($user, Rejected::class, 'User rejected successfully');
     }
 
-    /** Approve a pending account (e.g. one self-registered via Azure). */
+    /** Confirm who they are without letting them in yet. */
     public function verify(User $user): JsonResponse
     {
-        $user->forceFill(['verified_at' => now()])->save();
-
-        return $this->respond(UserData::from($user->load('roles')), 'User approved successfully');
+        return $this->transition($user, Verified::class, 'User verified successfully');
     }
 
-    /** Revoke approval — the user can no longer sign in until re-approved. */
-    public function unverify(User $user): JsonResponse
+    /**
+     * Apply a status transition, turning a disallowed one (e.g. approving an
+     * already-approved user) into a 422 rather than a 500.
+     *
+     * @param  class-string<UserStatus>  $status
+     */
+    protected function transition(User $user, string $status, string $message): JsonResponse
     {
-        $user->forceFill(['verified_at' => null])->save();
+        try {
+            $user->status->transitionTo($status);
+        } catch (TransitionNotFound) {
+            throw ValidationException::withMessages([
+                'status' => "A {$user->status->getValue()} user cannot become {$status::$name}.",
+            ]);
+        }
 
-        return $this->respond(UserData::from($user->load('roles')), 'User approval revoked successfully');
+        return $this->respond(UserData::from($user->fresh()->load('roles')), $message);
     }
 }

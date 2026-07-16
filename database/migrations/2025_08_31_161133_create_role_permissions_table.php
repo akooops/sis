@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('role_permissions', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            
+
             $table->ulid('role_id');
             $table->foreign('role_id')->references('id')->on('roles')->cascadeOnDelete();
 
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreign('permission_id')->references('id')->on('permissions')->cascadeOnDelete();
 
             $table->unique(['role_id', 'permission_id']);
-            
+
             $table->index('role_id');
             $table->index('permission_id');
 

@@ -20,14 +20,11 @@ class PermissionsController extends ApiController
         $permissions = QueryBuilder::for(Permission::class)
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::partial('code'),
-                AllowedFilter::partial('name'),
                 AllowedFilter::exact('supports_api'),
                 AllowedFilter::exact('supports_web'),
-                $this->search(['code', 'name']),
-                AllowedFilter::trashed(),
+                $this->search(['id', 'name', 'code']),
             ])
-            ->allowedSorts(['id', 'code', 'name', 'created_at'])
+            ->allowedSorts(['id', 'name', 'code', 'created_at'])
             ->defaultSort('-created_at')
             ->paginate($this->perPage())
             ->appends(request()->query());

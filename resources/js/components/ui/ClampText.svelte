@@ -11,7 +11,6 @@
      *   <ClampText value={role.name} lines={4} toggle copy />           // drawer
      *   <ClampText maxWidth="260px">{#snippet children()}…{/snippet}</ClampText>  // table
      */
-    import { t, dir } from '@/lib/i18n';
 
     let {
         value = '',
@@ -47,14 +46,12 @@
     });
 
     // Fade the trailing edge of the shown text (vertical for a multi-line clamp,
-    // horizontal — direction-aware — for a single line).
+    // horizontal for a single line).
     const fadeStyle = $derived.by(() => {
         if (expanded || !overflowing) return '';
         const grad = multiline
             ? 'linear-gradient(to bottom, #000 calc(100% - 1.15em), transparent)'
-            : $dir === 'rtl'
-              ? 'linear-gradient(to left, #000 calc(100% - 2.2em), transparent)'
-              : 'linear-gradient(to right, #000 calc(100% - 2.2em), transparent)';
+            : 'linear-gradient(to right, #000 calc(100% - 2.2em), transparent)';
         return `-webkit-mask-image:${grad};mask-image:${grad};`;
     });
 
@@ -80,7 +77,7 @@
                     type="button"
                     class="text-primary font-bold leading-none hover:opacity-70"
                     onclick={() => (expanded = !expanded)}
-                    aria-label={expanded ? $t('common.actions.collapse') : $t('common.actions.expand')}
+                    aria-label={expanded ? 'Collapse' : 'Expand'}
                 >
                     {#if expanded}<i class="ki-filled ki-arrow-up text-sm"></i>{:else}…{/if}
                 </button>
@@ -88,7 +85,7 @@
                 <span class="text-primary font-bold leading-none">…</span>
             {/if}
             {#if copy}
-                <button type="button" class="text-muted-foreground hover:text-primary" title={$t('common.actions.copy')} onclick={doCopy} aria-label={$t('common.actions.copy')}>
+                <button type="button" class="text-muted-foreground hover:text-primary" title="Copy" onclick={doCopy} aria-label="Copy">
                     <i class="ki-filled {copied ? 'ki-check' : 'ki-copy'} text-sm"></i>
                 </button>
             {/if}

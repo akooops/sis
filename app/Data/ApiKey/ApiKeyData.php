@@ -26,9 +26,7 @@ class ApiKeyData extends Data
         public ?string $revoked_at,
         public ?string $created_at,
         public ?string $updated_at,
-        public ?string $deleted_at,
         /** @var array<int, PermissionData> */
-        public Lazy|array $permissions,
     ) {}
 
     public static function fromModel(ApiKey $apiKey): self
@@ -45,12 +43,6 @@ class ApiKeyData extends Data
             revoked_at: $apiKey->revoked_at?->toIso8601String(),
             created_at: $apiKey->created_at?->toIso8601String(),
             updated_at: $apiKey->updated_at?->toIso8601String(),
-            deleted_at: $apiKey->deleted_at?->toIso8601String(),
-            permissions: Lazy::whenLoaded(
-                'permissions',
-                $apiKey,
-                fn () => PermissionData::collect($apiKey->permissions->all()),
-            ),
         );
     }
 }

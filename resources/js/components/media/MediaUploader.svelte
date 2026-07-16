@@ -5,7 +5,6 @@
      */
     import Spinner from '@/components/ui/Spinner.svelte';
     import { uploadFile, mediaConfig, acceptFor, acceptForTypes, typeForFile, MEDIA_TYPES } from '@/lib/upload';
-    import { t } from '@/lib/i18n';
 
     // `accept` restricts to a subset of types (e.g. ['images']); default = all.
     let { accept = null, onuploaded } = $props();
@@ -25,7 +24,7 @@
         // A single-type uploader forces that type; a multi-type one infers it.
         const type = singleType ?? typeForFile(file.name, allowedTypes);
         if (!type) {
-            error = $t('common.media.unsupported');
+            error = 'Unsupported file type.';
             return;
         }
         uploading = true;
@@ -59,11 +58,11 @@
     <input type="file" class="hidden" accept={inputAccept} onchange={(e) => handle(e.currentTarget.files)} disabled={uploading} />
     {#if uploading}
         <Spinner />
-        <span class="text-sm text-secondary-foreground">{$t('common.media.scanning')}</span>
+        <span class="text-sm text-secondary-foreground">Scanning…</span>
     {:else}
         <i class="ki-filled ki-cloud-add text-3xl text-muted-foreground"></i>
-        <span class="text-sm text-secondary-foreground">{$t('common.media.drop_here')}</span>
-        <span class="text-xs text-muted-foreground">{$t('common.media.max_size', { size: cfg.max_file_size_human })}</span>
+        <span class="text-sm text-secondary-foreground">Drag &amp; drop a file here, or click to browse</span>
+        <span class="text-xs text-muted-foreground">Maximum size: {cfg.max_file_size_human}</span>
     {/if}
     {#if error}<span class="text-xs text-destructive">{error}</span>{/if}
 </label>

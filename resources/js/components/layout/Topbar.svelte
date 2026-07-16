@@ -1,37 +1,21 @@
 <script>
     /**
      * Topbar — Metronic demo1 header, Svelte 5. Chrome (dropdowns, theme switch)
-     * is KTUI-driven; language switch + logout hit the app. Language is a flag
-     * dropdown so new locales are one config line (localeMeta + supported_locales).
+     * is KTUI-driven; logout hits the app.
      */
-    import { inertia, router } from '@inertiajs/svelte';
+    import { inertia } from '@inertiajs/svelte';
     import Breadcrumbs from './Breadcrumbs.svelte';
     import { authUser } from '@/lib/permissions';
     import { api } from '@/lib/api/client';
-    import { locale as currentLocale, t } from '@/lib/i18n';
     import { sidebarTheme, toggleSidebarTheme } from '@/lib/sidebar';
 
     let { breadcrumbs = [] } = $props();
 
     const user = authUser();
 
-    // Locale display metadata — add a line here to offer a new language.
-    const localeMeta = {
-        en: { label: 'English', flag: 'united-states' },
-        ar: { label: 'العربية', flag: 'saudi-arabia' },
-    };
-    
-    const locales = Object.keys(localeMeta);
-
-    function setLocale(loc) {
-        if (loc !== $currentLocale) {
-            router.post(route('web.locale.set'), { locale: loc }, { preserveScroll: true });
-        }
-    }
-
     async function logout() {
         try {
-            await api.post(route('api.v1.auth.logout'));
+            await api.post(route('api.v1.admin.auth.logout'));
         } finally {
             window.location.assign(route('web.auth.login-page'));
         }
@@ -63,26 +47,6 @@
 
         <!-- Topbar actions -->
         <div class="flex items-center gap-2.5">
-            <!-- Language (flags) -->
-            <div data-kt-dropdown="true" data-kt-dropdown-offset="10px, 10px" data-kt-dropdown-placement="bottom-end" data-kt-dropdown-trigger="click">
-                <button class="kt-btn kt-btn-ghost kt-btn-icon size-9 rounded-full hover:bg-primary/10" data-kt-dropdown-toggle="true" aria-label="Language">
-                    <img class="size-5 rounded-full" src="/assets/media/flags/{localeMeta[$currentLocale]?.flag ?? 'united-states'}.svg" alt={$currentLocale} />
-                </button>
-                <div class="kt-dropdown-menu w-[200px]" data-kt-dropdown-menu="true">
-                    <ul class="kt-dropdown-menu-sub">
-                        {#each locales as loc}
-                            <li class={$currentLocale === loc ? 'active' : ''}>
-                                <button class="kt-dropdown-menu-link w-full" onclick={() => setLocale(loc)}>
-                                    <img class="inline-block size-4 rounded-full" src="/assets/media/flags/{localeMeta[loc].flag}.svg" alt={loc} />
-                                    <span class="kt-menu-title grow">{localeMeta[loc].label}</span>
-                                    {#if $currentLocale === loc}<i class="ki-solid ki-check-circle text-green-500 text-base"></i>{/if}
-                                </button>
-                            </li>
-                        {/each}
-                    </ul>
-                </div>
-            </div>
-
             <!-- User -->
             <div
                 class="shrink-0"
@@ -112,7 +76,7 @@
                         <div class="flex items-center gap-2 justify-between">
                             <span class="flex items-center gap-2">
                                 <i class="ki-filled ki-color-swatch text-base text-muted-foreground"></i>
-                                <span class="font-medium text-2sm">{$t('common.actions.dark_sidebar')}</span>
+                                <span class="font-medium text-2sm">Dark Sidebar</span>
                             </span>
                             <input class="kt-switch" type="checkbox" checked={$sidebarTheme === 'dark'} onchange={toggleSidebarTheme} />
                         </div>
@@ -120,13 +84,13 @@
                         <div class="flex items-center gap-2 justify-between">
                             <span class="flex items-center gap-2">
                                 <i class="ki-filled ki-moon text-base text-muted-foreground"></i>
-                                <span class="font-medium text-2sm">{$t('common.actions.dark_mode')}</span>
+                                <span class="font-medium text-2sm">Dark Mode</span>
                             </span>
                             <input class="kt-switch" data-kt-theme-switch-state="dark" data-kt-theme-switch-toggle="true" type="checkbox" value="1" />
                         </div>
                         <button class="kt-btn kt-btn-outline justify-center w-full" onclick={logout}>
                             <i class="ki-filled ki-exit-right"></i>
-                            {$t('common.actions.logout')}
+                            Log out
                         </button>
                     </div>
                 </div>

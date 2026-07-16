@@ -7,20 +7,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Role extends Model
 {
-    use HasFactory, HasUlids, SoftDeletes;
+    use HasFactory, HasUlids;
 
-    // Attributes
+    /* -----------------------------------------
+     1. Attributes
+    ------------------------------------------*/
+
     protected $guarded = ['id'];
 
-    protected $casts = [
-        'is_default' => 'boolean',
-    ];
+    /* -----------------------------------------
+     2. Relationships
+    ------------------------------------------*/
 
-    // Relationships
     public function rolePermissions(): HasMany
     {
         return $this->hasMany(RolePermission::class);
@@ -45,9 +46,14 @@ class Role extends Model
             ->withTimestamps();
     }
 
-    // Accessors
+    /* -----------------------------------------
+     3. Accessors
+    ------------------------------------------*/
 
-    // Permissions
+    /* -----------------------------------------
+     4. Methods
+    ------------------------------------------*/
+
     /**
      * Set the role's permissions to exactly the given ids.
      *

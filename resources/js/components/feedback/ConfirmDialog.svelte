@@ -3,7 +3,6 @@
     import Modal from '@/components/ui/Modal.svelte';
     import Button from '@/components/ui/Button.svelte';
     import { confirmState, resolveConfirm } from '@/lib/confirm';
-    import { t } from '@/lib/i18n';
 
     let open = $state(false);
 
@@ -22,17 +21,17 @@
     }
 </script>
 
-<Modal bind:open size="sm" title={$confirmState?.title ?? $t('common.confirm.delete_title')} onclose={onDismiss}>
+<Modal bind:open size="sm" title={$confirmState?.title ?? 'Delete confirmation'} onclose={onDismiss}>
     <p class="text-sm text-secondary-foreground">
-        {$confirmState?.body ?? $t('common.confirm.delete_body')}
+        {$confirmState?.body ?? 'Are you sure you want to delete this record? This action cannot be undone.'}
     </p>
 
     {#snippet footer()}
         <Button variant="secondary" onclick={() => decide(false)}>
-            {$confirmState?.cancelLabel ?? $t('common.actions.cancel')}
+            {$confirmState?.cancelLabel ?? 'Cancel'}
         </Button>
         <Button variant={$confirmState?.variant ?? 'primary'} onclick={() => decide(true)}>
-            {$confirmState?.confirmLabel ?? $t('common.actions.confirm')}
+            {$confirmState?.confirmLabel ?? 'Confirm'}
         </Button>
     {/snippet}
 </Modal>

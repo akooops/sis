@@ -19,11 +19,7 @@ class ApiKeysController extends ApiController
         $apiKeys = QueryBuilder::for(ApiKey::class)
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::partial('name'),
-                AllowedFilter::exact('prefix'),
-                $this->search(['name', 'prefix']),
-                $this->relatedId('permission', 'permissions'),
-                AllowedFilter::trashed(),
+                $this->search(['id', 'name', 'prefix']),
             ])
             ->allowedSorts(['id', 'name', 'last_used_at', 'expires_at', 'created_at'])
             ->defaultSort('-created_at')
@@ -38,9 +34,6 @@ class ApiKeysController extends ApiController
         return $this->respond(ApiKeyData::from($apiKey), 'API key retrieved successfully');
     }
 
-    /**
-     * Create a key. The plaintext token is returned once here and never again.
-     */
     public function store(StoreApiKeyData $data): JsonResponse
     {
         [$apiKey, $token] = ApiKey::issue($data->toArray());
@@ -65,14 +58,6 @@ class ApiKeysController extends ApiController
         return $this->respond(null, 'API key deleted successfully');
     }
 
-    public function restore(string $apiKey): JsonResponse
-    {
-        $apiKey = ApiKey::onlyTrashed()->findOrFail($apiKey);
-        $apiKey->restore();
-
-        return $this->respond(ApiKeyData::from($apiKey), 'API key restored successfully');
-    }
-
     /**
      * Issue a new secret, invalidating the previous token. Returns the new token once.
      */
@@ -91,12 +76,5 @@ class ApiKeysController extends ApiController
         $apiKey->revoke();
 
         return $this->respond(ApiKeyData::from($apiKey->fresh()), 'API key revoked successfully');
-    }
-
-    public function forceDestroy(string $apiKey): JsonResponse
-    {
-        ApiKey::onlyTrashed()->findOrFail($apiKey)->forceDelete();
-
-        return $this->respond(null, 'API key permanently deleted successfully');
     }
 }

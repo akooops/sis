@@ -11,15 +11,16 @@
     import DateTime from '@/components/ui/DateTime.svelte';
     import Dropdown from '@/components/ui/Dropdown.svelte';
     import IdBadge from '@/components/data/IdBadge.svelte';
+    import ActivityDrawer from '@/components/activity/ActivityDrawer.svelte';
     import UserForm from './UserForm.svelte';
     import UserViewDrawer from './UserViewDrawer.svelte';
     import RolesDrawer from './RolesDrawer.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
+    import { USER_STATUS_LABELS, USER_STATUS_VARIANTS } from '@/lib/user';
     import { hasPermission } from '@/lib/permissions';
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
     import { confirm } from '@/lib/confirm';
-    import { t } from '@/lib/i18n';
 
     const list = useIndex('api.v1.admin.users.index', { perPage: 15, include: 'roles', sort: '-created_at', pollMs: 20000 });
 
@@ -28,76 +29,77 @@
     let filtersOpen = $state(false);
     let viewOpen = $state(false);
     let viewing = $state(null);
+    let activityOpen = $state(false);
+    let activityRow = $state(null);
     let rolesOpen = $state(false);
     let rolesUser = $state(null);
 
-    // $derived so labels re-translate when the locale switches (the page
-    // re-renders in place — a plain const would keep stale strings).
-    const columns = $derived([
-        { key: 'id', label: $t('common.detail.id'), width: '90px', truncate: false },
-        { key: 'firstname', label: $t('users.fields.name'), sortable: true, truncate: false },
-        { key: 'email', label: $t('users.fields.email'), sortable: true },
-        { key: 'roles', label: $t('users.fields.roles'), truncate: false },
-        { key: 'status', label: $t('users.fields.status'), truncate: false },
-    ]);
+    const columns = [
+        { key: 'id', label: 'ID', width: '90px', truncate: false },
+        { key: 'firstname', label: 'Name', sortable: true, truncate: false },
+        { key: 'email', label: 'Email', sortable: true },
+        { key: 'roles', label: 'Roles', truncate: false },
+        { key: 'status', label: 'Status', truncate: false },
+    ];
 
-    const filterConfig = $derived([
-        { key: 'email', type: 'text', label: $t('users.fields.email') },
+    const filterConfig = [
+        { key: 'email', type: 'text', label: 'Email' },
         {
-            key: 'trashed',
+            key: 'status',
             type: 'select',
-            label: $t('common.filters.trashed'),
-            options: [
-                { value: 'with', label: $t('common.filters.include_deleted') },
-                { value: 'only', label: $t('common.filters.only_deleted') },
-            ],
+            label: 'Status',
+            options: Object.entries(USER_STATUS_LABELS).map(([value, label]) => ({ value, label })),
         },
-    ]);
+    ];
 
     const create = () => { editing = null; showForm = true; };
     const edit = (u) => { editing = u; showForm = true; };
     const closeForm = () => { showForm = false; editing = null; };
     const saved = () => { closeForm(); list.refresh(); };
     const view = (u) => { viewing = u; viewOpen = true; };
+    const showActivity = (u) => { activityRow = u; activityOpen = true; };
     const manageRoles = (u) => { rolesUser = u; rolesOpen = true; };
 
-    async function setVerified(u, verified) {
+    // approve | reject | verify — the API rejects a transition the status
+    // doesn't allow, so surface its message rather than guessing client-side.
+    async function setStatus(u, action) {
         try {
-            await api.post(route(verified ? 'api.v1.admin.users.verify' : 'api.v1.admin.users.unverify', u.id));
-            toast.success($t('common.feedback.updated'));
+            await api.post(route(`api.v1.admin.users.${action}`, u.id));
+            toast.success('Updated successfully.');
             list.refresh();
         } catch (e) {
-            toast.error(e?.message ?? $t('common.feedback.error'));
+            toast.error(e?.message ?? 'Something went wrong. Please try again.');
         }
     }
 
     async function remove(u) {
-        if (!(await confirm({ body: $t('common.confirm.delete_body'), variant: 'destructive' }))) return;
+        if (!(await confirm({ body: 'Are you sure you want to delete this record? This action cannot be undone.', variant: 'destructive' }))) return;
         try {
             await api.delete(route('api.v1.admin.users.destroy', u.id));
-            toast.success($t('common.feedback.deleted'));
+            toast.success('Deleted successfully.');
             list.refresh();
         } catch (e) {
-            toast.error(e?.message ?? $t('common.feedback.error'));
+            toast.error(e?.message ?? 'Something went wrong. Please try again.');
         }
     }
 </script>
 
-<svelte:head><title>Novonordisk — {$t('users.title')}</title></svelte:head>
+<svelte:head><title>Novonordisk — Users</title></svelte:head>
 
-<AdminLayout title={$t('users.title')}>
+<AdminLayout title="Users">
     <IndexCard {showForm} {toolbar} {form} {table} />
 
     <Filters bind:open={filtersOpen} config={filterConfig} values={list.params.filter} onapply={(v) => list.setFilters(v)} />
     <UserViewDrawer bind:open={viewOpen} user={viewing} />
     <RolesDrawer bind:open={rolesOpen} user={rolesUser} />
+    <ActivityDrawer bind:open={activityOpen} subjectType="user" subjectId={activityRow?.id} title={activityRow?.username} />
 </AdminLayout>
 
 {#snippet toolbar(inForm)}
     {#if !inForm}
         <div class="flex items-center gap-2">
-            <SearchBar placeholder={$t('users.search')} value={list.search} onsearch={(v) => list.setSearch(v)} />
-            <button class="kt-btn kt-btn-sm kt-btn-ghost" onclick={() => (filtersOpen = true)} aria-label={$t('common.actions.filter')}>
+            <SearchBar placeholder="Search users…" value={list.search} onsearch={(v) => list.setSearch(v)} />
+            <button class="kt-btn kt-btn-sm kt-btn-ghost" onclick={() => (filtersOpen = true)} aria-label="Filter">
                 <i class="ki-filled ki-filter"></i>
             </button>
             <ExportButton rows={list.rows} columns={[
@@ -110,12 +112,12 @@
         </div>
         {#if hasPermission('users.store')}
             <button class="kt-btn kt-btn-sm kt-btn-primary" onclick={create}>
-                <i class="ki-filled ki-plus"></i>{$t('users.add')}
+                <i class="ki-filled ki-plus"></i>Add user
             </button>
         {/if}
     {:else}
         <button class="kt-btn kt-btn-sm kt-btn-secondary" onclick={closeForm}>
-            <i class="ki-filled ki-black-left"></i>{$t('common.actions.cancel')}
+            <i class="ki-filled ki-black-left"></i>Cancel
         </button>
     {/if}
 {/snippet}
@@ -156,8 +158,8 @@
             {#each row.roles ?? [] as r}<Badge variant="secondary">{r.name}</Badge>{/each}
         </div>
     {:else if column.key === 'status'}
-        <Badge variant={row.verified_at ? 'success' : 'warning'}>
-            {row.verified_at ? $t('users.status.verified') : $t('users.status.pending')}
+        <Badge variant={USER_STATUS_VARIANTS[row.status] ?? 'secondary'}>
+            {USER_STATUS_LABELS[row.status] ?? row.status}
         </Badge>
     {:else if column.key === 'created_at'}
         <DateTime value={row.created_at} />
@@ -173,35 +175,58 @@
         {/snippet}
         <div class="kt-menu-item">
             <button class="kt-menu-link" data-dropdown-dismiss onclick={() => view(row)}>
-                <span class="kt-menu-icon"><i class="ki-filled ki-eye"></i></span><span class="kt-menu-title">{$t('common.actions.view')}</span>
+                <span class="kt-menu-icon"><i class="ki-filled ki-eye"></i></span><span class="kt-menu-title">View</span>
             </button>
         </div>
+        {#if hasPermission('activities.index')}
+            <div class="kt-menu-item">
+                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => showActivity(row)}>
+                    <span class="kt-menu-icon"><i class="ki-filled ki-time"></i></span><span class="kt-menu-title">Activity</span>
+                </button>
+            </div>
+        {/if}
         {#if hasPermission('users.update')}
             <div class="kt-menu-item">
                 <button class="kt-menu-link" data-dropdown-dismiss onclick={() => edit(row)}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-pencil"></i></span><span class="kt-menu-title">{$t('common.actions.edit')}</span>
+                    <span class="kt-menu-icon"><i class="ki-filled ki-pencil"></i></span><span class="kt-menu-title">Edit</span>
                 </button>
             </div>
         {/if}
         {#if hasPermission('user-roles.index')}
             <div class="kt-menu-item">
                 <button class="kt-menu-link" data-dropdown-dismiss onclick={() => manageRoles(row)}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-shield-tick"></i></span><span class="kt-menu-title">{$t('users.actions.roles')}</span>
+                    <span class="kt-menu-icon"><i class="ki-filled ki-shield-tick"></i></span><span class="kt-menu-title">Manage roles</span>
                 </button>
             </div>
         {/if}
-        {#if hasPermission('users.verify')}
+        {#if hasPermission('users.approve') && row.status !== 'approved'}
             <div class="kt-menu-item">
-                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => setVerified(row, !row.verified_at)}>
+                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => setStatus(row, 'approve')}>
                     <span class="kt-menu-icon"><i class="ki-filled ki-check-circle"></i></span>
-                    <span class="kt-menu-title">{row.verified_at ? $t('users.actions.unverify') : $t('users.actions.verify')}</span>
+                    <span class="kt-menu-title">Approve</span>
+                </button>
+            </div>
+        {/if}
+        {#if hasPermission('users.verify') && row.status === 'pending'}
+            <div class="kt-menu-item">
+                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => setStatus(row, 'verify')}>
+                    <span class="kt-menu-icon"><i class="ki-filled ki-shield-tick"></i></span>
+                    <span class="kt-menu-title">Verify</span>
+                </button>
+            </div>
+        {/if}
+        {#if hasPermission('users.reject') && row.status !== 'rejected'}
+            <div class="kt-menu-item">
+                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => setStatus(row, 'reject')}>
+                    <span class="kt-menu-icon"><i class="ki-filled ki-cross-circle"></i></span>
+                    <span class="kt-menu-title">Reject</span>
                 </button>
             </div>
         {/if}
         {#if hasPermission('users.destroy')}
             <div class="kt-menu-item">
                 <button class="kt-menu-link text-destructive" data-dropdown-dismiss onclick={() => remove(row)}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-trash"></i></span><span class="kt-menu-title">{$t('common.actions.delete')}</span>
+                    <span class="kt-menu-icon"><i class="ki-filled ki-trash"></i></span><span class="kt-menu-title">Delete</span>
                 </button>
             </div>
         {/if}
