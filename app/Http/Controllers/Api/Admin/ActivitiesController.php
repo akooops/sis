@@ -6,10 +6,7 @@ use App\Data\Activity\ActivityData;
 use App\Enums\MorphType;
 use App\Http\Controllers\Api\ApiController;
 use App\Models\Activity;
-use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Carbon;
-use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -20,6 +17,12 @@ use Spatie\QueryBuilder\QueryBuilder;
  */
 class ActivitiesController extends ApiController
 {
+    /**
+     * filter[search] reaches only this table's own columns, and `description`
+     * holds the bare event slug — never the subject's name. A deleted record is
+     * therefore found by subject_id, not by what it was called. The polymorphic
+     * columns filter on MorphType aliases (`api_key`), never class names.
+     */
     public function index(): JsonResponse
     {
         $activities = QueryBuilder::for(Activity::query()->with(['causer', 'subject']))

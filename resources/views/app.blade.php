@@ -4,9 +4,9 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>Novonordisk supply chain management system</title>
+        <title>Saud International Schools</title>
 
-        <link href="{{ asset('assets/media/app/mini-logo.svg') }}" rel="shortcut icon" />
+        <link href="{{ asset('assets/media/app/favicon.png') }}" rel="shortcut icon" />
 
         <!-- Theme mode bootstrap (applies stored light/dark before paint) -->
         <script>

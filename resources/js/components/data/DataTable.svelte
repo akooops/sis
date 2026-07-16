@@ -33,7 +33,7 @@
         onRowClick,
         emptyTitle = null,
         emptyBody = null,
-        emptyIcon = 'ki-filled ki-file',
+        emptyIcon = 'ki-filled ki-document',
         cells,
         rowActions,
     } = $props();

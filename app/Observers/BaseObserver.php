@@ -5,6 +5,8 @@ namespace App\Observers;
 use App\Enums\MorphType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 /**
  * Turns an observer into an audit trail for its model.
@@ -109,7 +111,7 @@ abstract class BaseObserver
             return;
         }
 
-        $this->record($model, 'created', ['attributes' => $this->clean($model->getAttributes())]);
+        $this->record($model, 'created', ['attributes' => $this->clean($model, $model->getAttributes())]);
     }
 
     public function updated(Model $model): void
@@ -120,7 +122,7 @@ abstract class BaseObserver
             return;
         }
 
-        $attributes = Arr::except($this->clean($model->getChanges()), $this->housekeeping($model));
+        $attributes = Arr::except($this->clean($model, $model->getChanges()), $this->housekeeping($model));
 
         // Nothing loggable actually changed — a password-only update, or a
         // plain touch. A row here would be an empty diff.
@@ -128,7 +130,7 @@ abstract class BaseObserver
             return;
         }
 
-        $old = $this->clean(Arr::only($model->getOriginal(), array_keys($attributes)));
+        $old = $this->clean($model, Arr::only($model->getOriginal(), array_keys($attributes)));
 
         $this->record($model, 'updated', ['old' => $old, 'attributes' => $attributes]);
     }
@@ -158,7 +160,7 @@ abstract class BaseObserver
             return [];
         }
 
-        $attributes = $this->clean(Arr::only($model->getAttributes(), $keys));
+        $attributes = $this->clean($model, Arr::only($model->getAttributes(), $keys));
 
         return $attributes === [] ? [] : ['attributes' => $attributes];
     }
@@ -218,8 +220,64 @@ abstract class BaseObserver
      * @param  array<string, mixed>  $attributes
      * @return array<string, mixed>
      */
-    protected function clean(array $attributes): array
+    protected function clean(Model $model, array $attributes): array
     {
-        return Arr::except($attributes, array_merge($this->neverLog(), $this->ignored()));
+        return $this->inSchemaOrder(
+            $model,
+            Arr::except($attributes, array_merge($this->neverLog(), $this->ignored())),
+        );
+    }
+
+    /**
+     * Order a payload the way the model declares its columns — which is the
+     * order of its migration. A diff reads like the record it came from that
+     * way; sorted alphabetically it opens on `azure_ad_id` and buries `id` in
+     * the middle. Baked in at write time: an audit row is immutable, so it keeps
+     * the order the table had the day it was written.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    protected function inSchemaOrder(Model $model, array $attributes): array
+    {
+        $ordered = [];
+
+        foreach ($this->columnOrder($model) as $column) {
+            if (array_key_exists($column, $attributes)) {
+                $ordered[$column] = $attributes[$column];
+            }
+        }
+
+        // Union, so anything that is not a real column (an append, a cast-only
+        // key) survives at the end rather than being dropped.
+        return $ordered + $attributes;
+    }
+
+    /**
+     * Column names per table, resolved once per request.
+     *
+     * @var array<string, array<int, string>>
+     */
+    protected static array $columnOrder = [];
+
+    /**
+     * @return array<int, string>
+     */
+    protected function columnOrder(Model $model): array
+    {
+        $table = $model->getTable();
+
+        if (! array_key_exists($table, static::$columnOrder)) {
+            try {
+                static::$columnOrder[$table] = Schema::connection($model->getConnectionName())
+                    ->getColumnListing($table);
+            } catch (Throwable) {
+                // No schema to read (an unmigrated table): leave the order alone
+                // rather than lose the diff.
+                static::$columnOrder[$table] = [];
+            }
+        }
+
+        return static::$columnOrder[$table];
     }
 }

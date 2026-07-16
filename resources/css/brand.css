@@ -7,12 +7,12 @@
  */
 
 :root {
-    /* Novonordisk brand blue (previously set via public/assets/css/main.css). */
-    --primary: #001965;
+    /* Saud International Schools brand blue. */
+    --primary: #2a5d91;
     --primary-foreground: oklch(1 0 0);
 }
 
 .dark {
-    --primary: #001965;
+    --primary: #2a5d91;
     --primary-foreground: oklch(1 0 0);
 }

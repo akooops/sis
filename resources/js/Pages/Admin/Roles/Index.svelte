@@ -5,6 +5,7 @@
     import DataTable from '@/components/data/DataTable.svelte';
     import SearchBar from '@/components/data/SearchBar.svelte';
     import Filters from '@/components/data/Filters.svelte';
+    import FilterButton from '@/components/data/FilterButton.svelte';
     import ExportButton from '@/components/data/ExportButton.svelte';
     import Badge from '@/components/ui/Badge.svelte';
     import DateTime from '@/components/ui/DateTime.svelte';
@@ -33,12 +34,21 @@
     let activityRow = $state(null);
 
     const columns = $derived([
-        { key: 'id', label: 'ID', width: '90px', truncate: false },
+        { key: 'id', label: 'ID', sortable: true, width: '90px', truncate: false },
         { key: 'name', label: 'Name', sortable: true },
-        { key: 'is_default', label: 'Default', sortable: true, truncate: false },
-        { key: 'permissions', label: 'Permissions', truncate: false },
+        { key: 'code', label: 'Code', sortable: true },
     ]);
-    const filterConfig = $derived([{ key: 'is_default', type: 'boolean', label: 'Default' }]);
+
+    // Mirrors the controller's allowedSorts — the drawer and the table headers
+    // drive the same `sort`, so a column here must be sortable server-side.
+    const sortOptions = [
+        { value: 'id', label: 'ID' },
+        { value: 'name', label: 'Name' },
+        { value: 'code', label: 'Code' },
+        { value: 'created_at', label: 'Created' },
+    ];
+
+    const filterConfig = [];
 
     const create = () => { editing = null; showForm = true; };
     const edit = (r) => { editing = r; showForm = true; };
@@ -52,8 +62,7 @@
         viewing
             ? [
                   { label: 'Name', value: viewing.name },
-                  { label: 'Default', value: viewing.is_default ? 'Yes' : 'No' },
-                  { label: 'Permissions', value: String((viewing.permissions ?? []).length) },
+                  { label: 'Code', value: viewing.code },
               ]
             : [],
     );
@@ -70,11 +79,18 @@
     }
 </script>
 
-<svelte:head><title>Novonordisk — Roles</title></svelte:head>
+<svelte:head><title>Saud International Schools — Roles</title></svelte:head>
 
 <AdminLayout title="Roles">
     <IndexCard {showForm} {toolbar} {form} {table} />
-    <Filters bind:open={filtersOpen} config={filterConfig} values={list.params.filter} onapply={(v) => list.setFilters(v)} />
+    <Filters
+        bind:open={filtersOpen}
+        config={filterConfig}
+        values={list.params.filter}
+        sort={list.sort}
+        {sortOptions}
+        onapply={(filter, sort) => list.apply({ filter, sort })}
+    />
     <RolePermissionsDrawer bind:open={permsOpen} role={permsRole} />
     <DetailDrawer bind:open={viewOpen} title="Roles" id={viewing?.id} fields={viewFields} createdAt={viewing?.created_at} updatedAt={viewing?.updated_at} />
     <ActivityDrawer bind:open={activityOpen} subjectType="role" subjectId={activityRow?.id} title={activityRow?.name} />
@@ -84,12 +100,10 @@
     {#if !inForm}
         <div class="flex items-center gap-2">
             <SearchBar placeholder="Search roles…" value={list.search} onsearch={(v) => list.setSearch(v)} />
-            <button class="kt-btn kt-btn-sm kt-btn-ghost" onclick={() => (filtersOpen = true)} aria-label="Filter">
-                <i class="ki-filled ki-filter"></i>
-            </button>
+            <FilterButton count={list.activeFilters} onclick={() => (filtersOpen = true)} />
             <ExportButton rows={list.rows} columns={[
                 { key: 'name', label: 'Name' },
-                { key: 'is_default', label: 'Default' },
+                { key: 'code', label: 'Code' },
                 { key: 'created_at', label: 'Created' },
             ]} filename="roles" />
         </div>
@@ -112,8 +126,6 @@
 {#snippet cells(row, column)}
     {#if column.key === 'id'}
         <IdBadge id={row.id} onclick={() => view(row)} />
-    {:else if column.key === 'is_default'}
-        {#if row.is_default}<Badge variant="info">Yes</Badge>{:else}<span class="text-muted-foreground">—</span>{/if}
     {:else if column.key === 'permissions'}
         <Badge variant="secondary">{(row.permissions ?? []).length}</Badge>
     {:else if column.key === 'created_at'}

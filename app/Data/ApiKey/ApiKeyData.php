@@ -5,7 +5,6 @@ namespace App\Data\ApiKey;
 use App\Data\Permission\PermissionData;
 use App\Models\ApiKey;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
 
 /**
  * Output DTO for an API key. Never exposes the hash/secret — the plaintext

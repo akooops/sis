@@ -12,6 +12,7 @@
     import EmptyState from '@/components/ui/EmptyState.svelte';
     import Skeleton from '@/components/ui/Skeleton.svelte';
     import ActivityDiff from './ActivityDiff.svelte';
+    import ClampText from '@/components/ui/ClampText.svelte';
     import {
         activityMessage,
         eventIcon,
@@ -81,12 +82,14 @@
                                 <i class={eventIcon(row.event)}></i>
                             </span>
 
-                            <div class="flex grow flex-col gap-1.5">
-                                <div class="flex flex-wrap items-center gap-2">
+                            <div class="flex min-w-0 grow flex-col gap-1.5">
+                                <div class="flex min-w-0 flex-wrap items-center gap-2">
                                     <Badge variant={eventVariant(row.event)} size="sm">
                                         {EVENT_LABELS[row.event] ?? row.event}
                                     </Badge>
-                                    <span class="text-sm text-mono">{activityMessage(row)}</span>
+                                    <div class="min-w-0 grow text-sm text-mono">
+                                        <ClampText value={activityMessage(row)} lines={2} toggle />
+                                    </div>
                                 </div>
 
                                 <div class="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">

@@ -1,10 +1,12 @@
 <script>
-    /** Media library index — Metronic list card; browse media as cards + detach. */
+    /** Media library index — Metronic list card; browse media as cards. */
     import AdminLayout from '@/layouts/AdminLayout.svelte';
     import IndexCard from '@/components/data/IndexCard.svelte';
     import SearchBar from '@/components/data/SearchBar.svelte';
     import Pagination from '@/components/data/Pagination.svelte';
     import ExportButton from '@/components/data/ExportButton.svelte';
+    import Filters from '@/components/data/Filters.svelte';
+    import FilterButton from '@/components/data/FilterButton.svelte';
     import Skeleton from '@/components/ui/Skeleton.svelte';
     import EmptyState from '@/components/ui/EmptyState.svelte';
     import Dropdown from '@/components/ui/Dropdown.svelte';
@@ -15,15 +17,13 @@
     import { hasPermission } from '@/lib/permissions';
     import { MEDIA_TYPES } from '@/lib/upload';
     import { formatFileSize } from '@/lib/format';
-    import { api } from '@/lib/api/client';
-    import { toast } from '@/lib/toast';
-    import { confirm } from '@/lib/confirm';
 
     /** Display labels for each media type key (was `media.tabs.*` / `media.types.*`). */
     const TAB_LABELS = { images: 'Images', audio: 'Audio', videos: 'Videos', documents: 'Documents' };
     const TYPE_LABELS = { images: 'Image', audio: 'Audio', videos: 'Video', documents: 'Document' };
 
     const list = useIndex('api.v1.admin.media.index', { perPage: 15, sort: '-created_at', pollMs: 0 });
+    let filtersOpen = $state(false);
     let viewOpen = $state(false);
     let viewing = $state(null);
     let activityOpen = $state(false);
@@ -31,12 +31,28 @@
     const view = (m) => { viewing = m; viewOpen = true; };
     const showActivity = (m) => { activityRow = m; activityOpen = true; };
 
+    // Media renders as cards, so there are no column headers to sort by — the
+    // drawer is the only way in. Mirrors MediaController's allowedSorts.
+    const sortOptions = [
+        { value: 'id', label: 'ID' },
+        { value: 'name', label: 'Name' },
+        { value: 'size', label: 'Size' },
+        { value: 'created_at', label: 'Uploaded' },
+    ];
+
     // Type filter tabs (All + each media type). '' = all.
     let activeType = $state(list.params.filter?.type ?? '');
     const typeTabs = $derived([
         { id: '', label: 'All' },
         ...MEDIA_TYPES.map((ty) => ({ id: ty, label: TAB_LABELS[ty] })),
     ]);
+    // The drawer round-trips the whole filter object, so clearing it there also
+    // clears `type` — keep the tab strip pointing at whatever actually applied.
+    function applyFilters(filter, sort) {
+        activeType = filter.type ?? '';
+        list.apply({ filter, sort });
+    }
+
     function selectType(ty) {
         activeType = ty;
         const filter = { ...list.params.filter };
@@ -57,20 +73,20 @@
             : [],
     );
 
-    async function detach(m) {
-        if (!(await confirm({ variant: 'destructive' }))) return;
-        try {
-            await api.patch(route('api.v1.admin.media.detach', m.id));
-            toast.success('Updated successfully.');
-            list.refresh();
-        } catch (e) { toast.error(e?.message ?? 'Something went wrong. Please try again.'); }
-    }
 </script>
 
-<svelte:head><title>Novonordisk — Media library</title></svelte:head>
+<svelte:head><title>Saud International Schools — Media library</title></svelte:head>
 
 <AdminLayout title="Media library">
     <IndexCard showForm={false} {toolbar} {form} {table} />
+    <Filters
+        bind:open={filtersOpen}
+        config={[]}
+        values={list.params.filter}
+        sort={list.sort}
+        {sortOptions}
+        onapply={(filter, sort) => applyFilters(filter, sort)}
+    />
     <DetailDrawer bind:open={viewOpen} title="Media library" id={viewing?.id} fields={viewFields} createdAt={viewing?.created_at} updatedAt={viewing?.updated_at} />
     <ActivityDrawer bind:open={activityOpen} subjectType="media" subjectId={activityRow?.id} title={activityRow?.name} />
 </AdminLayout>
@@ -78,6 +94,7 @@
 {#snippet toolbar()}
     <div class="flex items-center gap-2">
         <SearchBar placeholder="Search media…" value={list.search} onsearch={(v) => list.setSearch(v)} />
+        <FilterButton count={list.activeFilters} onclick={() => (filtersOpen = true)} />
         <ExportButton rows={list.rows} columns={[
             { key: 'name', label: 'Name' },
             { key: 'type', label: 'Type' },
@@ -122,33 +139,29 @@
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
                 {#each list.rows as item (item.id)}
                     <div class="group relative">
-                        {#if hasPermission('activities.index') || (item.attached && hasPermission('media.detach'))}
-                            <div class="absolute end-2 top-2 z-10 opacity-0 transition-opacity group-hover:opacity-100">
-                                <Dropdown>
-                                    {#snippet trigger()}
-                                        <button class="kt-btn kt-btn-icon kt-btn-sm rounded-md bg-background/90 shadow-sm" aria-label="Actions">
-                                            <i class="ki-filled ki-dots-vertical"></i>
+                        <div class="absolute end-2 top-2 z-10 opacity-0 transition-opacity group-hover:opacity-100">
+                            <Dropdown>
+                                {#snippet trigger()}
+                                    <button class="kt-btn kt-btn-icon kt-btn-sm rounded-md bg-background/90 shadow-sm" aria-label="Actions">
+                                        <i class="ki-filled ki-dots-vertical"></i>
+                                    </button>
+                                {/snippet}
+                                <div class="kt-menu-item">
+                                    <button class="kt-menu-link" data-dropdown-dismiss onclick={() => view(item)}>
+                                        <span class="kt-menu-icon"><i class="ki-filled ki-eye"></i></span>
+                                        <span class="kt-menu-title">View</span>
+                                    </button>
+                                </div>
+                                {#if hasPermission('activities.index')}
+                                    <div class="kt-menu-item">
+                                        <button class="kt-menu-link" data-dropdown-dismiss onclick={() => showActivity(item)}>
+                                            <span class="kt-menu-icon"><i class="ki-filled ki-time"></i></span>
+                                            <span class="kt-menu-title">Activity</span>
                                         </button>
-                                    {/snippet}
-                                    {#if hasPermission('activities.index')}
-                                        <div class="kt-menu-item">
-                                            <button class="kt-menu-link" data-dropdown-dismiss onclick={() => showActivity(item)}>
-                                                <span class="kt-menu-icon"><i class="ki-filled ki-time"></i></span>
-                                                <span class="kt-menu-title">Activity</span>
-                                            </button>
-                                        </div>
-                                    {/if}
-                                    {#if item.attached && hasPermission('media.detach')}
-                                        <div class="kt-menu-item">
-                                            <button class="kt-menu-link text-destructive" data-dropdown-dismiss onclick={() => detach(item)}>
-                                                <span class="kt-menu-icon"><i class="ki-filled ki-cross-circle"></i></span>
-                                                <span class="kt-menu-title">Free (detach)</span>
-                                            </button>
-                                        </div>
-                                    {/if}
-                                </Dropdown>
-                            </div>
-                        {/if}
+                                    </div>
+                                {/if}
+                            </Dropdown>
+                        </div>
                         <button
                             type="button"
                             class="flex w-full flex-col overflow-hidden rounded-lg border border-border text-start transition-colors hover:border-primary/50"

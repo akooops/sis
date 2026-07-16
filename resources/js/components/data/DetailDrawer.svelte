@@ -1,18 +1,28 @@
 <script>
     /**
-     * DetailDrawer — the standard read-only record drawer. Shows the full id as a
-     * `#…` row (brand primary), then a list of label/value fields, an optional
-     * `header` snippet (avatar/status) and `children` (module extras), and a
-     * toggle that reveals the barcode + QR code for the id.
+     * DetailDrawer — the ONE read-only record drawer. Every module uses it; a
+     * module wanting an avatar or its files does not get a drawer of its own,
+     * it passes more props. Top to bottom: an optional avatar/heading block, the
+     * full id as a `#…` row (brand primary), the label/value fields, any media
+     * collections as thumbnail grids, `children` for genuine one-offs, and a
+     * toggle revealing the barcode + QR code for the id.
      *
      *   <DetailDrawer bind:open title="User" id={user?.id}
-     *       fields={[{ label, value }, { label, date }]}>
-     *       {#snippet header()}…{/snippet}
-     *   </DetailDrawer>
+     *       avatar={{ src: user?.avatar_url, name: 'Ada Lovelace' }}
+     *       heading="Ada Lovelace"
+     *       badge={{ label: 'Approved', variant: 'success' }}
+     *       fields={[{ label, value }, { label, date }]}
+     *       collections={[{ label: 'Attachments', items: [media, …] }]} />
+     *
+     * `header` remains for a heading no combination of props can express; prefer
+     * the props, so every drawer in the app keeps the same shape.
      */
     import Drawer from '@/components/ui/Drawer.svelte';
     import DateTime from '@/components/ui/DateTime.svelte';
     import ClampText from '@/components/ui/ClampText.svelte';
+    import Avatar from '@/components/ui/Avatar.svelte';
+    import Badge from '@/components/ui/Badge.svelte';
+    import MediaThumb from '@/components/media/MediaThumb.svelte';
     import BarcodeQRGenerator from './BarcodeQRGenerator.svelte';
 
     let {
@@ -20,11 +30,21 @@
         title = null,
         id = null,
         fields = [],
+        avatar = null,
+        heading = null,
+        subheading = null,
+        badge = null,
+        collections = [],
+        width = undefined,
         createdAt = null,
         updatedAt = null,
         header,
         children,
     } = $props();
+
+    // Only render a collection that actually has files — an empty grid is a
+    // heading over nothing.
+    const shownCollections = $derived((collections ?? []).filter((c) => c?.items?.length));
 
     let showCodes = $state(false);
 
@@ -42,11 +62,32 @@
     );
 </script>
 
-<Drawer bind:open {title}>
+<Drawer bind:open {title} {width}>
     {#if id != null}
         <div class="flex flex-col gap-5">
             {#if header}
                 {@render header()}
+            {:else if avatar || heading || badge}
+                <div class="flex items-center gap-3">
+                    {#if avatar}
+                        <Avatar src={avatar.src} name={avatar.name ?? heading ?? ''} size="lg" />
+                    {/if}
+                    <div class="flex min-w-0 flex-col items-start gap-1">
+                        {#if heading}
+                            <div class="text-base font-semibold text-mono">
+                                <ClampText value={heading} lines={2} title={heading} />
+                            </div>
+                        {/if}
+                        {#if subheading}
+                            <div class="text-xs text-muted-foreground">
+                                <ClampText value={subheading} title={subheading} />
+                            </div>
+                        {/if}
+                        {#if badge}
+                            <Badge variant={badge.variant ?? 'secondary'}>{badge.label}</Badge>
+                        {/if}
+                    </div>
+                </div>
             {/if}
 
             <dl class="flex flex-col divide-y divide-border rounded-lg border border-border">
@@ -75,6 +116,26 @@
                     </div>
                 {/each}
             </dl>
+
+            {#each shownCollections as collection (collection.label)}
+                <div class="flex flex-col gap-2">
+                    <span class="text-sm font-medium text-mono">{collection.label}</span>
+                    <div class="grid grid-cols-4 gap-2">
+                        {#each collection.items as item (item.id)}
+                            <a
+                                class="flex flex-col gap-1 rounded-lg border border-border p-1.5 hover:border-primary"
+                                href={item.url ?? null}
+                                target="_blank"
+                                rel="noreferrer"
+                                title={item.name}
+                            >
+                                <MediaThumb {item} />
+                                <span class="truncate text-[10px] text-muted-foreground">{item.name}</span>
+                            </a>
+                        {/each}
+                    </div>
+                </div>
+            {/each}
 
             {#if children}
                 {@render children()}

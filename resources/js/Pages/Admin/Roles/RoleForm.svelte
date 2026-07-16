@@ -9,8 +9,8 @@
     let { role = null, onsaved, oncancel } = $props();
 
     const editing = $derived(!!role);
-    const form = useForm({ name: '', is_default: false });
-    if (role) Object.assign(form.data, { name: role.name ?? '', is_default: !!role.is_default });
+    const form = useForm({ name: '', code: '' });
+    if (role) Object.assign(form.data, { name: role.name ?? '', code: role.code ?? '' });
 
     async function submit(event) {
         event.preventDefault();
@@ -27,10 +27,9 @@
     <Field label="Name" error={form.errors.name} required>
         <Input bind:value={form.data.name} invalid={!!form.errors.name} />
     </Field>
-    <label class="kt-label">
-        <input type="checkbox" class="kt-checkbox" bind:checked={form.data.is_default} />
-        <span class="kt-checkbox-label">Default</span>
-    </label>
+    <Field label="Code" error={form.errors.code} required>
+        <Input bind:value={form.data.code} invalid={!!form.errors.code} />
+    </Field>
 
     <div class="flex items-center justify-end gap-3 border-t border-border pt-4">
         <Button variant="secondary" onclick={oncancel}>Cancel</Button>

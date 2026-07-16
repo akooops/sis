@@ -17,7 +17,7 @@
         try {
             await api.post(route('api.v1.admin.auth.logout'));
         } finally {
-            window.location.assign(route('web.auth.login-page'));
+            window.location.assign(route('web.admin.auth.login'));
         }
     }
 </script>
@@ -32,8 +32,8 @@
     <div class="kt-container-fixed flex justify-between items-stretch lg:gap-4" id="headerContainer">
         <!-- Mobile logo + toggles -->
         <div class="flex gap-2.5 lg:hidden items-center -ms-1">
-            <a class="shrink-0" href={route('web.home')} use:inertia>
-                <img class="max-h-[25px] w-full" src="/assets/media/app/mini-logo.svg" alt="Logo" />
+            <a class="shrink-0" href={route('web.admin.dashboard')} use:inertia>
+                <img class="max-h-[25px] w-full" src="/assets/media/app/mini-logo.png" alt="Logo" />
             </a>
             <button class="kt-btn kt-btn-icon kt-btn-ghost" data-kt-drawer-toggle="#sidebar">
                 <i class="ki-filled ki-menu"></i>
@@ -56,12 +56,12 @@
                 data-kt-dropdown-trigger="click"
             >
                 <div class="cursor-pointer shrink-0" data-kt-dropdown-toggle="true">
-                    <img class="size-9 rounded-full border-2 border-green-500 shrink-0" src={user?.avatar_url || '/assets/media/app/mini-logo.svg'} alt={user?.username} />
+                    <img class="size-9 rounded-full border-2 border-green-500 shrink-0" src={user?.avatar_url || '/assets/media/app/mini-logo.png'} alt={user?.username} />
                 </div>
                 <div class="kt-dropdown-menu w-[250px]" data-kt-dropdown-menu="true">
                     <div class="flex items-center justify-between px-2.5 py-1.5 gap-1.5">
                         <div class="flex items-center gap-2">
-                            <img class="size-9 shrink-0 rounded-full border-2 border-green-500" src={user?.avatar_url || '/assets/media/app/mini-logo.svg'} alt={user?.username} />
+                            <img class="size-9 shrink-0 rounded-full border-2 border-green-500" src={user?.avatar_url || '/assets/media/app/mini-logo.png'} alt={user?.username} />
                             <div class="flex flex-col gap-1.5">
                                 <span class="text-sm text-foreground font-semibold leading-none">{user?.firstname} {user?.lastname}</span>
                                 <span class="text-xs text-secondary-foreground font-medium leading-none">{user?.email}</span>

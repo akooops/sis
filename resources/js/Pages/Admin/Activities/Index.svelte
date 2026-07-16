@@ -8,16 +8,15 @@
     import DataTable from '@/components/data/DataTable.svelte';
     import SearchBar from '@/components/data/SearchBar.svelte';
     import Filters from '@/components/data/Filters.svelte';
+    import FilterButton from '@/components/data/FilterButton.svelte';
     import Badge from '@/components/ui/Badge.svelte';
     import DateTime from '@/components/ui/DateTime.svelte';
     import Avatar from '@/components/ui/Avatar.svelte';
     import IdBadge from '@/components/data/IdBadge.svelte';
-    import Drawer from '@/components/ui/Drawer.svelte';
+    import DetailDrawer from '@/components/data/DetailDrawer.svelte';
     import ActivityDiff from '@/components/activity/ActivityDiff.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
     import {
-        ACTIVITY_EVENTS,
-        ACTIVITY_LOG_NAMES,
         CAUSER_RESOURCES,
         activityMessage,
         eventIcon,
@@ -39,35 +38,52 @@
         viewOpen = true;
     };
 
+    // Same shape as every other module's view drawer: DetailDrawer renders the
+    // id row, clamps each value and offers copy/expand. An activity's created_at
+    // IS the event's date, so it reads as "Date" rather than a Created/Updated
+    // pair that would both show the same instant.
+    const viewFields = $derived(
+        viewing
+            ? [
+                  { label: 'Module', value: LOG_NAME_LABELS[viewing.log_name] ?? viewing.log_name },
+                  { label: 'Event', value: EVENT_LABELS[viewing.event] ?? viewing.event },
+                  { label: 'Type', value: SUBJECT_TYPE_LABELS[viewing.subject_type] ?? viewing.subject_type ?? '—' },
+                  {
+                      label: 'Record',
+                      value: viewing.subject_id ? (viewing.subject_label ?? viewing.subject_id) : '—',
+                  },
+                  {
+                      label: 'Performed by',
+                      value: viewing.causer_id
+                          ? `${viewing.causer_name ?? viewing.causer_id} (${SUBJECT_TYPE_LABELS[viewing.causer_type] ?? viewing.causer_type})`
+                          : 'System',
+                  },
+                  { label: 'Date', date: viewing.created_at },
+              ]
+            : [],
+    );
+
     const columns = [
         { key: 'created_at', label: 'Date', sortable: true, truncate: false, width: '170px' },
         { key: 'event', label: 'Event', sortable: true, truncate: false, width: '150px' },
+        { key: 'subject_type', label: 'Type', truncate: false, width: '110px' },
         { key: 'description', label: 'Activity' },
         { key: 'causer', label: 'Performed by', truncate: false, width: '200px' },
         { key: 'subject', label: 'Record', truncate: false, width: '190px' },
     ];
 
+    // Mirrors the controller's allowedSorts — the drawer and the table headers
+    // drive the same `sort`, so a column here must be sortable server-side.
+    const sortOptions = [
+        { value: 'id', label: 'ID' },
+        { value: 'event', label: 'Event' },
+        { value: 'log_name', label: 'Module' },
+        { value: 'created_at', label: 'Date' },
+    ];
+
+    // Mirrors the controller's allowedFilters. Who did it and when — the rest of
+    // the row (module, event, record) is right there in the table to read.
     const filterConfig = [
-        {
-            key: 'log_name',
-            type: 'select',
-            label: 'Module',
-            options: ACTIVITY_LOG_NAMES.map((value) => ({ value, label: LOG_NAME_LABELS[value] ?? value })),
-        },
-        {
-            key: 'event',
-            type: 'select',
-            label: 'Event',
-            options: ACTIVITY_EVENTS.map((value) => ({ value, label: EVENT_LABELS[value] ?? value })),
-        },
-        {
-            key: 'subject_type',
-            type: 'select',
-            label: 'Record type',
-            options: Object.keys(CAUSER_RESOURCES)
-                .concat(['role', 'permission', 'media'])
-                .map((value) => ({ value, label: SUBJECT_TYPE_LABELS[value] ?? value })),
-        },
         {
             key: 'causer_type',
             type: 'select',
@@ -94,69 +110,43 @@
 
 <AdminLayout title="Activity log">
     <IndexCard showForm={false} {toolbar} {form} {table} />
-    <Filters bind:open={filtersOpen} config={filterConfig} values={list.params.filter} onapply={(v) => list.setFilters(v)} />
+    <Filters
+        bind:open={filtersOpen}
+        config={filterConfig}
+        values={list.params.filter}
+        sort={list.sort}
+        {sortOptions}
+        onapply={(filter, sort) => list.apply({ filter, sort })}
+    />
 
-    <Drawer bind:open={viewOpen} title="Activity" width="w-[560px]">
-        {#if viewing}
-            <div class="flex flex-col gap-4">
-                <div class="flex flex-wrap items-center gap-2">
-                    <Badge variant={eventVariant(viewing.event)}>{EVENT_LABELS[viewing.event] ?? viewing.event}</Badge>
-                    <span class="text-sm text-mono">{activityMessage(viewing)}</span>
+    <DetailDrawer
+        bind:open={viewOpen}
+        title="Activity"
+        width="w-[560px]"
+        id={viewing?.id}
+        heading={viewing ? activityMessage(viewing) : null}
+        badge={viewing ? { label: EVENT_LABELS[viewing.event] ?? viewing.event, variant: eventVariant(viewing.event) } : null}
+        fields={viewFields}
+    >
+        {#snippet children()}
+            {#if hasDiff(viewing?.properties)}
+                <div class="flex flex-col gap-2">
+                    <span class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        What changed
+                    </span>
+                    <ActivityDiff properties={viewing.properties} />
                 </div>
-
-                <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-                    <dt class="text-muted-foreground">Module</dt>
-                    <dd class="text-mono">{LOG_NAME_LABELS[viewing.log_name] ?? viewing.log_name}</dd>
-
-                    <dt class="text-muted-foreground">Performed by</dt>
-                    <dd class="text-mono">
-                        {#if viewing.causer_id}
-                            {viewing.causer_name ?? viewing.causer_id}
-                            <span class="text-muted-foreground">({SUBJECT_TYPE_LABELS[viewing.causer_type] ?? viewing.causer_type})</span>
-                        {:else}
-                            System
-                        {/if}
-                    </dd>
-
-                    <dt class="text-muted-foreground">Record</dt>
-                    <dd class="text-mono">
-                        {#if viewing.subject_id}
-                            {viewing.subject_label ?? viewing.subject_id}
-                            <span class="text-muted-foreground">({SUBJECT_TYPE_LABELS[viewing.subject_type] ?? viewing.subject_type})</span>
-                        {:else}
-                            —
-                        {/if}
-                    </dd>
-
-                    <dt class="text-muted-foreground">Date</dt>
-                    <dd class="text-mono"><DateTime value={viewing.created_at} /></dd>
-                </dl>
-
-                {#if hasDiff(viewing.properties)}
-                    <div class="flex flex-col gap-2">
-                        <span class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                            What changed
-                        </span>
-                        <ActivityDiff properties={viewing.properties} />
-                    </div>
-                {:else}
-                    <p class="text-xs text-muted-foreground">No field changes were recorded.</p>
-                {/if}
-            </div>
-        {/if}
-    </Drawer>
+            {:else}
+                <p class="text-xs text-muted-foreground">No field changes were recorded.</p>
+            {/if}
+        {/snippet}
+    </DetailDrawer>
 </AdminLayout>
 
 {#snippet toolbar()}
     <div class="flex items-center gap-2">
         <SearchBar placeholder="Search activities" value={list.search} onsearch={(v) => list.setSearch(v)} />
-        <button
-            class="kt-btn kt-btn-sm kt-btn-ghost"
-            onclick={() => (filtersOpen = true)}
-            aria-label="Filter"
-        >
-            <i class="ki-filled ki-filter"></i>
-        </button>
+        <FilterButton count={list.activeFilters} onclick={() => (filtersOpen = true)} />
     </div>
 {/snippet}
 
@@ -187,6 +177,12 @@
         <Badge variant={eventVariant(row.event)}>
             <i class="{eventIcon(row.event)} me-1"></i>{EVENT_LABELS[row.event] ?? row.event}
         </Badge>
+    {:else if column.key === 'subject_type'}
+        {#if row.subject_type}
+            <Badge variant="secondary">{SUBJECT_TYPE_LABELS[row.subject_type] ?? row.subject_type}</Badge>
+        {:else}
+            <span class="text-muted-foreground">—</span>
+        {/if}
     {:else if column.key === 'description'}
         {activityMessage(row)}
     {:else if column.key === 'causer'}

@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Spatie\QueryBuilder\AllowedFilter;
 use App\Enums\MorphType;
+use App\Http\Controllers\Controller;
+use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
-use Carbon\Exceptions\InvalidFormatException;
+use Spatie\QueryBuilder\AllowedFilter;
 
+/**
+ * Base for the JSON API controllers. The { status, message, data } envelope
+ * comes from Controller::respond(); everything here is a piece of the shared
+ * query contract the index endpoints expose through spatie/query-builder —
+ * filter[field], filter[search], sort=field|-field, include=rel, per_page, page.
+ */
 abstract class ApiController extends Controller
 {
     protected int $defaultPerPage = 15;
@@ -91,6 +97,12 @@ abstract class ApiController extends Controller
         });
     }
 
+    /**
+     * A date-boundary filter (?filter[<name>]=2024-01-01). The name is public
+     * only — the column compared is always created_at, so created_from and
+     * created_to bound the same field from either side. An unparsable date is a
+     * 422: a date the server can't read must not silently drop the filter.
+     */
     protected function date(string $name, string $operator, string $boundary): AllowedFilter
     {
         return AllowedFilter::callback($name, function ($query, $value) use ($name, $operator, $boundary) {

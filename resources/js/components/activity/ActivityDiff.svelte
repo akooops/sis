@@ -8,6 +8,7 @@
      *   <ActivityDiff properties={row.properties} />
      */
     import { diffRows } from '@/lib/activity';
+    import ClampText from '@/components/ui/ClampText.svelte';
 
     let { properties = {} } = $props();
 
@@ -32,12 +33,12 @@
                     <tr class="border-t border-border align-top">
                         <td class="px-3 py-2 font-medium text-mono">{row.key}</td>
                         {#if hasOld}
-                            <td class="px-3 py-2 text-muted-foreground line-through decoration-destructive/40">
-                                <span class="break-all">{row.from}</span>
+                            <td class="max-w-[180px] px-3 py-2 text-muted-foreground line-through decoration-destructive/40">
+                                <ClampText value={row.from} lines={3} toggle copy />
                             </td>
                         {/if}
-                        <td class="px-3 py-2 {row.changed ? 'text-mono' : 'text-muted-foreground'}">
-                            <span class="break-all">{row.to}</span>
+                        <td class="max-w-[180px] px-3 py-2 {row.changed ? 'text-mono' : 'text-muted-foreground'}">
+                            <ClampText value={row.to} lines={3} toggle copy />
                         </td>
                     </tr>
                 {/each}

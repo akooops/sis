@@ -10,12 +10,12 @@
     const isVideo = $derived(item?.type === 'videos' || (item?.mime ?? '').startsWith('video/'));
 
     const icons = {
-        documents: 'ki-filled ki-file',
-        audio: 'ki-filled ki-music',
-        videos: 'ki-filled ki-video',
+        documents: 'ki-filled ki-document',
+        audio: 'ki-filled ki-speaker',
+        videos: 'ki-filled ki-screen',
         images: 'ki-filled ki-picture',
     };
-    const icon = $derived(icons[item?.type] ?? 'ki-filled ki-file');
+    const icon = $derived(icons[item?.type] ?? 'ki-filled ki-document');
 </script>
 
 {#if isImage && item?.url}

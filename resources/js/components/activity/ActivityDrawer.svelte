@@ -16,9 +16,10 @@
     import Select from '@/components/form/Select.svelte';
     import DatePicker from '@/components/form/DatePicker.svelte';
     import Pagination from '@/components/data/Pagination.svelte';
+    import ClampText from '@/components/ui/ClampText.svelte';
     import ActivityTimeline from './ActivityTimeline.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
-    import { ACTIVITY_EVENTS, CAUSER_RESOURCES, EVENT_LABELS } from '@/lib/activity';
+    import { CAUSER_RESOURCES } from '@/lib/activity';
     import { untrack } from 'svelte';
 
     let { open = $bindable(false), subjectType = null, subjectId = null, title = null } = $props();
@@ -26,7 +27,7 @@
     // readUrl:false — the drawer must not read or fight the page's own query
     // string. immediate:false — a mounted-but-closed drawer shouldn't fetch.
     const list = useIndex('api.v1.admin.activities.index', {
-        perPage: 20,
+        perPage: 15,
         sort: '-created_at',
         readUrl: false,
         immediate: false,
@@ -34,12 +35,11 @@
 
     let causerType = $state('');
     let causerId = $state(null);
-    let event = $state('');
     let dates = $state([]);
 
     const causerResource = $derived(causerType ? CAUSER_RESOURCES[causerType] : null);
     const activeFilters = $derived(
-        [causerType, causerId, event, dates?.length ? '1' : ''].filter(Boolean).length,
+        [causerType, causerId, dates?.length ? '1' : ''].filter(Boolean).length,
     );
 
     function apply() {
@@ -48,7 +48,6 @@
             subject_id: subjectId,
             causer_type: causerType || null,
             causer_id: causerId || null,
-            event: event || null,
             created_from: dates?.[0] ?? null,
             created_to: dates?.[1] ?? null,
         });
@@ -57,7 +56,6 @@
     function reset() {
         causerType = '';
         causerId = null;
-        event = '';
         dates = [];
         apply();
     }
@@ -79,10 +77,12 @@
 
 <Drawer bind:open title="Activity" width="w-[620px]">
     {#snippet header()}
-        <div class="flex flex-col gap-0.5">
+        <div class="flex min-w-0 flex-col gap-0.5">
             <h3 class="text-base font-semibold text-mono">Activity</h3>
             {#if title}
-                <span class="text-xs text-muted-foreground">{title}</span>
+                <div class="text-xs font-normal text-muted-foreground">
+                    <ClampText value={title} {title} />
+                </div>
             {/if}
         </div>
     {/snippet}
@@ -110,15 +110,6 @@
                             onchange={(v) => (causerId = v)}
                         />
                     {/key}
-                </Field>
-
-                <Field label="Event">
-                    <select class="kt-select" value={event} onchange={(e) => (event = e.currentTarget.value)}>
-                        <option value="">All</option>
-                        {#each ACTIVITY_EVENTS as value (value)}
-                            <option {value}>{EVENT_LABELS[value] ?? value}</option>
-                        {/each}
-                    </select>
                 </Field>
 
                 <Field label="Date">

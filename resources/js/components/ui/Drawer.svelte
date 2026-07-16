@@ -7,6 +7,7 @@
      */
     import { fade, fly } from 'svelte/transition';
     import { portal } from '@/lib/portal';
+    import ClampText from '@/components/ui/ClampText.svelte';
 
     let {
         open = $bindable(false),
@@ -50,11 +51,16 @@
             aria-modal="true"
         >
             <div class="flex items-center justify-between gap-2.5 text-sm text-mono font-semibold px-5 py-3 border-b border-b-border">
-                {#if header}
-                    {@render header()}
-                {:else}
-                    <div class="flex items-center gap-2">{title}</div>
-                {/if}
+                <!-- min-w-0: a flex child defaults to min-width:auto and refuses to
+                     shrink below its content, which is what lets a long title
+                     widen the drawer rather than clamp inside it. -->
+                <div class="flex min-w-0 grow items-center gap-2">
+                    {#if header}
+                        {@render header()}
+                    {:else}
+                        <ClampText value={title ?? ''} title={title} />
+                    {/if}
+                </div>
                 <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-dim shrink-0" onclick={close} aria-label="Close">
                     <i class="ki-filled ki-cross"></i>
                 </button>

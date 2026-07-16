@@ -1,6 +1,6 @@
 <script>
     /** EmptyState — centered icon + message for empty/no-results tables. */
-    let { icon = 'ki-filled ki-file', title = null, body = null, action, children } = $props();
+    let { icon = 'ki-filled ki-document', title = null, body = null, action, children } = $props();
 </script>
 
 <div class="flex flex-col items-center justify-center gap-3 p-10 text-center">

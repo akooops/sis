@@ -84,14 +84,9 @@
     id="sidebar"
 >
     <div class="kt-sidebar-header hidden lg:flex items-center relative justify-between px-3 lg:px-6 shrink-0" id="sidebar_header">
-        <a href={href('web.home')} use:inertia>
-            {#if isDark}
-                <img class="default-logo h-[42px] max-w-none" src="/assets/media/app/logo-dark.svg" alt="Logo" />
-                <img class="small-logo h-[22px] max-w-none" src="/assets/media/app/mini-logo-dark.svg" alt="Logo" />
-            {:else}
-                <img class="default-logo h-[42px] max-w-none" src="/assets/media/app/logo.svg" alt="Logo" />
-                <img class="small-logo h-[22px] max-w-none" src="/assets/media/app/mini-logo.svg" alt="Logo" />
-            {/if}
+        <a href={href('web.admin.dashboard')} use:inertia>
+            <img class="default-logo h-[42px] max-w-none" src="/assets/media/app/mini-logo.png" alt="Logo" />
+            <img class="small-logo h-[22px] max-w-none" src="/assets/media/app/mini-logo.png" alt="Logo" />
         </a>
         <button
             class="kt-btn kt-btn-outline kt-btn-icon size-[30px] absolute start-full top-2/4 z-40 -translate-x-2/4 -translate-y-2/4 rtl:translate-x-2/4"

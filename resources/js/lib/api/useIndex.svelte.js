@@ -12,7 +12,14 @@
  *   });
  *   // list.rows, list.meta, list.loading, list.error
  *   // list.setFilters({...}), list.setSearch('x'), list.toggleSort('email')
+ *   // list.setSort('-created_at'), list.apply({ filter, sort })
  *   // list.goToPage(2), list.setPerPage(25), list.refresh()
+ *
+ * Sort is two-way: clicking a column header (toggleSort) and the Filters drawer
+ * (apply) both write the same `params.sort`, so each reflects the other.
+ *
+ * `routeParams` accepts a function (`() => parentId`) for routes whose parent is
+ * in the URL, e.g. a pivot drawer opened for one row after another.
  *
  * Must be called during component init (it uses $state/$effect internally).
  */
@@ -100,7 +107,10 @@ export function useIndex(routeName, options = {}) {
         if (!silent) loading = true;
         error = null;
         try {
-            const url = route(routeName, routeParams);
+            // routeParams may be a function so a drawer reused across rows can
+            // point at the row it is currently open for — a plain value is read
+            // once at init and would pin it to the first parent forever.
+            const url = route(routeName, typeof routeParams === 'function' ? routeParams() : routeParams);
             const data = await api.get(url, queryParams(), { signal: controller.signal });
             if (my !== reqId) return; // stale
             rows = Array.isArray(data) ? data : (data?.data ?? []);
@@ -128,6 +138,23 @@ export function useIndex(routeName, options = {}) {
 
     function setFilters(next) {
         params.filter = { ...next };
+        return reload();
+    }
+
+    /** Set the sort outright: 'field' (asc), '-field' (desc), or null for none. */
+    function setSort(next) {
+        params.sort = next || null;
+        return reload();
+    }
+
+    /**
+     * Filters and sort in one request — the Filters drawer applies both at once,
+     * and calling setFilters() then setSort() would fire two round trips and
+     * leave the table briefly showing the old sort.
+     */
+    function apply({ filter, sort: nextSort } = {}) {
+        if (filter !== undefined) params.filter = { ...filter };
+        if (nextSort !== undefined) params.sort = nextSort || null;
         return reload();
     }
 
@@ -211,14 +238,30 @@ export function useIndex(routeName, options = {}) {
         get search() {
             return params.filter?.search ?? '';
         },
+        /**
+         * How many filters are actually applied, for the toolbar's filter button.
+         * `search` has its own input and is excluded — counting it would light
+         * the button up while the drawer showed nothing set.
+         */
+        get activeFilters() {
+            return Object.entries(params.filter ?? {}).filter(
+                ([key, value]) =>
+                    key !== 'search' && value !== null && value !== undefined && value !== '',
+            ).length;
+        },
         get perPage() {
             return params.per_page;
         },
         get page() {
             return params.page;
         },
+        get sort() {
+            return params.sort ?? null;
+        },
         setSearch,
         setFilters,
+        setSort,
+        apply,
         setPerPage,
         goToPage,
         toggleSort,

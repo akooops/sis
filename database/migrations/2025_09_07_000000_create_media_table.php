@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('size');
 
             $table->string('disk');
+            $table->json('custom_properties')->nullable();
 
             $table->string('state')->nullable();
 

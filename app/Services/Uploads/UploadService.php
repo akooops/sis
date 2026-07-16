@@ -51,7 +51,11 @@ class UploadService
 
         ScanUpload::dispatch($media);
 
-        return UploadData::from($media);
+        // On a sync queue the scan has already run and moved the file to the
+        // public disk, so re-read the row: the in-memory copy still says
+        // pending/quarantine, which reports a verdict that has been reached and
+        // yields no url for the client to render.
+        return UploadData::from($media->fresh() ?? $media);
     }
 
     /**

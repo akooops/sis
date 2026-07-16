@@ -14,8 +14,8 @@ class RolesSeeder extends Seeder
     public function run(): void
     {
         $ownerRole = Role::updateOrCreate(
-            ['name' => 'Owner', 'code' => 'owner'],
-            ['is_default' => false],
+            ['code' => 'owner'],
+            ['name' => 'Owner'],
         );
 
         $ownerRole->syncPermissions(Permission::pluck('id')->all());

@@ -5,6 +5,7 @@
     import DataTable from '@/components/data/DataTable.svelte';
     import SearchBar from '@/components/data/SearchBar.svelte';
     import Filters from '@/components/data/Filters.svelte';
+    import FilterButton from '@/components/data/FilterButton.svelte';
     import ExportButton from '@/components/data/ExportButton.svelte';
     import Badge from '@/components/ui/Badge.svelte';
     import DateTime from '@/components/ui/DateTime.svelte';
@@ -36,13 +37,25 @@
     let activityRow = $state(null);
 
     const columns = $derived([
-        { key: 'id', label: 'ID', width: '90px', truncate: false },
+        { key: 'id', label: 'ID', sortable: true, width: '90px', truncate: false },
         { key: 'name', label: 'Name', sortable: true },
         { key: 'prefix', label: 'Prefix' },
         { key: 'status', label: 'Status', truncate: false },
         { key: 'last_used_at', label: 'Last used', sortable: true, truncate: false },
     ]);
-    const filterConfig = $derived([{ key: 'prefix', type: 'text', label: 'Prefix' }]);
+    // Mirrors the controller's allowedSorts — the drawer and the table headers
+    // drive the same `sort`, so a column here must be sortable server-side.
+    const sortOptions = [
+        { value: 'id', label: 'ID' },
+        { value: 'name', label: 'Name' },
+        { value: 'last_used_at', label: 'Last used' },
+        { value: 'expires_at', label: 'Expires at' },
+        { value: 'created_at', label: 'Created' },
+    ];
+
+    // Mirrors the controller's allowedFilters. Anything not listed there is a
+    // 400 from the query builder, and everything else is reachable by search.
+    const filterConfig = [];
 
     const showToken = (v) => { if (v) { token = v; tokenOpen = true; } };
     const create = () => { editing = null; showForm = true; };
@@ -59,13 +72,19 @@
                   { label: 'Name', value: viewing.name },
                   { label: 'Prefix', value: viewing.prefix },
                   { label: 'Status', value: viewing.is_active ? 'Active' : 'Inactive' },
+                  // An empty allow-list means every IP, which is the opposite of
+                  // "none" — say so rather than showing a blank.
+                  { label: 'Allowed IPs', value: viewing.allowed_ips?.length ? viewing.allowed_ips.join(', ') : 'Any IP' },
                   { label: 'Last used', date: viewing.last_used_at },
+                  { label: 'Last used IP', value: viewing.last_used_ip || '—' },
+                  { label: 'Expires at', date: viewing.expires_at },
+                  { label: 'Revoked at', date: viewing.revoked_at },
               ]
             : [],
     );
 
     async function rotate(k) {
-        if (!(await confirm({ title: 'Rotate token' }))) return;
+        if (!(await confirm({ title: 'Rotate token', body: 'Are you sure you want to rotate the token? The old one would be invalid.', }))) return;
         try {
             const res = await api.post(route('api.v1.admin.api-keys.rotate', k.id));
             toast.success('Updated successfully.');
@@ -74,7 +93,7 @@
         } catch (e) { toast.error(e?.message ?? 'Something went wrong. Please try again.'); }
     }
     async function revoke(k) {
-        if (!(await confirm({ title: 'Revoke', variant: 'destructive' }))) return;
+        if (!(await confirm({ title: 'Revoke', body: 'Are you sure you want to revoke this api key? This action cannot be undone.',  variant: 'destructive' }))) return;
         try {
             await api.post(route('api.v1.admin.api-keys.revoke', k.id));
             toast.success('Updated successfully.');
@@ -91,11 +110,18 @@
     }
 </script>
 
-<svelte:head><title>Novonordisk — API keys</title></svelte:head>
+<svelte:head><title>Saud International Schools — API keys</title></svelte:head>
 
 <AdminLayout title="API keys">
     <IndexCard {showForm} {toolbar} {form} {table} />
-    <Filters bind:open={filtersOpen} config={filterConfig} values={list.params.filter} onapply={(v) => list.setFilters(v)} />
+    <Filters
+        bind:open={filtersOpen}
+        config={filterConfig}
+        values={list.params.filter}
+        sort={list.sort}
+        {sortOptions}
+        onapply={(filter, sort) => list.apply({ filter, sort })}
+    />
     <ApiKeyPermissionsDrawer bind:open={permsOpen} apiKey={permsKey} />
     <TokenModal bind:open={tokenOpen} {token} />
     <DetailDrawer bind:open={viewOpen} title="API keys" id={viewing?.id} fields={viewFields} createdAt={viewing?.created_at} updatedAt={viewing?.updated_at} />
@@ -106,7 +132,7 @@
     {#if !inForm}
         <div class="flex items-center gap-2">
             <SearchBar placeholder="Search API keys…" value={list.search} onsearch={(v) => list.setSearch(v)} />
-            <button class="kt-btn kt-btn-sm kt-btn-ghost" onclick={() => (filtersOpen = true)} aria-label="Filter"><i class="ki-filled ki-filter"></i></button>
+            <FilterButton count={list.activeFilters} onclick={() => (filtersOpen = true)} />
             <ExportButton rows={list.rows} columns={[
                 { key: 'name', label: 'Name' },
                 { key: 'prefix', label: 'Prefix' },
@@ -151,14 +177,14 @@
             <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" aria-label="Actions"><i class="ki-filled ki-dots-vertical"></i></button>
         {/snippet}
         <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => view(row)}><span class="kt-menu-icon"><i class="ki-filled ki-eye"></i></span><span class="kt-menu-title">View</span></button></div>
+        {#if hasPermission('activities.index')}
+            <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => showActivity(row)}><span class="kt-menu-icon"><i class="ki-filled ki-time"></i></span><span class="kt-menu-title">Activity</span></button></div>
+        {/if}
         {#if hasPermission('api-keys.update')}
             <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => edit(row)}><span class="kt-menu-icon"><i class="ki-filled ki-pencil"></i></span><span class="kt-menu-title">Edit</span></button></div>
         {/if}
         {#if hasPermission('api-key-permissions.index')}
             <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => managePerms(row)}><span class="kt-menu-icon"><i class="ki-filled ki-key"></i></span><span class="kt-menu-title">Manage permissions</span></button></div>
-        {/if}
-        {#if hasPermission('activities.index')}
-            <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => showActivity(row)}><span class="kt-menu-icon"><i class="ki-filled ki-time"></i></span><span class="kt-menu-title">Activity</span></button></div>
         {/if}
         {#if hasPermission('api-keys.rotate')}
             <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => rotate(row)}><span class="kt-menu-icon"><i class="ki-filled ki-arrows-circle"></i></span><span class="kt-menu-title">Rotate token</span></button></div>

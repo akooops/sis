@@ -32,14 +32,14 @@
             </div>
 
             {#if generalError}
-                <div class="kt-alert kt-alert-destructive" role="alert">
+                <div class="kt-alert kt-alert-outline kt-alert-destructive" role="alert">
                     <div class="kt-alert-content">{generalError}</div>
                 </div>
             {/if}
 
             <a href={route('api.v1.admin.auth.azure.redirect')} class="kt-btn kt-btn-outline justify-center">
                 <img src="/assets/media/brand-logos/azure.svg" alt="Azure" class="size-4" />
-                Azure
+                Sign in with Azure
             </a>
 
             <div class="flex items-center gap-3 text-xs text-muted-foreground">

@@ -163,7 +163,7 @@ export function eventIcon(event) {
         case 'deleted':
             return 'ki-filled ki-trash';
         case 'attached':
-            return 'ki-filled ki-link';
+            return 'ki-filled ki-paper-clip';
         case 'detached':
             return 'ki-filled ki-disconnect';
         case 'login':
@@ -187,7 +187,10 @@ export function eventIcon(event) {
 export function diffRows(properties) {
     const oldValues = properties?.old ?? {};
     const newValues = properties?.attributes ?? {};
-    const keys = [...new Set([...Object.keys(oldValues), ...Object.keys(newValues)])].sort();
+    // Insertion order, NOT sorted: the observer already wrote these in the
+    // model's own column order (its migration order), which reads the way the
+    // record does. Re-sorting here would throw that away.
+    const keys = [...new Set([...Object.keys(oldValues), ...Object.keys(newValues)])];
 
     return keys.map((key) => ({
         key,

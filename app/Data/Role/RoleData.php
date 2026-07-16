@@ -2,7 +2,6 @@
 
 namespace App\Data\Role;
 
-use App\Data\Permission\PermissionData;
 use App\Models\Role;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;

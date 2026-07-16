@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Data\Media\MediaData;
+use App\Data\Media\StoreMediaData;
 use App\Http\Controllers\Api\ApiController;
 use App\Models\Media;
 use App\Services\Uploads\UploadService;
@@ -11,14 +12,21 @@ use Illuminate\Http\JsonResponse;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
-use App\Data\Media\StoreMediaData;
 
+/**
+ * The upload endpoint plus the library that browses what has been uploaded.
+ * store() is the single door files come in through — every form posts here and
+ * then submits only the returned id — and it is the one media route with no
+ * permission gate, since any authenticated admin filling in a form needs it.
+ * Nothing here writes to a disk directly: UploadService owns that.
+ */
 class MediaController extends ApiController
 {
     /**
-     * Media library index — browse existing media to reuse across models.
-     * Filter by type (image/document/video/audio), search by name, and
-     * optionally restrict to scanned-clean media (the pickable set).
+     * Browse media to reuse across models. `type` is a config/uploads.php
+     * category key — images/documents/videos/audio, plural — not a mime group.
+     * `clean=true` narrows to scan-cleared media, which is the only set a picker
+     * should offer: anything else may still be sitting in quarantine.
      */
     public function index(): JsonResponse
     {
@@ -38,7 +46,7 @@ class MediaController extends ApiController
                     : $query),
                 $this->search(['name', 'file_name']),
             ])
-            ->allowedSorts(['name', 'size', 'created_at'])
+            ->allowedSorts(['id', 'name', 'size', 'created_at'])
             ->defaultSort('-created_at')
             ->paginate($this->perPage())
             ->appends(request()->query());

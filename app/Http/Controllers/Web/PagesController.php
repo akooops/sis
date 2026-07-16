@@ -4,16 +4,18 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
-use Inertia\Response;
 
+/**
+ * The user end. It has no pages yet — every screen built so far is admin — so
+ * `/` just points at where you can actually go. Give it its own Inertia page
+ * when the user-facing side exists; the admin landing is web.admin.dashboard.
+ */
 class PagesController extends Controller
 {
-    public function index(): Response|RedirectResponse
+    public function index(): RedirectResponse
     {
-        if (! auth()->check()) {
-            return redirect()->route('web.auth.login-page');
-        }
-
-        return inertia('Home');
+        return auth()->check()
+            ? redirect()->route('web.admin.dashboard')
+            : redirect()->route('web.admin.auth.login');
     }
 }

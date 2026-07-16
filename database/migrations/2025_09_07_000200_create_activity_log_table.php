@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('causer_type')->nullable();
             $table->ulid('causer_id')->nullable();
 
+            $table->uuid('batch_uuid')->nullable();
+
             $table->index('log_name');
             $table->index(['subject_type', 'subject_id']);
             $table->index(['causer_type', 'causer_id']);

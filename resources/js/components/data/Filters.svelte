@@ -14,8 +14,15 @@
      *           { key:'name', type:'text', label:'Name' },
      *       ]}
      *       values={currentFilters}
-     *       onapply={(v) => list.setFilters(v)}
+     *       sort={list.sort}
+     *       sortOptions={[{ value:'created_at', label:'Created' }]}
+     *       onapply={(filter, sort) => list.apply({ filter, sort })}
      *   />
+     *
+     * Sort is the same state the table headers drive, so the two stay in step:
+     * whatever the user last clicked shows up preselected here, and applying
+     * here re-renders the header arrows. Pass `sortOptions` to show the pair of
+     * sort controls; omit it and the drawer is filters-only.
      *
      * A resource-select can depend on another field in the same drawer: give any
      * of its props a function of the current draft, and name the field it
@@ -31,13 +38,29 @@
     import Select from '@/components/form/Select.svelte';
     import DatePicker from '@/components/form/DatePicker.svelte';
 
-    let { open = $bindable(false), config = [], values = {}, onapply } = $props();
+    let {
+        open = $bindable(false),
+        config = [],
+        values = {},
+        sort = null,
+        sortOptions = [],
+        onapply,
+    } = $props();
 
     // Working copy; seeded from applied values whenever the drawer opens.
     let draft = $state({});
+    let sortColumn = $state('');
+    let sortDir = $state('asc');
 
     $effect(() => {
-        if (open) draft = { ...values };
+        if (!open) return;
+        draft = { ...values };
+
+        // `-field` is the query builder's descending form; split it so the two
+        // controls can show it, and rejoin on apply.
+        const current = sort ?? '';
+        sortColumn = current.startsWith('-') ? current.slice(1) : current;
+        sortDir = current.startsWith('-') ? 'desc' : 'asc';
     });
 
     function set(key, value) {
@@ -70,19 +93,27 @@
         return field.maxKey ?? `${field.key}_max`;
     }
 
+    /** Rejoin the two controls into the query builder's `sort` string. */
+    function sortValue() {
+        if (!sortColumn) return null;
+        return sortDir === 'desc' ? `-${sortColumn}` : sortColumn;
+    }
+
     function apply() {
         // Drop empty values so the query stays clean.
         const out = {};
         for (const [k, v] of Object.entries(draft)) {
             if (v !== null && v !== undefined && v !== '') out[k] = v;
         }
-        onapply?.(out);
+        onapply?.(out, sortValue());
         open = false;
     }
 
     function reset() {
         draft = {};
-        onapply?.({});
+        sortColumn = '';
+        sortDir = 'asc';
+        onapply?.({}, null);
         open = false;
     }
 </script>
@@ -144,6 +175,25 @@
                 {/if}
             </Field>
         {/each}
+
+        {#if sortOptions.length}
+            <div class="grid grid-cols-2 gap-3 border-t border-border pt-4">
+                <Field label="Sort by">
+                    <select class="kt-select" value={sortColumn} onchange={(e) => (sortColumn = e.currentTarget.value)}>
+                        <option value="">Default</option>
+                        {#each sortOptions as opt (opt.value)}
+                            <option value={opt.value}>{opt.label}</option>
+                        {/each}
+                    </select>
+                </Field>
+                <Field label="Direction">
+                    <select class="kt-select" value={sortDir} disabled={!sortColumn} onchange={(e) => (sortDir = e.currentTarget.value)}>
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                </Field>
+            </div>
+        {/if}
     </div>
 
     {#snippet footer()}

@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Web\Admin\PagesController as AdminPagesController;
 use App\Http\Controllers\Web\Admin\AuthController;
+use App\Http\Controllers\Web\Admin\PagesController as AdminPagesController;
 use App\Http\Controllers\Web\PagesController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +27,7 @@ Route::middleware('guest')->prefix('admin/auth')->group(function () {
 | Admin (authenticated) pages
 |------------------------*/
 Route::middleware('auth')->prefix('admin')->group(function () {
+    Route::get('/', [AdminPagesController::class, 'index'])->name('web.admin.dashboard');
     Route::get('users', [AdminPagesController::class, 'users'])->name('web.admin.users.index');
     Route::get('roles', [AdminPagesController::class, 'roles'])->name('web.admin.roles.index');
     Route::get('permissions', [AdminPagesController::class, 'permissions'])->name('web.admin.permissions.index');

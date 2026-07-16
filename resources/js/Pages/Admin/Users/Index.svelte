@@ -5,15 +5,16 @@
     import DataTable from '@/components/data/DataTable.svelte';
     import SearchBar from '@/components/data/SearchBar.svelte';
     import Filters from '@/components/data/Filters.svelte';
+    import FilterButton from '@/components/data/FilterButton.svelte';
     import ExportButton from '@/components/data/ExportButton.svelte';
     import Avatar from '@/components/ui/Avatar.svelte';
     import Badge from '@/components/ui/Badge.svelte';
     import DateTime from '@/components/ui/DateTime.svelte';
     import Dropdown from '@/components/ui/Dropdown.svelte';
     import IdBadge from '@/components/data/IdBadge.svelte';
+    import DetailDrawer from '@/components/data/DetailDrawer.svelte';
     import ActivityDrawer from '@/components/activity/ActivityDrawer.svelte';
     import UserForm from './UserForm.svelte';
-    import UserViewDrawer from './UserViewDrawer.svelte';
     import RolesDrawer from './RolesDrawer.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
     import { USER_STATUS_LABELS, USER_STATUS_VARIANTS } from '@/lib/user';
@@ -35,15 +36,27 @@
     let rolesUser = $state(null);
 
     const columns = [
-        { key: 'id', label: 'ID', width: '90px', truncate: false },
+        { key: 'id', label: 'ID', sortable: true, width: '90px', truncate: false },
         { key: 'firstname', label: 'Name', sortable: true, truncate: false },
         { key: 'email', label: 'Email', sortable: true },
-        { key: 'roles', label: 'Roles', truncate: false },
+        { key: 'phone', label: 'Phone', truncate: false },
         { key: 'status', label: 'Status', truncate: false },
     ];
 
+    // Mirrors the controller's allowedSorts — the drawer and the table headers
+    // drive the same `sort`, so a column here must be sortable server-side.
+    const sortOptions = [
+        { value: 'id', label: 'ID' },
+        { value: 'firstname', label: 'First name' },
+        { value: 'lastname', label: 'Last name' },
+        { value: 'username', label: 'Username' },
+        { value: 'email', label: 'Email' },
+        { value: 'created_at', label: 'Created' },
+    ];
+
+    // Mirrors the controller's allowedFilters. Anything not listed there is a
+    // 400 from the query builder, and everything else is reachable by search.
     const filterConfig = [
-        { key: 'email', type: 'text', label: 'Email' },
         {
             key: 'status',
             type: 'select',
@@ -51,6 +64,16 @@
             options: Object.entries(USER_STATUS_LABELS).map(([value, label]) => ({ value, label })),
         },
     ];
+
+    const viewFields = $derived(
+        viewing
+            ? [
+                  { label: 'Username', value: viewing.username },
+                  { label: 'Email', value: viewing.email },
+                  { label: 'Phone', value: viewing.phone || '—' },
+              ]
+            : [],
+    );
 
     const create = () => { editing = null; showForm = true; };
     const edit = (u) => { editing = u; showForm = true; };
@@ -84,13 +107,30 @@
     }
 </script>
 
-<svelte:head><title>Novonordisk — Users</title></svelte:head>
+<svelte:head><title>Saud International Schools — Users</title></svelte:head>
 
 <AdminLayout title="Users">
     <IndexCard {showForm} {toolbar} {form} {table} />
 
-    <Filters bind:open={filtersOpen} config={filterConfig} values={list.params.filter} onapply={(v) => list.setFilters(v)} />
-    <UserViewDrawer bind:open={viewOpen} user={viewing} />
+    <Filters
+        bind:open={filtersOpen}
+        config={filterConfig}
+        values={list.params.filter}
+        sort={list.sort}
+        {sortOptions}
+        onapply={(filter, sort) => list.apply({ filter, sort })}
+    />
+    <DetailDrawer
+        bind:open={viewOpen}
+        title="User"
+        id={viewing?.id}
+        avatar={{ src: viewing?.avatar_url, name: `${viewing?.firstname ?? ''} ${viewing?.lastname ?? ''}` }}
+        heading={`${viewing?.firstname ?? ''} ${viewing?.lastname ?? ''}`}
+        badge={viewing ? { label: USER_STATUS_LABELS[viewing.status] ?? viewing.status, variant: USER_STATUS_VARIANTS[viewing.status] ?? 'secondary' } : null}
+        fields={viewFields}
+        createdAt={viewing?.created_at}
+        updatedAt={viewing?.updated_at}
+    />
     <RolesDrawer bind:open={rolesOpen} user={rolesUser} />
     <ActivityDrawer bind:open={activityOpen} subjectType="user" subjectId={activityRow?.id} title={activityRow?.username} />
 </AdminLayout>
@@ -99,9 +139,7 @@
     {#if !inForm}
         <div class="flex items-center gap-2">
             <SearchBar placeholder="Search users…" value={list.search} onsearch={(v) => list.setSearch(v)} />
-            <button class="kt-btn kt-btn-sm kt-btn-ghost" onclick={() => (filtersOpen = true)} aria-label="Filter">
-                <i class="ki-filled ki-filter"></i>
-            </button>
+            <FilterButton count={list.activeFilters} onclick={() => (filtersOpen = true)} />
             <ExportButton rows={list.rows} columns={[
                 { key: 'firstname', label: 'First name' },
                 { key: 'lastname', label: 'Last name' },

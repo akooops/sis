@@ -104,5 +104,5 @@ export async function uploadFile(file, type, opts = {}) {
     form.append('type', type);
     form.append('file', file);
 
-    return api.post(route('api.v1.admin.uploads.store'), form, { signal: opts.signal });
+    return api.post(route('api.v1.admin.media.store'), form, { signal: opts.signal });
 }

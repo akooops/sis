@@ -16,6 +16,14 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
+/**
+ * Sign-in for the admin app — password or Azure SSO, both ending in the same
+ * Sanctum session. These routes live under the admin prefix but deliberately
+ * outside verify.auth: gating them behind authentication would leave no way in.
+ * Authenticating is not admission — every path here ends at $user->canLogin(),
+ * true only for an Approved account. The Azure endpoints redirect a browser
+ * rather than returning the JSON envelope.
+ */
 class AuthController extends Controller
 {
     /**
@@ -36,7 +44,7 @@ class AuthController extends Controller
         Auth::login($user, $data->remember);
         request()->session()->regenerate();
 
-        return $this->respond(UserData::from($user->load('roles')), 'Logged in successfully');
+        return $this->respond(UserData::from($user), 'Logged in successfully');
     }
 
     public function logout(Request $request): JsonResponse
