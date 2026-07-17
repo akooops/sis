@@ -4,6 +4,7 @@ namespace App\Data\User;
 
 use App\Rules\CleanUpload;
 use App\Rules\PhoneNumber;
+use App\Traits\Phone\NormalizesPhones;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
@@ -11,6 +12,8 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 class UpdateUserData extends Data
 {
+    use NormalizesPhones;
+
     public function __construct(
         public string|Optional $firstname,
         public string|Optional $lastname,
