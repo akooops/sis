@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\Admin\ApiKeyPermissionsController;
 use App\Http\Controllers\Api\Admin\ApiKeysController;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\MediaController;
+use App\Http\Controllers\Api\Admin\IntegrationsController;
+use App\Http\Controllers\Api\Admin\IntegrationTypesController;
 use App\Http\Controllers\Api\Admin\PermissionsController;
 use App\Http\Controllers\Api\Admin\RolePermissionsController;
 use App\Http\Controllers\Api\Admin\RolesController;
@@ -79,16 +81,27 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('api-keys/{apiKey}/rotate', [ApiKeysController::class, 'rotate'])->middleware('verify.permissions:api-keys.rotate')->name('api.v1.admin.api-keys.rotate');
         Route::post('api-keys/{apiKey}/revoke', [ApiKeysController::class, 'revoke'])->middleware('verify.permissions:api-keys.revoke')->name('api.v1.admin.api-keys.revoke');
 
-        // Media (library index + generic detach — frees a media back into the reusable pool)
+        // Media
         Route::get('media', [MediaController::class, 'index'])->middleware('verify.permissions:media.index')->name('api.v1.admin.media.index');
         Route::patch('media/{media}/detach', [MediaController::class, 'detach'])->middleware('verify.permissions:media.detach')->name('api.v1.admin.media.detach');
 
-        // Activities (append-only audit trail; read-only by design)
+        // Activities 
         Route::get('activities', [ActivitiesController::class, 'index'])->middleware('verify.permissions:activities.index')->name('api.v1.admin.activities.index');
 
         // API Key Permissions
         Route::get('api-key-permissions/{apiKey}', [ApiKeyPermissionsController::class, 'index'])->middleware('verify.permissions:api-key-permissions.index')->name('api.v1.admin.api-key-permissions.index');
         Route::post('api-key-permissions/{apiKey}', [ApiKeyPermissionsController::class, 'store'])->middleware('verify.permissions:api-key-permissions.store')->name('api.v1.admin.api-key-permissions.store');
         Route::delete('api-key-permissions/{apiKeyPermission}', [ApiKeyPermissionsController::class, 'destroy'])->middleware('verify.permissions:api-key-permissions.destroy')->name('api.v1.admin.api-key-permissions.destroy');
+
+        // Integrations — types (catalogue + drivers) and the configured integrations under them.
+        Route::get('integration-types', [IntegrationTypesController::class, 'index'])->middleware('verify.permissions:integrations.index')->name('api.v1.admin.integration-types.index');
+        Route::get('integration-types/{integrationType}/drivers', [IntegrationTypesController::class, 'drivers'])->middleware('verify.permissions:integrations.index')->name('api.v1.admin.integration-types.drivers');
+
+        Route::get('integrations', [IntegrationsController::class, 'index'])->middleware('verify.permissions:integrations.index')->name('api.v1.admin.integrations.index');
+        Route::get('integrations/{integration}', [IntegrationsController::class, 'show'])->middleware('verify.permissions:integrations.index')->name('api.v1.admin.integrations.show');
+        Route::post('integrations', [IntegrationsController::class, 'store'])->middleware('verify.permissions:integrations.store')->name('api.v1.admin.integrations.store');
+        Route::put('integrations/{integration}', [IntegrationsController::class, 'update'])->middleware('verify.permissions:integrations.update')->name('api.v1.admin.integrations.update');
+        Route::delete('integrations/{integration}', [IntegrationsController::class, 'destroy'])->middleware('verify.permissions:integrations.destroy')->name('api.v1.admin.integrations.destroy');
+        Route::patch('integrations/{integration}/toggle', [IntegrationsController::class, 'toggle'])->middleware('verify.permissions:integrations.update')->name('api.v1.admin.integrations.toggle');
     });
 });

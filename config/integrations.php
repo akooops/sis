@@ -3,45 +3,34 @@
 return [
 
     /*
-     * The type catalogue — the capability slots the admin can configure a
-     * provider under (Email, SMS, later WhatsApp/OAuth/AI…). This array is the
-     * source of truth; database/seeders/ProviderTypesSeeder mirrors it into the
-     * provider_types table (for FK integrity + fast counts). Adding a new type
-     * is: add a row here, add a driver below, reseed. No core edits.
+     * The type catalogue — the capability slots the admin can configure an
+     * integration under. This array is the source of truth; IntegrationTypesSeeder
+     * mirrors it into the integration_types table. Adding a new type is: add a row
+     * here, add a driver below, reseed. No core edits.
      */
     'types' => [
         'email' => ['name' => 'Email', 'icon' => 'ki-sms', 'sort' => 1],
         'sms' => ['name' => 'SMS', 'icon' => 'ki-message-text', 'sort' => 2],
-        // future: 'whatsapp', 'oauth', 'ai', 'captcha', 'analytics'.
+        'ai' => ['name' => 'AI', 'icon' => 'ki-abstract-26', 'sort' => 3],
     ],
 
     /*
      * The registered drivers (vendor implementations). Each class self-describes
-     * its type/code/label/schema and does the real work (test/send).
-     * App\Services\Integrations\IntegrationRegistry builds a code => class map
-     * from this list and resolves via the container — no match, no core edit to
-     * add a vendor. A new driver is one class + one line here.
+     * its type/code/label/schema and does the real work (send/generate).
+     * App\Services\Integrations\Registry builds a code => class map from this list;
+     * IntegrationDriversSeeder mirrors them into the integration_drivers table.
+     * A new driver is one class + one line here. Drivers are intentionally thin —
+     * optimise them later without touching the framework around them.
      */
     'drivers' => [
         App\Services\Integrations\Drivers\SmtpDriver::class,
+        App\Services\Integrations\Drivers\TwilioEmailDriver::class,
         App\Services\Integrations\Drivers\FourJawalyDriver::class,
+        App\Services\Integrations\Drivers\OpenAiDriver::class,
     ],
 
     /*
-     * Connection-test guards. The test endpoints reach out to third-party hosts
-     * on demand, so they are throttled (per minute, per admin) and time-limited
-     * so a hung provider can't tie up a worker.
+     * Outbound HTTP timeout (seconds) for driver calls (SMS/AI providers).
      */
-    'test' => [
-        'timeout' => (int) env('INTEGRATIONS_TEST_TIMEOUT', 5),
-        'connect_timeout' => (int) env('INTEGRATIONS_TEST_CONNECT_TIMEOUT', 3),
-    ],
-
-    /*
-     * Provider credentials are stored with Laravel's `encrypted:array` cast,
-     * keyed by APP_KEY (AES-256). NOTE (Laravel 10): rotating APP_KEY makes every
-     * stored credential undecryptable — there is no APP_PREVIOUS_KEYS fallback
-     * until Laravel 11. After an APP_KEY rotation, secrets must be re-entered.
-     */
-
+    'timeout' => (int) env('INTEGRATIONS_TIMEOUT', 15),
 ];

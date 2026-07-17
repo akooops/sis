@@ -2,35 +2,37 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * A capability slot (email, sms…). A seeded mirror of config('integrations.types')
- * kept for FK integrity and fast counts; the drivers and their schemas live in
- * code (App\Services\Integrations\IntegrationRegistry).
+ * A capability slot (email, sms, ai…). A seeded mirror of
+ * config('integrations.types'); the drivers and their schemas live in code and
+ * are mirrored into integration_drivers.
  */
-class ProviderType extends Model
+class IntegrationType extends Model
 {
+    use HasUlids;
+
     /* -----------------------------------------
      1. Attributes
     ------------------------------------------*/
 
-    public $incrementing = false;
-
-    protected $keyType = 'string';
-
-    protected $primaryKey = 'code';
-
-    protected $guarded = ['code'];
+    protected $guarded = ['id'];
 
     /* -----------------------------------------
      2. Relationships
     ------------------------------------------*/
 
-    public function providers(): HasMany
+    public function integrations(): HasMany
     {
-        return $this->hasMany(Provider::class, 'provider_type_code', 'code');
+        return $this->hasMany(Integration::class);
+    }
+
+    public function drivers(): HasMany
+    {
+        return $this->hasMany(IntegrationDriver::class);
     }
 
     /* -----------------------------------------

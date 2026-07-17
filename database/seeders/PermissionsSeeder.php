@@ -13,7 +13,10 @@ class PermissionsSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
-
+            ['code' => 'integrations.index', 'name' => 'View integrations', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'integrations.store', 'name' => 'Create integrations', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'integrations.update', 'name' => 'Update integrations', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'integrations.destroy', 'name' => 'Delete integrations', 'supports_web' => true, 'supports_api' => false],
         ];
 
         foreach ($permissions as $permission) {

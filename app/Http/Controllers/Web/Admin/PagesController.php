@@ -41,4 +41,9 @@ class PagesController extends Controller
     {
         return inertia('Admin/Activities/Index');
     }
+
+    public function integrations(): Response
+    {
+        return inertia('Admin/Integrations/Index');
+    }
 }

@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -37,6 +37,7 @@ export const LOG_NAME_LABELS = {
     permissions: 'Permissions',
     'api-keys': 'API keys',
     media: 'Media',
+    integrations: 'Integrations',
     auth: 'Authentication',
 };
 
@@ -47,6 +48,7 @@ export const SUBJECT_TYPE_LABELS = {
     permission: 'Permission',
     api_key: 'API key',
     media: 'File',
+    integration: 'Integration',
 };
 
 /** Generic fallback wording, used when there is no per-module message below. */
@@ -100,6 +102,11 @@ const ACTIVITY_MESSAGES = {
         'scanned-clean': ':name passed the malware scan',
         'scanned-infected': ':name was blocked: malware detected',
         'scan-failed': 'Could not scan :name',
+    },
+    integrations: {
+        created: 'Added the provider :name',
+        updated: 'Updated the provider :name',
+        deleted: 'Deleted the provider :name',
     },
     auth: {
         login: ':name signed in',

@@ -30,6 +30,7 @@ export const adminMenu = [
         label: 'System',
         icon: 'ki-filled ki-setting-2',
         children: [
+            { label: 'Integrations', route: 'web.admin.integrations.index', permission: 'integrations.index' },
             { label: 'Activity Log', route: 'web.admin.activities.index', permission: 'activities.index' },
         ],
     },

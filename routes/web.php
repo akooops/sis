@@ -34,6 +34,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('api-keys', [AdminPagesController::class, 'apiKeys'])->name('web.admin.api-keys.index');
     Route::get('media', [AdminPagesController::class, 'media'])->name('web.admin.media.index');
     Route::get('activities', [AdminPagesController::class, 'activities'])->name('web.admin.activities.index');
+    Route::get('integrations', [AdminPagesController::class, 'integrations'])->name('web.admin.integrations.index');
 });
 
 /*------------------------

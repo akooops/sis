@@ -127,24 +127,11 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
-        'communications' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/communications.log'),
-        ],
-
-        'sms' => [
+        'integrations' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/sms.log'),
+            'path' => storage_path('logs/integrations.log'),
             'level' => 'debug',
             'days' => 30,
         ],
-
-        'payments' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/payments.log'),
-            'level' => 'info',
-            'days' => 90,
-        ],
     ],
-
 ];

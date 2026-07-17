@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
             PermissionsSeeder::class,
             RolesSeeder::class,
             UserSeeder::class,
+            IntegrationTypesSeeder::class,
+            IntegrationDriversSeeder::class,
         ]);
 
         if (app()->environment('local')) {
