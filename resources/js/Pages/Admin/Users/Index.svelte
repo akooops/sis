@@ -16,9 +16,10 @@
     import ActivityDrawer from '@/components/activity/ActivityDrawer.svelte';
     import UserForm from './UserForm.svelte';
     import RolesDrawer from './RolesDrawer.svelte';
+    import SessionsDrawer from './SessionsDrawer.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
     import { USER_STATUS_LABELS, USER_STATUS_VARIANTS } from '@/lib/user';
-    import { hasPermission } from '@/lib/permissions';
+    import { authUser, hasPermission } from '@/lib/permissions';
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
     import { confirm } from '@/lib/confirm';
@@ -34,6 +35,8 @@
     let activityRow = $state(null);
     let rolesOpen = $state(false);
     let rolesUser = $state(null);
+    let sessionsOpen = $state(false);
+    let sessionsUser = $state(null);
 
     const columns = [
         { key: 'id', label: 'ID', sortable: true, width: '90px', truncate: false },
@@ -75,6 +78,49 @@
             : [],
     );
 
+    /**
+     * Which menu groups have anything in them for this row. The first group
+     * always does (View), so only the rest need checking — a separator before an
+     * empty group is a line to nowhere.
+     */
+    function menuGroups(row) {
+        return {
+            status:
+                (hasPermission('users.approve') && row.status !== 'approved') ||
+                (hasPermission('users.verify') && row.status === 'pending') ||
+                (hasPermission('users.reject') && row.status !== 'rejected'),
+            related:
+                hasPermission('activities.index') ||
+                hasPermission('user-roles.index') ||
+                hasPermission('sessions.index') ||
+                hasPermission('users.logout-devices'),
+            danger: hasPermission('users.destroy'),
+        };
+    }
+
+    async function logoutDevices(u) {
+        const self = u.id === authUser()?.id;
+
+        if (
+            !(await confirm({
+                title: 'Log out all devices',
+                body: self
+                    ? 'This is your own account — you will be signed out immediately.'
+                    : `Sign ${u.firstname} out of every device they are logged in on?`,
+                variant: 'destructive',
+            }))
+        ) {
+            return;
+        }
+
+        try {
+            const data = await api.post(route('api.v1.admin.users.logout-devices', u.id));
+            toast.success(`Logged out of ${data?.revoked ?? 0} device(s).`);
+        } catch (e) {
+            toast.error(e?.message ?? 'Something went wrong. Please try again.');
+        }
+    }
+
     const create = () => { editing = null; showForm = true; };
     const edit = (u) => { editing = u; showForm = true; };
     const closeForm = () => { showForm = false; editing = null; };
@@ -82,6 +128,7 @@
     const view = (u) => { viewing = u; viewOpen = true; };
     const showActivity = (u) => { activityRow = u; activityOpen = true; };
     const manageRoles = (u) => { rolesUser = u; rolesOpen = true; };
+    const manageSessions = (u) => { sessionsUser = u; sessionsOpen = true; };
 
     // approve | reject | verify — the API rejects a transition the status
     // doesn't allow, so surface its message rather than guessing client-side.
@@ -132,6 +179,7 @@
         updatedAt={viewing?.updated_at}
     />
     <RolesDrawer bind:open={rolesOpen} user={rolesUser} />
+    <SessionsDrawer bind:open={sessionsOpen} user={sessionsUser} />
     <ActivityDrawer bind:open={activityOpen} subjectType="user" subjectId={activityRow?.id} title={activityRow?.username} />
 </AdminLayout>
 
@@ -207,22 +255,18 @@
 {/snippet}
 
 {#snippet rowActions(row)}
+    {@const g = menuGroups(row)}
     <Dropdown>
         {#snippet trigger()}
             <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" aria-label="Actions"><i class="ki-filled ki-dots-vertical"></i></button>
         {/snippet}
+
+        <!-- the record itself -->
         <div class="kt-menu-item">
             <button class="kt-menu-link" data-dropdown-dismiss onclick={() => view(row)}>
                 <span class="kt-menu-icon"><i class="ki-filled ki-eye"></i></span><span class="kt-menu-title">View</span>
             </button>
         </div>
-        {#if hasPermission('activities.index')}
-            <div class="kt-menu-item">
-                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => showActivity(row)}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-time"></i></span><span class="kt-menu-title">Activity</span>
-                </button>
-            </div>
-        {/if}
         {#if hasPermission('users.update')}
             <div class="kt-menu-item">
                 <button class="kt-menu-link" data-dropdown-dismiss onclick={() => edit(row)}>
@@ -230,38 +274,72 @@
                 </button>
             </div>
         {/if}
-        {#if hasPermission('user-roles.index')}
-            <div class="kt-menu-item">
-                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => manageRoles(row)}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-shield-tick"></i></span><span class="kt-menu-title">Manage roles</span>
-                </button>
-            </div>
+
+        <!-- what it can become -->
+        {#if g.status}
+            <div class="kt-menu-separator"></div>
+            {#if hasPermission('users.approve') && row.status !== 'approved'}
+                <div class="kt-menu-item">
+                    <button class="kt-menu-link" data-dropdown-dismiss onclick={() => setStatus(row, 'approve')}>
+                        <span class="kt-menu-icon"><i class="ki-filled ki-check-circle"></i></span>
+                        <span class="kt-menu-title">Approve</span>
+                    </button>
+                </div>
+            {/if}
+            {#if hasPermission('users.verify') && row.status === 'pending'}
+                <div class="kt-menu-item">
+                    <button class="kt-menu-link" data-dropdown-dismiss onclick={() => setStatus(row, 'verify')}>
+                        <span class="kt-menu-icon"><i class="ki-filled ki-shield-tick"></i></span>
+                        <span class="kt-menu-title">Verify</span>
+                    </button>
+                </div>
+            {/if}
+            {#if hasPermission('users.reject') && row.status !== 'rejected'}
+                <div class="kt-menu-item">
+                    <button class="kt-menu-link" data-dropdown-dismiss onclick={() => setStatus(row, 'reject')}>
+                        <span class="kt-menu-icon"><i class="ki-filled ki-cross-circle"></i></span>
+                        <span class="kt-menu-title">Reject</span>
+                    </button>
+                </div>
+            {/if}
         {/if}
-        {#if hasPermission('users.approve') && row.status !== 'approved'}
-            <div class="kt-menu-item">
-                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => setStatus(row, 'approve')}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-check-circle"></i></span>
-                    <span class="kt-menu-title">Approve</span>
-                </button>
-            </div>
+
+        <!-- what hangs off it -->
+        {#if g.related}
+            <div class="kt-menu-separator"></div>
+            {#if hasPermission('activities.index')}
+                <div class="kt-menu-item">
+                    <button class="kt-menu-link" data-dropdown-dismiss onclick={() => showActivity(row)}>
+                        <span class="kt-menu-icon"><i class="ki-filled ki-time"></i></span><span class="kt-menu-title">Activity</span>
+                    </button>
+                </div>
+            {/if}
+            {#if hasPermission('user-roles.index')}
+                <div class="kt-menu-item">
+                    <button class="kt-menu-link" data-dropdown-dismiss onclick={() => manageRoles(row)}>
+                        <span class="kt-menu-icon"><i class="ki-filled ki-shield-tick"></i></span><span class="kt-menu-title">Manage roles</span>
+                    </button>
+                </div>
+            {/if}
+            {#if hasPermission('sessions.index')}
+                <div class="kt-menu-item">
+                    <button class="kt-menu-link" data-dropdown-dismiss onclick={() => manageSessions(row)}>
+                        <span class="kt-menu-icon"><i class="ki-filled ki-technology-4"></i></span><span class="kt-menu-title">Sessions</span>
+                    </button>
+                </div>
+            {/if}
+            {#if hasPermission('users.logout-devices')}
+                <div class="kt-menu-item">
+                    <button class="kt-menu-link" data-dropdown-dismiss onclick={() => logoutDevices(row)}>
+                        <span class="kt-menu-icon"><i class="ki-filled ki-entrance-right"></i></span><span class="kt-menu-title">Log out all devices</span>
+                    </button>
+                </div>
+            {/if}
         {/if}
-        {#if hasPermission('users.verify') && row.status === 'pending'}
-            <div class="kt-menu-item">
-                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => setStatus(row, 'verify')}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-shield-tick"></i></span>
-                    <span class="kt-menu-title">Verify</span>
-                </button>
-            </div>
-        {/if}
-        {#if hasPermission('users.reject') && row.status !== 'rejected'}
-            <div class="kt-menu-item">
-                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => setStatus(row, 'reject')}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-cross-circle"></i></span>
-                    <span class="kt-menu-title">Reject</span>
-                </button>
-            </div>
-        {/if}
-        {#if hasPermission('users.destroy')}
+
+        <!-- destroys it: on its own, away from Edit -->
+        {#if g.danger}
+            <div class="kt-menu-separator"></div>
             <div class="kt-menu-item">
                 <button class="kt-menu-link text-destructive" data-dropdown-dismiss onclick={() => remove(row)}>
                     <span class="kt-menu-icon"><i class="ki-filled ki-trash"></i></span><span class="kt-menu-title">Delete</span>

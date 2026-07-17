@@ -8,7 +8,7 @@
     let { label = null, error = null, hint = null, required = false, for: forId = null, class: klass = '', children } = $props();
 </script>
 
-<div class="flex flex-col gap-1.5 {klass}">
+<div class="flex min-w-0 flex-col gap-1.5 {klass}">
     {#if label}
         <label class="kt-form-label font-normal text-mono" for={forId}>
             {label}{#if required}<span class="text-destructive ms-0.5">*</span>{/if}

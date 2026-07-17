@@ -25,7 +25,11 @@
      * pivot is a real endpoint, not a lookup, and a role with 200 permissions
      * must not arrive in one unscrollable slab.
      *
-     * TWO SHAPES OF PIVOT, and the `form` snippet is the switch between them.
+     * THREE SHAPES, and the props pick between them.
+     *
+     * 0. Nothing can be ADDED — a user's login sessions are created by living,
+     *    not by an admin. `addable={false}`: no select, no form, just a
+     *    searchable paginated list with a revoke on each row.
      *
      * 1. The link carries no data of its own — api_key_permissions is only its
      *    two foreign keys. There is nothing to fill in and nothing to edit, so
@@ -74,8 +78,10 @@
         resourceLabelKey = 'name',
         payloadKey,
         relation,
+        addable = true,
         assignLabel = 'Assign',
         addLabel = 'Add',
+        confirmBody = null,
         currentLabel = 'Assigned',
         emptyLabel = 'Nothing assigned yet.',
         searchPlaceholder = 'Search…',
@@ -151,7 +157,11 @@
     }
 
     async function detach(pivot) {
-        if (!(await confirm({ variant: 'destructive' }))) return;
+        // confirmBody may be a function of the row: revoking the session you are
+        // sitting at logs you out, and that is worth saying out loud.
+        const body = typeof confirmBody === 'function' ? confirmBody(pivot) : confirmBody;
+
+        if (!(await confirm({ body, variant: 'destructive' }))) return;
         try {
             await api.delete(route(destroyRoute, pivot.id));
             toast.success('Deleted successfully.');
@@ -169,7 +179,9 @@
         </div>
     {:else}
         <div class="flex flex-col gap-5" in:fly={{ x: '-100%', duration: 750 }}>
-            {#if form}
+            {#if !addable}
+                <!-- Nothing to add: the list is the whole drawer. -->
+            {:else if form}
                 <!-- A custom form owns the add flow; the bulk select would be a
                      second, weaker way to do the same thing. -->
                 <div class="flex justify-end">
@@ -179,8 +191,10 @@
                 </div>
             {:else}
                 <Field label={assignLabel}>
-                    <div class="flex items-end gap-2">
-                        <div class="grow">
+                    <div class="flex min-w-0 items-end gap-2">
+                        <!-- min-w-0: without it this column cannot shrink below the
+                             Select's content, so one long option widens the drawer. -->
+                        <div class="min-w-0 grow">
                             <Select {resource} labelKey={resourceLabelKey} valueKey="id" multiple bind:value={selected} />
                         </div>
                         <Button variant="primary" onclick={assign} loading={saving} disabled={!selected.length}>{addLabel}</Button>
@@ -208,7 +222,7 @@
                                     {@render item(row)}
                                 </div>
                                 <div class="flex shrink-0 items-center">
-                                    {#if form}
+                                    {#if form && addable}
                                         <!-- Only a pivot with data of its own has anything to edit. -->
                                         <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" onclick={() => edit(row)} aria-label="Edit">
                                             <i class="ki-filled ki-pencil"></i>

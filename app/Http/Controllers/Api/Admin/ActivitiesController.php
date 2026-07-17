@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Data\Activity\ActivityData;
-use App\Enums\MorphType;
 use App\Http\Controllers\Api\ApiController;
 use App\Models\Activity;
 use Illuminate\Http\JsonResponse;
@@ -11,18 +10,8 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * The audit trail is append-only: there is no store/update/destroy here, and
- * that is the point. Rows are written by the observers in App\Observers.
- */
 class ActivitiesController extends ApiController
 {
-    /**
-     * filter[search] reaches only this table's own columns, and `description`
-     * holds the bare event slug — never the subject's name. A deleted record is
-     * therefore found by subject_id, not by what it was called. The polymorphic
-     * columns filter on MorphType aliases (`api_key`), never class names.
-     */
     public function index(): JsonResponse
     {
         $activities = QueryBuilder::for(Activity::query()->with(['causer', 'subject']))

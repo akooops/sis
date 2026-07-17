@@ -112,12 +112,17 @@
         {#snippet trigger()}
             <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" aria-label="Actions"><i class="ki-filled ki-dots-vertical"></i></button>
         {/snippet}
+
+        <!-- the record itself (read-only module: no edit, no delete) -->
         <div class="kt-menu-item">
             <button class="kt-menu-link" data-dropdown-dismiss onclick={() => view(row)}>
                 <span class="kt-menu-icon"><i class="ki-filled ki-eye"></i></span><span class="kt-menu-title">View</span>
             </button>
         </div>
+
+        <!-- what hangs off it -->
         {#if hasPermission('activities.index')}
+            <div class="kt-menu-separator"></div>
             <div class="kt-menu-item">
                 <button class="kt-menu-link" data-dropdown-dismiss onclick={() => showActivity(row)}>
                     <span class="kt-menu-icon"><i class="ki-filled ki-time"></i></span><span class="kt-menu-title">Activity</span>

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->ulid('id')->primary();
 
             $table->string('collection_name');
-            $table->unsignedInteger('order_column')->nullable()->index();
+            $table->unsignedInteger('order_column')->nullable();
             $table->string('name');
             $table->string('file_name')->unique();
 
@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('model_type')->nullable();
             $table->ulid('model_id')->nullable();
 
+            $table->index('order_column');
             $table->index('state');
             $table->index(['model_type', 'model_id']);
 

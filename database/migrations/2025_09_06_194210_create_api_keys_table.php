@@ -20,11 +20,11 @@ return new class extends Migration
 
             $table->json('allowed_ips')->nullable();
 
-            $table->timestamp('last_used_at')->nullable();
+            $table->dateTime('last_used_at')->nullable();
             $table->string('last_used_ip', 45)->nullable();
 
-            $table->timestamp('expires_at')->nullable();
-            $table->timestamp('revoked_at')->nullable();
+            $table->dateTime('expires_at')->nullable();
+            $table->dateTime('revoked_at')->nullable();
 
             $table->timestamps();
         });

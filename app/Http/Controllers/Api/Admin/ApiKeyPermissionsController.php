@@ -12,14 +12,6 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * The permissions granted to one API key, as pivot rows — paginated and searched
- * through the related permission, not the pivot's own columns. store() is
- * additive and idempotent: an already-granted code is a no-op, and the response
- * lists only the rows actually created, so an empty 201 means nothing was new.
- * A grant here is honoured only if the permission supports_api, so a web-only
- * code can be attached and still never let the key through.
- */
 class ApiKeyPermissionsController extends ApiController
 {
     public function index(ApiKey $apiKey): JsonResponse

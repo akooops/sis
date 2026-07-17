@@ -12,8 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('mails:process-unread')->everyFiveSeconds();
-        $schedule->command('uploads:prune')->daily();
+        $schedule->command('model:prune')->daily();
     }
 
     /**

@@ -26,9 +26,6 @@ use Laravel\Socialite\Facades\Socialite;
  */
 class AuthController extends Controller
 {
-    /**
-     * Password login. Gated on status: only an Approved account can sign in.
-     */
     public function login(LoginData $data): JsonResponse
     {
         if (! Auth::validate(['email' => $data->email, 'password' => $data->password])) {
@@ -42,7 +39,7 @@ class AuthController extends Controller
         }
 
         Auth::login($user, $data->remember);
-        request()->session()->regenerate();
+        request()->session()->regenerate(true);
 
         return $this->respond(UserData::from($user), 'Logged in successfully');
     }
@@ -61,13 +58,6 @@ class AuthController extends Controller
         return Socialite::driver('azure')->redirect();
     }
 
-    /**
-     * Azure SSO callback. Never grants access on its own:
-     *  - existing user  -> link azure_ad_id (so they can use password OR Azure)
-     *  - unknown email  -> create a VERIFIED account (no roles, awaiting approval)
-     * Azure proves who they are, not that they may come in: a user signs in only
-     * once an admin has approved them.
-     */
     public function handleAzureCallback(Request $request): RedirectResponse
     {
         try {
@@ -100,7 +90,8 @@ class AuthController extends Controller
         }
 
         Auth::login($user);
-        $request->session()->regenerate();
+
+        $request->session()->regenerate(true);
 
         return redirect('/');
     }

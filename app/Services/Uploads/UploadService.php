@@ -90,7 +90,8 @@ class UploadService
 
     /**
      * Detach a single media, returning it to the free (reusable) pool. The file
-     * is never deleted here — the uploads:prune command removes stale free media.
+     * is never deleted here — Media is Prunable, so the daily model:prune sweeps
+     * stale free media and takes each file with its row.
      */
     public static function detach(Media $media): void
     {

@@ -8,6 +8,7 @@ use App\Models\Media;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RolePermission;
+use App\Models\Session;
 use App\Models\User;
 use App\Models\UserRole;
 use App\Observers\ApiKeyObserver;
@@ -18,7 +19,9 @@ use App\Observers\RoleObserver;
 use App\Observers\RolePermissionObserver;
 use App\Observers\UserObserver;
 use App\Observers\UserRoleObserver;
+use App\Services\Sessions\SessionHandler;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Session as SessionFacade;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Activitylog\Facades\CauserResolver;
 
@@ -38,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->resolveActivityCauser();
+        $this->useOurSessionTable();
 
         User::observe(UserObserver::class);
         Role::observe(RoleObserver::class);
@@ -47,6 +51,24 @@ class AppServiceProvider extends ServiceProvider
         UserRole::observe(UserRoleObserver::class);
         RolePermission::observe(RolePermissionObserver::class);
         ApiKeyPermission::observe(ApiKeyPermissionObserver::class);
+    }
+
+    /**
+     * Swap Laravel's database session handler for ours, so the sessions table
+     * can be a ULID + timestamps model like everything else instead of PHP's
+     * session id and a unix integer. SessionManager::callCustomCreator wraps the
+     * handler in a Store, so cookie/encryption config is untouched.
+     */
+    protected function useOurSessionTable(): void
+    {
+        SessionFacade::extend('database', function ($app) {
+            return new SessionHandler(
+                $app['db']->connection(config('session.connection')),
+                config('session.table', 'sessions'),
+                (int) config('session.lifetime', 120),
+                $app,
+            );
+        });
     }
 
     /**

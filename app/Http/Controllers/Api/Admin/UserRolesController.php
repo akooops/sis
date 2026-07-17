@@ -12,13 +12,6 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * The roles held by one user, as pivot rows — paginated and searched through the
- * related role, not the pivot's own columns. store() is additive and idempotent:
- * re-granting a role the user already has is a no-op, and the response lists
- * only the rows actually created, so an empty 201 means nothing was new.
- * destroy() keys off the pivot's own id, not a (user, role) pair.
- */
 class UserRolesController extends ApiController
 {
     public function index(User $user): JsonResponse

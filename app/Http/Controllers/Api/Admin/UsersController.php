@@ -19,13 +19,6 @@ use Spatie\ModelStates\Exceptions\TransitionNotFound;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * Accounts and the approval workflow that governs them (App\States\User\UserStatus).
- * Status is never part of an update payload — it moves only through
- * approve/reject/verify below, and a transition the state machine forbids comes
- * back as a 422 rather than a 500. store() writes Approved explicitly, past the
- * Pending default: an admin creating the account is the approval.
- */
 class UsersController extends ApiController
 {
     public function index(): JsonResponse
@@ -79,11 +72,6 @@ class UsersController extends ApiController
         return $this->respond(UserData::from($user->fresh()), 'User updated successfully');
     }
 
-    /**
-     * A real delete — there is no soft delete to fall back on. Role rows go with
-     * it (FK cascade) and UserObserver frees the avatar back into the reusable
-     * pool rather than deleting the file.
-     */
     public function destroy(User $user): JsonResponse
     {
         $user->delete();
@@ -91,10 +79,6 @@ class UsersController extends ApiController
         return $this->respond(null, 'User deleted successfully');
     }
 
-    /**
-     * Let the account in — `approved` is the only status that can sign in.
-     * Reachable from every other status, so a rejection is never final.
-     */
     public function approve(User $user): JsonResponse
     {
         try {
@@ -108,10 +92,6 @@ class UsersController extends ApiController
         return $this->respond(UserData::from($user->fresh()), 'User approved successfully');
     }
 
-    /**
-     * Refuse the account. Reachable from every live status, so access can always
-     * be revoked; approve() reopens it.
-     */
     public function reject(User $user): JsonResponse
     {
         try {
@@ -125,10 +105,6 @@ class UsersController extends ApiController
         return $this->respond(UserData::from($user->fresh()), 'User rejected successfully');
     }
 
-    /**
-     * Confirm who they are without letting them in — what Azure SSO does on
-     * self-signup, done by hand. Only a pending account can be verified.
-     */
     public function verify(User $user): JsonResponse
     {
         try {
@@ -140,5 +116,17 @@ class UsersController extends ApiController
         }
 
         return $this->respond(UserData::from($user->fresh()), 'User verified successfully');
+    }
+
+    public function logoutDevices(User $user): JsonResponse
+    {
+        $revoked = 0;
+
+        foreach ($user->sessions()->get() as $session) {
+            $session->delete();
+            $revoked++;
+        }
+
+        return $this->respond(['revoked' => $revoked], "Logged out of {$revoked} device(s) successfully");
     }
 }

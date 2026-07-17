@@ -10,13 +10,6 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * Permissions are code-defined and seeded (database/seeders/PermissionsSeeder),
- * never authored through the API — hence read-only, index and show only.
- * supports_web/supports_api say which channel a code counts on: a session user
- * is checked against supports_web, an API key against supports_api, so the same
- * code can be granted to both and honoured for only one.
- */
 class PermissionsController extends ApiController
 {
     public function index(): JsonResponse

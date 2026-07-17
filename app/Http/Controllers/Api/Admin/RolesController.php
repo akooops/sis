@@ -12,12 +12,6 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * Roles — the named bundles a user is granted. The grants themselves are pivots
- * and live in RolePermissionsController/UserRolesController, not here. destroy()
- * is a real delete and the FK cascade takes every assignment with it: a role in
- * use is removed from its users, not blocked.
- */
 class RolesController extends ApiController
 {
     public function index(): JsonResponse

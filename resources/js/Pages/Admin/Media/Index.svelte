@@ -171,6 +171,9 @@
                                         <span class="kt-menu-title">View</span>
                                     </button>
                                 </div>
+                                {#if hasPermission('activities.index') || item.url}
+                                    <div class="kt-menu-separator"></div>
+                                {/if}
                                 {#if hasPermission('activities.index')}
                                     <div class="kt-menu-item">
                                         <button class="kt-menu-link" data-dropdown-dismiss onclick={() => showActivity(item)}>

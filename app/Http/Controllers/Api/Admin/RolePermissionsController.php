@@ -12,13 +12,6 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * The permissions granted to one role, as pivot rows — paginated and searched
- * through the related permission, not the pivot's own columns. store() is
- * additive and idempotent: an already-granted code is a no-op, and the response
- * lists only the rows actually created, so an empty 201 means nothing was new.
- * destroy() keys off the pivot's own id, not a (role, permission) pair.
- */
 class RolePermissionsController extends ApiController
 {
     public function index(Role $role): JsonResponse

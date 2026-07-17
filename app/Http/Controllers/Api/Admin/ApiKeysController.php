@@ -12,12 +12,6 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * API keys for the X-API-KEY channel. The database keeps only a hash of the
- * secret, so the plaintext token exists exactly twice — in the store() and
- * rotate() responses — and can never be read back afterwards. Losing it means
- * rotating, not looking it up.
- */
 class ApiKeysController extends ApiController
 {
     public function index(): JsonResponse
@@ -64,11 +58,6 @@ class ApiKeysController extends ApiController
         return $this->respond(null, 'API key deleted successfully');
     }
 
-    /**
-     * Issue a new secret: the previous token stops working the moment this
-     * returns, and the response is the only place the new one appears. Rotating
-     * also un-revokes — a revoked key comes back to life with a fresh token.
-     */
     public function rotate(ApiKey $apiKey): JsonResponse
     {
         $token = $apiKey->rotate();
@@ -79,11 +68,6 @@ class ApiKeysController extends ApiController
         ], 'API key rotated successfully');
     }
 
-    /**
-     * Stamps revoked_at — the key stops authenticating but the row, its
-     * permissions and its audit trail stay. Reversible via rotate(); destroy()
-     * is the one that takes it all away.
-     */
     public function revoke(ApiKey $apiKey): JsonResponse
     {
         $apiKey->revoke();

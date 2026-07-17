@@ -181,7 +181,7 @@
 <svelte:window onclick={onWindow} onkeydown={openState ? onKeydown : undefined} onscroll={openState ? place : undefined} onresize={openState ? place : undefined} />
 
 <div
-    class="kt-input cursor-pointer {invalid ? 'border-destructive' : ''} {disabled ? 'opacity-60' : ''}"
+    class="kt-input min-w-0 cursor-pointer {invalid ? 'border-destructive' : ''} {disabled ? 'opacity-60' : ''}"
     bind:this={trigger}
     onclick={toggle}
     role="button"
@@ -190,20 +190,22 @@
     aria-expanded={openState}
 >
     {#if multiple && selectedValues.length}
-        <div class="flex flex-wrap items-center gap-1">
+        <div class="flex min-w-0 grow flex-wrap items-center gap-1">
             {#each selectedValues as val}
-                <span class="kt-badge kt-badge-sm kt-badge-outline kt-badge-primary">
-                    {labelFor(val)}
-                    <button type="button" class="ms-1" onclick={(e) => removeChip(val, e)} aria-label="Remove">
+                <!-- max-w-full + a truncating label: one long option must not be
+                     able to widen the field past the form it sits in. -->
+                <span class="kt-badge kt-badge-sm kt-badge-outline kt-badge-primary max-w-full">
+                    <span class="min-w-0 truncate" title={labelFor(val)}>{labelFor(val)}</span>
+                    <button type="button" class="ms-1 shrink-0" onclick={(e) => removeChip(val, e)} aria-label="Remove">
                         <i class="ki-filled ki-cross text-2xs"></i>
                     </button>
                 </span>
             {/each}
         </div>
     {:else if !multiple && hasValue}
-        <span class="grow truncate text-mono">{labelFor(value)}</span>
+        <span class="min-w-0 grow truncate text-mono" title={labelFor(value)}>{labelFor(value)}</span>
     {:else}
-        <span class="grow truncate text-muted-foreground">{placeholder ?? 'Search'}</span>
+        <span class="min-w-0 grow truncate text-muted-foreground">{placeholder ?? 'Search'}</span>
     {/if}
 
     {#if clearable && hasValue}
@@ -238,7 +240,7 @@
                     role="option"
                     aria-selected={isSelected(item.value)}
                 >
-                    <span class="truncate">{item.label}</span>
+                    <span class="min-w-0 truncate" title={item.label}>{item.label}</span>
                     {#if isSelected(item.value)}<i class="ki-filled ki-check text-primary"></i>{/if}
                 </button>
             {/each}

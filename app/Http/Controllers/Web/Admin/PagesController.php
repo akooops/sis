@@ -5,11 +5,6 @@ namespace App\Http\Controllers\Web\Admin;
 use App\Http\Controllers\Controller;
 use Inertia\Response;
 
-/**
- * Renders the admin page shells. Nothing is fetched here on purpose: every page
- * is a Svelte component that pulls its own data from the JSON API, so these
- * actions exist only to name a route and hand Inertia a component.
- */
 class PagesController extends Controller
 {
     public function index(): Response

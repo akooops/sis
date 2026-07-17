@@ -4,8 +4,10 @@ namespace App\Models;
 
 use App\States\Media\Clean;
 use App\States\Media\MediaScanState;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Storage;
 use Spatie\ModelStates\HasStates;
@@ -23,7 +25,7 @@ use Throwable;
  */
 class Media extends Model
 {
-    use HasStates, HasUlids;
+    use HasStates, HasUlids, Prunable;
 
     /* -----------------------------------------
      1. Attributes
@@ -80,6 +82,29 @@ class Media extends Model
     public function getCustomProperty(string $key, mixed $default = null): mixed
     {
         return data_get($this->custom_properties, $key, $default);
+    }
+
+    /**
+     * What `model:prune` deletes (scheduled daily in App\Console\Kernel): an
+     * upload nobody ever attached, past the configured age. Replaces the old
+     * uploads:prune command — Prunable already chunks, and pruning() below is
+     * the per-row hook that takes the file with the row.
+     */
+    public function prunable(): Builder
+    {
+        return static::query()
+            ->whereNull('model_id')
+            ->where('created_at', '<', now()->subDays((int) config('uploads.max_orphaned_files_age', 30)));
+    }
+
+    /**
+     * Called once per row, before it is deleted — which is exactly why a command
+     * is unnecessary: the file goes with its row, and a mass delete could never
+     * have done that.
+     */
+    protected function pruning(): void
+    {
+        $this->deleteFile();
     }
 
     /** Delete just this file — never the folder, which is shared by every media. */

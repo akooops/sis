@@ -5,6 +5,7 @@ namespace App\Enums;
 use App\Models\ApiKey;
 use App\Models\Media;
 use App\Models\Permission;
+use App\Models\Provider;
 use App\Models\Role;
 use App\Models\User;
 
@@ -24,6 +25,7 @@ enum MorphType: string
     case Permission = 'permission';
     case ApiKey = 'api_key';
     case Media = 'media';
+    case Provider = 'provider';
 
     /** @return class-string */
     public function class(): string
@@ -34,6 +36,7 @@ enum MorphType: string
             self::Permission => Permission::class,
             self::ApiKey => ApiKey::class,
             self::Media => Media::class,
+            self::Provider => Provider::class,
         };
     }
 
