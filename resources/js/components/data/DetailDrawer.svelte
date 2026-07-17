@@ -129,7 +129,9 @@
                                 rel="noreferrer"
                                 title={item.name}
                             >
-                                <MediaThumb {item} />
+                                <div class="flex aspect-square items-center justify-center overflow-hidden rounded bg-muted">
+                                    <MediaThumb {item} iconSize="text-xl" />
+                                </div>
                                 <span class="truncate text-[10px] text-muted-foreground">{item.name}</span>
                             </a>
                         {/each}

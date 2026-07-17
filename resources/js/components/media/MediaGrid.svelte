@@ -19,7 +19,7 @@
             onclick={() => onselect?.(item)}
             title={item.name}
         >
-            <div class="flex aspect-square items-center justify-center bg-muted">
+            <div class="flex aspect-square items-center justify-center overflow-hidden bg-muted">
                 <MediaThumb {item} />
             </div>
             <div class="p-2">

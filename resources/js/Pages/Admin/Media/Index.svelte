@@ -87,7 +87,26 @@
         {sortOptions}
         onapply={(filter, sort) => applyFilters(filter, sort)}
     />
-    <DetailDrawer bind:open={viewOpen} title="Media library" id={viewing?.id} fields={viewFields} createdAt={viewing?.created_at} updatedAt={viewing?.updated_at} />
+    <DetailDrawer bind:open={viewOpen} title="Media library" id={viewing?.id} fields={viewFields} createdAt={viewing?.created_at} updatedAt={viewing?.updated_at}>
+        {#snippet children()}
+            {#if viewing?.url}
+                <div class="flex flex-wrap gap-2">
+                    <a class="kt-btn kt-btn-sm kt-btn-primary" href={viewing.url} target="_blank" rel="noreferrer">
+                        <i class="ki-filled ki-exit-right"></i>Open file
+                    </a>
+                    <a class="kt-btn kt-btn-sm kt-btn-secondary" href={viewing.url} download={viewing.name}>
+                        <i class="ki-filled ki-exit-down"></i>Download
+                    </a>
+                </div>
+            {:else}
+                <!-- No url until the scan passes: an infected or pending file has
+                     nothing safe to hand out. -->
+                <p class="text-xs text-muted-foreground">
+                    This file is not available yet — its scan is {viewing?.scan_status ?? 'pending'}.
+                </p>
+            {/if}
+        {/snippet}
+    </DetailDrawer>
     <ActivityDrawer bind:open={activityOpen} subjectType="media" subjectId={activityRow?.id} title={activityRow?.name} />
 </AdminLayout>
 
@@ -160,6 +179,14 @@
                                         </button>
                                     </div>
                                 {/if}
+                                {#if item.url}
+                                    <div class="kt-menu-item">
+                                        <a class="kt-menu-link" href={item.url} target="_blank" rel="noreferrer" data-dropdown-dismiss>
+                                            <span class="kt-menu-icon"><i class="ki-filled ki-exit-right"></i></span>
+                                            <span class="kt-menu-title">Open file</span>
+                                        </a>
+                                    </div>
+                                {/if}
                             </Dropdown>
                         </div>
                         <button
@@ -168,7 +195,7 @@
                             onclick={() => view(item)}
                             title={item.name}
                         >
-                            <div class="flex aspect-square items-center justify-center bg-muted">
+                            <div class="flex aspect-square items-center justify-center overflow-hidden bg-muted">
                                 <MediaThumb {item} />
                             </div>
                             <div class="p-2">
