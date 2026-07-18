@@ -13,6 +13,15 @@ class PermissionsSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
+            // Index permissions that gate the admin page shells (routes/web.php).
+            ['code' => 'dashboards.index', 'name' => 'View dashboard', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'users.index', 'name' => 'View users', 'supports_web' => true, 'supports_api' => true],
+            ['code' => 'roles.index', 'name' => 'View roles', 'supports_web' => true, 'supports_api' => true],
+            ['code' => 'permissions.index', 'name' => 'View permissions', 'supports_web' => true, 'supports_api' => true],
+            ['code' => 'api-keys.index', 'name' => 'View API keys', 'supports_web' => true, 'supports_api' => true],
+            ['code' => 'media.index', 'name' => 'View media', 'supports_web' => true, 'supports_api' => true],
+            ['code' => 'activities.index', 'name' => 'View activity log', 'supports_web' => true, 'supports_api' => true],
+
             ['code' => 'integrations.index', 'name' => 'View integrations', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'integrations.store', 'name' => 'Create integrations', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'integrations.update', 'name' => 'Update integrations', 'supports_web' => true, 'supports_api' => false],

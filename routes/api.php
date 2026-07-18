@@ -93,7 +93,7 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('api-key-permissions/{apiKey}', [ApiKeyPermissionsController::class, 'store'])->middleware('verify.permissions:api-key-permissions.store')->name('api.v1.admin.api-key-permissions.store');
         Route::delete('api-key-permissions/{apiKeyPermission}', [ApiKeyPermissionsController::class, 'destroy'])->middleware('verify.permissions:api-key-permissions.destroy')->name('api.v1.admin.api-key-permissions.destroy');
 
-        // Integrations — types (catalogue + drivers) and the configured integrations under them.
+        // Integrations
         Route::get('integration-types', [IntegrationTypesController::class, 'index'])->middleware('verify.permissions:integrations.index')->name('api.v1.admin.integration-types.index');
         Route::get('integration-types/{integrationType}/drivers', [IntegrationTypesController::class, 'drivers'])->middleware('verify.permissions:integrations.index')->name('api.v1.admin.integration-types.drivers');
 

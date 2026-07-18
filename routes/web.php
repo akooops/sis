@@ -27,14 +27,14 @@ Route::middleware('guest')->prefix('admin/auth')->group(function () {
 | Admin (authenticated) pages
 |------------------------*/
 Route::middleware('auth')->prefix('admin')->group(function () {
-    Route::get('/', [AdminPagesController::class, 'index'])->name('web.admin.dashboard');
-    Route::get('users', [AdminPagesController::class, 'users'])->name('web.admin.users.index');
-    Route::get('roles', [AdminPagesController::class, 'roles'])->name('web.admin.roles.index');
-    Route::get('permissions', [AdminPagesController::class, 'permissions'])->name('web.admin.permissions.index');
-    Route::get('api-keys', [AdminPagesController::class, 'apiKeys'])->name('web.admin.api-keys.index');
-    Route::get('media', [AdminPagesController::class, 'media'])->name('web.admin.media.index');
-    Route::get('activities', [AdminPagesController::class, 'activities'])->name('web.admin.activities.index');
-    Route::get('integrations', [AdminPagesController::class, 'integrations'])->name('web.admin.integrations.index');
+    Route::get('/', [AdminPagesController::class, 'index'])->middleware('verify.permissions:dashboards.index')->name('web.admin.dashboard');
+    Route::get('users', [AdminPagesController::class, 'users'])->middleware('verify.permissions:users.index')->name('web.admin.users.index');
+    Route::get('roles', [AdminPagesController::class, 'roles'])->middleware('verify.permissions:roles.index')->name('web.admin.roles.index');
+    Route::get('permissions', [AdminPagesController::class, 'permissions'])->middleware('verify.permissions:permissions.index')->name('web.admin.permissions.index');
+    Route::get('api-keys', [AdminPagesController::class, 'apiKeys'])->middleware('verify.permissions:api-keys.index')->name('web.admin.api-keys.index');
+    Route::get('media', [AdminPagesController::class, 'media'])->middleware('verify.permissions:media.index')->name('web.admin.media.index');
+    Route::get('activities', [AdminPagesController::class, 'activities'])->middleware('verify.permissions:activities.index')->name('web.admin.activities.index');
+    Route::get('integrations', [AdminPagesController::class, 'integrations'])->middleware('verify.permissions:integrations.index')->name('web.admin.integrations.index');
 });
 
 /*------------------------

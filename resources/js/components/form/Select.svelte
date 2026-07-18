@@ -4,9 +4,10 @@
      *
      * Two modes:
      *  - Static:  pass `options={[{ value, label }]}`.
-     *  - Remote:  pass `resource` (a route name). It fetches the paginated JSON
-     *    API with `filter[search]` + `per_page`/`page`, debounced, and loads more
-     *    on scroll — the old Select2-AJAX behaviour, on the new envelope.
+     *  - Remote:  pass `resource` (a route name). It loads the FIRST page only,
+     *    then the user narrows with search (debounced) — never paginates and
+     *    never infinite-scrolls. A picker is for finding one thing, not browsing
+     *    the whole table; if it's not on the page, type to find it.
      *
      *   <Select resource="api.v1.admin.permissions.index" bind:value labelKey="name" />
      *   <Select {options} bind:value multiple />
@@ -16,6 +17,7 @@
      */
     import { portal } from '@/lib/portal';
     import { api } from '@/lib/api/client';
+    import Spinner from '@/components/ui/Spinner.svelte';
 
     let {
         value = $bindable(null), // single: scalar; multiple: array
@@ -38,8 +40,6 @@
     let search = $state('');
     let remoteItems = $state([]);
     let loading = $state(false);
-    let page = $state(1);
-    let lastPage = $state(1);
     let trigger;
     let menu;
     let pos = $state({ top: 0, left: 0, width: 0 });
@@ -69,24 +69,18 @@
         return selectedValues.includes(val);
     }
 
-    // --- remote fetching ---
-    async function fetchPage(reset = false) {
+    // --- remote fetching: page 1 for the current search, and only that ---
+    async function fetchOptions() {
         if (!isRemote) return;
-        if (reset) {
-            page = 1;
-            remoteItems = [];
-        }
         loading = true;
         try {
             const data = await api.get(route(resource), {
                 filter: { search: search || undefined, ...(resourceParams.filter ?? {}) },
                 ...resourceParams,
                 per_page: perPage,
-                page,
             });
             const rows = data?.data ?? [];
-            remoteItems = reset ? rows : [...remoteItems, ...rows];
-            lastPage = data?.meta?.last_page ?? 1;
+            remoteItems = rows;
             // Remember labels for anything we just loaded.
             const next = new Map(known);
             for (const r of rows) next.set(r[valueKey], r[labelKey]);
@@ -101,17 +95,11 @@
     function onSearchInput(event) {
         search = event.currentTarget.value;
         if (isRemote) {
+            // Show the spinner NOW, through the debounce and the fetch, so the
+            // load is visible even when the response is near-instant.
+            loading = true;
             clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => fetchPage(true), 300);
-        }
-    }
-
-    function onMenuScroll(event) {
-        if (!isRemote || loading || page >= lastPage) return;
-        const el = event.currentTarget;
-        if (el.scrollTop + el.clientHeight >= el.scrollHeight - 40) {
-            page += 1;
-            fetchPage(false);
+            debounceTimer = setTimeout(() => fetchOptions(), 300);
         }
     }
 
@@ -126,7 +114,7 @@
         if (disabled) return;
         openState = true;
         place();
-        if (isRemote && remoteItems.length === 0) fetchPage(true);
+        if (isRemote && remoteItems.length === 0) fetchOptions();
     }
 
     function close() {
@@ -190,7 +178,10 @@
     aria-expanded={openState}
 >
     {#if multiple && selectedValues.length}
-        <div class="flex min-w-0 grow flex-wrap items-center gap-1">
+        <!-- Cap the chip strip: it fills the field's height, pads the top so a
+             single chip still reads centered, wraps to a few rows, then scrolls
+             on Y instead of growing the field down the page. -->
+        <div class="flex h-full min-w-0 grow flex-wrap content-start items-center gap-1 max-h-[5.5rem] overflow-x-hidden overflow-y-auto pt-1">
             {#each selectedValues as val}
                 <!-- max-w-full + a truncating label: one long option must not be
                      able to widen the field past the form it sits in. -->
@@ -228,10 +219,16 @@
             <div class="kt-input kt-input-sm">
                 <i class="ki-filled ki-magnifier text-muted-foreground"></i>
                 <input type="text" value={search} oninput={onSearchInput} placeholder="Search" />
+                {#if loading}<Spinner size="sm" class="text-muted-foreground" />{/if}
             </div>
         </div>
 
-        <div class="max-h-[240px] overflow-y-auto p-1" onscroll={onMenuScroll}>
+        <div class="max-h-[240px] overflow-y-auto p-1">
+            {#if loading}
+                <div class="flex items-center justify-center gap-2 px-3 py-4 text-sm text-muted-foreground">
+                    <Spinner size="sm" /> Searching…
+                </div>
+            {:else}
             {#each listItems as item (item.value)}
                 <button
                     type="button"
@@ -245,10 +242,9 @@
                 </button>
             {/each}
 
-            {#if loading}
-                <div class="px-3 py-2 text-sm text-muted-foreground">Loading…</div>
-            {:else if listItems.length === 0}
+            {#if listItems.length === 0}
                 <div class="px-3 py-2 text-sm text-muted-foreground">No results found</div>
+            {/if}
             {/if}
         </div>
     </div>

@@ -1,8 +1,6 @@
 <script>
     /** Users → Roles pivot drawer: assign/detach roles for a user. */
     import PivotDrawer from '@/components/data/PivotDrawer.svelte';
-    import Badge from '@/components/ui/Badge.svelte';
-    import ClampText from '@/components/ui/ClampText.svelte';
 
     let { open = $bindable(false), user = null } = $props();
 </script>
@@ -17,15 +15,12 @@
     resource="api.v1.admin.roles.index"
     payloadKey="roles"
     relation="role"
+    columns={[
+        { key: 'name', label: 'Name', truncate: false, maxWidth: '220px' },
+        { key: 'code', label: 'Code' },
+    ]}
     assignLabel="Assign roles"
-    currentLabel="Assigned roles"
-    emptyLabel="No roles assigned yet."
+    emptyTitle="No roles assigned yet"
+    emptyBody="Assign roles using the field above."
     searchPlaceholder="Search roles…"
-    {item}
 />
-
-{#snippet item(row)}
-    <Badge variant="primary" class="max-w-full">
-        <ClampText value={row.role?.name ?? row.role_id} title={row.role?.name} />
-    </Badge>
-{/snippet}

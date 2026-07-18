@@ -38,13 +38,12 @@
 
     const columns = $derived([
         { key: 'id', label: 'ID', sortable: true, width: '90px', truncate: false },
-        { key: 'code', label: 'Code', sortable: true },
         { key: 'name', label: 'Name', sortable: true },
+        { key: 'code', label: 'Code', sortable: true },
         { key: 'supports_web', label: 'Web', truncate: false },
         { key: 'supports_api', label: 'API', truncate: false },
     ]);
-    // Mirrors the controller's allowedSorts — the drawer and the table headers
-    // drive the same `sort`, so a column here must be sortable server-side.
+
     const sortOptions = [
         { value: 'id', label: 'ID' },
         { value: 'name', label: 'Name' },

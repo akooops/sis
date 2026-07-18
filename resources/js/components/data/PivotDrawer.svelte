@@ -1,8 +1,11 @@
 <script>
     /**
-     * PivotDrawer — "what is attached to this record", plus the attach/detach
-     * controls. One component behind Users→Roles, Roles→Permissions and
-     * ApiKeys→Permissions, which are the same screen with different nouns.
+     * PivotDrawer — the standard "records related to this one" drawer: a DataTable
+     * (same columns/cells/rowActions contract as every module index), a search,
+     * a way to add, and a fly-in create/edit form when the pivot carries data.
+     * One component behind Users→Roles, Roles→Permissions, ApiKeys→Permissions,
+     * Users→Sessions, and any future rich pivot — so the view is identical across
+     * models and only the config differs.
      *
      *   <PivotDrawer
      *       bind:open={permsOpen}
@@ -14,52 +17,49 @@
      *       resource="api.v1.admin.permissions.index"
      *       payloadKey="permissions"
      *       relation="permission"
-     *       assignLabel="Assign permissions"
-     *       currentLabel="Assigned permissions"
-     *       emptyLabel="No permissions assigned yet."
-     *       searchPlaceholder="Search permissions…"
-     *       {item}
      *   />
      *
-     * The assigned list is paginated and searchable like any other index — a
-     * pivot is a real endpoint, not a lookup, and a role with 200 permissions
-     * must not arrive in one unscrollable slab.
+     * The list is paginated and searchable like any index — a pivot is a real
+     * endpoint, not a lookup, so a role with 200 permissions never arrives in one
+     * unscrollable slab.
      *
-     * THREE SHAPES, and the props pick between them.
+     * The parent reaches the list one of two ways: `parentId` for a nested route
+     * (…/sessions/{user}), or `parentFilter` for a flat index scoped by a filter
+     * (…/integrations?filter[integration_type_id]=…). Give whichever the endpoint
+     * expects.
      *
-     * 0. Nothing can be ADDED — a user's login sessions are created by living,
-     *    not by an admin. `addable={false}`: no select, no form, just a
-     *    searchable paginated list with a revoke on each row.
+     * COLUMNS are the caller's — a pivot is not always name + code. Pass the exact
+     * DataTable `columns` you want (a permission's name/code, or a supplier_product's
+     * price and quantity). Rendering: `cells` overrides it; without one, a cell reads
+     * `row[relation]?.[key]` then falls back to `row[key]`, so both the related
+     * record's own fields and the pivot's columns resolve with no snippet.
      *
-     * 1. The link carries no data of its own — api_key_permissions is only its
-     *    two foreign keys. There is nothing to fill in and nothing to edit, so
-     *    the interaction is a bulk multi-select that attaches several at once,
-     *    a paginated table, and a remove button. This is the default: pass no
-     *    `form` and that is what you get.
+     * THREE SHAPES, chosen by props:
      *
-     * 2. The link IS a record — a supplier_product with its own sales data. You
-     *    create them one at a time, and you edit them afterwards. Pass a `form`
-     *    snippet: the bulk select gives way to an Add button, every row grows an
-     *    edit action, and the form flies in over the list the way a module index
-     *    swaps in its create/edit card (see IndexCard).
+     * 0. `addable={false}` — nothing can be attached (a user's sessions are made by
+     *    signing in). No select, no form: a searchable table with a revoke per row.
      *
-     *   {#snippet form({ parentId, row, close, saved })}
-     *       <SupplierProductForm {parentId} pivot={row} oncancel={close} onsaved={saved} />
-     *   {/snippet}
+     * 1. No `form` — the link is only two foreign keys (api_key_permissions). A
+     *    bulk multi-select attaches several at once; each row has a remove.
      *
-     * `row` is the pivot being edited, or null when adding — the same shape as a
-     * module index's create/edit form, so the form decides POST vs PUT the way
-     * it always has. `close` returns to the list; `saved` returns AND refetches.
-     * The form owns its own submit: this component never guesses at columns it
-     * cannot know about.
+     * 2. `form` snippet — the link IS a record with its own data. The bulk select
+     *    gives way to an Add button, every row gains an edit action, and the form
+     *    flies in over the table exactly like a module index's create/edit card:
+     *
+     *      {#snippet form({ parentId, row, close, saved })}
+     *          <SupplierProductForm {parentId} pivot={row} oncancel={close} onsaved={saved} />
+     *      {/snippet}
+     *
+     *    `row` is the pivot being edited, or null when adding — same shape as an
+     *    index create/edit form, so it decides POST vs PUT itself. `close` returns
+     *    to the table; `saved` returns AND refetches.
      */
     import Drawer from '@/components/ui/Drawer.svelte';
     import Field from '@/components/form/Field.svelte';
     import Select from '@/components/form/Select.svelte';
     import Button from '@/components/ui/Button.svelte';
-    import Spinner from '@/components/ui/Spinner.svelte';
     import SearchBar from '@/components/data/SearchBar.svelte';
-    import Pagination from '@/components/data/Pagination.svelte';
+    import DataTable from '@/components/data/DataTable.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
@@ -72,20 +72,24 @@
         title = '',
         parentId = null,
         indexRoute,
-        storeRoute,
+        storeRoute = null, // only the bulk-assign path uses this; a form owns its own submit
         destroyRoute,
+        parentFilter = null, // flat index scoped by a filter instead of a route param
         resource,
         resourceLabelKey = 'name',
         payloadKey,
         relation,
+        columns, // DataTable columns — required; a pivot is not always name/code
         addable = true,
         assignLabel = 'Assign',
         addLabel = 'Add',
         confirmBody = null,
-        currentLabel = 'Assigned',
-        emptyLabel = 'Nothing assigned yet.',
+        emptyTitle = null,
+        emptyBody = null,
         searchPlaceholder = 'Search…',
-        item,
+        perPage = 10,
+        cells, // optional custom cell snippet, same as DataTable
+        rowActions, // optional custom per-row actions snippet
         form,
     } = $props();
 
@@ -100,12 +104,12 @@
     // readUrl:false so it can't fight the page's own query string;
     // immediate:false so a mounted-but-closed drawer doesn't fetch.
     const list = useIndex(indexRoute, {
-        perPage: 10,
+        perPage,
         include: relation,
         sort: '-created_at',
         readUrl: false,
         immediate: false,
-        routeParams: () => parentId,
+        routeParams: parentFilter ? undefined : () => parentId,
     });
 
     // Reopening for a different row must drop the previous row's search, page
@@ -117,7 +121,7 @@
             selected = [];
             showForm = false;
             editing = null;
-            list.apply({ filter: {} });
+            list.apply({ filter: { ...(parentFilter ?? {}) } });
         });
     });
 
@@ -178,9 +182,10 @@
             {@render form({ parentId, row: editing, close: closeForm, saved })}
         </div>
     {:else}
-        <div class="flex flex-col gap-5" in:fly={{ x: '-100%', duration: 750 }}>
+        <div class="flex flex-col gap-4" in:fly={{ x: '-100%', duration: 750 }}>
+            <!-- add -->
             {#if !addable}
-                <!-- Nothing to add: the list is the whole drawer. -->
+                <!-- Nothing to add: the table is the whole drawer. -->
             {:else if form}
                 <!-- A custom form owns the add flow; the bulk select would be a
                      second, weaker way to do the same thing. -->
@@ -202,45 +207,44 @@
                 </Field>
             {/if}
 
-            <div class="flex flex-col gap-2">
-                <div class="flex items-center justify-between gap-2">
-                    <span class="text-sm font-medium text-mono">{currentLabel}</span>
-                    <SearchBar placeholder={searchPlaceholder} value={list.search} onsearch={(v) => list.setSearch(v)} />
-                </div>
+            <!-- search -->
+            <SearchBar placeholder={searchPlaceholder} value={list.search} onsearch={(v) => list.setSearch(v)} />
 
-                {#if list.loading}
-                    <div class="py-4 text-center"><Spinner /></div>
-                {:else if list.rows.length === 0}
-                    <p class="text-sm text-muted-foreground">
-                        {list.search ? 'No results found.' : emptyLabel}
-                    </p>
-                {:else}
-                    <div class="flex flex-col divide-y divide-border rounded-lg border border-border">
-                        {#each list.rows as row (row.id)}
-                            <div class="flex items-center justify-between gap-2 px-3 py-2">
-                                <div class="min-w-0 grow">
-                                    {@render item(row)}
-                                </div>
-                                <div class="flex shrink-0 items-center">
-                                    {#if form && addable}
-                                        <!-- Only a pivot with data of its own has anything to edit. -->
-                                        <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" onclick={() => edit(row)} aria-label="Edit">
-                                            <i class="ki-filled ki-pencil"></i>
-                                        </button>
-                                    {/if}
-                                    <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost text-destructive" onclick={() => detach(row)} aria-label="Remove">
-                                        <i class="ki-filled ki-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        {/each}
-                    </div>
-
-                    {#if list.meta?.total > list.meta?.per_page}
-                        <Pagination meta={list.meta} onPageChange={(p) => list.goToPage(p)} />
-                    {/if}
-                {/if}
-            </div>
+            <!-- table -->
+            <DataTable
+                {columns}
+                rows={list.rows}
+                loading={list.loading}
+                meta={list.meta}
+                sort={list.sort}
+                onSort={list.toggleSort}
+                onPageChange={(p) => list.goToPage(p)}
+                onPerPageChange={(n) => list.setPerPage(n)}
+                emptyTitle={emptyTitle}
+                emptyBody={emptyBody}
+                cells={cells ?? defaultCells}
+                rowActions={rowActions ?? defaultRowActions}
+            />
         </div>
     {/if}
 </Drawer>
+
+<!-- A cell reads the related record first, then the pivot's own column — so the
+     default Name/Code and a caller's custom columns both resolve. -->
+{#snippet defaultCells(row, column)}
+    {row[relation]?.[column.key] ?? row[column.key] ?? '—'}
+{/snippet}
+
+{#snippet defaultRowActions(row)}
+    <div class="inline-flex items-center">
+        {#if form && addable}
+            <!-- Only a pivot with data of its own has anything to edit. -->
+            <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" onclick={() => edit(row)} aria-label="Edit" title="Edit">
+                <i class="ki-filled ki-pencil"></i>
+            </button>
+        {/if}
+        <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost text-destructive" onclick={() => detach(row)} aria-label="Remove" title="Remove">
+            <i class="ki-filled ki-trash"></i>
+        </button>
+    </div>
+{/snippet}

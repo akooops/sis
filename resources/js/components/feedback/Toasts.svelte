@@ -12,7 +12,9 @@
     };
 </script>
 
-<div class="fixed bottom-5 end-5 z-100 flex flex-col gap-2" use:portal>
+<!-- z-[200]: above the drawer/modal layer (z-100). The toast container mounts
+     once and early, so a drawer opened later would otherwise portal on top of it. -->
+<div class="fixed bottom-5 end-5 z-[200] flex flex-col gap-2" use:portal>
     {#each $toasts as t (t.id)}
         <div
             class="kt-alert {variants[t.variant] ?? variants.info} min-w-[260px] max-w-sm items-center shadow-lg"

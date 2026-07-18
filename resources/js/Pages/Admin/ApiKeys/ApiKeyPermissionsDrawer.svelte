@@ -1,7 +1,6 @@
 <script>
     /** API key → Permissions pivot drawer. */
     import PivotDrawer from '@/components/data/PivotDrawer.svelte';
-    import ClampText from '@/components/ui/ClampText.svelte';
 
     let { open = $bindable(false), apiKey = null } = $props();
 </script>
@@ -16,20 +15,12 @@
     resource="api.v1.admin.permissions.index"
     payloadKey="permissions"
     relation="permission"
+    columns={[
+        { key: 'name', label: 'Name', truncate: false, maxWidth: '220px' },
+        { key: 'code', label: 'Code' },
+    ]}
     assignLabel="Assign permissions"
-    currentLabel="Assigned permissions"
-    emptyLabel="No permissions assigned yet."
+    emptyTitle="No permissions assigned yet"
+    emptyBody="Assign permissions using the field above."
     searchPlaceholder="Search permissions…"
-    {item}
 />
-
-{#snippet item(row)}
-    <div class="flex min-w-0 flex-col">
-        <div class="text-sm font-medium text-mono">
-            <ClampText value={row.permission?.name ?? row.permission_id} title={row.permission?.name} />
-        </div>
-        <div class="text-xs text-muted-foreground">
-            <ClampText value={row.permission?.code ?? ''} title={row.permission?.code} />
-        </div>
-    </div>
-{/snippet}
