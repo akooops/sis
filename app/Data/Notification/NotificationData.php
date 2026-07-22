@@ -2,49 +2,47 @@
 
 namespace App\Data\Notification;
 
-use App\Enums\MorphType;
-use App\Models\Notification;
+use App\Models\NotificationUser;
 use Spatie\LaravelData\Data;
 
 /**
- * Output DTO for a notification (the admin compose history). The polymorphic
- * subject is exposed by its public MorphType alias, never a class name.
+ * Output DTO for one inbox row (the bell drawer + notifications page). Flattens
+ * the notification_users pivot with its notification so the frontend has the read
+ * state, the content, the type's icon, and the Ziggy route to click through to —
+ * all in one row. `id` is the NOTIFICATION id — the read/delete endpoints take
+ * it and resolve the current user's own row server-side.
  */
 class NotificationData extends Data
 {
     public function __construct(
         public string $id,
-        public string $type,
         public string $title,
         public ?string $body,
-        /** @var array<string, mixed>|null */
-        public ?array $data,
+        public ?string $icon,
+        public ?string $type_name,
         public ?string $route_name,
         /** @var array<string, mixed>|null */
         public ?array $route_params,
-        public ?string $icon,
-        public ?string $notifiable_type,
-        public ?string $notifiable_id,
-        public int $recipients_count,
+        public bool $is_read,
+        public ?string $read_at,
         public ?string $created_at,
     ) {}
 
-    public static function fromModel(Notification $notification): self
+    public static function fromModel(NotificationUser $row): self
     {
+        $notification = $row->notification;
+
         return new self(
-            id: $notification->id,
-            type: $notification->type,
-            title: $notification->title,
-            body: $notification->body,
-            data: $notification->data,
-            route_name: $notification->route_name,
-            route_params: $notification->route_params,
-            icon: $notification->icon,
-            notifiable_type: MorphType::aliasFor($notification->notifiable_type),
-            notifiable_id: $notification->notifiable_id,
-            recipients_count: $notification->notification_users_count
-                ?? $notification->notificationUsers()->count(),
-            created_at: $notification->created_at?->toIso8601String(),
+            id: $row->notification_id,
+            title: $notification?->title ?? '',
+            body: $notification?->body,
+            icon: $notification?->type?->icon,
+            type_name: $notification?->type?->name,
+            route_name: $notification?->route_name,
+            route_params: $notification?->route_params,
+            is_read: $row->read_at !== null,
+            read_at: $row->read_at?->toIso8601String(),
+            created_at: $row->created_at?->toIso8601String(),
         );
     }
 }

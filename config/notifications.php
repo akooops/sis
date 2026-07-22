@@ -11,14 +11,18 @@ return [
      * A group routes a type to its members: emitting a notification of type <code>
      * fans out to the users of every group whose types include <code>.
      *
-     * `code` is the array key (stored on notifications.type and referenced by
-     * NotificationService::send()); `name`/`icon` are display; `sort` orders the
-     * type pickers.
+     * `code` is the array key — what observers pass to NotificationService::send()
+     * (notifications reference the seeded row by FK); `name`/`icon` are display;
+     * `sort` orders the type pickers.
      */
     'types' => [
-        'system.announcement' => ['name' => 'System announcement', 'icon' => 'ki-notification-status', 'sort' => 1],
-        'user.approved' => ['name' => 'User approved', 'icon' => 'ki-check-circle', 'sort' => 2],
-        'user.rejected' => ['name' => 'User rejected', 'icon' => 'ki-cross-circle', 'sort' => 3],
+        'user.pending_approval' => ['name' => 'User pending approval', 'icon' => 'ki-time', 'sort' => 1],
     ],
+
+    /*
+     * Notifications are append-only with no delete UI; the daily model:prune
+     * drops rows (and, via FK cascade, their notification_users) older than this.
+     */
+    'prune_after_days' => (int) env('NOTIFICATIONS_PRUNE_AFTER_DAYS', 90),
 
 ];

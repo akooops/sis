@@ -5,14 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * A routing config: a named group (with a unique code) that binds a set of
  * notification types to a set of member users. Emitting a notification of a type
- * delivers it to every member of every group that includes that type; each
- * membership (NotificationGroupUser) carries the integrations it wants delivery through.
+ * delivers it to every member of every group that includes that type — always to
+ * the in-app inbox, plus by email through the group's integration when one is
+ * set (null = in-app only). Members are managed as a pivot resource
+ * (NotificationGroupUsersController), not through the group form.
  */
 class NotificationGroup extends Model
 {
@@ -28,14 +31,19 @@ class NotificationGroup extends Model
      2. Relationships
     ------------------------------------------*/
 
+    public function integration(): BelongsTo
+    {
+        return $this->belongsTo(Integration::class);
+    }
+
     public function types(): BelongsToMany
     {
-        return $this->belongsToMany(NotificationType::class, 'notification_group_types');
+        return $this->belongsToMany(NotificationType::class, 'notification_group_notification_types');
     }
 
     public function groupNotificationTypes(): HasMany
     {
-        return $this->hasMany(NotificationGroupType::class);
+        return $this->hasMany(NotificationGroupNotificationType::class);
     }
 
     public function users(): BelongsToMany
@@ -71,22 +79,6 @@ class NotificationGroup extends Model
 
         foreach ($typeIds as $typeId) {
             $this->groupNotificationTypes()->firstOrCreate(['notification_type_id' => $typeId]);
-        }
-    }
-
-    /**
-     * Set the group's members to exactly the given user ids.
-     *
-     * @param  array<int, string>  $userIds
-     */
-    public function syncUsers(array $userIds): void
-    {
-        $this->groupUsers()
-            ->whereNotIn('user_id', $userIds)
-            ->delete();
-
-        foreach ($userIds as $userId) {
-            $this->groupUsers()->firstOrCreate(['user_id' => $userId]);
         }
     }
 }

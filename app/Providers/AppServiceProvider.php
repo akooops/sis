@@ -9,9 +9,9 @@ use App\Models\Media;
 use App\Models\Integration;
 use App\Models\Notification;
 use App\Models\NotificationGroup;
-use App\Models\NotificationGroupType;
+use App\Models\NotificationGroupNotificationType;
 use App\Models\NotificationGroupUser;
-use App\Models\NotificationGroupUserIntegration;
+use App\Models\NotificationUser;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RolePermission;
@@ -22,11 +22,11 @@ use App\Observers\ApiKeyObserver;
 use App\Observers\ApiKeyPermissionObserver;
 use App\Observers\MediaObserver;
 use App\Observers\IntegrationObserver;
+use App\Observers\NotificationGroupNotificationTypeObserver;
 use App\Observers\NotificationGroupObserver;
-use App\Observers\NotificationGroupTypeObserver;
-use App\Observers\NotificationGroupUserIntegrationObserver;
 use App\Observers\NotificationGroupUserObserver;
 use App\Observers\NotificationObserver;
+use App\Observers\NotificationUserObserver;
 use App\Observers\PermissionObserver;
 use App\Observers\RoleObserver;
 use App\Observers\RolePermissionObserver;
@@ -72,9 +72,9 @@ class AppServiceProvider extends ServiceProvider
         Integration::observe(IntegrationObserver::class);
         Notification::observe(NotificationObserver::class);
         NotificationGroup::observe(NotificationGroupObserver::class);
-        NotificationGroupType::observe(NotificationGroupTypeObserver::class);
+        NotificationGroupNotificationType::observe(NotificationGroupNotificationTypeObserver::class);
         NotificationGroupUser::observe(NotificationGroupUserObserver::class);
-        NotificationGroupUserIntegration::observe(NotificationGroupUserIntegrationObserver::class);
+        NotificationUser::observe(NotificationUserObserver::class);
     }
 
     /**

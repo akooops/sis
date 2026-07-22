@@ -5,10 +5,10 @@ namespace App\Observers;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Choosing/removing a delivery integration for a member is an activity on the
- * group (that is where memberships and their integrations are managed).
+ * Adding/removing a notification type on a group is an activity on the group
+ * (that is where its types are managed).
  */
-class NotificationGroupUserIntegrationObserver extends BaseObserver
+class NotificationGroupNotificationTypeObserver extends BaseObserver
 {
     protected function isPivot(): bool
     {
@@ -22,11 +22,11 @@ class NotificationGroupUserIntegrationObserver extends BaseObserver
 
     protected function parent(Model $pivot): ?Model
     {
-        return $pivot->groupUser?->group;
+        return $pivot->group;
     }
 
     protected function related(Model $pivot): ?Model
     {
-        return $pivot->integration;
+        return $pivot->type;
     }
 }

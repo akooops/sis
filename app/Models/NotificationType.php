@@ -28,7 +28,7 @@ class NotificationType extends Model
 
     public function groups(): BelongsToMany
     {
-        return $this->belongsToMany(NotificationGroup::class, 'notification_group_types');
+        return $this->belongsToMany(NotificationGroup::class, 'notification_group_notification_types');
     }
 
     /* -----------------------------------------

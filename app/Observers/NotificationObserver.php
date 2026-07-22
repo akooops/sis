@@ -16,7 +16,7 @@ class NotificationObserver extends BaseObserver
      */
     protected function loggedOnDelete(): array
     {
-        return ['type', 'title'];
+        return ['title'];
     }
 
     /**

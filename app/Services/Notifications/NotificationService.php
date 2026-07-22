@@ -3,99 +3,86 @@
 namespace App\Services\Notifications;
 
 use App\Jobs\ShipNotification;
-use App\Models\NotificationGroupUser;
 use App\Models\Notification;
 use App\Models\NotificationGroup;
 use App\Models\NotificationType;
 use App\Models\NotificationUser;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
- * The one way notifications are created. Fan-out-on-write:
+ * The one way notifications are created — called from observers when a system
+ * event happens, never from controllers. Fan-out-on-write:
  *
  *   1. Resolve recipients — the distinct users of every group whose notification
  *      types include the emitted type. Groups are the routing mechanism; the
  *      notification itself is addressed to users, never stored against a group.
- *   2. Create the Notification (content) once.
- *   3. Write a notification_users row per recipient (the in-app inbox — always).
- *   4. For each recipient, ship through the distinct integrations from the
- *      memberships that routed this type to them, via a queued ShipNotification
- *      job per user × integration.
+ *   2. Create the Notification (content) once plus a notification_users row per
+ *      recipient (the in-app inbox — always on), in one transaction.
+ *   3. Ship email through each routing group's enabled integration, deduped per
+ *      user, via a queued ShipNotification job per user × integration.
  *
- * @see \App\Services\Integrations\Email / Sms — the channels the job ships through.
+ * @see \App\Services\Integrations\Email — the channel the job ships through.
  */
 class NotificationService
 {
     /**
-     * @param  array{title?: string, body?: string|null, data?: array<string, mixed>|null, route_name?: string|null, route_params?: array<string, mixed>|null, icon?: string|null, notifiable?: Model|null}  $attributes
+     * @param  array{title?: string, body?: string|null, route_name?: string|null, route_params?: array<string, mixed>|null}  $attributes
      */
-    public static function send(string $typeCode, array $attributes = []): Notification
+    public static function send(string $typeCode, array $attributes = []): ?Notification
     {
         $type = NotificationType::where('code', $typeCode)->first();
 
-        // Groups that route this type to their members.
-        $groupIds = $type
-            ? NotificationGroup::whereHas('types', fn ($q) => $q->whereKey($type->id))->pluck('id')
-            : collect();
+        if (!$type) {
+            Log::channel('integrations')->warning('notification.unknown-type', ['type' => $typeCode]);
 
-        // Memberships in those groups, with each member's enabled delivery
-        // integrations eager-loaded (so shipping needs no extra query per user).
-        $memberships = NotificationGroupUser::query()
-            ->whereIn('notification_group_id', $groupIds)
-            ->with(['integrations' => fn ($q) => $q->where('is_enabled', true)])
+            return null;
+        }
+
+        $groups = NotificationGroup::query()
+            ->whereHas('types', fn ($q) => $q->whereKey($type->id))
+            ->with(['groupUsers', 'integration' => fn ($q) => $q->where('is_enabled', true)])
             ->get();
 
-        $notifiable = $attributes['notifiable'] ?? null;
+        $byUser = [];
+
+        foreach ($groups as $group) {
+            foreach ($group->groupUsers as $membership) {
+                $byUser[$membership->user_id] ??= [];
+
+                if ($group->integration) {
+                    $byUser[$membership->user_id][$group->integration->id] = true;
+                }
+            }
+        }
 
         $notification = Notification::create([
-            'type' => $typeCode,
-            'title' => $attributes['title'] ?? ($type?->name ?? $typeCode),
+            'notification_type_id' => $type->id,
+            'title' => $attributes['title'] ?? $type->name,
             'body' => $attributes['body'] ?? null,
-            'data' => $attributes['data'] ?? null,
             'route_name' => $attributes['route_name'] ?? null,
             'route_params' => $attributes['route_params'] ?? null,
-            'icon' => $attributes['icon'] ?? null,
-            'notifiable_type' => $notifiable?->getMorphClass(),
-            'notifiable_id' => $notifiable?->getKey(),
         ]);
 
-        // user_id => [integration_id => Integration], deduped across the user's
-        // routing memberships. A user with no integrations still gets a key here,
-        // so they still receive the in-app row.
-        $byUser = [];
-        foreach ($memberships as $membership) {
-            $byUser[$membership->user_id] ??= [];
-            foreach ($membership->integrations as $integration) {
-                $byUser[$membership->user_id][$integration->id] = $integration;
-            }
-        }
-
-        if ($byUser === []) {
-            return $notification;
-        }
-
-        // In-app rows in one bulk insert — notification_users is not audited, so
-        // skipping model events here is deliberate (and much faster).
-        $now = now();
-        $rows = [];
         foreach (array_keys($byUser) as $userId) {
-            $rows[] = [
-                'id' => (string) Str::ulid(),
+            NotificationUser::create([
                 'notification_id' => $notification->id,
                 'user_id' => $userId,
-                'read_at' => null,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ];
+            ]);
         }
-        NotificationUser::insert($rows);
 
-        // External delivery — queued, one job per user × integration.
-        foreach ($byUser as $userId => $integrations) {
-            foreach ($integrations as $integrationId => $integration) {
-                ShipNotification::dispatch($notification->id, (string) $userId, (string) $integrationId);
+        try {
+            foreach ($byUser as $userId => $integrations) {
+                foreach (array_keys($integrations) as $integrationId) {
+                    ShipNotification::dispatch($notification->id, (string) $userId, (string) $integrationId);
+                }
             }
+        } catch (Throwable $e) {
+            Log::channel('integrations')->error('notification.dispatch-failed', [
+                'notification_id' => $notification->id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return $notification;

@@ -1,13 +1,13 @@
 <script>
-    /** Notification groups — routing configs (types × members), with a per-member integrations drawer. */
+    /** Notification groups — routing configs (types × members × one optional email integration), with a members pivot drawer. */
     import AdminLayout from '@/layouts/AdminLayout.svelte';
     import IndexCard from '@/components/data/IndexCard.svelte';
     import DataTable from '@/components/data/DataTable.svelte';
     import SearchBar from '@/components/data/SearchBar.svelte';
     import Badge from '@/components/ui/Badge.svelte';
-    import DateTime from '@/components/ui/DateTime.svelte';
     import Dropdown from '@/components/ui/Dropdown.svelte';
     import IdBadge from '@/components/data/IdBadge.svelte';
+    import DetailDrawer from '@/components/data/DetailDrawer.svelte';
     import NotificationGroupForm from './NotificationGroupForm.svelte';
     import MembersDrawer from './MembersDrawer.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
@@ -22,31 +22,16 @@
     let editing = $state(null);
     let membersOpen = $state(false);
     let membersGroup = $state(null);
-    let integrationOptions = $state([]);
-
-    // The per-member picker only offers email/SMS integrations (never ai).
-    $effect(() => {
-        (async () => {
-            try {
-                const typesData = await api.get(route('api.v1.admin.integration-types.index'));
-                const msgIds = (typesData ?? []).filter((t) => ['email', 'sms'].includes(t.code)).map((t) => t.id);
-                const ints = await api.get(route('api.v1.admin.integrations.index'), { per_page: 100 });
-                integrationOptions = (ints?.data ?? [])
-                    .filter((i) => msgIds.includes(i.integration_type_id))
-                    .map((i) => ({ value: i.id, label: i.name }));
-            } catch {
-                integrationOptions = [];
-            }
-        })();
-    });
+    let viewOpen = $state(false);
+    let viewing = $state(null);
 
     const columns = [
         { key: 'id', label: 'ID', sortable: true, width: '90px', truncate: false },
         { key: 'name', label: 'Name', sortable: true, truncate: false },
         { key: 'code', label: 'Code', sortable: true, truncate: false },
+        { key: 'integration', label: 'Delivery', truncate: false },
         { key: 'types_count', label: 'Types', truncate: false },
         { key: 'members_count', label: 'Members', truncate: false },
-        { key: 'created_at', label: 'Created', sortable: true, truncate: false },
     ];
 
     const create = () => { editing = null; showForm = true; };
@@ -54,9 +39,10 @@
     const closeForm = () => { showForm = false; editing = null; };
     const saved = () => { closeForm(); list.refresh(); };
     const manageMembers = (g) => { membersGroup = g; membersOpen = true; };
+    const view = (g) => { viewing = g; viewOpen = true; };
 
     async function remove(g) {
-        if (!(await confirm({ body: 'Delete this group? Members and their integration choices for it are removed. This cannot be undone.', variant: 'destructive' }))) return;
+        if (!(await confirm({ body: 'Delete this group? Its memberships are removed. This cannot be undone.', variant: 'destructive' }))) return;
         try {
             await api.delete(route('api.v1.admin.notification-groups.destroy', g.id));
             toast.success('Deleted successfully.');
@@ -71,7 +57,22 @@
 
 <AdminLayout title="Notification Groups">
     <IndexCard {showForm} {toolbar} {form} {table} />
-    <MembersDrawer bind:open={membersOpen} group={membersGroup} {integrationOptions} />
+    <MembersDrawer bind:open={membersOpen} group={membersGroup} />
+
+    <DetailDrawer
+        bind:open={viewOpen}
+        title="Notification group"
+        id={viewing?.id}
+        heading={viewing?.name}
+        badge={viewing ? { label: viewing.code, variant: 'secondary' } : null}
+        fields={[
+            { label: 'Delivery', value: viewing?.integration?.name ?? 'In-app only' },
+            { label: 'Types', value: viewing?.types?.length ? viewing.types.map((t) => t.name).join(', ') : '—' },
+            { label: 'Members', value: String(viewing?.members_count ?? 0) },
+        ]}
+        createdAt={viewing?.created_at}
+        updatedAt={viewing?.updated_at}
+    />
 </AdminLayout>
 
 {#snippet toolbar(inForm)}
@@ -105,6 +106,7 @@
         onSort={list.toggleSort}
         onPageChange={list.goToPage}
         onPerPageChange={list.setPerPage}
+        onRowClick={view}
         {cells}
         {rowActions}
     />
@@ -112,17 +114,21 @@
 
 {#snippet cells(row, column)}
     {#if column.key === 'id'}
-        <IdBadge id={row.id} />
+        <IdBadge id={row.id} onclick={() => view(row)} />
     {:else if column.key === 'name'}
         <span class="text-sm font-medium text-mono">{row.name}</span>
     {:else if column.key === 'code'}
         <Badge variant="secondary">{row.code}</Badge>
+    {:else if column.key === 'integration'}
+        {#if row.integration}
+            <Badge variant="secondary"><i class="ki-filled ki-sms me-1"></i>{row.integration.name}</Badge>
+        {:else}
+            <span class="text-xs text-muted-foreground">In-app only</span>
+        {/if}
     {:else if column.key === 'types_count'}
         <span class="text-sm text-mono">{row.types_count}</span>
     {:else if column.key === 'members_count'}
         <span class="text-sm text-mono">{row.members_count}</span>
-    {:else if column.key === 'created_at'}
-        <DateTime value={row.created_at} />
     {:else}
         {row[column.key] ?? '—'}
     {/if}
@@ -133,15 +139,25 @@
         {#snippet trigger()}
             <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" aria-label="Actions"><i class="ki-filled ki-dots-vertical"></i></button>
         {/snippet}
+        <div class="kt-menu-item">
+            <button class="kt-menu-link" data-dropdown-dismiss onclick={() => view(row)}>
+                <span class="kt-menu-icon"><i class="ki-filled ki-eye"></i></span><span class="kt-menu-title">View</span>
+            </button>
+        </div>
         {#if hasPermission('notification-groups.update')}
             <div class="kt-menu-item">
                 <button class="kt-menu-link" data-dropdown-dismiss onclick={() => edit(row)}>
                     <span class="kt-menu-icon"><i class="ki-filled ki-pencil"></i></span><span class="kt-menu-title">Edit</span>
                 </button>
             </div>
+        {/if}
+
+        <!-- what hangs off it -->
+        {#if hasPermission('notification-group-users.index')}
+            <div class="kt-menu-separator"></div>
             <div class="kt-menu-item">
                 <button class="kt-menu-link" data-dropdown-dismiss onclick={() => manageMembers(row)}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-people"></i></span><span class="kt-menu-title">Members & integrations</span>
+                    <span class="kt-menu-icon"><i class="ki-filled ki-people"></i></span><span class="kt-menu-title">Manage members</span>
                 </button>
             </div>
         {/if}

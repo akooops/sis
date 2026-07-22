@@ -3,20 +3,18 @@
  * A node is either a link ({ label, icon, route }) or an accordion group
  * ({ label, icon, children: [...] }). Children are { label, route, permission? }.
  * Items are permission-gated; empty groups are hidden.
+ *
+ * Ordered by proximity to the signed-in admin: their own stuff (Personal),
+ * then who can do what (Access), then what the app holds (Content), then how
+ * it is wired and watched (System).
  */
 export const adminMenu = [
-    { label: 'Dashboard', icon: 'ki-filled ki-element-11', route: 'web.admin.dashboard' },
     {
-        label: 'Access',
-        icon: 'ki-filled ki-shield-tick',
-        // Ordered the way access is built up: a permission is granted to a role,
-        // a role to a user, and an API key is the non-human holder of the same
-        // permissions.
+        label: 'Personal',
+        icon: 'ki-filled ki-user',
         children: [
-            { label: 'Permissions', route: 'web.admin.permissions.index', permission: 'permissions.index' },
-            { label: 'Roles', route: 'web.admin.roles.index', permission: 'roles.index' },
-            { label: 'Users', route: 'web.admin.users.index', permission: 'users.index' },
-            { label: 'API Keys', route: 'web.admin.api-keys.index', permission: 'api-keys.index' },
+            { label: 'Dashboard', route: 'web.admin.dashboard' },
+            { label: 'Notifications', route: 'web.admin.notifications.index' },
         ],
     },
     {
@@ -27,17 +25,20 @@ export const adminMenu = [
         ],
     },
     {
-        label: 'Notifications',
-        icon: 'ki-filled ki-notification-status',
+        label: 'Access',
+        icon: 'ki-filled ki-shield-tick',
         children: [
-            { label: 'Notifications', route: 'web.admin.notifications.index', permission: 'notifications.index' },
-            { label: 'Groups', route: 'web.admin.notification-groups.index', permission: 'notification-groups.index' },
+            { label: 'Permissions', route: 'web.admin.permissions.index', permission: 'permissions.index' },
+            { label: 'Roles', route: 'web.admin.roles.index', permission: 'roles.index' },
+            { label: 'Users', route: 'web.admin.users.index', permission: 'users.index' },
+            { label: 'API Keys', route: 'web.admin.api-keys.index', permission: 'api-keys.index' },
         ],
     },
     {
         label: 'System',
         icon: 'ki-filled ki-setting-2',
         children: [
+            { label: 'Notification Groups', route: 'web.admin.notification-groups.index', permission: 'notification-groups.index' },
             { label: 'Integrations', route: 'web.admin.integrations.index', permission: 'integrations.index' },
             { label: 'Activity Log', route: 'web.admin.activities.index', permission: 'activities.index' },
         ],

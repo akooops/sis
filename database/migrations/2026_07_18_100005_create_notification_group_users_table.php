@@ -17,10 +17,12 @@ return new class extends Migration
             $table->ulid('user_id');
             $table->foreign('user_id', 'ngu_user_fk')->references('id')->on('users')->cascadeOnDelete();
 
-            $table->timestamps();
-
-            // Explicit name: the auto-generated one is over MySQL's 64-char limit.
             $table->unique(['notification_group_id', 'user_id'], 'ngu_group_user_unique');
+
+            $table->index('notification_group_id');
+            $table->index('user_id');
+
+            $table->timestamps();
         });
     }
 

@@ -6,13 +6,11 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * A membership: one user in one notification group. Carries the set of
- * integrations that user wants this group's notifications delivered through
- * (besides the always-on in-app inbox).
+ * Pivot: a membership — one user in one notification group. Audited against the
+ * parent group (attached/detached) — see NotificationGroupUserObserver. Delivery
+ * is decided by the group: in-app always, email when the group has an integration.
  */
 class NotificationGroupUser extends Model
 {
@@ -38,16 +36,6 @@ class NotificationGroupUser extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function integrations(): BelongsToMany
-    {
-        return $this->belongsToMany(Integration::class, 'notification_group_user_integrations');
-    }
-
-    public function groupUserIntegrations(): HasMany
-    {
-        return $this->hasMany(NotificationGroupUserIntegration::class);
-    }
-
     /* -----------------------------------------
      3. Accessors
     ------------------------------------------*/
@@ -55,22 +43,4 @@ class NotificationGroupUser extends Model
     /* -----------------------------------------
      4. Methods
     ------------------------------------------*/
-
-    /**
-     * Set this membership's delivery integrations to exactly the given ids.
-     * firstOrCreate fires the pivot observer per new row (attach audited);
-     * removals go through a builder delete (unaudited, like syncRoles/syncTypes).
-     *
-     * @param  array<int, string>  $integrationIds
-     */
-    public function syncIntegrations(array $integrationIds): void
-    {
-        $this->groupUserIntegrations()
-            ->whereNotIn('integration_id', $integrationIds)
-            ->delete();
-
-        foreach ($integrationIds as $integrationId) {
-            $this->groupUserIntegrations()->firstOrCreate(['integration_id' => $integrationId]);
-        }
-    }
 }

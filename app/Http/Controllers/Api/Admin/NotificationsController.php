@@ -3,12 +3,8 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Data\Notification\NotificationData;
-use App\Data\Notification\StoreNotificationData;
 use App\Http\Controllers\Api\ApiController;
-use App\Models\NotificationGroupUser;
 use App\Models\Notification;
-use App\Models\NotificationGroup;
-use App\Services\Notifications\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\PaginatedDataCollection;
@@ -16,73 +12,71 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 /**
- * Admin compose + sent-history. Sending fans out via NotificationService (which
- * resolves recipients from the groups that route the chosen type); the in-app
- * inbox itself is served by InboxController, not here.
+ * The signed-in admin's own notification inbox (the bell drawer + notifications
+ * page). Auth-only, never permission-gated — every admin has an inbox, and
+ * creation happens exclusively in observers via NotificationService::send().
+ *
+ * The API is keyed by the NOTIFICATION id (what the frontend shows); read and
+ * delete resolve the current user's own notification_users row for it, so a
+ * notification that never reached this user is simply a 404 and one user can
+ * never touch another's read state or copy. Deleting removes only this user's
+ * copy — the notification itself stays for its other recipients.
  */
 class NotificationsController extends ApiController
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $notifications = QueryBuilder::for(Notification::class)
-            ->withCount('notificationUsers')
+        $inbox = QueryBuilder::for($request->user()->notificationUsers()->with('notification.type'))
             ->allowedFilters([
-                AllowedFilter::exact('id'),
-                AllowedFilter::exact('type'),
-                $this->search(['id', 'title', 'type']),
+                AllowedFilter::callback('read', function ($query, $value) {
+                    filter_var($value, FILTER_VALIDATE_BOOLEAN)
+                        ? $query->whereNotNull('read_at')
+                        : $query->whereNull('read_at');
+                }),
+                $this->searchRelationByColumns('notification', ['id', 'title', 'body']),
             ])
-            ->allowedSorts(['id', 'type', 'title', 'created_at'])
+            ->allowedSorts(['created_at', 'read_at'])
             ->defaultSort('-created_at')
             ->paginate($this->perPage())
             ->appends(request()->query());
 
-        return $this->respond(NotificationData::collect($notifications, PaginatedDataCollection::class), 'Notifications retrieved successfully');
+        return $this->respond(NotificationData::collect($inbox, PaginatedDataCollection::class), 'Notifications retrieved successfully');
     }
 
-    /**
-     * How many users a notification of the given type would reach, for the compose
-     * form's live "will reach N users" preview. Mirrors the recipient resolution
-     * in NotificationService::send.
-     */
-    public function preview(Request $request): JsonResponse
+    public function unreadCount(Request $request): JsonResponse
     {
-        $type = (string) $request->query('type', '');
-
-        $groupIds = NotificationGroup::whereHas('types', fn ($q) => $q->where('code', $type))->pluck('id');
-
-        $count = $groupIds->isEmpty() ? 0 : NotificationGroupUser::whereIn('notification_group_id', $groupIds)
-            ->distinct('user_id')
-            ->count('user_id');
-
-        return $this->respond(['recipients_count' => $count], 'Recipient preview retrieved successfully');
+        return $this->respond(
+            ['unread_count' => $request->user()->unreadNotificationsCount()],
+            'Unread count retrieved successfully',
+        );
     }
 
-    public function show(Notification $notification): JsonResponse
+    public function markRead(Request $request, Notification $notification): JsonResponse
     {
-        $notification->loadCount('notificationUsers');
+        $row = $request->user()->notificationUsers()
+            ->where('notification_id', $notification->id)
+            ->firstOrFail();
 
-        return $this->respond(NotificationData::from($notification), 'Notification retrieved successfully');
+        $row->markRead();
+        $row->load('notification.type');
+
+        return $this->respond(NotificationData::from($row), 'Notification marked as read');
     }
 
-    public function store(StoreNotificationData $data): JsonResponse
+    public function markAllRead(Request $request): JsonResponse
     {
-        $notification = NotificationService::send($data->type, [
-            'title' => $data->title,
-            'body' => $data->body,
-            'route_name' => $data->route_name,
-            'route_params' => $data->route_params,
-            'icon' => $data->icon,
-        ]);
+        $request->user()->notificationUsers()->whereNull('read_at')->update(['read_at' => now()]);
 
-        $notification->loadCount('notificationUsers');
-
-        return $this->respond(NotificationData::from($notification), 'Notification sent successfully', 201);
+        return $this->respond(['unread_count' => 0], 'All notifications marked as read');
     }
 
-    public function destroy(Notification $notification): JsonResponse
+    public function destroy(Request $request, Notification $notification): JsonResponse
     {
-        $notification->delete();
+        $request->user()->notificationUsers()
+            ->where('notification_id', $notification->id)
+            ->firstOrFail()
+            ->delete();
 
-        return $this->respond(null, 'Notification deleted successfully');
+        return $this->respond(null, 'Notification removed successfully');
     }
 }

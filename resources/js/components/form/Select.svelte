@@ -15,6 +15,7 @@
      * The dropdown is portaled to <body> and positioned from the trigger, so it
      * is never clipped inside a Drawer/Modal.
      */
+    import { untrack } from 'svelte';
     import { portal } from '@/lib/portal';
     import { api } from '@/lib/api/client';
     import Spinner from '@/components/ui/Spinner.svelte';
@@ -50,6 +51,61 @@
 
     const isRemote = $derived(!!resource);
 
+    // initialOptions often arrive AFTER mount (an edit form fetching its record)
+    // — merge them in whenever they change instead of reading them only once.
+    $effect(() => {
+        if (!initialOptions?.length) return;
+        const next = new Map(untrack(() => known));
+        let changed = false;
+        for (const o of initialOptions) {
+            if (next.get(o.value) !== o.label) {
+                next.set(o.value, o.label);
+                changed = true;
+            }
+        }
+        if (changed) known = next;
+    });
+
+    // Selected values we can't label yet (remote mode) — resolved below.
+    const unknownSelected = $derived(
+        isRemote
+            ? (multiple ? (Array.isArray(value) ? value : []) : value != null && value !== '' ? [value] : []).filter(
+                  (v) => !known.has(v),
+              )
+            : [],
+    );
+    let resolving = $state(false);
+
+    // A preselected value whose label was never loaded (edit form, deep link)
+    // resolves itself: every index route supports filter[id], so fetch exactly
+    // those records for their labels — opening the dropdown still browses
+    // unfiltered. A miss keeps the raw value so this can never loop or retry.
+    $effect(() => {
+        if (!isRemote || unknownSelected.length === 0) return;
+        const targets = [...unknownSelected];
+        resolving = true;
+
+        (async () => {
+            const next = new Map(untrack(() => known));
+            try {
+                const { filter: extraFilter, ...extraParams } = resourceParams;
+                const data = await api.get(route(resource), {
+                    ...extraParams,
+                    filter: { ...(extraFilter ?? {}), id: targets.join(',') },
+                    per_page: targets.length,
+                });
+                for (const r of data?.data ?? []) next.set(r[valueKey], r[labelKey]);
+            } catch {
+                // fall through — misses keep their raw value below
+            }
+            for (const t of targets) {
+                if (!next.has(t)) next.set(t, t);
+            }
+            known = next;
+            resolving = false;
+        })();
+    });
+
     // Normalized options currently shown in the list.
     const listItems = $derived.by(() => {
         if (isRemote) {
@@ -74,9 +130,12 @@
         if (!isRemote) return;
         loading = true;
         try {
+            // Spread the extras first so their `filter` can't clobber the merged
+            // one — search must survive alongside caller-pinned filters.
+            const { filter: extraFilter, ...extraParams } = resourceParams;
             const data = await api.get(route(resource), {
-                filter: { search: search || undefined, ...(resourceParams.filter ?? {}) },
-                ...resourceParams,
+                ...extraParams,
+                filter: { search: search || undefined, ...(extraFilter ?? {}) },
                 per_page: perPage,
             });
             const rows = data?.data ?? [];
@@ -186,7 +245,11 @@
                 <!-- max-w-full + a truncating label: one long option must not be
                      able to widen the field past the form it sits in. -->
                 <span class="kt-badge kt-badge-sm kt-badge-outline kt-badge-primary max-w-full">
-                    <span class="min-w-0 truncate" title={labelFor(val)}>{labelFor(val)}</span>
+                    {#if resolving && !known.has(val)}
+                        <span class="inline-block h-3 w-16 animate-pulse rounded bg-muted"></span>
+                    {:else}
+                        <span class="min-w-0 truncate" title={labelFor(val)}>{labelFor(val)}</span>
+                    {/if}
                     <button type="button" class="ms-1 shrink-0" onclick={(e) => removeChip(val, e)} aria-label="Remove">
                         <i class="ki-filled ki-cross text-2xs"></i>
                     </button>
@@ -194,7 +257,11 @@
             {/each}
         </div>
     {:else if !multiple && hasValue}
-        <span class="min-w-0 grow truncate text-mono" title={labelFor(value)}>{labelFor(value)}</span>
+        {#if resolving && !known.has(value)}
+            <span class="min-w-0 grow"><span class="block h-4 w-28 animate-pulse rounded bg-muted"></span></span>
+        {:else}
+            <span class="min-w-0 grow truncate text-mono" title={labelFor(value)}>{labelFor(value)}</span>
+        {/if}
     {:else}
         <span class="min-w-0 grow truncate text-muted-foreground">{placeholder ?? 'Search'}</span>
     {/if}

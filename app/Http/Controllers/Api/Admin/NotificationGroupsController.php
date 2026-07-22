@@ -14,19 +14,20 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 /**
- * CRUD for notification groups — the routing configs (types × members). Member
- * add/remove is handled here (syncUsers); each member's delivery integrations are
- * managed per-membership by GroupUsersController.
+ * CRUD for notification groups — the routing configs (types × members × one
+ * optional email integration). Members are managed as their own pivot resource
+ * (NotificationGroupUsersController), never through this form.
  */
 class NotificationGroupsController extends ApiController
 {
     public function index(): JsonResponse
     {
         $groups = QueryBuilder::for(NotificationGroup::class)
-            ->with('types')
+            ->with(['types', 'integration'])
             ->withCount(['types', 'users'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
+                AllowedFilter::exact('integration_id'),
                 $this->search(['id', 'name', 'code']),
             ])
             ->allowedSorts(['id', 'name', 'code', 'created_at'])
@@ -39,46 +40,37 @@ class NotificationGroupsController extends ApiController
 
     public function show(NotificationGroup $notificationGroup): JsonResponse
     {
-        $notificationGroup->load(['types', 'users'])->loadCount(['types', 'users']);
+        $notificationGroup->load(['types', 'integration'])->loadCount(['types', 'users']);
 
         return $this->respond(NotificationGroupData::from($notificationGroup), 'Notification group retrieved successfully');
     }
 
     public function store(StoreNotificationGroupData $data): JsonResponse
     {
-        // One transaction so a failed type/member sync can't leave a half-built group.
-        $group = DB::transaction(function () use ($data) {
-            $group = NotificationGroup::create([
-                'name' => $data->name,
-                'code' => $data->code,
-                'description' => $data->description,
-            ]);
+        $group = NotificationGroup::create([
+            'name' => $data->name,
+            'code' => $data->code,
+            'integration_id' => $data->integration_id,
+        ]);
 
-            $group->syncTypes($data->notification_type_ids);
-            $group->syncUsers($data->user_ids);
+        $group->syncTypes($data->notification_type_ids);
 
-            return $group;
-        });
-
-        $group->load(['types', 'users'])->loadCount(['types', 'users']);
+        $group->load(['types', 'integration'])->loadCount(['types', 'users']);
 
         return $this->respond(NotificationGroupData::from($group), 'Notification group created successfully', 201);
     }
 
     public function update(UpdateNotificationGroupData $data, NotificationGroup $notificationGroup): JsonResponse
     {
-        DB::transaction(function () use ($data, $notificationGroup) {
-            $notificationGroup->update([
-                'name' => $data->name,
-                'code' => $data->code,
-                'description' => $data->description,
-            ]);
+        $notificationGroup->update([
+            'name' => $data->name,
+            'code' => $data->code,
+            'integration_id' => $data->integration_id,
+        ]);
 
-            $notificationGroup->syncTypes($data->notification_type_ids);
-            $notificationGroup->syncUsers($data->user_ids);
-        });
+        $notificationGroup->syncTypes($data->notification_type_ids);
 
-        $notificationGroup->load(['types', 'users'])->loadCount(['types', 'users']);
+        $notificationGroup->load(['types', 'integration'])->loadCount(['types', 'users']);
 
         return $this->respond(NotificationGroupData::from($notificationGroup), 'Notification group updated successfully');
     }

@@ -10,8 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * A recipient's copy of a notification — the in-app inbox row. `read_at` is the
- * per-user read state (read is per user, never global). High-volume and written
- * on every send, so like Session it is intentionally NOT audited.
+ * per-user read state (read is per user, never global). Audited as a pivot
+ * against the parent notification (attached/detached) — see
+ * NotificationUserObserver; read-state updates write nothing.
  */
 class NotificationUser extends Model
 {

@@ -13,7 +13,9 @@ return new class extends Migration
 
             $table->string('name');
             $table->string('code')->unique();
-            $table->text('description')->nullable();
+
+            $table->ulid('integration_id')->nullable();
+            $table->foreign('integration_id')->references('id')->on('integrations')->nullOnDelete();
 
             $table->timestamps();
         });

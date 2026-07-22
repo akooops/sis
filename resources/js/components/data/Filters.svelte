@@ -116,6 +116,11 @@
         onapply?.({}, null);
         open = false;
     }
+
+    // Anything to clear? Search counts too — it lives in the same filter object.
+    const dirty = $derived(
+        Object.values(draft).some((v) => v !== null && v !== undefined && v !== '') || !!sortColumn,
+    );
 </script>
 
 <Drawer bind:open title="Filters">
@@ -197,7 +202,7 @@
     </div>
 
     {#snippet footer()}
-        <Button variant="secondary" onclick={reset}>Clear filters</Button>
+        <Button variant="secondary" onclick={reset} disabled={!dirty}>Clear filters</Button>
         <Button variant="primary" onclick={apply}>Apply</Button>
     {/snippet}
 </Drawer>

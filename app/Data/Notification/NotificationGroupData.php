@@ -2,13 +2,17 @@
 
 namespace App\Data\Notification;
 
+use App\Data\Integration\IntegrationData;
 use App\Models\NotificationGroup;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Lazy;
 
 /**
- * Output DTO for a notification group. `type_ids`/`user_ids` prefill the edit
- * form's multi-selects (present only when the relations are loaded — the show
- * endpoint loads them; the index list uses the counts instead).
+ * Output DTO for a notification group. `type_ids` prefills the edit form's type
+ * multiselect and `integration_id`/`integration` its email-integration select;
+ * `integration` is the full IntegrationData, present when the relation is loaded
+ * (null when the group is in-app only). Members are a separate pivot resource
+ * (notification-group-users), so only their count appears here.
  */
 class NotificationGroupData extends Data
 {
@@ -16,15 +20,12 @@ class NotificationGroupData extends Data
         public string $id,
         public string $name,
         public string $code,
-        public ?string $description,
+        public ?string $integration_id,
+        public Lazy|IntegrationData|null $integration,
         /** @var array<int, string> */
         public array $type_ids,
-        /** @var array<int, string> */
-        public array $user_ids,
         /** @var array<int, NotificationTypeData> */
         public array $types,
-        /** Preselected members as {value,label} for the edit-form multiselect. @var array<int, array{value: string, label: string}> */
-        public array $members,
         public int $types_count,
         public int $members_count,
         public ?string $created_at,
@@ -34,21 +35,19 @@ class NotificationGroupData extends Data
     public static function fromModel(NotificationGroup $group): self
     {
         $typesLoaded = $group->relationLoaded('types');
-        $usersLoaded = $group->relationLoaded('users');
 
         return new self(
             id: $group->id,
             name: $group->name,
             code: $group->code,
-            description: $group->description,
+            integration_id: $group->integration_id,
             type_ids: $typesLoaded ? $group->types->pluck('id')->all() : [],
-            user_ids: $usersLoaded ? $group->users->pluck('id')->all() : [],
             types: $typesLoaded ? NotificationTypeData::collect($group->types->all()) : [],
-            members: $usersLoaded ? $group->users->map(fn ($u) => ['value' => $u->id, 'label' => $u->username ?? $u->email])->all() : [],
             types_count: $group->types_count ?? ($typesLoaded ? $group->types->count() : 0),
-            members_count: $group->users_count ?? ($usersLoaded ? $group->users->count() : 0),
+            members_count: $group->users_count ?? 0,
             created_at: $group->created_at?->toIso8601String(),
             updated_at: $group->updated_at?->toIso8601String(),
+            integration: Lazy::whenLoaded('integration', $group, fn () => $group->integration ? IntegrationData::from($group->integration) : null),
         );
     }
 }

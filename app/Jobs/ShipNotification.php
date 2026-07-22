@@ -6,7 +6,6 @@ use App\Models\Integration;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\Integrations\Email;
-use App\Services\Integrations\Sms;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -16,9 +15,9 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
- * Ships one notification to one user through one integration (email or sms).
- * Dispatched by NotificationService after the in-app row is already written, so a
- * provider being slow or down never blocks the notification itself.
+ * Ships one notification to one user through one email integration. Dispatched by
+ * NotificationService after the in-app row is already written, so a provider
+ * being slow or down never blocks the notification itself.
  *
  * Outcomes go to the `integrations` log channel, not the audit trail — the same
  * place the drivers log, and per-recipient sends would flood the activity log.
@@ -58,18 +57,9 @@ class ShipNotification implements ShouldQueue
             return;
         }
 
-        $channel = $integration->type?->code;
-
-        match ($channel) {
-            'email' => $this->shipEmail($notification, $user, $integration),
-            'sms' => $this->shipSms($notification, $user, $integration),
-            default => null, // ai and anything else: never delivered this way.
-        };
-    }
-
-    protected function shipEmail(Notification $notification, User $user, Integration $integration): void
-    {
-        if (empty($user->email)) {
+        // Groups only carry email integrations, but that constraint lives in
+        // validation — re-check here so a stray row can never mis-ship.
+        if ($integration->type?->code !== 'email' || empty($user->email)) {
             return;
         }
 
@@ -82,24 +72,11 @@ class ShipNotification implements ShouldQueue
         $this->log('sent', $notification, $user, $integration);
     }
 
-    protected function shipSms(Notification $notification, User $user, Integration $integration): void
-    {
-        if (empty($user->phone)) {
-            return;
-        }
-
-        $text = trim($notification->title."\n".($notification->body ?? ''));
-
-        $result = Sms::for($integration->id)->send($text, $user->phone);
-
-        $this->log($result->ok ? 'sent' : 'failed', $notification, $user, $integration, $result->message);
-    }
-
     protected function log(string $outcome, Notification $notification, User $user, Integration $integration, ?string $detail = null): void
     {
         Log::channel('integrations')->info('notification.'.$outcome, [
             'notification_id' => $notification->id,
-            'type' => $notification->type,
+            'type' => $notification->type?->code,
             'user_id' => $user->id,
             'integration_id' => $integration->id,
             'channel' => $integration->type?->code,

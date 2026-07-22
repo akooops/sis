@@ -27,15 +27,15 @@ class PermissionsSeeder extends Seeder
             ['code' => 'integrations.update', 'name' => 'Update integrations', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'integrations.destroy', 'name' => 'Delete integrations', 'supports_web' => true, 'supports_api' => false],
 
-            // Notifications management (the inbox itself is auth-only, no permission).
-            ['code' => 'notifications.index', 'name' => 'View sent notifications', 'supports_web' => true, 'supports_api' => true],
-            ['code' => 'notifications.store', 'name' => 'Send notifications', 'supports_web' => true, 'supports_api' => true],
-            ['code' => 'notifications.destroy', 'name' => 'Delete notifications', 'supports_web' => true, 'supports_api' => true],
-
+            // Notification groups + members (the inbox itself is auth-only, no permission).
             ['code' => 'notification-groups.index', 'name' => 'View notification groups', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'notification-groups.store', 'name' => 'Create notification groups', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'notification-groups.update', 'name' => 'Update notification groups', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'notification-groups.destroy', 'name' => 'Delete notification groups', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'notification-group-users.index', 'name' => 'View group members', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'notification-group-users.store', 'name' => 'Add group members', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'notification-group-users.destroy', 'name' => 'Remove group members', 'supports_web' => true, 'supports_api' => false],
         ];
 
         foreach ($permissions as $permission) {
