@@ -4,9 +4,14 @@ use App\Http\Controllers\Api\Admin\ActivitiesController;
 use App\Http\Controllers\Api\Admin\ApiKeyPermissionsController;
 use App\Http\Controllers\Api\Admin\ApiKeysController;
 use App\Http\Controllers\Api\Admin\AuthController;
+use App\Http\Controllers\Api\Admin\GroupUsersController;
+use App\Http\Controllers\Api\Admin\InboxController;
 use App\Http\Controllers\Api\Admin\MediaController;
 use App\Http\Controllers\Api\Admin\IntegrationsController;
 use App\Http\Controllers\Api\Admin\IntegrationTypesController;
+use App\Http\Controllers\Api\Admin\NotificationGroupsController;
+use App\Http\Controllers\Api\Admin\NotificationsController;
+use App\Http\Controllers\Api\Admin\NotificationTypesController;
 use App\Http\Controllers\Api\Admin\PermissionsController;
 use App\Http\Controllers\Api\Admin\RolePermissionsController;
 use App\Http\Controllers\Api\Admin\RolesController;
@@ -103,5 +108,32 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::put('integrations/{integration}', [IntegrationsController::class, 'update'])->middleware('verify.permissions:integrations.update')->name('api.v1.admin.integrations.update');
         Route::delete('integrations/{integration}', [IntegrationsController::class, 'destroy'])->middleware('verify.permissions:integrations.destroy')->name('api.v1.admin.integrations.destroy');
         Route::patch('integrations/{integration}/toggle', [IntegrationsController::class, 'toggle'])->middleware('verify.permissions:integrations.update')->name('api.v1.admin.integrations.toggle');
+
+        // Notifications — inbox (auth-only: every admin has an inbox, no permission gate)
+        Route::get('notifications/inbox', [InboxController::class, 'index'])->name('api.v1.admin.notifications.inbox');
+        Route::get('notifications/inbox/unread-count', [InboxController::class, 'unreadCount'])->name('api.v1.admin.notifications.unread-count');
+        Route::post('notifications/inbox/read-all', [InboxController::class, 'markAllRead'])->name('api.v1.admin.notifications.read-all');
+        Route::patch('notifications/inbox/{notificationUser}/read', [InboxController::class, 'markRead'])->name('api.v1.admin.notifications.read');
+
+        // Notification types (read-only reference for the pickers)
+        Route::get('notification-types', [NotificationTypesController::class, 'index'])->middleware('verify.permissions:notifications.index')->name('api.v1.admin.notification-types.index');
+
+        // Notifications — compose + sent history (preview/show registered before the {notification} wildcard)
+        Route::get('notifications/preview', [NotificationsController::class, 'preview'])->middleware('verify.permissions:notifications.store')->name('api.v1.admin.notifications.preview');
+        Route::get('notifications', [NotificationsController::class, 'index'])->middleware('verify.permissions:notifications.index')->name('api.v1.admin.notifications.index');
+        Route::get('notifications/{notification}', [NotificationsController::class, 'show'])->middleware('verify.permissions:notifications.index')->name('api.v1.admin.notifications.show');
+        Route::post('notifications', [NotificationsController::class, 'store'])->middleware('verify.permissions:notifications.store')->name('api.v1.admin.notifications.store');
+        Route::delete('notifications/{notification}', [NotificationsController::class, 'destroy'])->middleware('verify.permissions:notifications.destroy')->name('api.v1.admin.notifications.destroy');
+
+        // Notification Groups
+        Route::get('notification-groups', [NotificationGroupsController::class, 'index'])->middleware('verify.permissions:notification-groups.index')->name('api.v1.admin.notification-groups.index');
+        Route::get('notification-groups/{notificationGroup}/members', [GroupUsersController::class, 'index'])->middleware('verify.permissions:notification-groups.index')->name('api.v1.admin.notification-groups.members.index');
+        Route::get('notification-groups/{notificationGroup}', [NotificationGroupsController::class, 'show'])->middleware('verify.permissions:notification-groups.index')->name('api.v1.admin.notification-groups.show');
+        Route::post('notification-groups', [NotificationGroupsController::class, 'store'])->middleware('verify.permissions:notification-groups.store')->name('api.v1.admin.notification-groups.store');
+        Route::put('notification-groups/{notificationGroup}', [NotificationGroupsController::class, 'update'])->middleware('verify.permissions:notification-groups.update')->name('api.v1.admin.notification-groups.update');
+        Route::delete('notification-groups/{notificationGroup}', [NotificationGroupsController::class, 'destroy'])->middleware('verify.permissions:notification-groups.destroy')->name('api.v1.admin.notification-groups.destroy');
+
+        // Group member delivery integrations
+        Route::put('group-users/{groupUser}/integrations', [GroupUsersController::class, 'updateIntegrations'])->middleware('verify.permissions:notification-groups.update')->name('api.v1.admin.group-users.integrations');
     });
 });

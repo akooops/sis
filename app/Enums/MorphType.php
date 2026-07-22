@@ -5,6 +5,9 @@ namespace App\Enums;
 use App\Models\ApiKey;
 use App\Models\Integration;
 use App\Models\Media;
+use App\Models\Notification;
+use App\Models\NotificationGroup;
+use App\Models\NotificationType;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -26,6 +29,9 @@ enum MorphType: string
     case ApiKey = 'api_key';
     case Media = 'media';
     case Integration = 'integration';
+    case Notification = 'notification';
+    case NotificationGroup = 'notification_group';
+    case NotificationType = 'notification_type';
 
     /** @return class-string */
     public function class(): string
@@ -37,6 +43,9 @@ enum MorphType: string
             self::ApiKey => ApiKey::class,
             self::Media => Media::class,
             self::Integration => Integration::class,
+            self::Notification => Notification::class,
+            self::NotificationGroup => NotificationGroup::class,
+            self::NotificationType => NotificationType::class,
         };
     }
 

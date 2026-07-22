@@ -46,4 +46,14 @@ class PagesController extends Controller
     {
         return inertia('Admin/Integrations/Index');
     }
+
+    public function notifications(): Response
+    {
+        return inertia('Admin/Notifications/Index');
+    }
+
+    public function notificationGroups(): Response
+    {
+        return inertia('Admin/NotificationGroups/Index');
+    }
 }

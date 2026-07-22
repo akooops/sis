@@ -5,6 +5,7 @@
      */
     import { inertia } from '@inertiajs/svelte';
     import Breadcrumbs from './Breadcrumbs.svelte';
+    import NotificationBell from './NotificationBell.svelte';
     import { authUser } from '@/lib/permissions';
     import { api } from '@/lib/api/client';
     import { sidebarTheme, toggleSidebarTheme } from '@/lib/sidebar';
@@ -47,6 +48,9 @@
 
         <!-- Topbar actions -->
         <div class="flex items-center gap-2.5">
+            <!-- Notifications -->
+            <NotificationBell />
+
             <!-- User -->
             <div
                 class="shrink-0"

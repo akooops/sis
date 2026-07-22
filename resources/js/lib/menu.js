@@ -27,6 +27,14 @@ export const adminMenu = [
         ],
     },
     {
+        label: 'Notifications',
+        icon: 'ki-filled ki-notification-status',
+        children: [
+            { label: 'Notifications', route: 'web.admin.notifications.index', permission: 'notifications.index' },
+            { label: 'Groups', route: 'web.admin.notification-groups.index', permission: 'notification-groups.index' },
+        ],
+    },
+    {
         label: 'System',
         icon: 'ki-filled ki-setting-2',
         children: [

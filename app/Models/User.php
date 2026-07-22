@@ -56,6 +56,26 @@ class User extends Authenticatable
         return $this->hasMany(Session::class);
     }
 
+    /**
+     * The user's in-app notification inbox rows (per-user copies with read state).
+     * Named notificationUsers(), not notifications(), to avoid colliding with the
+     * Notifiable trait's own notifications() relation.
+     */
+    public function notificationUsers(): HasMany
+    {
+        return $this->hasMany(NotificationUser::class);
+    }
+
+    public function notificationGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(NotificationGroup::class, 'notification_group_users');
+    }
+
+    public function groupMemberships(): HasMany
+    {
+        return $this->hasMany(NotificationGroupUser::class);
+    }
+
     /* -----------------------------------------
      3. Accessors
     ------------------------------------------*/
@@ -130,5 +150,11 @@ class User extends Authenticatable
     public function hasPermissions(array $permissions): bool
     {
         return array_diff(array_unique($permissions), $this->permissions()) === [];
+    }
+
+    /** How many of the user's inbox notifications are unread (drives the bell badge). */
+    public function unreadNotificationsCount(): int
+    {
+        return $this->notificationUsers()->whereNull('read_at')->count();
     }
 }

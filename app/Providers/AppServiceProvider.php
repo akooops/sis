@@ -7,6 +7,11 @@ use App\Models\ApiKey;
 use App\Models\ApiKeyPermission;
 use App\Models\Media;
 use App\Models\Integration;
+use App\Models\Notification;
+use App\Models\NotificationGroup;
+use App\Models\NotificationGroupType;
+use App\Models\NotificationGroupUser;
+use App\Models\NotificationGroupUserIntegration;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RolePermission;
@@ -17,6 +22,11 @@ use App\Observers\ApiKeyObserver;
 use App\Observers\ApiKeyPermissionObserver;
 use App\Observers\MediaObserver;
 use App\Observers\IntegrationObserver;
+use App\Observers\NotificationGroupObserver;
+use App\Observers\NotificationGroupTypeObserver;
+use App\Observers\NotificationGroupUserIntegrationObserver;
+use App\Observers\NotificationGroupUserObserver;
+use App\Observers\NotificationObserver;
 use App\Observers\PermissionObserver;
 use App\Observers\RoleObserver;
 use App\Observers\RolePermissionObserver;
@@ -60,6 +70,11 @@ class AppServiceProvider extends ServiceProvider
         RolePermission::observe(RolePermissionObserver::class);
         ApiKeyPermission::observe(ApiKeyPermissionObserver::class);
         Integration::observe(IntegrationObserver::class);
+        Notification::observe(NotificationObserver::class);
+        NotificationGroup::observe(NotificationGroupObserver::class);
+        NotificationGroupType::observe(NotificationGroupTypeObserver::class);
+        NotificationGroupUser::observe(NotificationGroupUserObserver::class);
+        NotificationGroupUserIntegration::observe(NotificationGroupUserIntegrationObserver::class);
     }
 
     /**

@@ -41,6 +41,8 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user() ? $request->user() : null,
                 'permissions' => $request->user() ? $request->user()->permissions() : null,
                 'enable_permissions' => config('app.enable_permissions'),
+                // Seeds the bell badge on first paint; kept fresh by the bell's poll.
+                'unread_notifications' => $request->user() ? $request->user()->unreadNotificationsCount() : 0,
             ],
             'media' => $this->mediaConfig(),
         ];

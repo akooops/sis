@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             IntegrationTypesSeeder::class,
             IntegrationDriversSeeder::class,
+            NotificationTypesSeeder::class,
         ]);
 
         if (app()->environment('local')) {
