@@ -9,7 +9,7 @@
     import FilterButton from '@/components/data/FilterButton.svelte';
     import Skeleton from '@/components/ui/Skeleton.svelte';
     import EmptyState from '@/components/ui/EmptyState.svelte';
-    import Dropdown from '@/components/ui/Dropdown.svelte';
+    import RowActions from '@/components/data/RowActions.svelte';
     import DetailDrawer from '@/components/data/DetailDrawer.svelte';
     import ActivityDrawer from '@/components/activity/ActivityDrawer.svelte';
     import MediaThumb from '@/components/media/MediaThumb.svelte';
@@ -158,39 +158,12 @@
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
                 {#each list.rows as item (item.id)}
                     <div class="group relative">
-                        <div class="absolute end-2 top-2 z-10 opacity-0 transition-opacity group-hover:opacity-100">
-                            <Dropdown>
-                                {#snippet trigger()}
-                                    <button class="kt-btn kt-btn-icon kt-btn-sm rounded-md bg-background/90 shadow-sm" aria-label="Actions">
-                                        <i class="ki-filled ki-dots-vertical"></i>
-                                    </button>
-                                {/snippet}
-                                <div class="kt-menu-item">
-                                    <button class="kt-menu-link" data-dropdown-dismiss onclick={() => view(item)}>
-                                        <span class="kt-menu-icon"><i class="ki-filled ki-eye"></i></span>
-                                        <span class="kt-menu-title">View</span>
-                                    </button>
-                                </div>
-                                {#if hasPermission('activities.index') || item.url}
-                                    <div class="kt-menu-separator"></div>
-                                {/if}
-                                {#if hasPermission('activities.index')}
-                                    <div class="kt-menu-item">
-                                        <button class="kt-menu-link" data-dropdown-dismiss onclick={() => showActivity(item)}>
-                                            <span class="kt-menu-icon"><i class="ki-filled ki-time"></i></span>
-                                            <span class="kt-menu-title">Activity</span>
-                                        </button>
-                                    </div>
-                                {/if}
-                                {#if item.url}
-                                    <div class="kt-menu-item">
-                                        <a class="kt-menu-link" href={item.url} target="_blank" rel="noreferrer" data-dropdown-dismiss>
-                                            <span class="kt-menu-icon"><i class="ki-filled ki-exit-right"></i></span>
-                                            <span class="kt-menu-title">Open file</span>
-                                        </a>
-                                    </div>
-                                {/if}
-                            </Dropdown>
+                        <div class="absolute end-2 top-2 z-10 rounded-md bg-background/90 shadow-sm opacity-0 transition-opacity group-hover:opacity-100">
+                            <RowActions actions={[
+                                { icon: 'ki-eye', label: 'View', onclick: () => view(item) },
+                                hasPermission('activities.index') && { icon: 'ki-time', label: 'Activity', onclick: () => showActivity(item) },
+                                item.url && { icon: 'ki-exit-right', label: 'Open file', onclick: () => window.open(item.url, '_blank', 'noopener,noreferrer') },
+                            ].filter(Boolean)} />
                         </div>
                         <button
                             type="button"

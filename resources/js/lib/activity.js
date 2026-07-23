@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -38,6 +38,8 @@ export const LOG_NAME_LABELS = {
     'api-keys': 'API keys',
     media: 'Media',
     integrations: 'Integrations',
+    notifications: 'Notifications',
+    'notification-groups': 'Notification groups',
     auth: 'Authentication',
 };
 
@@ -49,6 +51,9 @@ export const SUBJECT_TYPE_LABELS = {
     api_key: 'API key',
     media: 'File',
     integration: 'Integration',
+    notification: 'Notification',
+    notification_group: 'Notification group',
+    notification_type: 'Notification type',
 };
 
 /** Generic fallback wording, used when there is no per-module message below. */
@@ -107,6 +112,20 @@ const ACTIVITY_MESSAGES = {
         created: 'Added the provider :name',
         updated: 'Updated the provider :name',
         deleted: 'Deleted the provider :name',
+    },
+    notifications: {
+        created: 'Created the notification :name',
+        deleted: 'Deleted the notification :name',
+        attached: 'Delivered to :name',
+        detached: 'Removed from :name',
+    },
+    // attach/detach cover both pivots on a group (types and members).
+    'notification-groups': {
+        created: 'Created the group :name',
+        updated: 'Updated the group :name',
+        deleted: 'Deleted the group :name',
+        attached: 'Added :name to the group',
+        detached: 'Removed :name from the group',
     },
     auth: {
         login: ':name signed in',

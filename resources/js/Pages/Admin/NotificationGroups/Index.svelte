@@ -5,9 +5,10 @@
     import DataTable from '@/components/data/DataTable.svelte';
     import SearchBar from '@/components/data/SearchBar.svelte';
     import Badge from '@/components/ui/Badge.svelte';
-    import Dropdown from '@/components/ui/Dropdown.svelte';
     import IdBadge from '@/components/data/IdBadge.svelte';
+    import RowActions from '@/components/data/RowActions.svelte';
     import DetailDrawer from '@/components/data/DetailDrawer.svelte';
+    import ActivityDrawer from '@/components/activity/ActivityDrawer.svelte';
     import NotificationGroupForm from './NotificationGroupForm.svelte';
     import MembersDrawer from './MembersDrawer.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
@@ -24,6 +25,8 @@
     let membersGroup = $state(null);
     let viewOpen = $state(false);
     let viewing = $state(null);
+    let activityOpen = $state(false);
+    let activityRow = $state(null);
 
     const columns = [
         { key: 'id', label: 'ID', sortable: true, width: '90px', truncate: false },
@@ -40,6 +43,7 @@
     const saved = () => { closeForm(); list.refresh(); };
     const manageMembers = (g) => { membersGroup = g; membersOpen = true; };
     const view = (g) => { viewing = g; viewOpen = true; };
+    const showActivity = (g) => { activityRow = g; activityOpen = true; };
 
     async function remove(g) {
         if (!(await confirm({ body: 'Delete this group? Its memberships are removed. This cannot be undone.', variant: 'destructive' }))) return;
@@ -73,6 +77,7 @@
         createdAt={viewing?.created_at}
         updatedAt={viewing?.updated_at}
     />
+    <ActivityDrawer bind:open={activityOpen} subjectType="notification_group" subjectId={activityRow?.id} title={activityRow?.name} />
 </AdminLayout>
 
 {#snippet toolbar(inForm)}
@@ -135,39 +140,11 @@
 {/snippet}
 
 {#snippet rowActions(row)}
-    <Dropdown>
-        {#snippet trigger()}
-            <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" aria-label="Actions"><i class="ki-filled ki-dots-vertical"></i></button>
-        {/snippet}
-        <div class="kt-menu-item">
-            <button class="kt-menu-link" data-dropdown-dismiss onclick={() => view(row)}>
-                <span class="kt-menu-icon"><i class="ki-filled ki-eye"></i></span><span class="kt-menu-title">View</span>
-            </button>
-        </div>
-        {#if hasPermission('notification-groups.update')}
-            <div class="kt-menu-item">
-                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => edit(row)}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-pencil"></i></span><span class="kt-menu-title">Edit</span>
-                </button>
-            </div>
-        {/if}
-
-        <!-- what hangs off it -->
-        {#if hasPermission('notification-group-users.index')}
-            <div class="kt-menu-separator"></div>
-            <div class="kt-menu-item">
-                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => manageMembers(row)}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-people"></i></span><span class="kt-menu-title">Manage members</span>
-                </button>
-            </div>
-        {/if}
-        {#if hasPermission('notification-groups.destroy')}
-            <div class="kt-menu-separator"></div>
-            <div class="kt-menu-item">
-                <button class="kt-menu-link text-destructive" data-dropdown-dismiss onclick={() => remove(row)}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-trash"></i></span><span class="kt-menu-title">Delete</span>
-                </button>
-            </div>
-        {/if}
-    </Dropdown>
+    <RowActions actions={[
+        { icon: 'ki-eye', label: 'View', onclick: () => view(row) },
+        hasPermission('notification-groups.update') && { icon: 'ki-pencil', label: 'Edit', onclick: () => edit(row) },
+        hasPermission('activities.index') && { icon: 'ki-time', label: 'Activity', onclick: () => showActivity(row) },
+        hasPermission('notification-group-users.index') && { icon: 'ki-people', label: 'Manage members', onclick: () => manageMembers(row) },
+        hasPermission('notification-groups.destroy') && { icon: 'ki-trash', label: 'Delete', onclick: () => remove(row), variant: 'destructive' },
+    ].filter(Boolean)} />
 {/snippet}

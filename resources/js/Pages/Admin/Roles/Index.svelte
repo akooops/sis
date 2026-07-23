@@ -9,8 +9,8 @@
     import ExportButton from '@/components/data/ExportButton.svelte';
     import Badge from '@/components/ui/Badge.svelte';
     import DateTime from '@/components/ui/DateTime.svelte';
-    import Dropdown from '@/components/ui/Dropdown.svelte';
     import IdBadge from '@/components/data/IdBadge.svelte';
+    import RowActions from '@/components/data/RowActions.svelte';
     import DetailDrawer from '@/components/data/DetailDrawer.svelte';
     import ActivityDrawer from '@/components/activity/ActivityDrawer.svelte';
     import RoleForm from './RoleForm.svelte';
@@ -49,18 +49,6 @@
     ];
 
     const filterConfig = [];
-
-    /**
-     * Which menu groups have anything in them. The first group always does
-     * (View), so only the rest need checking — a separator before an empty group
-     * is a line to nowhere.
-     */
-    function menuGroups() {
-        return {
-            related: hasPermission('activities.index') || hasPermission('role-permissions.index'),
-            danger: hasPermission('roles.destroy'),
-        };
-    }
 
     const create = () => { editing = null; showForm = true; };
     const edit = (r) => { editing = r; showForm = true; };
@@ -148,33 +136,11 @@
 {/snippet}
 
 {#snippet rowActions(row)}
-    {@const g = menuGroups()}
-    <Dropdown>
-        {#snippet trigger()}
-            <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" aria-label="Actions"><i class="ki-filled ki-dots-vertical"></i></button>
-        {/snippet}
-
-        <!-- the record itself -->
-        <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => view(row)}><span class="kt-menu-icon"><i class="ki-filled ki-eye"></i></span><span class="kt-menu-title">View</span></button></div>
-        {#if hasPermission('roles.update')}
-            <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => edit(row)}><span class="kt-menu-icon"><i class="ki-filled ki-pencil"></i></span><span class="kt-menu-title">Edit</span></button></div>
-        {/if}
-
-        <!-- what hangs off it -->
-        {#if g.related}
-            <div class="kt-menu-separator"></div>
-            {#if hasPermission('activities.index')}
-                <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => showActivity(row)}><span class="kt-menu-icon"><i class="ki-filled ki-time"></i></span><span class="kt-menu-title">Activity</span></button></div>
-            {/if}
-            {#if hasPermission('role-permissions.index')}
-                <div class="kt-menu-item"><button class="kt-menu-link" data-dropdown-dismiss onclick={() => managePerms(row)}><span class="kt-menu-icon"><i class="ki-filled ki-key"></i></span><span class="kt-menu-title">Manage permissions</span></button></div>
-            {/if}
-        {/if}
-
-        <!-- destroys it: on its own, away from Edit -->
-        {#if g.danger}
-            <div class="kt-menu-separator"></div>
-            <div class="kt-menu-item"><button class="kt-menu-link text-destructive" data-dropdown-dismiss onclick={() => remove(row)}><span class="kt-menu-icon"><i class="ki-filled ki-trash"></i></span><span class="kt-menu-title">Delete</span></button></div>
-        {/if}
-    </Dropdown>
+    <RowActions actions={[
+        { icon: 'ki-eye', label: 'View', onclick: () => view(row) },
+        hasPermission('roles.update') && { icon: 'ki-pencil', label: 'Edit', onclick: () => edit(row) },
+        hasPermission('activities.index') && { icon: 'ki-time', label: 'Activity', onclick: () => showActivity(row) },
+        hasPermission('role-permissions.index') && { icon: 'ki-key', label: 'Manage permissions', onclick: () => managePerms(row) },
+        hasPermission('roles.destroy') && { icon: 'ki-trash', label: 'Delete', onclick: () => remove(row), variant: 'destructive' },
+    ].filter(Boolean)} />
 {/snippet}

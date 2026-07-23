@@ -15,7 +15,7 @@
     import IdBadge from '@/components/data/IdBadge.svelte';
     import DetailDrawer from '@/components/data/DetailDrawer.svelte';
     import Badge from '@/components/ui/Badge.svelte';
-    import Dropdown from '@/components/ui/Dropdown.svelte';
+    import RowActions from '@/components/data/RowActions.svelte';
     import { router } from '@inertiajs/svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
     import { api } from '@/lib/api/client';
@@ -189,34 +189,10 @@
 {/snippet}
 
 {#snippet rowActions(row)}
-    <Dropdown>
-        {#snippet trigger()}
-            <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" aria-label="Actions"><i class="ki-filled ki-dots-vertical"></i></button>
-        {/snippet}
-        <div class="kt-menu-item">
-            <button class="kt-menu-link" data-dropdown-dismiss onclick={() => view(row)}>
-                <span class="kt-menu-icon"><i class="ki-filled ki-eye"></i></span><span class="kt-menu-title">View</span>
-            </button>
-        </div>
-        {#if hasRoute(row.route_name)}
-            <div class="kt-menu-item">
-                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => openLink(row)}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-exit-right-corner"></i></span><span class="kt-menu-title">Open related page</span>
-                </button>
-            </div>
-        {/if}
-        {#if !row.is_read}
-            <div class="kt-menu-item">
-                <button class="kt-menu-link" data-dropdown-dismiss onclick={() => markRead(row)}>
-                    <span class="kt-menu-icon"><i class="ki-filled ki-check"></i></span><span class="kt-menu-title">Mark as read</span>
-                </button>
-            </div>
-        {/if}
-        <div class="kt-menu-separator"></div>
-        <div class="kt-menu-item">
-            <button class="kt-menu-link text-destructive" data-dropdown-dismiss onclick={() => remove(row)}>
-                <span class="kt-menu-icon"><i class="ki-filled ki-trash"></i></span><span class="kt-menu-title">Remove</span>
-            </button>
-        </div>
-    </Dropdown>
+    <RowActions actions={[
+        { icon: 'ki-eye', label: 'View', onclick: () => view(row) },
+        hasRoute(row.route_name) && { icon: 'ki-exit-right-corner', label: 'Open related page', onclick: () => openLink(row) },
+        !row.is_read && { icon: 'ki-check', label: 'Mark as read', onclick: () => markRead(row) },
+        { icon: 'ki-trash', label: 'Remove', onclick: () => remove(row), variant: 'destructive' },
+    ].filter(Boolean)} />
 {/snippet}
