@@ -118,8 +118,18 @@
     const selectedValues = $derived(multiple ? (Array.isArray(value) ? value : []) : value != null && value !== '' ? [value] : []);
 
     function labelFor(val) {
-        return known.get(val) ?? val;
+        return known.get(val) ?? (options ?? []).find((o) => o.value === val)?.label ?? val;
     }
+
+    /** Can we show a real label for this value yet (known map OR static options)? */
+    function hasLabel(val) {
+        return known.has(val) || (options ?? []).some((o) => o.value === val);
+    }
+
+    // Labels may be on their way: a remote resolve in flight, or a static
+    // options array that hasn't been fetched by the parent yet. While pending,
+    // an unlabellable selected value renders as a pulse instead of its raw id.
+    const labelsPending = $derived(resolving || (!isRemote && !(options?.length)));
 
     function isSelected(val) {
         return selectedValues.includes(val);
@@ -245,7 +255,7 @@
                 <!-- max-w-full + a truncating label: one long option must not be
                      able to widen the field past the form it sits in. -->
                 <span class="kt-badge kt-badge-sm kt-badge-outline kt-badge-primary max-w-full">
-                    {#if resolving && !known.has(val)}
+                    {#if labelsPending && !hasLabel(val)}
                         <span class="inline-block h-3 w-16 animate-pulse rounded bg-muted"></span>
                     {:else}
                         <span class="min-w-0 truncate" title={labelFor(val)}>{labelFor(val)}</span>
@@ -257,7 +267,7 @@
             {/each}
         </div>
     {:else if !multiple && hasValue}
-        {#if resolving && !known.has(value)}
+        {#if labelsPending && !hasLabel(value)}
             <span class="min-w-0 grow"><span class="block h-4 w-28 animate-pulse rounded bg-muted"></span></span>
         {:else}
             <span class="min-w-0 grow truncate text-mono" title={labelFor(value)}>{labelFor(value)}</span>
