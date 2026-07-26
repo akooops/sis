@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -40,6 +40,8 @@ export const LOG_NAME_LABELS = {
     integrations: 'Integrations',
     notifications: 'Notifications',
     'notification-groups': 'Notification groups',
+    languages: 'Languages',
+    translations: 'Translations',
     auth: 'Authentication',
 };
 
@@ -54,6 +56,8 @@ export const SUBJECT_TYPE_LABELS = {
     notification: 'Notification',
     notification_group: 'Notification group',
     notification_type: 'Notification type',
+    language: 'Language',
+    translation_key: 'Translation key',
 };
 
 /** Generic fallback wording, used when there is no per-module message below. */
@@ -126,6 +130,16 @@ const ACTIVITY_MESSAGES = {
         deleted: 'Deleted the group :name',
         attached: 'Added :name to the group',
         detached: 'Removed :name from the group',
+    },
+    languages: {
+        created: 'Added the language :name',
+        updated: 'Updated the language :name',
+        deleted: 'Deleted the language :name',
+    },
+    // Subject is the TranslationKey, so one drawer shows a key's history across
+    // every locale — :locale is what tells the rows apart.
+    translations: {
+        updated: 'Updated the :locale translation of :name',
     },
     auth: {
         login: ':name signed in',

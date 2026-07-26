@@ -97,9 +97,22 @@
         </button>
     </div>
 
-    <div class="kt-sidebar-content flex grow shrink-0 py-5 pe-2 overflow-hidden" id="sidebar_content">
-        <div class="grow shrink-0 flex flex-col ps-2 lg:ps-5 pe-1 lg:pe-3 overflow-y-auto" id="sidebar_scrollable">
-            <div class="kt-menu flex flex-col grow gap-1" id="sidebar_menu">
+    <!--
+        min-h-0 on both, and NOT shrink-0: a flex child defaults to min-height
+        auto, so a menu taller than the screen refuses to shrink and simply gets
+        clipped by the overflow-hidden above. min-h-0 lets it be constrained,
+        which is what finally gives #sidebar_scrollable something to scroll.
+    -->
+    <div class="kt-sidebar-content flex grow min-h-0 py-5 pe-2 overflow-hidden" id="sidebar_content">
+        <div class="grow min-h-0 flex flex-col ps-2 lg:ps-5 pe-1 lg:pe-3 overflow-y-auto" id="sidebar_scrollable">
+            <!--
+                shrink-0 is the other half of it: as a flex item the menu would
+                otherwise be squashed to fit and spill its rows out invisibly,
+                leaving the scroll container with a scrollHeight equal to its own
+                height — i.e. nothing to scroll. Keeping its natural height is
+                what actually produces the scrollbar.
+            -->
+            <div class="kt-menu flex flex-col shrink-0 gap-1" id="sidebar_menu">
                 {#each visibleMenu as node (node.label)}
                     {#if node.children}
                         <!-- Accordion group -->

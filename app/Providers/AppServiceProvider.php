@@ -7,6 +7,7 @@ use App\Models\ApiKey;
 use App\Models\ApiKeyPermission;
 use App\Models\Media;
 use App\Models\Integration;
+use App\Models\Language;
 use App\Models\Notification;
 use App\Models\NotificationGroup;
 use App\Models\NotificationGroupNotificationType;
@@ -22,6 +23,7 @@ use App\Observers\ApiKeyObserver;
 use App\Observers\ApiKeyPermissionObserver;
 use App\Observers\MediaObserver;
 use App\Observers\IntegrationObserver;
+use App\Observers\LanguageObserver;
 use App\Observers\NotificationGroupNotificationTypeObserver;
 use App\Observers\NotificationGroupObserver;
 use App\Observers\NotificationGroupUserObserver;
@@ -34,6 +36,7 @@ use App\Observers\UserObserver;
 use App\Observers\UserRoleObserver;
 use App\Services\Integrations\Registry;
 use App\Services\Sessions\SessionHandler;
+use App\Services\Translations\TranslationService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session as SessionFacade;
@@ -50,6 +53,10 @@ class AppServiceProvider extends ServiceProvider
     {
         // One registry instance per request — it caches the resolved driver map.
         $this->app->singleton(Registry::class);
+
+        // Likewise one translation service per request — it memoises the lang
+        // files it has read, so a page of keys costs one read per group.
+        $this->app->singleton(TranslationService::class);
     }
 
     /**
@@ -75,6 +82,7 @@ class AppServiceProvider extends ServiceProvider
         NotificationGroupNotificationType::observe(NotificationGroupNotificationTypeObserver::class);
         NotificationGroupUser::observe(NotificationGroupUserObserver::class);
         NotificationUser::observe(NotificationUserObserver::class);
+        Language::observe(LanguageObserver::class);
     }
 
     /**

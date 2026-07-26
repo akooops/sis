@@ -37,6 +37,8 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('integrations', [AdminPagesController::class, 'integrations'])->middleware('verify.permissions:integrations.index')->name('web.admin.integrations.index');
     Route::get('notifications', [AdminPagesController::class, 'notifications'])->name('web.admin.notifications.index');
     Route::get('notification-groups', [AdminPagesController::class, 'notificationGroups'])->middleware('verify.permissions:notification-groups.index')->name('web.admin.notification-groups.index');
+    Route::get('languages', [AdminPagesController::class, 'languages'])->middleware('verify.permissions:languages.index')->name('web.admin.languages.index');
+    Route::get('translations', [AdminPagesController::class, 'translations'])->middleware('verify.permissions:translations.index')->name('web.admin.translations.index');
 });
 
 /*------------------------

@@ -56,4 +56,14 @@ class PagesController extends Controller
     {
         return inertia('Admin/NotificationGroups/Index');
     }
+
+    public function languages(): Response
+    {
+        return inertia('Admin/Languages/Index');
+    }
+
+    public function translations(): Response
+    {
+        return inertia('Admin/Translations/Index');
+    }
 }

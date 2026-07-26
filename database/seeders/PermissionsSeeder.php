@@ -36,6 +36,16 @@ class PermissionsSeeder extends Seeder
             ['code' => 'notification-group-users.index', 'name' => 'View group members', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'notification-group-users.store', 'name' => 'Add group members', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'notification-group-users.destroy', 'name' => 'Remove group members', 'supports_web' => true, 'supports_api' => false],
+
+            // Languages + translations. The read-only key registry is gated by
+            // translations.index — it has no codes of its own.
+            ['code' => 'languages.index', 'name' => 'View languages', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'languages.store', 'name' => 'Create languages', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'languages.update', 'name' => 'Update languages', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'languages.destroy', 'name' => 'Delete languages', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'translations.index', 'name' => 'View translations', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'translations.update', 'name' => 'Update translations', 'supports_web' => true, 'supports_api' => false],
         ];
 
         foreach ($permissions as $permission) {

@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             IntegrationTypesSeeder::class,
             IntegrationDriversSeeder::class,
             NotificationTypesSeeder::class,
+            LanguagesSeeder::class,
+            TranslationKeysSeeder::class,
         ]);
 
         if (app()->environment('local')) {

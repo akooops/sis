@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\MediaController;
 use App\Http\Controllers\Api\Admin\IntegrationsController;
 use App\Http\Controllers\Api\Admin\IntegrationTypesController;
+use App\Http\Controllers\Api\Admin\LanguagesController;
 use App\Http\Controllers\Api\Admin\NotificationGroupsController;
 use App\Http\Controllers\Api\Admin\NotificationGroupUsersController;
 use App\Http\Controllers\Api\Admin\NotificationsController;
@@ -15,6 +16,8 @@ use App\Http\Controllers\Api\Admin\PermissionsController;
 use App\Http\Controllers\Api\Admin\RolePermissionsController;
 use App\Http\Controllers\Api\Admin\RolesController;
 use App\Http\Controllers\Api\Admin\SessionsController;
+use App\Http\Controllers\Api\Admin\TranslationKeysController;
+use App\Http\Controllers\Api\Admin\TranslationsController;
 use App\Http\Controllers\Api\Admin\UserRolesController;
 use App\Http\Controllers\Api\Admin\UsersController;
 use Illuminate\Support\Facades\Route;
@@ -129,5 +132,20 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::get('notification-group-users/{notificationGroup}', [NotificationGroupUsersController::class, 'index'])->middleware('verify.permissions:notification-group-users.index')->name('api.v1.admin.notification-group-users.index');
         Route::post('notification-group-users/{notificationGroup}', [NotificationGroupUsersController::class, 'store'])->middleware('verify.permissions:notification-group-users.store')->name('api.v1.admin.notification-group-users.store');
         Route::delete('notification-group-users/{notificationGroupUser}', [NotificationGroupUsersController::class, 'destroy'])->middleware('verify.permissions:notification-group-users.destroy')->name('api.v1.admin.notification-group-users.destroy');
+
+        // Languages
+        Route::get('languages', [LanguagesController::class, 'index'])->middleware('verify.permissions:languages.index')->name('api.v1.admin.languages.index');
+        Route::get('languages/{language}', [LanguagesController::class, 'show'])->middleware('verify.permissions:languages.index')->name('api.v1.admin.languages.show');
+        Route::post('languages', [LanguagesController::class, 'store'])->middleware('verify.permissions:languages.store')->name('api.v1.admin.languages.store');
+        Route::put('languages/{language}', [LanguagesController::class, 'update'])->middleware('verify.permissions:languages.update')->name('api.v1.admin.languages.update');
+        Route::delete('languages/{language}', [LanguagesController::class, 'destroy'])->middleware('verify.permissions:languages.destroy')->name('api.v1.admin.languages.destroy');
+
+        // Translation keys
+        Route::get('translation-keys', [TranslationKeysController::class, 'index'])->middleware('verify.permissions:translations.index')->name('api.v1.admin.translation-keys.index');
+        Route::get('translation-key-groups', [TranslationKeysController::class, 'groups'])->middleware('verify.permissions:translations.index')->name('api.v1.admin.translation-key-groups.index');
+
+        // Translations
+        Route::get('translations/{language}', [TranslationsController::class, 'index'])->middleware('verify.permissions:translations.index')->name('api.v1.admin.translations.index');
+        Route::put('translations/{language}/{translationKey}', [TranslationsController::class, 'update'])->middleware('verify.permissions:translations.update')->name('api.v1.admin.translations.update');
     });
 });

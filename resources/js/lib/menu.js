@@ -5,8 +5,9 @@
  * Items are permission-gated; empty groups are hidden.
  *
  * Ordered by proximity to the signed-in admin: their own stuff (Personal),
- * then who can do what (Access), then what the app holds (Content), then how
- * it is wired and watched (System).
+ * then the languages the content is written in (Localisation), then what the
+ * app holds (Content), then who can do what (Access), then how it is wired and
+ * watched (System).
  */
 export const adminMenu = [
     {
@@ -15,6 +16,14 @@ export const adminMenu = [
         children: [
             { label: 'Dashboard', route: 'web.admin.dashboard' },
             { label: 'Notifications', route: 'web.admin.notifications.index' },
+        ],
+    },
+    {
+        label: 'Localisation',
+        icon: 'ki-filled ki-flag',
+        children: [
+            { label: 'Languages', route: 'web.admin.languages.index', permission: 'languages.index' },
+            { label: 'Translations', route: 'web.admin.translations.index', permission: 'translations.index' },
         ],
     },
     {
