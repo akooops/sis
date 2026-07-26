@@ -1,5 +1,11 @@
 <script>
-    /** Articles index — news items with a publish workflow and per-locale copy. */
+    /**
+     * Achievements index.
+     *
+     * Two independent timelines: `published_at` is when the listing goes live,
+     * `achieved_at` is when the thing happened. The table shows the latter and
+     * sorts by it, because that is what an editor scans for.
+     */
     import AdminLayout from '@/layouts/AdminLayout.svelte';
     import IndexCard from '@/components/data/IndexCard.svelte';
     import DataTable from '@/components/data/DataTable.svelte';
@@ -13,15 +19,15 @@
     import RowActions from '@/components/data/RowActions.svelte';
     import DetailDrawer from '@/components/data/DetailDrawer.svelte';
     import ActivityDrawer from '@/components/activity/ActivityDrawer.svelte';
-    import ArticleForm from './ArticleForm.svelte';
+    import AchievementForm from './AchievementForm.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
-    import { ARTICLE_STATUS_LABELS, ARTICLE_STATUS_VARIANTS } from '@/lib/article';
+    import { ACHIEVEMENT_STATUS_LABELS, ACHIEVEMENT_STATUS_VARIANTS } from '@/lib/achievement';
     import { hasPermission } from '@/lib/permissions';
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
     import { confirm } from '@/lib/confirm';
 
-    const list = useIndex('api.v1.admin.articles.index', { perPage: 15, sort: '-created_at' });
+    const list = useIndex('api.v1.admin.achievements.index', { perPage: 15, sort: '-achieved_at' });
 
     let showForm = $state(false);
     let editing = $state(null);
@@ -36,8 +42,8 @@
         { key: 'name', label: 'Name', sortable: true, truncate: false },
         { key: 'slug', label: 'Slug', sortable: true, truncate: false },
         { key: 'category_name', label: 'Category', truncate: false },
+        { key: 'achieved_at', label: 'Achieved', sortable: true, truncate: false },
         { key: 'status', label: 'Status', sortable: true, truncate: false },
-        { key: 'published_at', label: 'Published', sortable: true, truncate: false },
     ];
 
     // Mirrors the controller's allowedSorts.
@@ -47,6 +53,7 @@
         { value: 'slug', label: 'Slug' },
         { value: 'status', label: 'Status' },
         { value: 'published_at', label: 'Published' },
+        { value: 'achieved_at', label: 'Achieved' },
         { value: 'created_at', label: 'Created' },
     ];
 
@@ -56,8 +63,11 @@
             key: 'status',
             type: 'select',
             label: 'Status',
-            options: Object.entries(ARTICLE_STATUS_LABELS).map(([value, label]) => ({ value, label })),
+            options: Object.entries(ACHIEVEMENT_STATUS_LABELS).map(([value, label]) => ({ value, label })),
         },
+        // A daterange submits <key>_from / <key>_to - pairs with the
+        // controller's achieved_from / achieved_to filters.
+        { key: 'achieved', type: 'daterange', label: 'Achieved between' },
     ];
 
     const create = () => { editing = null; showForm = true; };
@@ -73,7 +83,7 @@
             variant: 'destructive',
         }))) return;
         try {
-            await api.delete(route('api.v1.admin.articles.destroy', a.id));
+            await api.delete(route('api.v1.admin.achievements.destroy', a.id));
             toast.success('Deleted successfully.');
             list.refresh();
         } catch (e) {
@@ -82,9 +92,9 @@
     }
 </script>
 
-<svelte:head><title>Saud International Schools — Articles</title></svelte:head>
+<svelte:head><title>Saud International Schools — Achievements</title></svelte:head>
 
-<AdminLayout title="Articles">
+<AdminLayout title="Achievements">
     <IndexCard {showForm} {toolbar} {form} {table} />
 
     <Filters
@@ -97,32 +107,33 @@
     />
     <DetailDrawer
         bind:open={viewOpen}
-        title="Article"
+        title="Achievement"
         id={viewing?.id}
         avatar={{ src: viewing?.thumbnail_url, name: viewing?.name }}
         heading={viewing?.name}
-        badge={viewing ? { label: ARTICLE_STATUS_LABELS[viewing.status] ?? viewing.status, variant: ARTICLE_STATUS_VARIANTS[viewing.status] ?? 'secondary' } : null}
+        badge={viewing ? { label: ACHIEVEMENT_STATUS_LABELS[viewing.status] ?? viewing.status, variant: ACHIEVEMENT_STATUS_VARIANTS[viewing.status] ?? 'secondary' } : null}
         fields={[
             { label: 'Slug', value: viewing?.slug },
             { label: 'Category', value: viewing?.category_name || '—' },
+            { label: 'Achieved on', value: viewing?.achieved_at ?? '—' },
             { label: 'Published at', value: viewing?.published_at ?? '—' },
             { label: 'Stylesheet', value: viewing?.css_url || '—' },
         ]}
         createdAt={viewing?.created_at}
         updatedAt={viewing?.updated_at}
     />
-    <ActivityDrawer bind:open={activityOpen} subjectType="article" subjectId={activityRow?.id} title={activityRow?.name} />
+    <ActivityDrawer bind:open={activityOpen} subjectType="achievement" subjectId={activityRow?.id} title={activityRow?.name} />
 </AdminLayout>
 
 {#snippet toolbar(inForm)}
     {#if !inForm}
         <div class="flex items-center gap-2">
-            <SearchBar placeholder="Search articles…" value={list.search} onsearch={(v) => list.setSearch(v)} />
+            <SearchBar placeholder="Search achievements…" value={list.search} onsearch={(v) => list.setSearch(v)} />
             <FilterButton count={list.activeFilters} onclick={() => (filtersOpen = true)} />
         </div>
-        {#if hasPermission('articles.store')}
+        {#if hasPermission('achievements.store')}
             <button class="kt-btn kt-btn-sm kt-btn-primary" onclick={create}>
-                <i class="ki-filled ki-plus"></i>Add article
+                <i class="ki-filled ki-plus"></i>Add achievement
             </button>
         {/if}
     {:else}
@@ -135,7 +146,7 @@
 <!-- `ready` comes from IndexCard: false while the fly transition runs, so the
      editor doesn't measure itself inside a transformed box. -->
 {#snippet form(ready)}
-    <ArticleForm article={editing} {ready} onsaved={saved} oncancel={closeForm} />
+    <AchievementForm achievement={editing} {ready} onsaved={saved} oncancel={closeForm} />
 {/snippet}
 
 {#snippet table()}
@@ -149,8 +160,8 @@
         onPageChange={list.goToPage}
         onPerPageChange={list.setPerPage}
         onRowClick={view}
-        emptyTitle="No articles yet"
-        emptyBody="Create an article to get started."
+        emptyTitle="No achievements yet"
+        emptyBody="Create an achievement to get started."
         {cells}
         {rowActions}
     />
@@ -180,9 +191,19 @@
         {:else}
             <span class="text-xs text-muted-foreground">—</span>
         {/if}
+    {:else if column.key === 'category_name'}
+        {#if row.category_name}
+            <Badge variant="primary">
+                <ClampText value={row.category_name} maxWidth="140px" title={row.category_name} />
+            </Badge>
+        {:else}
+            <span class="text-xs text-muted-foreground">-</span>
+        {/if}
+    {:else if column.key === 'achieved_at'}
+        <DateTime value={row.achieved_at} />
     {:else if column.key === 'status'}
-        <Badge variant={ARTICLE_STATUS_VARIANTS[row.status] ?? 'secondary'}>
-            {ARTICLE_STATUS_LABELS[row.status] ?? row.status}
+        <Badge variant={ACHIEVEMENT_STATUS_VARIANTS[row.status] ?? 'secondary'}>
+            {ACHIEVEMENT_STATUS_LABELS[row.status] ?? row.status}
         </Badge>
     {:else if column.key === 'published_at'}
         {#if row.published_at}<DateTime value={row.published_at} />{:else}<span class="text-xs text-muted-foreground">—</span>{/if}
@@ -194,8 +215,8 @@
 {#snippet rowActions(row)}
     <RowActions actions={[
         { icon: 'ki-eye', label: 'View', onclick: () => view(row) },
-        hasPermission('articles.update') && { icon: 'ki-pencil', label: 'Edit', onclick: () => edit(row) },
+        hasPermission('achievements.update') && { icon: 'ki-pencil', label: 'Edit', onclick: () => edit(row) },
         hasPermission('activities.index') && { icon: 'ki-time', label: 'Activity', onclick: () => showActivity(row) },
-        hasPermission('articles.destroy') && { icon: 'ki-trash', label: 'Delete', onclick: () => remove(row), variant: 'destructive' },
+        hasPermission('achievements.destroy') && { icon: 'ki-trash', label: 'Delete', onclick: () => remove(row), variant: 'destructive' },
     ].filter(Boolean)} />
 {/snippet}

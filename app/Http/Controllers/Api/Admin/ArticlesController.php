@@ -24,10 +24,11 @@ class ArticlesController extends ApiController
     public function index(): JsonResponse
     {
         $articles = QueryBuilder::for(Article::class)
-            ->with('media')
+            ->with(['media', 'category'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('status'),
+                AllowedFilter::exact('category_id'),
                 $this->searchTranslations(
                     ['id', 'name', 'slug'],
                     ['title', 'description'],
@@ -54,6 +55,7 @@ class ArticlesController extends ApiController
         $article = Article::create([
             'name' => $data->name,
             'slug' => $data->slug,
+            'category_id' => $data->category_id,
             'title' => [$default => $data->title],
             'description' => [$default => $data->description],
             'content' => [$default => $data->content],

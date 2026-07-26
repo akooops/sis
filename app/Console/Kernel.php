@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('articles:publish-scheduled')->everyMinute()->withoutOverlapping();
         $schedule->command('albums:publish-scheduled')->everyMinute()->withoutOverlapping();
         $schedule->command('events:publish-scheduled')->everyMinute()->withoutOverlapping();
+        $schedule->command('achievements:publish-scheduled')->everyMinute()->withoutOverlapping();
     }
 
     /**

@@ -21,6 +21,8 @@ class ArticleData extends Data
         public string $id,
         public string $name,
         public string $slug,
+        public ?string $category_id,
+        public ?string $category_name,
         /** @var array<string, string|null> */
         public array $title,
         /** @var array<string, string|null> */
@@ -44,6 +46,10 @@ class ArticleData extends Data
             id: $article->id,
             name: $article->name,
             slug: $article->slug,
+            category_id: $article->category_id,
+            // Flattened rather than a nested object: the table renders a name and
+            // the picker only needs the id, so a relation DTO would be ceremony.
+            category_name: $article->category?->name,
             title: $article->getTranslations('title'),
             description: $article->getTranslations('description'),
             content: $article->getTranslations('content'),

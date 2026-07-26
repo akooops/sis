@@ -86,4 +86,14 @@ class PagesController extends Controller
     {
         return inertia('Admin/Events/Index');
     }
+
+    public function categories(): Response
+    {
+        return inertia('Admin/Categories/Index');
+    }
+
+    public function achievements(): Response
+    {
+        return inertia('Admin/Achievements/Index');
+    }
 }

@@ -1,16 +1,18 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\AchievementsController;
 use App\Http\Controllers\Api\Admin\ActivitiesController;
 use App\Http\Controllers\Api\Admin\AlbumsController;
 use App\Http\Controllers\Api\Admin\ApiKeyPermissionsController;
 use App\Http\Controllers\Api\Admin\ApiKeysController;
 use App\Http\Controllers\Api\Admin\ArticlesController;
 use App\Http\Controllers\Api\Admin\AuthController;
+use App\Http\Controllers\Api\Admin\CategoriesController;
 use App\Http\Controllers\Api\Admin\EventsController;
-use App\Http\Controllers\Api\Admin\MediaController;
 use App\Http\Controllers\Api\Admin\IntegrationsController;
 use App\Http\Controllers\Api\Admin\IntegrationTypesController;
 use App\Http\Controllers\Api\Admin\LanguagesController;
+use App\Http\Controllers\Api\Admin\MediaController;
 use App\Http\Controllers\Api\Admin\NotificationGroupsController;
 use App\Http\Controllers\Api\Admin\NotificationGroupUsersController;
 use App\Http\Controllers\Api\Admin\NotificationsController;
@@ -96,7 +98,7 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::get('media', [MediaController::class, 'index'])->middleware('verify.permissions:media.index')->name('api.v1.admin.media.index');
         Route::patch('media/{media}/detach', [MediaController::class, 'detach'])->middleware('verify.permissions:media.detach')->name('api.v1.admin.media.detach');
 
-        // Activities 
+        // Activities
         Route::get('activities', [ActivitiesController::class, 'index'])->middleware('verify.permissions:activities.index')->name('api.v1.admin.activities.index');
 
         // API Key Permissions
@@ -115,7 +117,7 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::delete('integrations/{integration}', [IntegrationsController::class, 'destroy'])->middleware('verify.permissions:integrations.destroy')->name('api.v1.admin.integrations.destroy');
         Route::patch('integrations/{integration}/toggle', [IntegrationsController::class, 'toggle'])->middleware('verify.permissions:integrations.update')->name('api.v1.admin.integrations.toggle');
 
-        // Notifications 
+        // Notifications
         Route::get('notification', [NotificationsController::class, 'index'])->name('api.v1.admin.notifications.index');
         Route::get('notification/unread-count', [NotificationsController::class, 'unreadCount'])->name('api.v1.admin.notifications.unread-count');
         Route::post('notification/read-all', [NotificationsController::class, 'markAllRead'])->name('api.v1.admin.notifications.read-all');
@@ -179,5 +181,19 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('events', [EventsController::class, 'store'])->middleware('verify.permissions:events.store')->name('api.v1.admin.events.store');
         Route::put('events/{event}', [EventsController::class, 'update'])->middleware('verify.permissions:events.update')->name('api.v1.admin.events.update');
         Route::delete('events/{event}', [EventsController::class, 'destroy'])->middleware('verify.permissions:events.destroy')->name('api.v1.admin.events.destroy');
+
+        // Categories
+        Route::get('categories', [CategoriesController::class, 'index'])->middleware('verify.permissions:categories.index')->name('api.v1.admin.categories.index');
+        Route::get('categories/{category}', [CategoriesController::class, 'show'])->middleware('verify.permissions:categories.index')->name('api.v1.admin.categories.show');
+        Route::post('categories', [CategoriesController::class, 'store'])->middleware('verify.permissions:categories.store')->name('api.v1.admin.categories.store');
+        Route::put('categories/{category}', [CategoriesController::class, 'update'])->middleware('verify.permissions:categories.update')->name('api.v1.admin.categories.update');
+        Route::delete('categories/{category}', [CategoriesController::class, 'destroy'])->middleware('verify.permissions:categories.destroy')->name('api.v1.admin.categories.destroy');
+
+        // Achievements
+        Route::get('achievements', [AchievementsController::class, 'index'])->middleware('verify.permissions:achievements.index')->name('api.v1.admin.achievements.index');
+        Route::get('achievements/{achievement}', [AchievementsController::class, 'show'])->middleware('verify.permissions:achievements.index')->name('api.v1.admin.achievements.show');
+        Route::post('achievements', [AchievementsController::class, 'store'])->middleware('verify.permissions:achievements.store')->name('api.v1.admin.achievements.store');
+        Route::put('achievements/{achievement}', [AchievementsController::class, 'update'])->middleware('verify.permissions:achievements.update')->name('api.v1.admin.achievements.update');
+        Route::delete('achievements/{achievement}', [AchievementsController::class, 'destroy'])->middleware('verify.permissions:achievements.destroy')->name('api.v1.admin.achievements.destroy');
     });
 });

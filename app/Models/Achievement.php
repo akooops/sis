@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\States\Article\ArticleStatus;
-use App\States\Article\Published;
+use App\States\Achievement\AchievementStatus;
+use App\States\Achievement\Published;
 use App\Traits\Uploads\HasMedia;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -14,16 +14,17 @@ use Spatie\ModelStates\HasStates;
 use Spatie\Translatable\HasTranslations;
 
 /**
- * A news article. Structurally a Page without the is_system lock — nothing about
- * an article is resolved by the app itself, so every one of them is fully
- * editable and deletable.
+ * Something the school achieved: an article that also records when it happened
+ * and who did it.
  *
- * `name` is the internal label an admin scans the list by; `title`,
- * `description` and `content` are translated per locale by
- * spatie/laravel-translatable into JSON columns. That is content, not UI chrome:
- * the UI string catalogue still lives in lang/*.php and is untouched.
+ * Two unrelated timelines, and confusing them is the easy mistake. `published_at`
+ * is when the LISTING goes live; `achieved_at` is when the thing actually
+ * happened. A published achievement is usually long past.
+ *
+ * `done_by` is translatable alongside the copy — a person, team or year group
+ * renders differently per language.
  */
-class Article extends Model
+class Achievement extends Model
 {
     use HasFactory, HasMedia, HasStates, HasTranslations, HasUlids;
 
@@ -41,15 +42,17 @@ class Article extends Model
      *
      * @var array<int, string>
      */
-    public $translatable = ['title', 'description', 'content'];
+    public $translatable = ['title', 'description', 'content', 'done_by'];
 
     protected $guarded = ['id'];
 
     protected $appends = ['thumbnail_url'];
 
     protected $casts = [
-        'status' => ArticleStatus::class,
+        'status' => AchievementStatus::class,
         'published_at' => 'datetime',
+        // A date, not a datetime: nobody records the hour a prize was won.
+        'achieved_at' => 'date',
     ];
 
     /* -----------------------------------------
@@ -74,16 +77,13 @@ class Article extends Model
      4. Methods
     ------------------------------------------*/
 
-    /** Articles the public site may serve. */
+    /** Achievements the public site may serve. */
     public function scopeLive(Builder $query): Builder
     {
         return $query->whereState('status', Published::class);
     }
 
     /**
-     * One thumbnail; `images` is deliberately absent, which is what makes it
-     * multi-file.
-     *
      * @return array<int, string>
      */
     public function singleFileCollections(): array

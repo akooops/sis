@@ -43,6 +43,8 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('articles', [AdminPagesController::class, 'articles'])->middleware('verify.permissions:articles.index')->name('web.admin.articles.index');
     Route::get('albums', [AdminPagesController::class, 'albums'])->middleware('verify.permissions:albums.index')->name('web.admin.albums.index');
     Route::get('events', [AdminPagesController::class, 'events'])->middleware('verify.permissions:events.index')->name('web.admin.events.index');
+    Route::get('categories', [AdminPagesController::class, 'categories'])->middleware('verify.permissions:categories.index')->name('web.admin.categories.index');
+    Route::get('achievements', [AdminPagesController::class, 'achievements'])->middleware('verify.permissions:achievements.index')->name('web.admin.achievements.index');
 });
 
 /*------------------------

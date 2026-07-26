@@ -3,40 +3,44 @@
 namespace App\Providers;
 
 use App\Contracts\Integrations\SendsMail;
+use App\Models\Achievement;
 use App\Models\Album;
 use App\Models\ApiKey;
 use App\Models\ApiKeyPermission;
 use App\Models\Article;
+use App\Models\Category;
 use App\Models\Event;
-use App\Models\Media;
 use App\Models\Integration;
 use App\Models\Language;
+use App\Models\Media;
 use App\Models\Notification;
-use App\Models\Page;
 use App\Models\NotificationGroup;
 use App\Models\NotificationGroupNotificationType;
 use App\Models\NotificationGroupUser;
 use App\Models\NotificationUser;
+use App\Models\Page;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RolePermission;
 use App\Models\Session;
 use App\Models\User;
 use App\Models\UserRole;
+use App\Observers\AchievementObserver;
 use App\Observers\AlbumObserver;
 use App\Observers\ApiKeyObserver;
 use App\Observers\ApiKeyPermissionObserver;
 use App\Observers\ArticleObserver;
+use App\Observers\CategoryObserver;
 use App\Observers\EventObserver;
-use App\Observers\MediaObserver;
 use App\Observers\IntegrationObserver;
 use App\Observers\LanguageObserver;
+use App\Observers\MediaObserver;
 use App\Observers\NotificationGroupNotificationTypeObserver;
-use App\Observers\PageObserver;
 use App\Observers\NotificationGroupObserver;
 use App\Observers\NotificationGroupUserObserver;
 use App\Observers\NotificationObserver;
 use App\Observers\NotificationUserObserver;
+use App\Observers\PageObserver;
 use App\Observers\PermissionObserver;
 use App\Observers\RoleObserver;
 use App\Observers\RolePermissionObserver;
@@ -97,6 +101,8 @@ class AppServiceProvider extends ServiceProvider
         Article::observe(ArticleObserver::class);
         Album::observe(AlbumObserver::class);
         Event::observe(EventObserver::class);
+        Category::observe(CategoryObserver::class);
+        Achievement::observe(AchievementObserver::class);
     }
 
     /**

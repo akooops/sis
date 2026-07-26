@@ -2,9 +2,11 @@
 
 namespace App\Enums;
 
+use App\Models\Achievement;
 use App\Models\Album;
 use App\Models\ApiKey;
 use App\Models\Article;
+use App\Models\Category;
 use App\Models\Event;
 use App\Models\Integration;
 use App\Models\Language;
@@ -44,6 +46,8 @@ enum MorphType: string
     case Article = 'article';
     case Album = 'album';
     case Event = 'event';
+    case Category = 'category';
+    case Achievement = 'achievement';
 
     /** @return class-string */
     public function class(): string
@@ -64,6 +68,8 @@ enum MorphType: string
             self::Article => Article::class,
             self::Album => Album::class,
             self::Event => Event::class,
+            self::Category => Category::class,
+            self::Achievement => Achievement::class,
         };
     }
 

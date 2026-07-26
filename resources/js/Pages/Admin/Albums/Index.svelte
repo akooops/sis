@@ -103,7 +103,7 @@
         badge={viewing ? { label: ALBUM_STATUS_LABELS[viewing.status] ?? viewing.status, variant: ALBUM_STATUS_VARIANTS[viewing.status] ?? 'secondary' } : null}
         fields={[
             { label: 'Slug', value: viewing?.slug },
-            { label: 'Files', value: String(viewing?.files_count ?? 0) },
+            { label: 'Files', value: String(viewing?.files?.length ?? 0) },
             { label: 'Published at', value: viewing?.published_at ?? '—' },
             { label: 'Stylesheet', value: viewing?.css_url || '—' },
         ]}
@@ -173,8 +173,11 @@
             <ClampText value={row.slug} maxWidth="160px" title={row.slug} />
         </Badge>
     {:else if column.key === 'files_count'}
-        <Badge variant={row.files_count ? 'primary' : 'secondary'}>
-            <i class="ki-filled ki-picture me-1"></i>{row.files_count ?? 0}
+        <!-- Counted from `files` rather than a dedicated column: the DTO already
+             ships the gallery, so a separate count would be a second source of
+             truth for the same number. -->
+        <Badge variant={row.files?.length ? 'primary' : 'secondary'}>
+            <i class="ki-filled ki-picture me-1"></i>{row.files?.length ?? 0}
         </Badge>
     {:else if column.key === 'status'}
         <Badge variant={ALBUM_STATUS_VARIANTS[row.status] ?? 'secondary'}>

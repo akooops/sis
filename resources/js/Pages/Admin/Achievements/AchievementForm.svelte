@@ -1,9 +1,9 @@
 <script>
     /**
-     * Article create/edit.
+     * Achievement create/edit.
      *
      * Create asks for the DEFAULT language only — one column, no tabs — because
-     * there is nothing to translate until the article exists. Edit splits into
+     * there is nothing to translate until the achievement exists. Edit splits into
      * [Details | Translations], and Translations nests a tab per enabled language.
      *
      * The HtmlEditor is rendered ONCE, outside the language loop, and its bound
@@ -21,18 +21,18 @@
     import { useForm } from '@/lib/api/useForm.svelte';
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
-    import { ARTICLE_STATUS_LABELS, needsPublishedAt, reachableStatuses } from '@/lib/article';
+    import { ACHIEVEMENT_STATUS_LABELS, needsPublishedAt, reachableStatuses } from '@/lib/achievement';
 
-    let { article = null, ready = true, onsaved, oncancel } = $props();
+    let { achievement = null, ready = true, onsaved, oncancel } = $props();
 
-    const editing = $derived(!!article);
+    const editing = $derived(!!achievement);
 
     let languages = $state([]);
     let activeTab = $state('details');
     let activeLocale = $state(null);
 
     /**
-     * Every image this article has ever linked, as { id, url, name }. Seeded from
+     * Every image this achievement has ever linked, as { id, url, name }. Seeded from
      * the record on edit and appended to as the editor uploads.
      *
      * On save it is filtered to the ones the content still references — that
@@ -40,29 +40,34 @@
      * than the full url because TinyMCE rewrites srcs to be relative, so the
      * absolute url the upload returned is not what ends up in the HTML.
      */
-    let imageRefs = $state(article?.images ? [...article.images] : []);
+    let imageRefs = $state(achievement?.images ? [...achievement.images] : []);
 
     const fileNameOf = (url) => String(url ?? '').split('?')[0].split('/').pop();
 
     const form = useForm(
-        article
+        achievement
             ? {
-                  name: article.name ?? '',
-                  slug: article.slug ?? '',
-                  category_id: article.category_id ?? null,
-                  title: { ...(article.title ?? {}) },
-                  description: { ...(article.description ?? {}) },
-                  content: { ...(article.content ?? {}) },
-                  status: article.status ?? 'draft',
-                  published_at: article.published_at ? article.published_at.slice(0, 16).replace('T', ' ') : null,
-                  css_url: article.css_url ?? '',
-                  custom_css: article.custom_css ?? '',
+                  name: achievement.name ?? '',
+                  slug: achievement.slug ?? '',
+                  category_id: achievement.category_id ?? null,
+                  done_by: { ...(achievement.done_by ?? {}) },
+                  achieved_at: achievement.achieved_at ?? null,
+                  category_id: achievement.category_id ?? null,
+                  title: { ...(achievement.title ?? {}) },
+                  description: { ...(achievement.description ?? {}) },
+                  content: { ...(achievement.content ?? {}) },
+                  status: achievement.status ?? 'draft',
+                  published_at: achievement.published_at ? achievement.published_at.slice(0, 16).replace('T', ' ') : null,
+                  css_url: achievement.css_url ?? '',
+                  custom_css: achievement.custom_css ?? '',
                   thumbnail: null,
               }
             : {
                   name: '',
                   slug: '',
                   category_id: null,
+                  done_by: '',
+                  achieved_at: null,
                   title: '',
                   description: '',
                   content: '',
@@ -75,7 +80,7 @@
     );
 
     const statusOptions = $derived(
-        reachableStatuses(article?.status ?? null).map((value) => ({ value, label: ARTICLE_STATUS_LABELS[value] ?? value })),
+        reachableStatuses(achievement?.status ?? null).map((value) => ({ value, label: ACHIEVEMENT_STATUS_LABELS[value] ?? value })),
     );
 
     const activeLanguage = $derived(languages.find((l) => l.code === activeLocale) ?? null);
@@ -94,7 +99,7 @@
 
     /** Any validation error under this locale, so a collapsed tab isn't a mystery. */
     function localeHasError(code) {
-        return ['title', 'description', 'content'].some((field) => !!form.errors[`${field}.${code}`]);
+        return ['title', 'description', 'content', 'done_by'].some((field) => !!form.errors[`${field}.${code}`]);
     }
 
     $effect(() => {
@@ -107,7 +112,7 @@
                 // binding to an undefined key throws props_invalid_value.
                 if (editing) {
                     for (const l of languages) {
-                        for (const field of ['title', 'description', 'content']) {
+                        for (const field of ['title', 'description', 'content', 'done_by']) {
                             if (form.data[field][l.code] === undefined) form.data[field][l.code] = '';
                         }
                     }
@@ -129,7 +134,7 @@
 
     async function submit(event) {
         event.preventDefault();
-        const url = editing ? route('api.v1.admin.articles.update', article.id) : route('api.v1.admin.articles.store');
+        const url = editing ? route('api.v1.admin.achievements.update', achievement.id) : route('api.v1.admin.achievements.store');
         try {
             const res = await form.submit(editing ? 'put' : 'post', url, { transform: payload });
             if (res) {
@@ -159,8 +164,8 @@
 
     {#if !editing || activeTab === 'details'}
         <div class="flex flex-col gap-5">
-            <Field label="Thumbnail" error={form.errors.thumbnail} required={!editing} hint="Shown wherever the article is listed.">
-                <MediaPicker accept={['images']} bind:value={form.data.thumbnail} previewUrl={article?.thumbnail_url} />
+            <Field label="Thumbnail" error={form.errors.thumbnail} required={!editing} hint="Shown wherever the achievement is listed.">
+                <MediaPicker accept={['images']} bind:value={form.data.thumbnail} previewUrl={achievement?.thumbnail_url} />
             </Field>
 
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -177,18 +182,41 @@
                 listing everything, and the filter pins it to this content type so
                 an achievements category can never be offered here.
             -->
-            <Field label="Category" error={form.errors.category_id} hint="Optional — an uncategorised article is fine.">
+            <Field label="Category" error={form.errors.category_id} hint="Optional — an uncategorised achievement is fine.">
                 <Select
                     resource="api.v1.admin.categories.index"
-                    resourceParams={{ filter: { type: 'articles' } }}
+                    resourceParams={{ filter: { type: 'achievements' } }}
                     bind:value={form.data.category_id}
                     labelKey="name"
                     placeholder="Search categories…"
-                    initialOptions={article?.category_id && article?.category_name
-                        ? [{ value: article.category_id, label: article.category_name }]
+                    initialOptions={achievement?.category_id && achievement?.category_name
+                        ? [{ value: achievement.category_id, label: achievement.category_name }]
                         : []}
                 />
             </Field>
+
+            <!--
+                Remote select, pinned to this content type so an articles
+                category can never be offered here.
+            -->
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <Field label="Category" error={form.errors.category_id} hint="Optional.">
+                    <Select
+                        resource="api.v1.admin.categories.index"
+                        resourceParams={{ filter: { type: 'achievements' } }}
+                        bind:value={form.data.category_id}
+                        labelKey="name"
+                        placeholder="Search categories"
+                        initialOptions={achievement?.category_id && achievement?.category_name
+                            ? [{ value: achievement.category_id, label: achievement.category_name }]
+                            : []}
+                    />
+                </Field>
+                <!-- When it happened - unrelated to when the listing goes live. -->
+                <Field label="Achieved on" error={form.errors.achieved_at} required hint="The date of the achievement itself.">
+                    <DatePicker bind:value={form.data.achieved_at} invalid={!!form.errors.achieved_at} />
+                </Field>
+            </div>
 
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <Field label="Status" error={form.errors.status} required>
@@ -201,11 +229,11 @@
                 {/if}
             </div>
 
-            <Field label="Stylesheet URL" error={form.errors.css_url} hint="Optional external CSS applied to this article's content.">
+            <Field label="Stylesheet URL" error={form.errors.css_url} hint="Optional external CSS applied to this achievement's content.">
                 <Input bind:value={form.data.css_url} invalid={!!form.errors.css_url} placeholder="https://…" />
             </Field>
 
-            <Field label="Custom CSS" error={form.errors.custom_css} hint="Inline CSS applied to this article's content.">
+            <Field label="Custom CSS" error={form.errors.custom_css} hint="Inline CSS applied to this achievement's content.">
                 <textarea
                     class="kt-input min-h-[90px] font-mono text-2sm"
                     class:border-destructive={!!form.errors.custom_css}
@@ -223,6 +251,9 @@
             </Field>
             <Field label="Description" error={form.errors.description} required>
                 <textarea class="kt-input min-h-[90px]" class:border-destructive={!!form.errors.description} bind:value={form.data.description}></textarea>
+            </Field>
+            <Field label="Done by" error={form.errors.done_by} hint="Who achieved it - a person, team or year group.">
+                <Input bind:value={form.data.done_by} invalid={!!form.errors.done_by} />
             </Field>
             <Field label="Content" error={form.errors.content} required>
                 <HtmlEditor
@@ -269,6 +300,14 @@
                         dir={activeLanguage?.is_rtl ? 'rtl' : 'ltr'}
                         bind:value={form.data.description[activeLocale]}
                     ></textarea>
+                </Field>
+
+                <Field label="Done by" error={form.errors[`done_by.${activeLocale}`]}>
+                    <Input
+                        bind:value={form.data.done_by[activeLocale]}
+                        invalid={!!form.errors[`done_by.${activeLocale}`]}
+                        dir={activeLanguage?.is_rtl ? 'rtl' : 'ltr'}
+                    />
                 </Field>
 
                 <Field label="Content" error={form.errors[`content.${activeLocale}`]} required={!!activeLanguage?.is_default}>

@@ -30,7 +30,6 @@ class AlbumData extends Data
         public ?string $thumbnail_url,
         /** @var array<int, array{id: string, url: string|null, name: string, type: string|null, mime: string|null}> */
         public array $files,
-        public int $files_count,
         /** @var array<int, array{id: string, url: string|null, name: string}> */
         public array $images,
         public ?string $created_at,
@@ -61,7 +60,6 @@ class AlbumData extends Data
                 'type' => $media->getCustomProperty('type'),
                 'mime' => $media->mime_type,
             ])->all(),
-            files_count: $files->count(),
             images: $album->getMedia(Album::IMAGES_COLLECTION)
                 ->map(fn (Media $media) => ['id' => $media->id, 'url' => $media->url, 'name' => $media->name])
                 ->all(),

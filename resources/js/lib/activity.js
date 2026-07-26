@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -46,6 +46,8 @@ export const LOG_NAME_LABELS = {
     articles: 'Articles',
     albums: 'Albums',
     events: 'Events',
+    achievements: 'Achievements',
+    categories: 'Categories',
     auth: 'Authentication',
 };
 
@@ -66,6 +68,8 @@ export const SUBJECT_TYPE_LABELS = {
     article: 'Article',
     album: 'Album',
     event: 'Event',
+    achievement: 'Achievement',
+    category: 'Category',
 };
 
 /** Generic fallback wording, used when there is no per-module message below. */
@@ -168,6 +172,16 @@ const ACTIVITY_MESSAGES = {
         created: 'Created the event :name',
         updated: 'Updated the event :name',
         deleted: 'Deleted the event :name',
+    },
+    achievements: {
+        created: 'Created the achievement :name',
+        updated: 'Updated the achievement :name',
+        deleted: 'Deleted the achievement :name',
+    },
+    categories: {
+        created: 'Created the category :name',
+        updated: 'Updated the category :name',
+        deleted: 'Deleted the category :name',
     },
     auth: {
         login: ':name signed in',
