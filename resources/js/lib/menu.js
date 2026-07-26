@@ -31,6 +31,7 @@ export const adminMenu = [
         icon: 'ki-filled ki-picture',
         children: [
             { label: 'Media Library', route: 'web.admin.media.index', permission: 'media.index' },
+            { label: 'Pages', route: 'web.admin.pages.index', permission: 'pages.index' },
         ],
     },
     {

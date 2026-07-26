@@ -9,6 +9,7 @@ use App\Models\Media;
 use App\Models\Integration;
 use App\Models\Language;
 use App\Models\Notification;
+use App\Models\Page;
 use App\Models\NotificationGroup;
 use App\Models\NotificationGroupNotificationType;
 use App\Models\NotificationGroupUser;
@@ -25,6 +26,7 @@ use App\Observers\MediaObserver;
 use App\Observers\IntegrationObserver;
 use App\Observers\LanguageObserver;
 use App\Observers\NotificationGroupNotificationTypeObserver;
+use App\Observers\PageObserver;
 use App\Observers\NotificationGroupObserver;
 use App\Observers\NotificationGroupUserObserver;
 use App\Observers\NotificationObserver;
@@ -42,6 +44,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session as SessionFacade;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Activitylog\Facades\CauserResolver;
+use Spatie\Translatable\Facades\Translatable;
 use Throwable;
 
 class AppServiceProvider extends ServiceProvider
@@ -67,6 +70,7 @@ class AppServiceProvider extends ServiceProvider
         $this->resolveActivityCauser();
         $this->useOurSessionTable();
         $this->useIntegrationMailer();
+        $this->useTranslationFallback();
 
         User::observe(UserObserver::class);
         Role::observe(RoleObserver::class);
@@ -83,6 +87,27 @@ class AppServiceProvider extends ServiceProvider
         NotificationGroupUser::observe(NotificationGroupUserObserver::class);
         NotificationUser::observe(NotificationUserObserver::class);
         Language::observe(LanguageObserver::class);
+        Page::observe(PageObserver::class);
+    }
+
+    /**
+     * How a translatable model resolves a locale it has no value for.
+     * spatie/laravel-translatable v6 ships no config file, so this is the only
+     * place it can be set.
+     *
+     * fallbackAny is the right call for a CMS: a page translated only into Arabic
+     * should still render something rather than an empty <title> when someone
+     * asks for a locale nobody has filled in.
+     *
+     * Note this governs page CONTENT only. The UI string catalogue is unrelated —
+     * that still lives in lang/*.php and is read by __()/@lang() (see CLAUDE.md).
+     */
+    protected function useTranslationFallback(): void
+    {
+        Translatable::fallback(
+            fallbackLocale: config('app.fallback_locale'),
+            fallbackAny: true,
+        );
     }
 
     /**

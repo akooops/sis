@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -42,6 +42,7 @@ export const LOG_NAME_LABELS = {
     'notification-groups': 'Notification groups',
     languages: 'Languages',
     translations: 'Translations',
+    pages: 'Pages',
     auth: 'Authentication',
 };
 
@@ -58,6 +59,7 @@ export const SUBJECT_TYPE_LABELS = {
     notification_type: 'Notification type',
     language: 'Language',
     translation_key: 'Translation key',
+    page: 'Page',
 };
 
 /** Generic fallback wording, used when there is no per-module message below. */
@@ -140,6 +142,11 @@ const ACTIVITY_MESSAGES = {
     // every locale — :locale is what tells the rows apart.
     translations: {
         updated: 'Updated the :locale translation of :name',
+    },
+    pages: {
+        created: 'Created the page :name',
+        updated: 'Updated the page :name',
+        deleted: 'Deleted the page :name',
     },
     auth: {
         login: ':name signed in',

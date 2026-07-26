@@ -7,6 +7,7 @@ use App\Models\Integration;
 use App\Models\Language;
 use App\Models\Media;
 use App\Models\Notification;
+use App\Models\Page;
 use App\Models\NotificationGroup;
 use App\Models\NotificationType;
 use App\Models\Permission;
@@ -36,6 +37,7 @@ enum MorphType: string
     case NotificationType = 'notification_type';
     case Language = 'language';
     case TranslationKey = 'translation_key';
+    case Page = 'page';
 
     /** @return class-string */
     public function class(): string
@@ -52,6 +54,7 @@ enum MorphType: string
             self::NotificationType => NotificationType::class,
             self::Language => Language::class,
             self::TranslationKey => TranslationKey::class,
+            self::Page => Page::class,
         };
     }
 

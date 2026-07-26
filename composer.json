@@ -22,6 +22,7 @@
         "spatie/laravel-health": "^1.34",
         "spatie/laravel-model-states": "^2.12",
         "spatie/laravel-query-builder": "*",
+        "spatie/laravel-translatable": "^6.11",
         "tightenco/ziggy": "^2.5"
     },
     "require-dev": {

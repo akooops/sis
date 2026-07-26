@@ -89,6 +89,55 @@ class UploadService
     }
 
     /**
+     * Make one of a model's collections hold exactly the given media and nothing
+     * else: attach what is new, leave what is already here, detach the rest.
+     *
+     * The subtlety is why this exists at all. attach() COPIES a media that
+     * already has an owner, so re-attaching on every save would fork the file
+     * once per save — and the copy's file_name is not the one written into the
+     * page's content, so it would never settle. sync() therefore only takes over
+     * media that are still FREE; one owned by another model is left exactly as it
+     * is, because the file is on the public disk either way and two pages linking
+     * the same image must not duplicate it.
+     *
+     * Multi-file collections only: on a single-file collection attach() frees the
+     * collection first, so two incoming ids would fight over it.
+     *
+     * @param  array<int, string>  $mediaIds
+     */
+    public static function sync(array $mediaIds, Model $model, string $collection): void
+    {
+        $mediaIds = array_values(array_unique(array_filter($mediaIds)));
+
+        // A raw query, deliberately NOT $model->getMedia(): that filters to the
+        // Clean state, so a still-scanning upload would be invisible here and
+        // would be neither detached nor recognised as already held.
+        $current = Media::query()
+            ->where('model_type', $model->getMorphClass())
+            ->where('model_id', $model->getKey())
+            ->where('collection_name', $collection)
+            ->get();
+
+        foreach ($current as $media) {
+            if (! in_array($media->getKey(), $mediaIds, true)) {
+                static::detach($media);
+            }
+        }
+
+        $incoming = array_values(array_diff($mediaIds, $current->modelKeys()));
+
+        if ($incoming === []) {
+            return;
+        }
+
+        Media::query()
+            ->whereKey($incoming)
+            ->whereNull('model_id')
+            ->get()
+            ->each(fn (Media $media) => static::attach($media->getKey(), $model, $collection));
+    }
+
+    /**
      * Detach a single media, returning it to the free (reusable) pool. The file
      * is never deleted here — Media is Prunable, so the daily model:prune sweeps
      * stale free media and takes each file with its row.

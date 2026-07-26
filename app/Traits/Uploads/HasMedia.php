@@ -25,6 +25,18 @@ trait HasMedia
     /** @return Collection<int, Media> */
     public function getMedia(string $collection): Collection
     {
+        // Use the eager-loaded relation when the caller asked for one. An index
+        // page appends a *_url accessor per row, so without this a ->with('media')
+        // still costs one query per row — the filtering has to happen in PHP to
+        // benefit from the single load.
+        if ($this->relationLoaded('media')) {
+            return $this->media
+                ->where('collection_name', $collection)
+                ->filter(fn (Media $media) => $media->state instanceof Clean)
+                ->sortBy([['order_column', 'asc'], ['created_at', 'asc']])
+                ->values();
+        }
+
         return $this->media()
             ->where('collection_name', $collection)
             ->whereState('state', Clean::class)

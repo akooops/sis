@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Admin\NotificationGroupsController;
 use App\Http\Controllers\Api\Admin\NotificationGroupUsersController;
 use App\Http\Controllers\Api\Admin\NotificationsController;
 use App\Http\Controllers\Api\Admin\NotificationTypesController;
+use App\Http\Controllers\Api\Admin\PagesController;
 use App\Http\Controllers\Api\Admin\PermissionsController;
 use App\Http\Controllers\Api\Admin\RolePermissionsController;
 use App\Http\Controllers\Api\Admin\RolesController;
@@ -147,5 +148,12 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         // Translations
         Route::get('translations/{language}', [TranslationsController::class, 'index'])->middleware('verify.permissions:translations.index')->name('api.v1.admin.translations.index');
         Route::put('translations/{language}/{translationKey}', [TranslationsController::class, 'update'])->middleware('verify.permissions:translations.update')->name('api.v1.admin.translations.update');
+
+        // Pages
+        Route::get('pages', [PagesController::class, 'index'])->middleware('verify.permissions:pages.index')->name('api.v1.admin.pages.index');
+        Route::get('pages/{page}', [PagesController::class, 'show'])->middleware('verify.permissions:pages.index')->name('api.v1.admin.pages.show');
+        Route::post('pages', [PagesController::class, 'store'])->middleware('verify.permissions:pages.store')->name('api.v1.admin.pages.store');
+        Route::put('pages/{page}', [PagesController::class, 'update'])->middleware('verify.permissions:pages.update')->name('api.v1.admin.pages.update');
+        Route::delete('pages/{page}', [PagesController::class, 'destroy'])->middleware('verify.permissions:pages.destroy')->name('api.v1.admin.pages.destroy');
     });
 });

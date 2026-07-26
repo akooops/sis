@@ -40,6 +40,17 @@
     min-width: 0;
 }
 
+/* Sidebar scrollbar thumb. Metronic's .kt-scrollable-* paints the thumb with
+   `var(--color-input)`, but that theme var is DECLARED on :root (@theme inline),
+   so it computes there once — light zinc-200 — and merely inherits into the
+   sidebar. Our sidebar is a nested `.dark` scope (dark rail on a light page),
+   which remaps `--input` but can't retroactively change `--color-input`, so the
+   thumb came out light. Re-point it at the raw token: declared HERE, it resolves
+   in whatever scope the sidebar is actually in. */
+#sidebar_scrollable {
+    --scrollbar-thumb-color: var(--input);
+}
+
 /* Collapsed sidebar (narrow rail): show ONLY the icons; hovering the sidebar
    (Metronic expands it back to full width) or toggling it open reveals the rest.
    Reinforces demo1's collapse rules with `!important` because our Svelte-driven

@@ -46,6 +46,12 @@ class PermissionsSeeder extends Seeder
 
             ['code' => 'translations.index', 'name' => 'View translations', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'translations.update', 'name' => 'Update translations', 'supports_web' => true, 'supports_api' => false],
+
+            // Content pages.
+            ['code' => 'pages.index', 'name' => 'View pages', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'pages.store', 'name' => 'Create pages', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'pages.update', 'name' => 'Update pages', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'pages.destroy', 'name' => 'Delete pages', 'supports_web' => true, 'supports_api' => false],
         ];
 
         foreach ($permissions as $permission) {

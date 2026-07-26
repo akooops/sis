@@ -57,6 +57,8 @@ class LanguageObserver extends BaseObserver
      */
     public function deleting(Language $language): void
     {
+        Language::forgetCodes();
+
         UploadService::freeModel($language);
     }
 
@@ -67,6 +69,10 @@ class LanguageObserver extends BaseObserver
      */
     public function saved(Model $model): void
     {
+        // Enabling, disabling or re-defaulting a language changes what the
+        // translated-search filter and every translatable DTO resolve.
+        Language::forgetCodes();
+
         if ($model->is_default) {
             Language::query()->whereKeyNot($model->getKey())->update(['is_default' => false]);
         }

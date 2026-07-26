@@ -94,4 +94,42 @@ class Language extends Model
     {
         return static::query()->where('is_default', true)->first();
     }
+
+    /**
+     * Codes of the enabled locales, memoised for the request.
+     *
+     * Two very different callers need this on the same request: the translated
+     * search filter (once) and every translatable DTO's fromModel() (once per
+     * row) — and that second one is the N+1 this exists to prevent. A static
+     * memo, deliberately not a Cache:: layer; this app has none and CLAUDE.md
+     * says not to introduce one. Same technique as BaseObserver::$columnOrder.
+     *
+     * @var array<int, string>|null
+     */
+    protected static ?array $enabledCodes = null;
+
+    protected static ?string $defaultCode = null;
+
+    /** @return array<int, string> */
+    public static function enabledCodes(): array
+    {
+        return static::$enabledCodes ??= static::query()
+            ->where('is_enabled', true)
+            ->orderBy('code')
+            ->pluck('code')
+            ->all();
+    }
+
+    /** The default locale's code, falling back to config when no row is flagged. */
+    public static function defaultCode(): string
+    {
+        return static::$defaultCode ??= (string) (static::default()?->code ?? config('app.fallback_locale'));
+    }
+
+    /** Drop the memos — called by LanguageObserver on any write. */
+    public static function forgetCodes(): void
+    {
+        static::$enabledCodes = null;
+        static::$defaultCode = null;
+    }
 }

@@ -55,6 +55,60 @@ abstract class ApiController extends Controller
     }
 
     /**
+     * A "search" filter that also reaches into spatie/laravel-translatable JSON
+     * columns, matching every locale passed in — so searching a page finds it by
+     * its Arabic title as readily as by its slug.
+     *
+     * The CAST is load-bearing, not decoration. MySQL's json_unquote() hands back
+     * a utf8mb4_bin string, so a plain LIKE against it is CASE-SENSITIVE while the
+     * same LIKE on `name` is not: searching "home" would match the slug and
+     * silently miss a page titled "Home". CAST(… AS CHAR) re-tags the value with
+     * the connection collation — utf8mb4_unicode_ci here, the same one the tables
+     * use — which makes translated search behave like every other search in the
+     * app rather than nearly like it. A missing locale key yields NULL, and
+     * NULL LIKE … is NULL, so absent translations simply don't match.
+     *
+     * Cost: a JSON column cannot carry a plain index, so this is a table scan.
+     * Fine for a CMS; if it ever isn't, the fix is an indexed generated column
+     * per (column, locale), not a change here.
+     *
+     * @param  array<int, string>  $columns     plain columns
+     * @param  array<int, string>  $translated  JSON (translatable) columns
+     * @param  array<int, string>  $locales     locale codes to match, e.g. ['en', 'ar']
+     */
+    protected function searchTranslations(array $columns, array $translated, array $locales, bool $withId = true): AllowedFilter
+    {
+        return AllowedFilter::callback('search', function ($query, $value) use ($columns, $translated, $locales, $withId) {
+            // One nested group, so the whole thing ANDs with the other filters
+            // instead of widening them — same shape as search().
+            $query->where(function ($query) use ($columns, $translated, $locales, $withId, $value) {
+                foreach ($columns as $column) {
+                    $query->orWhere($column, 'like', "%{$value}%");
+                }
+
+                $grammar = $query->getQuery()->getGrammar();
+
+                foreach ($translated as $column) {
+                    // Wrapped by the grammar rather than interpolated: the column
+                    // list is developer-supplied, and the JSON path is a binding.
+                    $wrapped = $grammar->wrap($column);
+
+                    foreach ($locales as $locale) {
+                        $query->orWhereRaw(
+                            "cast(json_unquote(json_extract({$wrapped}, ?)) as char) like ?",
+                            ['$."'.$locale.'"', "%{$value}%"],
+                        );
+                    }
+                }
+
+                if ($withId) {
+                    $query->orWhere($query->getModel()->getKeyName(), 'like', "%{$value}%");
+                }
+            });
+        });
+    }
+
+    /**
      * An exact filter (?filter[<name>]=<id>) that matches records related to a
      * given id through a relationship — e.g. users by role id, roles by
      * permission id, or (in domain modules) students by their guardian id.

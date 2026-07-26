@@ -24,7 +24,13 @@
     // Show the image preview box for image-only pickers or when the pick is an image.
     const imageOnly = $derived(accept?.length === 1 && accept[0] === 'images');
     const showImageBox = $derived(imageOnly || picked?.type === 'images');
-    const shownUrl = $derived(picked?.url ?? (value ? previewUrl : null));
+
+    // A new pick wins; otherwise the record's CURRENT file. Deliberately NOT
+    // gated on `value`: an edit form seeds its media field to null (null means
+    // "leave the existing file alone" — every controller only attaches a truthy
+    // id), so gating on it meant `previewUrl` was unreachable and an edit form
+    // always looked empty even when the record had an image.
+    const shownUrl = $derived(picked?.url ?? previewUrl);
 
     function onpick(media) {
         picked = media;
@@ -59,8 +65,14 @@
             <i class="ki-filled ki-picture"></i>
             Media library
         </Button>
+        <!--
+            Only ever drops the NEW pick: clearing sends null, which every
+            controller reads as "leave the current file alone" (there is no
+            detach path), so on a record that already has one this is an undo,
+            not a delete — say so rather than promising a removal.
+        -->
         {#if value}
-            <Button variant="ghost" size="sm" onclick={clear}>Remove</Button>
+            <Button variant="ghost" size="sm" onclick={clear}>{previewUrl ? 'Undo' : 'Remove'}</Button>
         {/if}
     </div>
 </div>

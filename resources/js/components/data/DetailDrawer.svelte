@@ -68,18 +68,22 @@
             {#if header}
                 {@render header()}
             {:else if avatar || heading || badge}
-                <div class="flex items-center gap-3">
+                <div class="flex min-w-0 items-center gap-3">
                     {#if avatar}
                         <Avatar src={avatar.src} name={avatar.name ?? heading ?? ''} size="lg" />
                     {/if}
-                    <div class="flex min-w-0 flex-col items-start gap-1">
+                    <!-- flex-1 + min-w-0 on the column, and w-full on each row
+                         inside it: with `items-start` a child sizes to its content,
+                         so an unbroken 200-char name would otherwise push past the
+                         drawer and scroll the whole panel sideways. -->
+                    <div class="flex min-w-0 flex-1 flex-col items-start gap-1">
                         {#if heading}
-                            <div class="text-base font-semibold text-mono">
+                            <div class="w-full min-w-0 text-base font-semibold text-mono">
                                 <ClampText value={heading} lines={2} title={heading} />
                             </div>
                         {/if}
                         {#if subheading}
-                            <div class="text-xs text-muted-foreground">
+                            <div class="w-full min-w-0 text-xs text-muted-foreground">
                                 <ClampText value={subheading} title={subheading} />
                             </div>
                         {/if}

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             NotificationTypesSeeder::class,
             LanguagesSeeder::class,
             TranslationKeysSeeder::class,
+            PagesSeeder::class,
         ]);
 
         if (app()->environment('local')) {

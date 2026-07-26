@@ -104,7 +104,17 @@
         which is what finally gives #sidebar_scrollable something to scroll.
     -->
     <div class="kt-sidebar-content flex grow min-h-0 py-5 pe-2 overflow-hidden" id="sidebar_content">
-        <div class="grow min-h-0 flex flex-col ps-2 lg:ps-5 pe-1 lg:pe-3 overflow-y-auto" id="sidebar_scrollable">
+        <!--
+            kt-scrollable-y-hover instead of a bare overflow-y-auto: the native
+            scrollbar is drawn by the OS and ignores the theme, so it stayed
+            light-on-light inside the dark sidebar. The Metronic class (this is
+            exactly what demo1 puts here) styles it — thin, transparent track,
+            thumb = var(--color-input) and only tinted while the sidebar is
+            hovered. Keep it a class, not a utility: `overflow-y-auto` sits in
+            Tailwind's utilities layer and would override the component's
+            `overflow-y: scroll`.
+        -->
+        <div class="kt-scrollable-y-hover grow min-h-0 flex flex-col ps-2 lg:ps-5 pe-1 lg:pe-3" id="sidebar_scrollable">
             <!--
                 shrink-0 is the other half of it: as a flex item the menu would
                 otherwise be squashed to fit and spill its rows out invisibly,
