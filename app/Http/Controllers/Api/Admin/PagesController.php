@@ -70,14 +70,13 @@ class PagesController extends ApiController
         ]);
 
         UploadService::attach($data->thumbnail, $page, Page::THUMBNAIL_COLLECTION);
-        UploadService::sync($data->images, $page, Page::IMAGES_COLLECTION);
 
         return $this->respond(PageData::from($page->fresh()), 'Page created successfully', 201);
     }
 
     public function update(UpdatePageData $data, Page $page): JsonResponse
     {
-        $page->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at', 'images']));
+        $page->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at']));
 
         $target = PageStatus::resolveStateClass($data->status);
 
@@ -99,8 +98,6 @@ class PagesController extends ApiController
         if (! $data->thumbnail instanceof Optional && $data->thumbnail) {
             UploadService::attach($data->thumbnail, $page, Page::THUMBNAIL_COLLECTION);
         }
-
-        UploadService::sync($data->images, $page, Page::IMAGES_COLLECTION);
 
         return $this->respond(PageData::from($page->fresh()), 'Page updated successfully');
     }

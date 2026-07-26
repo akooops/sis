@@ -32,11 +32,12 @@ export const adminMenu = [
         children: [
             { label: 'Media Library', route: 'web.admin.media.index', permission: 'media.index' },
             { label: 'Pages', route: 'web.admin.pages.index', permission: 'pages.index' },
+            // Categories first: it is what the two below are filed under.
+            { label: 'Categories', route: 'web.admin.categories.index', permission: 'categories.index' },
             { label: 'Articles', route: 'web.admin.articles.index', permission: 'articles.index' },
+            { label: 'Achievements', route: 'web.admin.achievements.index', permission: 'achievements.index' },
             { label: 'Albums', route: 'web.admin.albums.index', permission: 'albums.index' },
             { label: 'Events', route: 'web.admin.events.index', permission: 'events.index' },
-            { label: 'Achievements', route: 'web.admin.achievements.index', permission: 'achievements.index' },
-            { label: 'Categories', route: 'web.admin.categories.index', permission: 'categories.index' },
         ],
     },
     {

@@ -25,8 +25,6 @@ class StorePageData extends Data
         public ?string $css_url,
         public ?string $custom_css,
         public string $thumbnail,
-        /** @var array<int, string> */
-        public array $images = [],
     ) {}
 
     public static function rules(ValidationContext $context): array
@@ -50,9 +48,6 @@ class StorePageData extends Data
             'custom_css' => ['nullable', 'string', 'max:65535'],
 
             'thumbnail' => ['required', 'string', new CleanUpload('images')],
-
-            'images' => ['sometimes', 'array'],
-            'images.*' => ['string', new CleanUpload('images')],
         ];
     }
 }

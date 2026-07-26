@@ -20,6 +20,8 @@ class PermissionsSeeder extends Seeder
             ['code' => 'permissions.index', 'name' => 'View permissions', 'supports_web' => true, 'supports_api' => true],
             ['code' => 'api-keys.index', 'name' => 'View API keys', 'supports_web' => true, 'supports_api' => true],
             ['code' => 'media.index', 'name' => 'View media', 'supports_web' => true, 'supports_api' => true],
+            ['code' => 'media.detach', 'name' => 'Detach media', 'supports_web' => true, 'supports_api' => true],
+            ['code' => 'media.destroy', 'name' => 'Delete media', 'supports_web' => true, 'supports_api' => true],
             ['code' => 'activities.index', 'name' => 'View activity log', 'supports_web' => true, 'supports_api' => true],
 
             ['code' => 'integrations.index', 'name' => 'View integrations', 'supports_web' => true, 'supports_api' => false],

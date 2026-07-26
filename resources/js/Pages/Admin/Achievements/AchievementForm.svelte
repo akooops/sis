@@ -31,28 +31,14 @@
     let activeTab = $state('details');
     let activeLocale = $state(null);
 
-    /**
-     * Every image this achievement has ever linked, as { id, url, name }. Seeded from
-     * the record on edit and appended to as the editor uploads.
-     *
-     * On save it is filtered to the ones the content still references — that
-     * filter is what detaches a deleted image. It matches on the FILE NAME rather
-     * than the full url because TinyMCE rewrites srcs to be relative, so the
-     * absolute url the upload returned is not what ends up in the HTML.
-     */
-    let imageRefs = $state(achievement?.images ? [...achievement.images] : []);
-
-    const fileNameOf = (url) => String(url ?? '').split('?')[0].split('/').pop();
-
     const form = useForm(
         achievement
             ? {
                   name: achievement.name ?? '',
                   slug: achievement.slug ?? '',
-                  category_id: achievement.category_id ?? null,
+                  category_id: achievement.category?.id ?? null,
                   done_by: { ...(achievement.done_by ?? {}) },
                   achieved_at: achievement.achieved_at ?? null,
-                  category_id: achievement.category_id ?? null,
                   title: { ...(achievement.title ?? {}) },
                   description: { ...(achievement.description ?? {}) },
                   content: { ...(achievement.content ?? {}) },
@@ -85,18 +71,6 @@
 
     const activeLanguage = $derived(languages.find((l) => l.code === activeLocale) ?? null);
 
-    function allContent() {
-        const c = form.data.content;
-
-        return typeof c === 'string' ? c : Object.values(c ?? {}).join('\n');
-    }
-
-    function trackUpload(media) {
-        if (!imageRefs.some((r) => r.id === media.id)) {
-            imageRefs.push({ id: media.id, url: media.url, name: media.name });
-        }
-    }
-
     /** Any validation error under this locale, so a collapsed tab isn't a mystery. */
     function localeHasError(code) {
         return ['title', 'description', 'content', 'done_by'].some((field) => !!form.errors[`${field}.${code}`]);
@@ -125,9 +99,6 @@
         const out = { ...data };
         if (!out.thumbnail) delete out.thumbnail;
         if (!needsPublishedAt(out.status)) out.published_at = null;
-
-        const html = allContent();
-        out.images = imageRefs.filter((r) => html.includes(fileNameOf(r.url))).map((r) => r.id);
 
         return out;
     }
@@ -180,35 +151,18 @@
             <!--
                 Remote select: it loads page one and narrows by search rather than
                 listing everything, and the filter pins it to this content type so
-                an achievements category can never be offered here.
-            -->
-            <Field label="Category" error={form.errors.category_id} hint="Optional — an uncategorised achievement is fine.">
-                <Select
-                    resource="api.v1.admin.categories.index"
-                    resourceParams={{ filter: { type: 'achievements' } }}
-                    bind:value={form.data.category_id}
-                    labelKey="name"
-                    placeholder="Search categories…"
-                    initialOptions={achievement?.category_id && achievement?.category_name
-                        ? [{ value: achievement.category_id, label: achievement.category_name }]
-                        : []}
-                />
-            </Field>
-
-            <!--
-                Remote select, pinned to this content type so an articles
-                category can never be offered here.
+                an articles category can never be offered here.
             -->
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                <Field label="Category" error={form.errors.category_id} hint="Optional.">
+                <Field label="Category" error={form.errors.category_id} required hint="Every achievement is filed under a category.">
                     <Select
                         resource="api.v1.admin.categories.index"
                         resourceParams={{ filter: { type: 'achievements' } }}
                         bind:value={form.data.category_id}
                         labelKey="name"
-                        placeholder="Search categories"
-                        initialOptions={achievement?.category_id && achievement?.category_name
-                            ? [{ value: achievement.category_id, label: achievement.category_name }]
+                        placeholder="Search categories…"
+                        initialOptions={achievement?.category
+                            ? [{ value: achievement.category.id, label: achievement.category.name }]
                             : []}
                     />
                 </Field>
@@ -261,7 +215,6 @@
                     {ready}
                     contentCssUrl={form.data.css_url || null}
                     contentStyle={form.data.custom_css}
-                    onupload={trackUpload}
                 />
             </Field>
         </div>
@@ -317,7 +270,6 @@
                         {ready}
                         contentCssUrl={form.data.css_url || null}
                         contentStyle={form.data.custom_css}
-                        onupload={trackUpload}
                     />
                 </Field>
             {/if}

@@ -32,8 +32,6 @@ class UpdatePageData extends Data
         public ?string $css_url,
         public ?string $custom_css,
         public string|Optional|null $thumbnail = null,
-        /** @var array<int, string> */
-        public array $images = [],
     ) {}
 
     public static function rules(ValidationContext $context): array
@@ -70,9 +68,6 @@ class UpdatePageData extends Data
             'custom_css' => ['nullable', 'string', 'max:65535'],
 
             'thumbnail' => ['sometimes', 'nullable', 'string', new CleanUpload('images')],
-
-            'images' => ['sometimes', 'array'],
-            'images.*' => ['string', new CleanUpload('images')],
         ];
 
         foreach ($codes as $code) {

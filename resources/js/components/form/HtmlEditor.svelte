@@ -56,10 +56,6 @@
         contentStyle = '',
         height = 480,
         disabled = false,
-        // Called with the media record after a successful upload, so the page can
-        // link the file to itself. Without it an inserted image is never attached
-        // and the 30-day orphan sweep eventually deletes it out from under the page.
-        onupload,
     } = $props();
 
     // Two nested divs on purpose: TinyMCE replaces `target` and restores it on
@@ -86,8 +82,7 @@
             // media.url is null until ScanUpload promotes the file to the public
             // disk. With the default null scanner that has already happened; with
             // clamav on a real queue it has not. Refuse rather than insert an
-            // empty src — which also keeps the server-side content scan honest,
-            // since it derives the page's images from what the HTML references.
+            // empty src.
             if (!media?.url) {
                 return Promise.reject({
                     message: 'The image is still being scanned. Try again in a moment.',
@@ -95,7 +90,6 @@
                 });
             }
 
-            onupload?.(media);
 
             return media.url;
         } catch (e) {
@@ -113,10 +107,7 @@
             if (!file) return;
             try {
                 const media = await uploadFile(file, 'images');
-                if (media?.url) {
-                    onupload?.(media);
-                    callback(media.url, { title: media.name });
-                }
+                if (media?.url) callback(media.url, { title: media.name });
             } catch {
                 // The dialog stays open; the admin can retry or cancel.
             }

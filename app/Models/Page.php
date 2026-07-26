@@ -20,10 +20,8 @@ use Spatie\Translatable\HasTranslations;
  * locale by spatie/laravel-translatable into a JSON column. That is content, not
  * UI chrome: the UI string catalogue still lives in lang/*.php and is untouched.
  *
- * Two media collections: one `thumbnail` (required, replaced on re-attach) and
- * many `images`, which the edit form keeps in step with the content — an upload
- * is linked when it is inserted and detached once it is no longer referenced, so
- * the orphan sweep never reclaims a file a live page still renders.
+ * One media collection: `thumbnail`. Images inserted into the content stay FREE
+ * media in the library — nothing prunes them, so nothing needs to own them.
  */
 class Page extends Model
 {
@@ -34,8 +32,6 @@ class Page extends Model
     ------------------------------------------*/
 
     public const THUMBNAIL_COLLECTION = 'thumbnail';
-
-    public const IMAGES_COLLECTION = 'images';
 
     /**
      * Columns HasTranslations stores as a locale => value JSON map. The trait

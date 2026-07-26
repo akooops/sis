@@ -21,7 +21,7 @@ class UpdateArticleData extends Data
     public function __construct(
         public string $name,
         public string $slug,
-        public ?string $category_id,
+        public string $category_id,
         /** @var array<string, string|null> */
         public array $title,
         /** @var array<string, string|null> */
@@ -33,8 +33,6 @@ class UpdateArticleData extends Data
         public ?string $css_url,
         public ?string $custom_css,
         public string|Optional|null $thumbnail = null,
-        /** @var array<int, string> */
-        public array $images = [],
     ) {}
 
     public static function rules(ValidationContext $context): array
@@ -52,7 +50,7 @@ class UpdateArticleData extends Data
             ],
 
             'category_id' => [
-                'nullable', 'string',
+                'required', 'string',
                 Rule::exists('categories', 'id')->where('type', CategoryType::Articles->value),
             ],
 
@@ -71,9 +69,6 @@ class UpdateArticleData extends Data
             'custom_css' => ['nullable', 'string', 'max:65535'],
 
             'thumbnail' => ['sometimes', 'nullable', 'string', new CleanUpload('images')],
-
-            'images' => ['sometimes', 'array'],
-            'images.*' => ['string', new CleanUpload('images')],
         ];
 
         // Written out per locale rather than leaning on `title.*` plus a `title.en`

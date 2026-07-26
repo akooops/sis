@@ -18,7 +18,7 @@ class StoreArticleData extends Data
     public function __construct(
         public string $name,
         public string $slug,
-        public ?string $category_id,
+        public string $category_id,
         public string $title,
         public string $description,
         public string $content,
@@ -27,8 +27,6 @@ class StoreArticleData extends Data
         public ?string $css_url,
         public ?string $custom_css,
         public string $thumbnail,
-        /** @var array<int, string> */
-        public array $images = [],
     ) {}
 
     public static function rules(ValidationContext $context): array
@@ -41,7 +39,7 @@ class StoreArticleData extends Data
 
             // Scoped to its own type, so an achievements category can't be filed here.
             'category_id' => [
-                'nullable', 'string',
+                'required', 'string',
                 Rule::exists('categories', 'id')->where('type', CategoryType::Articles->value),
             ],
 
@@ -62,9 +60,6 @@ class StoreArticleData extends Data
             'custom_css' => ['nullable', 'string', 'max:65535'],
 
             'thumbnail' => ['required', 'string', new CleanUpload('images')],
-
-            'images' => ['sometimes', 'array'],
-            'images.*' => ['string', new CleanUpload('images')],
         ];
     }
 }

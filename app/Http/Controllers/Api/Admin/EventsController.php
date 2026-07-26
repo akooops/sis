@@ -70,14 +70,13 @@ class EventsController extends ApiController
         ]);
 
         UploadService::attach($data->thumbnail, $event, Event::THUMBNAIL_COLLECTION);
-        UploadService::sync($data->images, $event, Event::IMAGES_COLLECTION);
 
         return $this->respond(EventData::from($event->fresh()), 'Event created successfully', 201);
     }
 
     public function update(UpdateEventData $data, Event $event): JsonResponse
     {
-        $event->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at', 'images']));
+        $event->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at']));
 
         $target = EventStatus::resolveStateClass($data->status);
 
@@ -99,8 +98,6 @@ class EventsController extends ApiController
         if (! $data->thumbnail instanceof Optional && $data->thumbnail) {
             UploadService::attach($data->thumbnail, $event, Event::THUMBNAIL_COLLECTION);
         }
-
-        UploadService::sync($data->images, $event, Event::IMAGES_COLLECTION);
 
         return $this->respond(EventData::from($event->fresh()), 'Event updated successfully');
     }

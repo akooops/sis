@@ -35,7 +35,7 @@
         { key: 'id', label: 'ID', sortable: true, width: '90px', truncate: false },
         { key: 'name', label: 'Name', sortable: true, truncate: false },
         { key: 'slug', label: 'Slug', sortable: true, truncate: false },
-        { key: 'category_name', label: 'Category', truncate: false },
+        { key: 'category', label: 'Category', truncate: false },
         { key: 'status', label: 'Status', sortable: true, truncate: false },
         { key: 'published_at', label: 'Published', sortable: true, truncate: false },
     ];
@@ -104,7 +104,7 @@
         badge={viewing ? { label: ARTICLE_STATUS_LABELS[viewing.status] ?? viewing.status, variant: ARTICLE_STATUS_VARIANTS[viewing.status] ?? 'secondary' } : null}
         fields={[
             { label: 'Slug', value: viewing?.slug },
-            { label: 'Category', value: viewing?.category_name || '—' },
+            { label: 'Category', value: viewing?.category?.name || '—' },
             { label: 'Published at', value: viewing?.published_at ?? '—' },
             { label: 'Stylesheet', value: viewing?.css_url || '—' },
         ]}
@@ -172,10 +172,10 @@
         <Badge variant="secondary">
             <ClampText value={row.slug} maxWidth="160px" title={row.slug} />
         </Badge>
-    {:else if column.key === 'category_name'}
-        {#if row.category_name}
+    {:else if column.key === 'category'}
+        {#if row.category}
             <Badge variant="primary">
-                <ClampText value={row.category_name} maxWidth="140px" title={row.category_name} />
+                <ClampText value={row.category.name} maxWidth="140px" title={row.category.name} />
             </Badge>
         {:else}
             <span class="text-xs text-muted-foreground">—</span>

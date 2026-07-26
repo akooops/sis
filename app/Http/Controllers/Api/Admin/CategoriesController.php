@@ -69,7 +69,17 @@ class CategoriesController extends ApiController
 
     public function destroy(Category $category): JsonResponse
     {
-        // The FK is nullOnDelete, so deleting simply uncategorises — no guard.
+        // A category is mandatory on what it classifies, so deleting one in use
+        // would strand invalid records. The FK restricts it too — this guard is
+        // what turns that into a 422 rather than a raw database error.
+        $used = $this->usageCount($category);
+
+        if ($used > 0) {
+            throw ValidationException::withMessages([
+                'category' => "This category is used by {$used} record(s). Move them to another category first.",
+            ]);
+        }
+
         $category->delete();
 
         return $this->respond(null, 'Category deleted successfully');

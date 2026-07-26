@@ -31,25 +31,12 @@
     let activeTab = $state('details');
     let activeLocale = $state(null);
 
-    /**
-     * Every image this article has ever linked, as { id, url, name }. Seeded from
-     * the record on edit and appended to as the editor uploads.
-     *
-     * On save it is filtered to the ones the content still references — that
-     * filter is what detaches a deleted image. It matches on the FILE NAME rather
-     * than the full url because TinyMCE rewrites srcs to be relative, so the
-     * absolute url the upload returned is not what ends up in the HTML.
-     */
-    let imageRefs = $state(article?.images ? [...article.images] : []);
-
-    const fileNameOf = (url) => String(url ?? '').split('?')[0].split('/').pop();
-
     const form = useForm(
         article
             ? {
                   name: article.name ?? '',
                   slug: article.slug ?? '',
-                  category_id: article.category_id ?? null,
+                  category_id: article.category?.id ?? null,
                   title: { ...(article.title ?? {}) },
                   description: { ...(article.description ?? {}) },
                   content: { ...(article.content ?? {}) },
@@ -80,18 +67,6 @@
 
     const activeLanguage = $derived(languages.find((l) => l.code === activeLocale) ?? null);
 
-    function allContent() {
-        const c = form.data.content;
-
-        return typeof c === 'string' ? c : Object.values(c ?? {}).join('\n');
-    }
-
-    function trackUpload(media) {
-        if (!imageRefs.some((r) => r.id === media.id)) {
-            imageRefs.push({ id: media.id, url: media.url, name: media.name });
-        }
-    }
-
     /** Any validation error under this locale, so a collapsed tab isn't a mystery. */
     function localeHasError(code) {
         return ['title', 'description', 'content'].some((field) => !!form.errors[`${field}.${code}`]);
@@ -120,9 +95,6 @@
         const out = { ...data };
         if (!out.thumbnail) delete out.thumbnail;
         if (!needsPublishedAt(out.status)) out.published_at = null;
-
-        const html = allContent();
-        out.images = imageRefs.filter((r) => html.includes(fileNameOf(r.url))).map((r) => r.id);
 
         return out;
     }
@@ -177,15 +149,15 @@
                 listing everything, and the filter pins it to this content type so
                 an achievements category can never be offered here.
             -->
-            <Field label="Category" error={form.errors.category_id} hint="Optional — an uncategorised article is fine.">
+            <Field label="Category" error={form.errors.category_id} required hint="Every article is filed under a category.">
                 <Select
                     resource="api.v1.admin.categories.index"
                     resourceParams={{ filter: { type: 'articles' } }}
                     bind:value={form.data.category_id}
                     labelKey="name"
                     placeholder="Search categories…"
-                    initialOptions={article?.category_id && article?.category_name
-                        ? [{ value: article.category_id, label: article.category_name }]
+                    initialOptions={article?.category
+                        ? [{ value: article.category.id, label: article.category.name }]
                         : []}
                 />
             </Field>
@@ -230,7 +202,6 @@
                     {ready}
                     contentCssUrl={form.data.css_url || null}
                     contentStyle={form.data.custom_css}
-                    onupload={trackUpload}
                 />
             </Field>
         </div>
@@ -278,7 +249,6 @@
                         {ready}
                         contentCssUrl={form.data.css_url || null}
                         contentStyle={form.data.custom_css}
-                        onupload={trackUpload}
                     />
                 </Field>
             {/if}

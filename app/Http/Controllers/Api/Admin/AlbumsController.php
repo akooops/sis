@@ -46,7 +46,7 @@ class AlbumsController extends ApiController
 
     public function show(Album $album): JsonResponse
     {
-        return $this->respond(AlbumData::from($album), 'Album retrieved successfully');
+        return $this->respond(AlbumData::from($album->load('media')), 'Album retrieved successfully');
     }
 
     public function store(StoreAlbumData $data): JsonResponse
@@ -69,14 +69,13 @@ class AlbumsController extends ApiController
 
         // The gallery, in submitted order — sync writes order_column from it.
         UploadService::sync($data->files, $album, Album::FILES_COLLECTION);
-        UploadService::sync($data->images, $album, Album::IMAGES_COLLECTION);
 
-        return $this->respond(AlbumData::from($album->fresh()), 'Album created successfully', 201);
+        return $this->respond(AlbumData::from($album->fresh()->load('media')), 'Album created successfully', 201);
     }
 
     public function update(UpdateAlbumData $data, Album $album): JsonResponse
     {
-        $album->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at', 'files', 'images']));
+        $album->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at', 'files']));
 
         $target = AlbumStatus::resolveStateClass($data->status);
 
@@ -102,9 +101,8 @@ class AlbumsController extends ApiController
         // Removing a file from the gallery drops its id here, which detaches it
         // back into the media library rather than deleting it.
         UploadService::sync($data->files, $album, Album::FILES_COLLECTION);
-        UploadService::sync($data->images, $album, Album::IMAGES_COLLECTION);
 
-        return $this->respond(AlbumData::from($album->fresh()), 'Album updated successfully');
+        return $this->respond(AlbumData::from($album->fresh()->load('media')), 'Album updated successfully');
     }
 
     public function destroy(Album $album): JsonResponse

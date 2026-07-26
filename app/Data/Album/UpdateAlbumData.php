@@ -28,8 +28,6 @@ class UpdateAlbumData extends Data
         public string|Optional|null $thumbnail = null,
         /** @var array<int, string> */
         public array $files = [],
-        /** @var array<int, string> */
-        public array $images = [],
     ) {}
 
     public static function rules(ValidationContext $context): array
@@ -63,9 +61,6 @@ class UpdateAlbumData extends Data
             // Exactly the gallery, in order — an id dropped here is detached.
             'files' => ['sometimes', 'array'],
             'files.*' => ['string', new CleanUpload(Album::FILE_TYPES)],
-
-            'images' => ['sometimes', 'array'],
-            'images.*' => ['string', new CleanUpload('images')],
         ];
 
         foreach ($codes as $code) {

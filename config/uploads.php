@@ -7,7 +7,7 @@ return [
      * once App\Jobs\ScanUpload clears them. `quarantine_disk` must not be
      * web-readable; `disk` is the public one the UI links to.
      */
-    
+
     'disk' => env('MEDIA_DISK', 'public'),
     'quarantine_disk' => env('FILE_QUARANTINE_DISK', 'quarantine'),
 
@@ -26,9 +26,12 @@ return [
     'max_file_size' => (int) env('FILE_MAX_SIZE', 1024 * 1024 * 10), // 10MB
 
     /*
-     * How long an unattached upload survives before uploads:prune deletes it.
+     * There is no orphan sweep. An unattached upload stays in the library until
+     * someone deletes it from the Media page — see MediaController::destroy and
+     * the note on App\Models\Media. Editor-inserted images are free media by
+     * design, so an automatic sweep would eventually delete files that live
+     * pages still render.
      */
-    'max_orphaned_files_age' => (int) env('FILE_MAX_ORPHANED_FILES_AGE', 30), // days
 
     'scanner' => env('FILE_SCANNER', 'null'), // null | clamav
 

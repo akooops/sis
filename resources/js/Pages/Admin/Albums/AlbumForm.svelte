@@ -32,19 +32,6 @@
     let activeTab = $state('details');
     let activeLocale = $state(null);
 
-    /**
-     * Every image this album has ever linked, as { id, url, name }. Seeded from
-     * the record on edit and appended to as the editor uploads.
-     *
-     * On save it is filtered to the ones the content still references — that
-     * filter is what detaches a deleted image. It matches on the FILE NAME rather
-     * than the full url because TinyMCE rewrites srcs to be relative, so the
-     * absolute url the upload returned is not what ends up in the HTML.
-     */
-    let imageRefs = $state(album?.images ? [...album.images] : []);
-
-    const fileNameOf = (url) => String(url ?? '').split('?')[0].split('/').pop();
-
     const form = useForm(
         album
             ? {
@@ -82,18 +69,6 @@
 
     const activeLanguage = $derived(languages.find((l) => l.code === activeLocale) ?? null);
 
-    function allContent() {
-        const c = form.data.content;
-
-        return typeof c === 'string' ? c : Object.values(c ?? {}).join('\n');
-    }
-
-    function trackUpload(media) {
-        if (!imageRefs.some((r) => r.id === media.id)) {
-            imageRefs.push({ id: media.id, url: media.url, name: media.name });
-        }
-    }
-
     /** Any validation error under this locale, so a collapsed tab isn't a mystery. */
     function localeHasError(code) {
         return ['title', 'description', 'content'].some((field) => !!form.errors[`${field}.${code}`]);
@@ -122,9 +97,6 @@
         const out = { ...data };
         if (!out.thumbnail) delete out.thumbnail;
         if (!needsPublishedAt(out.status)) out.published_at = null;
-
-        const html = allContent();
-        out.images = imageRefs.filter((r) => html.includes(fileNameOf(r.url))).map((r) => r.id);
 
         return out;
     }
@@ -214,7 +186,6 @@
                     {ready}
                     contentCssUrl={form.data.css_url || null}
                     contentStyle={form.data.custom_css}
-                    onupload={trackUpload}
                 />
             </Field>
         </div>
@@ -262,7 +233,6 @@
                         {ready}
                         contentCssUrl={form.data.css_url || null}
                         contentStyle={form.data.custom_css}
-                        onupload={trackUpload}
                     />
                 </Field>
             {/if}

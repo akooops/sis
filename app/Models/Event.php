@@ -30,8 +30,6 @@ class Event extends Model
 
     public const THUMBNAIL_COLLECTION = 'thumbnail';
 
-    public const IMAGES_COLLECTION = 'images';
-
     /**
      * @var array<int, string>
      */

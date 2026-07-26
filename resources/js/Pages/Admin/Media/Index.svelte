@@ -17,6 +17,9 @@
     import { hasPermission } from '@/lib/permissions';
     import { MEDIA_TYPES } from '@/lib/upload';
     import { formatFileSize } from '@/lib/format';
+    import { api } from '@/lib/api/client';
+    import { toast } from '@/lib/toast';
+    import { confirm } from '@/lib/confirm';
 
     /** Display labels for each media type key (was `media.tabs.*` / `media.types.*`). */
     const TAB_LABELS = { images: 'Images', audio: 'Audio', videos: 'Videos', documents: 'Documents' };
@@ -30,6 +33,24 @@
     let activityRow = $state(null);
     const view = (m) => { viewing = m; viewOpen = true; };
     const showActivity = (m) => { activityRow = m; activityOpen = true; };
+
+    /**
+     * Permanently delete a free file. Nothing prunes media automatically, so this
+     * is the only way a file ever leaves the system — hence the blunt wording.
+     */
+    async function remove(item) {
+        if (!(await confirm({
+            body: `Permanently delete ${item.name}? The file is removed from disk. This cannot be undone.`,
+            variant: 'destructive',
+        }))) return;
+        try {
+            await api.delete(route('api.v1.admin.media.destroy', item.id));
+            toast.success('Deleted successfully.');
+            list.refresh();
+        } catch (e) {
+            toast.error(e?.message ?? 'Something went wrong. Please try again.');
+        }
+    }
 
     // Media renders as cards, so there are no column headers to sort by — the
     // drawer is the only way in. Mirrors MediaController's allowedSorts.
@@ -163,6 +184,10 @@
                                 { icon: 'ki-eye', label: 'View', onclick: () => view(item) },
                                 hasPermission('activities.index') && { icon: 'ki-time', label: 'Activity', onclick: () => showActivity(item) },
                                 item.url && { icon: 'ki-exit-right', label: 'Open file', onclick: () => window.open(item.url, '_blank', 'noopener,noreferrer') },
+                                // Only free files. An attached one belongs to a
+                                // record — detach it there first, or its owner is
+                                // left with a broken thumbnail and no explanation.
+                                hasPermission('media.destroy') && !item.attached && { icon: 'ki-trash', label: 'Delete', onclick: () => remove(item), variant: 'destructive' },
                             ].filter(Boolean)} />
                         </div>
                         <button

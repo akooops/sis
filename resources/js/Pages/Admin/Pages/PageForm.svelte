@@ -31,31 +31,6 @@
     let activeTab = $state('details');
     let activeLocale = $state(null);
 
-    /**
-     * Every image this page has ever linked, as { id, url, name }. Seeded from the
-     * record on edit and appended to as the editor uploads.
-     *
-     * On save it is filtered down to the ones the content still references — that
-     * filter is what detaches a deleted image. It matches on the FILE NAME rather
-     * than the full url because TinyMCE rewrites srcs to be relative, so the
-     * absolute url the upload returned is not what ends up in the HTML.
-     */
-    let imageRefs = $state(page?.images ? [...page.images] : []);
-
-    const fileNameOf = (url) => String(url ?? '').split('?')[0].split('/').pop();
-
-    function allContent() {
-        const c = form.data.content;
-
-        return typeof c === 'string' ? c : Object.values(c ?? {}).join('\n');
-    }
-
-    function trackUpload(media) {
-        if (!imageRefs.some((r) => r.id === media.id)) {
-            imageRefs.push({ id: media.id, url: media.url, name: media.name });
-        }
-    }
-
     // Create submits flat strings for the default language; edit submits the full
     // locale maps. Two shapes, so the form data is seeded accordingly.
     const form = useForm(
@@ -123,11 +98,6 @@
         const out = { ...data };
         if (!out.thumbnail) delete out.thumbnail;
         if (!needsPublishedAt(out.status)) out.published_at = null;
-
-        // Only the images the content still shows. Anything the admin deleted
-        // from the editor falls out here, and the server detaches it.
-        const html = allContent();
-        out.images = imageRefs.filter((r) => html.includes(fileNameOf(r.url))).map((r) => r.id);
 
         return out;
     }
@@ -230,7 +200,6 @@
                     {ready}
                     contentCssUrl={form.data.css_url || null}
                     contentStyle={form.data.custom_css}
-                    onupload={trackUpload}
                 />
             </Field>
         </div>
@@ -289,7 +258,6 @@
                         {ready}
                         contentCssUrl={form.data.css_url || null}
                         contentStyle={form.data.custom_css}
-                        onupload={trackUpload}
                     />
                 </Field>
             {/if}

@@ -2,14 +2,14 @@
 
 namespace App\Data\Achievement;
 
+use App\Data\Category\CategoryData;
 use App\Models\Achievement;
-use App\Models\Media;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Lazy;
 
 /**
- * Output DTO for an achievement. Note the two independent timelines:
- * `published_at` is when the listing goes live, `achieved_at` is when the thing
- * happened.
+ * Output DTO for an achievement. `published_at` is when the listing goes live,
+ * `achieved_at` is when it happened. `category` is Lazy.
  */
 class AchievementData extends Data
 {
@@ -18,7 +18,6 @@ class AchievementData extends Data
         public string $name,
         public string $slug,
         public ?string $category_id,
-        public ?string $category_name,
         /** @var array<string, string|null> */
         public array $title,
         /** @var array<string, string|null> */
@@ -33,10 +32,9 @@ class AchievementData extends Data
         public ?string $css_url,
         public ?string $custom_css,
         public ?string $thumbnail_url,
-        /** @var array<int, array{id: string, url: string|null, name: string}> */
-        public array $images,
         public ?string $created_at,
         public ?string $updated_at,
+        public Lazy|CategoryData|null $category,
     ) {}
 
     public static function fromModel(Achievement $achievement): self
@@ -46,9 +44,6 @@ class AchievementData extends Data
             name: $achievement->name,
             slug: $achievement->slug,
             category_id: $achievement->category_id,
-            // Flattened rather than a nested object: the table renders a name and
-            // the picker only needs the id, so a relation DTO would be ceremony.
-            category_name: $achievement->category?->name,
             title: $achievement->getTranslations('title'),
             description: $achievement->getTranslations('description'),
             content: $achievement->getTranslations('content'),
@@ -59,11 +54,9 @@ class AchievementData extends Data
             css_url: $achievement->css_url,
             custom_css: $achievement->custom_css,
             thumbnail_url: $achievement->thumbnail_url,
-            images: $achievement->getMedia(Achievement::IMAGES_COLLECTION)
-                ->map(fn (Media $media) => ['id' => $media->id, 'url' => $media->url, 'name' => $media->name])
-                ->all(),
             created_at: $achievement->created_at?->toIso8601String(),
             updated_at: $achievement->updated_at?->toIso8601String(),
+            category: Lazy::whenLoaded('category', $achievement, fn () => $achievement->category ? CategoryData::from($achievement->category) : null),
         );
     }
 }

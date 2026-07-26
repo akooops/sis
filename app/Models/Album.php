@@ -15,11 +15,12 @@ use Spatie\Translatable\HasTranslations;
 /**
  * A media album: an article that also carries an ordered gallery.
  *
- * Three collections. `thumbnail` is the cover (one file). `images` holds
- * whatever the editor inserted into the content, kept in step by the form.
- * `files` is the album itself — images, video and audio together, ordered by
- * media.order_column, which UploadService::sync() writes from the submitted
- * array's order.
+ * Two collections. `thumbnail` is the cover (one file). `files` is the album
+ * itself — images, video and audio together, ordered by media.order_column,
+ * which UploadService::sync() writes from the submitted array's order.
+ *
+ * Images inserted into the content are NOT a collection: they stay free media
+ * in the library, because nothing prunes them.
  */
 class Album extends Model
 {
@@ -30,8 +31,6 @@ class Album extends Model
     ------------------------------------------*/
 
     public const THUMBNAIL_COLLECTION = 'thumbnail';
-
-    public const IMAGES_COLLECTION = 'images';
 
     public const FILES_COLLECTION = 'files';
 
@@ -82,8 +81,8 @@ class Album extends Model
     }
 
     /**
-     * Only the cover is single-file. `images` and `files` are both absent, which
-     * is what makes them multi-file.
+     * Only the cover is single-file. `files` is absent, which is what makes it
+     * multi-file.
      *
      * @return array<int, string>
      */

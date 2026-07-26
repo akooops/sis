@@ -23,8 +23,6 @@ class StoreAlbumData extends Data
         public string $thumbnail,
         /** @var array<int, string> */
         public array $files = [],
-        /** @var array<int, string> */
-        public array $images = [],
     ) {}
 
     public static function rules(ValidationContext $context): array
@@ -53,9 +51,6 @@ class StoreAlbumData extends Data
             // is refused but an image, video or audio file is not.
             'files' => ['sometimes', 'array'],
             'files.*' => ['string', new CleanUpload(Album::FILE_TYPES)],
-
-            'images' => ['sometimes', 'array'],
-            'images.*' => ['string', new CleanUpload('images')],
         ];
     }
 }

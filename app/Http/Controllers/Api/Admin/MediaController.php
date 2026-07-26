@@ -9,6 +9,7 @@ use App\Models\Media;
 use App\Services\Uploads\UploadService;
 use App\States\Media\Clean;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -49,5 +50,18 @@ class MediaController extends ApiController
         UploadService::detach($media);
 
         return $this->respond(null, 'Media detached successfully');
+    }
+
+    public function destroy(Media $media): JsonResponse
+    {
+        if ($media->model_id !== null) {
+            throw ValidationException::withMessages([
+                'media' => 'This file is in use. Detach it from its record first, then delete it.',
+            ]);
+        }
+
+        UploadService::delete($media);
+
+        return $this->respond(null, 'File deleted successfully');
     }
 }

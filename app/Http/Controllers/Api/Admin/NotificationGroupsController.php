@@ -8,7 +8,6 @@ use App\Data\Notification\UpdateNotificationGroupData;
 use App\Http\Controllers\Api\ApiController;
 use App\Models\NotificationGroup;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;

@@ -45,7 +45,7 @@ class ArticlesController extends ApiController
 
     public function show(Article $article): JsonResponse
     {
-        return $this->respond(ArticleData::from($article), 'Article retrieved successfully');
+        return $this->respond(ArticleData::from($article->load('category')), 'Article retrieved successfully');
     }
 
     public function store(StoreArticleData $data): JsonResponse
@@ -67,15 +67,12 @@ class ArticlesController extends ApiController
 
         UploadService::attach($data->thumbnail, $article, Article::THUMBNAIL_COLLECTION);
 
-        // Link the images the content uses so the orphan sweep can't reclaim them.
-        UploadService::sync($data->images, $article, Article::IMAGES_COLLECTION);
-
-        return $this->respond(ArticleData::from($article->fresh()), 'Article created successfully', 201);
+        return $this->respond(ArticleData::from($article->fresh()->load('category')), 'Article created successfully', 201);
     }
 
     public function update(UpdateArticleData $data, Article $article): JsonResponse
     {
-        $article->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at', 'images']));
+        $article->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at']));
 
         $target = ArticleStatus::resolveStateClass($data->status);
 
@@ -98,9 +95,7 @@ class ArticlesController extends ApiController
             UploadService::attach($data->thumbnail, $article, Article::THUMBNAIL_COLLECTION);
         }
 
-        UploadService::sync($data->images, $article, Article::IMAGES_COLLECTION);
-
-        return $this->respond(ArticleData::from($article->fresh()), 'Article updated successfully');
+        return $this->respond(ArticleData::from($article->fresh()->load('category')), 'Article updated successfully');
     }
 
     public function destroy(Article $article): JsonResponse

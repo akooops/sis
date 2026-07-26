@@ -48,7 +48,7 @@ class AchievementsController extends ApiController
 
     public function show(Achievement $achievement): JsonResponse
     {
-        return $this->respond(AchievementData::from($achievement), 'Achievement retrieved successfully');
+        return $this->respond(AchievementData::from($achievement->load('category')), 'Achievement retrieved successfully');
     }
 
     public function store(StoreAchievementData $data): JsonResponse
@@ -71,14 +71,13 @@ class AchievementsController extends ApiController
         ]);
 
         UploadService::attach($data->thumbnail, $achievement, Achievement::THUMBNAIL_COLLECTION);
-        UploadService::sync($data->images, $achievement, Achievement::IMAGES_COLLECTION);
 
-        return $this->respond(AchievementData::from($achievement->fresh()), 'Achievement created successfully', 201);
+        return $this->respond(AchievementData::from($achievement->fresh()->load('category')), 'Achievement created successfully', 201);
     }
 
     public function update(UpdateAchievementData $data, Achievement $achievement): JsonResponse
     {
-        $achievement->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at', 'images']));
+        $achievement->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at']));
 
         $target = AchievementStatus::resolveStateClass($data->status);
 
@@ -101,9 +100,7 @@ class AchievementsController extends ApiController
             UploadService::attach($data->thumbnail, $achievement, Achievement::THUMBNAIL_COLLECTION);
         }
 
-        UploadService::sync($data->images, $achievement, Achievement::IMAGES_COLLECTION);
-
-        return $this->respond(AchievementData::from($achievement->fresh()), 'Achievement updated successfully');
+        return $this->respond(AchievementData::from($achievement->fresh()->load('category')), 'Achievement updated successfully');
     }
 
     public function destroy(Achievement $achievement): JsonResponse

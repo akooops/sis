@@ -33,8 +33,6 @@ class Article extends Model
 
     public const THUMBNAIL_COLLECTION = 'thumbnail';
 
-    public const IMAGES_COLLECTION = 'images';
-
     /**
      * Columns HasTranslations stores as a locale => value JSON map. The trait
      * casts these itself, so they must NOT be repeated in $casts.
@@ -81,9 +79,6 @@ class Article extends Model
     }
 
     /**
-     * One thumbnail; `images` is deliberately absent, which is what makes it
-     * multi-file.
-     *
      * @return array<int, string>
      */
     public function singleFileCollections(): array

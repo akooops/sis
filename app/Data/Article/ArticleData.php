@@ -2,19 +2,12 @@
 
 namespace App\Data\Article;
 
+use App\Data\Category\CategoryData;
 use App\Models\Article;
-use App\Models\Media;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Lazy;
 
-/**
- * Output DTO for an article. The three translatable fields are exposed as full
- * locale => value maps so the edit form's language tabs can be seeded in one
- * request.
- *
- * `images` carries the id AND url of every image currently linked, so the form
- * can match them against the content it is editing and drop the ones no longer
- * referenced.
- */
+/** Output DTO for an article. `category` is Lazy — included only when eager-loaded. */
 class ArticleData extends Data
 {
     public function __construct(
@@ -22,7 +15,6 @@ class ArticleData extends Data
         public string $name,
         public string $slug,
         public ?string $category_id,
-        public ?string $category_name,
         /** @var array<string, string|null> */
         public array $title,
         /** @var array<string, string|null> */
@@ -34,10 +26,9 @@ class ArticleData extends Data
         public ?string $css_url,
         public ?string $custom_css,
         public ?string $thumbnail_url,
-        /** @var array<int, array{id: string, url: string|null, name: string}> */
-        public array $images,
         public ?string $created_at,
         public ?string $updated_at,
+        public Lazy|CategoryData|null $category,
     ) {}
 
     public static function fromModel(Article $article): self
@@ -47,9 +38,6 @@ class ArticleData extends Data
             name: $article->name,
             slug: $article->slug,
             category_id: $article->category_id,
-            // Flattened rather than a nested object: the table renders a name and
-            // the picker only needs the id, so a relation DTO would be ceremony.
-            category_name: $article->category?->name,
             title: $article->getTranslations('title'),
             description: $article->getTranslations('description'),
             content: $article->getTranslations('content'),
@@ -58,11 +46,9 @@ class ArticleData extends Data
             css_url: $article->css_url,
             custom_css: $article->custom_css,
             thumbnail_url: $article->thumbnail_url,
-            images: $article->getMedia(Article::IMAGES_COLLECTION)
-                ->map(fn (Media $media) => ['id' => $media->id, 'url' => $media->url, 'name' => $media->name])
-                ->all(),
             created_at: $article->created_at?->toIso8601String(),
             updated_at: $article->updated_at?->toIso8601String(),
+            category: Lazy::whenLoaded('category', $article, fn () => $article->category ? CategoryData::from($article->category) : null),
         );
     }
 }

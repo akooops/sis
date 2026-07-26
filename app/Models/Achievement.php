@@ -34,8 +34,6 @@ class Achievement extends Model
 
     public const THUMBNAIL_COLLECTION = 'thumbnail';
 
-    public const IMAGES_COLLECTION = 'images';
-
     /**
      * Columns HasTranslations stores as a locale => value JSON map. The trait
      * casts these itself, so they must NOT be repeated in $casts.

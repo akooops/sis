@@ -48,6 +48,9 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
     Route::prefix('admin')->group(function () {
         // Media
         Route::post('media', [MediaController::class, 'store'])->name('api.v1.admin.media.store');
+        Route::get('media', [MediaController::class, 'index'])->middleware('verify.permissions:media.index')->name('api.v1.admin.media.index');
+        Route::patch('media/{media}/detach', [MediaController::class, 'detach'])->middleware('verify.permissions:media.detach')->name('api.v1.admin.media.detach');
+        Route::delete('media/{media}', [MediaController::class, 'destroy'])->middleware('verify.permissions:media.destroy')->name('api.v1.admin.media.destroy');
 
         // Users
         Route::get('users', [UsersController::class, 'index'])->middleware('verify.permissions:users.index')->name('api.v1.admin.users.index');
@@ -93,10 +96,6 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::delete('api-keys/{apiKey}', [ApiKeysController::class, 'destroy'])->middleware('verify.permissions:api-keys.destroy')->name('api.v1.admin.api-keys.destroy');
         Route::post('api-keys/{apiKey}/rotate', [ApiKeysController::class, 'rotate'])->middleware('verify.permissions:api-keys.rotate')->name('api.v1.admin.api-keys.rotate');
         Route::post('api-keys/{apiKey}/revoke', [ApiKeysController::class, 'revoke'])->middleware('verify.permissions:api-keys.revoke')->name('api.v1.admin.api-keys.revoke');
-
-        // Media
-        Route::get('media', [MediaController::class, 'index'])->middleware('verify.permissions:media.index')->name('api.v1.admin.media.index');
-        Route::patch('media/{media}/detach', [MediaController::class, 'detach'])->middleware('verify.permissions:media.detach')->name('api.v1.admin.media.detach');
 
         // Activities
         Route::get('activities', [ActivitiesController::class, 'index'])->middleware('verify.permissions:activities.index')->name('api.v1.admin.activities.index');
