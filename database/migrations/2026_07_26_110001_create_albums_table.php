@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('pages', function (Blueprint $table) {
+        Schema::create('albums', function (Blueprint $table) {
             $table->ulid('id')->primary();
 
             $table->string('name');
@@ -24,8 +24,6 @@ return new class extends Migration
             $table->string('css_url')->nullable();
             $table->text('custom_css')->nullable();
 
-            $table->boolean('is_system')->default(false);
-
             $table->index(['status', 'published_at']);
 
             $table->timestamps();
@@ -34,6 +32,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('pages');
+        Schema::dropIfExists('albums');
     }
 };

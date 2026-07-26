@@ -40,6 +40,9 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('languages', [AdminPagesController::class, 'languages'])->middleware('verify.permissions:languages.index')->name('web.admin.languages.index');
     Route::get('translations', [AdminPagesController::class, 'translations'])->middleware('verify.permissions:translations.index')->name('web.admin.translations.index');
     Route::get('pages', [AdminPagesController::class, 'pages'])->middleware('verify.permissions:pages.index')->name('web.admin.pages.index');
+    Route::get('articles', [AdminPagesController::class, 'articles'])->middleware('verify.permissions:articles.index')->name('web.admin.articles.index');
+    Route::get('albums', [AdminPagesController::class, 'albums'])->middleware('verify.permissions:albums.index')->name('web.admin.albums.index');
+    Route::get('events', [AdminPagesController::class, 'events'])->middleware('verify.permissions:events.index')->name('web.admin.events.index');
 });
 
 /*------------------------

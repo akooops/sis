@@ -32,6 +32,9 @@ export const adminMenu = [
         children: [
             { label: 'Media Library', route: 'web.admin.media.index', permission: 'media.index' },
             { label: 'Pages', route: 'web.admin.pages.index', permission: 'pages.index' },
+            { label: 'Articles', route: 'web.admin.articles.index', permission: 'articles.index' },
+            { label: 'Albums', route: 'web.admin.albums.index', permission: 'albums.index' },
+            { label: 'Events', route: 'web.admin.events.index', permission: 'events.index' },
         ],
     },
     {

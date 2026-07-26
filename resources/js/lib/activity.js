@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -43,6 +43,9 @@ export const LOG_NAME_LABELS = {
     languages: 'Languages',
     translations: 'Translations',
     pages: 'Pages',
+    articles: 'Articles',
+    albums: 'Albums',
+    events: 'Events',
     auth: 'Authentication',
 };
 
@@ -60,6 +63,9 @@ export const SUBJECT_TYPE_LABELS = {
     language: 'Language',
     translation_key: 'Translation key',
     page: 'Page',
+    article: 'Article',
+    album: 'Album',
+    event: 'Event',
 };
 
 /** Generic fallback wording, used when there is no per-module message below. */
@@ -147,6 +153,21 @@ const ACTIVITY_MESSAGES = {
         created: 'Created the page :name',
         updated: 'Updated the page :name',
         deleted: 'Deleted the page :name',
+    },
+    articles: {
+        created: 'Created the article :name',
+        updated: 'Updated the article :name',
+        deleted: 'Deleted the article :name',
+    },
+    albums: {
+        created: 'Created the album :name',
+        updated: 'Updated the album :name',
+        deleted: 'Deleted the album :name',
+    },
+    events: {
+        created: 'Created the event :name',
+        updated: 'Updated the event :name',
+        deleted: 'Deleted the event :name',
     },
     auth: {
         login: ':name signed in',

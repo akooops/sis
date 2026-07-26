@@ -71,4 +71,19 @@ class PagesController extends Controller
     {
         return inertia('Admin/Pages/Index');
     }
+
+    public function articles(): Response
+    {
+        return inertia('Admin/Articles/Index');
+    }
+
+    public function albums(): Response
+    {
+        return inertia('Admin/Albums/Index');
+    }
+
+    public function events(): Response
+    {
+        return inertia('Admin/Events/Index');
+    }
 }

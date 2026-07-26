@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\ActivitiesController;
+use App\Http\Controllers\Api\Admin\AlbumsController;
 use App\Http\Controllers\Api\Admin\ApiKeyPermissionsController;
 use App\Http\Controllers\Api\Admin\ApiKeysController;
+use App\Http\Controllers\Api\Admin\ArticlesController;
 use App\Http\Controllers\Api\Admin\AuthController;
+use App\Http\Controllers\Api\Admin\EventsController;
 use App\Http\Controllers\Api\Admin\MediaController;
 use App\Http\Controllers\Api\Admin\IntegrationsController;
 use App\Http\Controllers\Api\Admin\IntegrationTypesController;
@@ -155,5 +158,26 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('pages', [PagesController::class, 'store'])->middleware('verify.permissions:pages.store')->name('api.v1.admin.pages.store');
         Route::put('pages/{page}', [PagesController::class, 'update'])->middleware('verify.permissions:pages.update')->name('api.v1.admin.pages.update');
         Route::delete('pages/{page}', [PagesController::class, 'destroy'])->middleware('verify.permissions:pages.destroy')->name('api.v1.admin.pages.destroy');
+
+        // Articles
+        Route::get('articles', [ArticlesController::class, 'index'])->middleware('verify.permissions:articles.index')->name('api.v1.admin.articles.index');
+        Route::get('articles/{article}', [ArticlesController::class, 'show'])->middleware('verify.permissions:articles.index')->name('api.v1.admin.articles.show');
+        Route::post('articles', [ArticlesController::class, 'store'])->middleware('verify.permissions:articles.store')->name('api.v1.admin.articles.store');
+        Route::put('articles/{article}', [ArticlesController::class, 'update'])->middleware('verify.permissions:articles.update')->name('api.v1.admin.articles.update');
+        Route::delete('articles/{article}', [ArticlesController::class, 'destroy'])->middleware('verify.permissions:articles.destroy')->name('api.v1.admin.articles.destroy');
+
+        // Albums
+        Route::get('albums', [AlbumsController::class, 'index'])->middleware('verify.permissions:albums.index')->name('api.v1.admin.albums.index');
+        Route::get('albums/{album}', [AlbumsController::class, 'show'])->middleware('verify.permissions:albums.index')->name('api.v1.admin.albums.show');
+        Route::post('albums', [AlbumsController::class, 'store'])->middleware('verify.permissions:albums.store')->name('api.v1.admin.albums.store');
+        Route::put('albums/{album}', [AlbumsController::class, 'update'])->middleware('verify.permissions:albums.update')->name('api.v1.admin.albums.update');
+        Route::delete('albums/{album}', [AlbumsController::class, 'destroy'])->middleware('verify.permissions:albums.destroy')->name('api.v1.admin.albums.destroy');
+
+        // Events
+        Route::get('events', [EventsController::class, 'index'])->middleware('verify.permissions:events.index')->name('api.v1.admin.events.index');
+        Route::get('events/{event}', [EventsController::class, 'show'])->middleware('verify.permissions:events.index')->name('api.v1.admin.events.show');
+        Route::post('events', [EventsController::class, 'store'])->middleware('verify.permissions:events.store')->name('api.v1.admin.events.store');
+        Route::put('events/{event}', [EventsController::class, 'update'])->middleware('verify.permissions:events.update')->name('api.v1.admin.events.update');
+        Route::delete('events/{event}', [EventsController::class, 'destroy'])->middleware('verify.permissions:events.destroy')->name('api.v1.admin.events.destroy');
     });
 });

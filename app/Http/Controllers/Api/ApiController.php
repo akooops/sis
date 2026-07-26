@@ -72,9 +72,9 @@ abstract class ApiController extends Controller
      * Fine for a CMS; if it ever isn't, the fix is an indexed generated column
      * per (column, locale), not a change here.
      *
-     * @param  array<int, string>  $columns     plain columns
+     * @param  array<int, string>  $columns  plain columns
      * @param  array<int, string>  $translated  JSON (translatable) columns
-     * @param  array<int, string>  $locales     locale codes to match, e.g. ['en', 'ar']
+     * @param  array<int, string>  $locales  locale codes to match, e.g. ['en', 'ar']
      */
     protected function searchTranslations(array $columns, array $translated, array $locales, bool $withId = true): AllowedFilter
     {
@@ -153,20 +153,26 @@ abstract class ApiController extends Controller
 
     /**
      * A date-boundary filter (?filter[<name>]=2024-01-01). The name is public
-     * only — the column compared is always created_at, so created_from and
-     * created_to bound the same field from either side. An unparsable date is a
-     * 422: a date the server can't read must not silently drop the filter.
+     * only — created_from and created_to bound the same column from either side,
+     * which is why the two are separate filters rather than one: spatie keys
+     * allowed filters BY NAME, so registering the same name twice silently keeps
+     * only one of them. An unparsable date is a 422: a date the server can't read
+     * must not silently drop the filter.
+     *
+     * `$column` defaults to created_at, which is what every module wanted until a
+     * record gained dates of its own (an event's start_at). Pass it explicitly and
+     * the public filter name no longer has to match the column.
      */
-    protected function date(string $name, string $operator, string $boundary): AllowedFilter
+    protected function date(string $name, string $operator, string $boundary, string $column = 'created_at'): AllowedFilter
     {
-        return AllowedFilter::callback($name, function ($query, $value) use ($name, $operator, $boundary) {
+        return AllowedFilter::callback($name, function ($query, $value) use ($name, $operator, $boundary, $column) {
             try {
                 $date = Carbon::parse($value)->{$boundary}();
             } catch (InvalidFormatException) {
                 throw ValidationException::withMessages([$name => __('validation.date', ['attribute' => $name])]);
             }
 
-            $query->where('created_at', $operator, $date);
+            $query->where($column, $operator, $date);
         });
     }
 }

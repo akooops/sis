@@ -52,6 +52,21 @@ class PermissionsSeeder extends Seeder
             ['code' => 'pages.store', 'name' => 'Create pages', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'pages.update', 'name' => 'Update pages', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'pages.destroy', 'name' => 'Delete pages', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'articles.index', 'name' => 'View articles', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'articles.store', 'name' => 'Create articles', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'articles.update', 'name' => 'Update articles', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'articles.destroy', 'name' => 'Delete articles', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'albums.index', 'name' => 'View albums', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'albums.store', 'name' => 'Create albums', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'albums.update', 'name' => 'Update albums', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'albums.destroy', 'name' => 'Delete albums', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'events.index', 'name' => 'View events', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'events.store', 'name' => 'Create events', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'events.update', 'name' => 'Update events', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'events.destroy', 'name' => 'Delete events', 'supports_web' => true, 'supports_api' => false],
         ];
 
         foreach ($permissions as $permission) {

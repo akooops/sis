@@ -66,8 +66,13 @@ class UploadService
      * For a single-file collection (e.g. avatar) the existing item is first
      * freed back into the reusable pool. Multi-file collections keep all their
      * items — removing one is done explicitly via detach().
+     *
+     * Returns the media the model ends up owning — which on the copy path is a
+     * NEW row, not the one whose id was passed in. Callers that need to record
+     * what was actually attached (ordering a gallery, say) must use the return
+     * value rather than the argument.
      */
-    public static function attach(string $mediaId, Model $model, string $collection): void
+    public static function attach(string $mediaId, Model $model, string $collection): Media
     {
         $media = Media::query()->whereKey($mediaId)->firstOrFail();
 
@@ -82,23 +87,30 @@ class UploadService
 
             static::log($media, 'attached', $model, $collection);
 
-            return;
+            return $media;
         }
 
-        static::log(static::copy($media, $model, $collection), 'attached', $model, $collection);
+        $copy = static::copy($media, $model, $collection);
+
+        static::log($copy, 'attached', $model, $collection);
+
+        return $copy;
     }
 
     /**
      * Make one of a model's collections hold exactly the given media and nothing
      * else: attach what is new, leave what is already here, detach the rest.
      *
-     * The subtlety is why this exists at all. attach() COPIES a media that
-     * already has an owner, so re-attaching on every save would fork the file
-     * once per save — and the copy's file_name is not the one written into the
-     * page's content, so it would never settle. sync() therefore only takes over
-     * media that are still FREE; one owned by another model is left exactly as it
-     * is, because the file is on the public disk either way and two pages linking
-     * the same image must not duplicate it.
+     * Each incoming id goes through attach(), which decides between re-owning a
+     * free upload and COPYING one that already belongs to something else. The copy
+     * matters: picking an existing library file is a normal thing to do, and
+     * skipping owned media (as this once did) made that pick silently vanish on
+     * save. Two records must never share a row — deleting one would blank the other.
+     *
+     * A copy has a new id, so the collection ends up holding an id the caller did
+     * not send. That converges rather than looping: the response carries the new
+     * ids, the form reseeds from it, and the next save sends those instead. One
+     * copy per pick, not one per save.
      *
      * Multi-file collections only: on a single-file collection attach() frees the
      * collection first, so two incoming ids would fight over it.
@@ -124,17 +136,22 @@ class UploadService
             }
         }
 
-        $incoming = array_values(array_diff($mediaIds, $current->modelKeys()));
+        // Resolved in submitted order, because that order IS the display order and
+        // a copy's id isn't known until attach() returns.
+        $ordered = [];
 
-        if ($incoming === []) {
-            return;
+        foreach ($mediaIds as $mediaId) {
+            $held = $current->firstWhere('id', $mediaId);
+
+            $ordered[] = $held ?: static::attach($mediaId, $model, $collection);
         }
 
-        Media::query()
-            ->whereKey($incoming)
-            ->whereNull('model_id')
-            ->get()
-            ->each(fn (Media $media) => static::attach($media->getKey(), $model, $collection));
+        // HasMedia::getMedia() already sorts by order_column; nothing wrote it
+        // until now, so a gallery came back in creation order however the admin
+        // had arranged it. Builder updates, so reordering writes no audit rows.
+        foreach ($ordered as $position => $media) {
+            Media::query()->whereKey($media->getKey())->update(['order_column' => $position]);
+        }
     }
 
     /**

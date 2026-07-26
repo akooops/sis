@@ -13,7 +13,11 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('model:prune')->daily();
+
         $schedule->command('pages:publish-scheduled')->everyMinute()->withoutOverlapping();
+        $schedule->command('articles:publish-scheduled')->everyMinute()->withoutOverlapping();
+        $schedule->command('albums:publish-scheduled')->everyMinute()->withoutOverlapping();
+        $schedule->command('events:publish-scheduled')->everyMinute()->withoutOverlapping();
     }
 
     /**

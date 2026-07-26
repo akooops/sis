@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('pages', function (Blueprint $table) {
+        Schema::create('events', function (Blueprint $table) {
             $table->ulid('id')->primary();
 
             $table->string('name');
@@ -21,12 +21,14 @@ return new class extends Migration
             $table->string('status')->default('draft')->index();
             $table->dateTime('published_at')->nullable();
 
+            $table->dateTime('start_at');
+            $table->dateTime('end_at');
+
             $table->string('css_url')->nullable();
             $table->text('custom_css')->nullable();
 
-            $table->boolean('is_system')->default(false);
-
             $table->index(['status', 'published_at']);
+            $table->index(['start_at', 'end_at']);
 
             $table->timestamps();
         });
@@ -34,6 +36,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('pages');
+        Schema::dropIfExists('events');
     }
 };

@@ -2,14 +2,17 @@
 
 namespace App\Enums;
 
+use App\Models\Album;
 use App\Models\ApiKey;
+use App\Models\Article;
+use App\Models\Event;
 use App\Models\Integration;
 use App\Models\Language;
 use App\Models\Media;
 use App\Models\Notification;
-use App\Models\Page;
 use App\Models\NotificationGroup;
 use App\Models\NotificationType;
+use App\Models\Page;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\TranslationKey;
@@ -38,6 +41,9 @@ enum MorphType: string
     case Language = 'language';
     case TranslationKey = 'translation_key';
     case Page = 'page';
+    case Article = 'article';
+    case Album = 'album';
+    case Event = 'event';
 
     /** @return class-string */
     public function class(): string
@@ -55,6 +61,9 @@ enum MorphType: string
             self::Language => Language::class,
             self::TranslationKey => TranslationKey::class,
             self::Page => Page::class,
+            self::Article => Article::class,
+            self::Album => Album::class,
+            self::Event => Event::class,
         };
     }
 

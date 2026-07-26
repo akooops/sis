@@ -23,8 +23,38 @@ export class ApiError extends Error {
     }
 }
 
-function csrfToken() {
-    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+/**
+ * CSRF header for a request: the XSRF-TOKEN cookie first, the <meta> tag only as
+ * a fallback.
+ *
+ * Laravel rewrites that cookie on EVERY response, whereas the meta tag is
+ * printed once by the Blade shell and never again — an Inertia visit swaps the
+ * page component without re-rendering <head>. So when a session expired and the
+ * auth guard bounced you to the login page (a client-side swap, not a reload),
+ * the meta tag still held the DEAD session's token while the server had already
+ * issued a fresh one, and logging in answered 419 "CSRF token mismatch".
+ * Reading the cookie is self-healing: it always belongs to the session the
+ * server last issued.
+ *
+ * The two headers are mutually exclusive on purpose. Laravel's
+ * getTokenFromRequest() reads X-CSRF-TOKEN first and only falls back to
+ * X-XSRF-TOKEN, so sending a stale meta token alongside a good cookie would
+ * reintroduce the bug. The cookie value is passed through verbatim (just
+ * URL-decoded) — it is encrypted, and Laravel decrypts it on the way in.
+ */
+function csrfHeader() {
+    const cookie = document.cookie
+        .split('; ')
+        .find((c) => c.startsWith('XSRF-TOKEN='))
+        ?.split('=')
+        .slice(1)
+        .join('=');
+
+    if (cookie) return { 'X-XSRF-TOKEN': decodeURIComponent(cookie) };
+
+    const meta = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    return meta ? { 'X-CSRF-TOKEN': meta } : {};
 }
 
 /**
@@ -64,7 +94,7 @@ async function request(url, { method = 'GET', body, params, signal, headers = {}
     const finalHeaders = {
         Accept: 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': csrfToken(),
+        ...csrfHeader(),
         ...(body && !isFormData ? { 'Content-Type': 'application/json' } : {}),
         ...headers,
     };
