@@ -91,6 +91,12 @@ class PermissionsSeeder extends Seeder
             ['code' => 'documents.update', 'name' => 'Update documents', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'documents.destroy', 'name' => 'Delete documents', 'supports_web' => true, 'supports_api' => false],
 
+            ['code' => 'banners.index', 'name' => 'View banners', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'banners.store', 'name' => 'Create banners', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'banners.update', 'name' => 'Update banners', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'banners.reorder', 'name' => 'Reorder banners', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'banners.destroy', 'name' => 'Delete banners', 'supports_web' => true, 'supports_api' => false],
+
             ['code' => 'programs.index', 'name' => 'View programs', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'programs.store', 'name' => 'Create programs', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'programs.update', 'name' => 'Update programs', 'supports_web' => true, 'supports_api' => false],

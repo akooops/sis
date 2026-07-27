@@ -102,6 +102,11 @@ class PagesController extends Controller
         return inertia('Admin/Partners/Index');
     }
 
+    public function banners(): Response
+    {
+        return inertia('Admin/Banners/Index');
+    }
+
     public function documents(): Response
     {
         return inertia('Admin/Documents/Index');

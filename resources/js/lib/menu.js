@@ -40,6 +40,7 @@ export const adminMenu = [
             { label: 'Events', route: 'web.admin.events.index', permission: 'events.index' },
             { label: 'Partners', route: 'web.admin.partners.index', permission: 'partners.index' },
             { label: 'Documents', route: 'web.admin.documents.index', permission: 'documents.index' },
+            { label: 'Banners', route: 'web.admin.banners.index', permission: 'banners.index' },
         ],
     },
     {

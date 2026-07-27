@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Admin\ApiKeyPermissionsController;
 use App\Http\Controllers\Api\Admin\ApiKeysController;
 use App\Http\Controllers\Api\Admin\ArticlesController;
 use App\Http\Controllers\Api\Admin\AuthController;
+use App\Http\Controllers\Api\Admin\BannersController;
 use App\Http\Controllers\Api\Admin\CategoriesController;
 use App\Http\Controllers\Api\Admin\CountriesController;
 use App\Http\Controllers\Api\Admin\DocumentsController;
@@ -216,6 +217,15 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('documents', [DocumentsController::class, 'store'])->middleware('verify.permissions:documents.store')->name('api.v1.admin.documents.store');
         Route::put('documents/{document}', [DocumentsController::class, 'update'])->middleware('verify.permissions:documents.update')->name('api.v1.admin.documents.update');
         Route::delete('documents/{document}', [DocumentsController::class, 'destroy'])->middleware('verify.permissions:documents.destroy')->name('api.v1.admin.documents.destroy');
+
+        // Banners
+        Route::get('banners', [BannersController::class, 'index'])->middleware('verify.permissions:banners.index')->name('api.v1.admin.banners.index');
+        Route::get('banners/{banner}', [BannersController::class, 'show'])->middleware('verify.permissions:banners.index')->name('api.v1.admin.banners.show');
+        Route::post('banners', [BannersController::class, 'store'])->middleware('verify.permissions:banners.store')->name('api.v1.admin.banners.store');
+        // Declared before banners/{banner} so 'reorder' is not bound as an id.
+        Route::post('banners/reorder', [BannersController::class, 'reorder'])->middleware('verify.permissions:banners.reorder')->name('api.v1.admin.banners.reorder');
+        Route::put('banners/{banner}', [BannersController::class, 'update'])->middleware('verify.permissions:banners.update')->name('api.v1.admin.banners.update');
+        Route::delete('banners/{banner}', [BannersController::class, 'destroy'])->middleware('verify.permissions:banners.destroy')->name('api.v1.admin.banners.destroy');
 
         // Programs
         Route::get('programs', [ProgramsController::class, 'index'])->middleware('verify.permissions:programs.index')->name('api.v1.admin.programs.index');

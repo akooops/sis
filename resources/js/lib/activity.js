@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'partners', 'documents', 'programs', 'streams', 'grades', 'job-offers', 'countries', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'programs', 'streams', 'grades', 'job-offers', 'countries', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -49,6 +49,7 @@ export const LOG_NAME_LABELS = {
     achievements: 'Achievements',
     partners: 'Partners',
     documents: 'Documents',
+    banners: 'Banners',
     programs: 'Programs',
     streams: 'Streams',
     grades: 'Grades',
@@ -78,6 +79,7 @@ export const SUBJECT_TYPE_LABELS = {
     achievement: 'Achievement',
     partner: 'Partner',
     document: 'Document',
+    banner: 'Banner',
     program: 'Program',
     stream: 'Stream',
     grade: 'Grade',
@@ -206,6 +208,11 @@ const ACTIVITY_MESSAGES = {
         created: 'Created the document :name',
         updated: 'Updated the document :name',
         deleted: 'Deleted the document :name',
+    },
+    banners: {
+        created: 'Created the banner :name',
+        updated: 'Updated the banner :name',
+        deleted: 'Deleted the banner :name',
     },
     programs: {
         created: 'Created the program :name',

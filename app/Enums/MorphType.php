@@ -6,6 +6,7 @@ use App\Models\Achievement;
 use App\Models\Album;
 use App\Models\ApiKey;
 use App\Models\Article;
+use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Country;
 use App\Models\Document;
@@ -56,6 +57,7 @@ enum MorphType: string
     case Achievement = 'achievement';
     case Partner = 'partner';
     case Document = 'document';
+    case Banner = 'banner';
     case JobOffer = 'job_offer';
     case Country = 'country';
     case Program = 'program';
@@ -85,6 +87,7 @@ enum MorphType: string
             self::Achievement => Achievement::class,
             self::Partner => Partner::class,
             self::Document => Document::class,
+            self::Banner => Banner::class,
             self::JobOffer => JobOffer::class,
             self::Country => Country::class,
             self::Program => Program::class,
