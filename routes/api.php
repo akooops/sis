@@ -8,11 +8,13 @@ use App\Http\Controllers\Api\Admin\ApiKeysController;
 use App\Http\Controllers\Api\Admin\ArticlesController;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\CategoriesController;
+use App\Http\Controllers\Api\Admin\CountriesController;
 use App\Http\Controllers\Api\Admin\DocumentsController;
 use App\Http\Controllers\Api\Admin\EventsController;
 use App\Http\Controllers\Api\Admin\GradesController;
 use App\Http\Controllers\Api\Admin\IntegrationsController;
 use App\Http\Controllers\Api\Admin\IntegrationTypesController;
+use App\Http\Controllers\Api\Admin\JobOffersController;
 use App\Http\Controllers\Api\Admin\LanguagesController;
 use App\Http\Controllers\Api\Admin\MediaController;
 use App\Http\Controllers\Api\Admin\NotificationGroupsController;
@@ -241,5 +243,18 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('grades/reorder', [GradesController::class, 'reorder'])->middleware('verify.permissions:grades.reorder')->name('api.v1.admin.grades.reorder');
         Route::put('grades/{grade}', [GradesController::class, 'update'])->middleware('verify.permissions:grades.update')->name('api.v1.admin.grades.update');
         Route::delete('grades/{grade}', [GradesController::class, 'destroy'])->middleware('verify.permissions:grades.destroy')->name('api.v1.admin.grades.destroy');
+
+        // Job Offers
+        Route::get('job-offers', [JobOffersController::class, 'index'])->middleware('verify.permissions:job-offers.index')->name('api.v1.admin.job-offers.index');
+        Route::get('job-offers/{job_offer}', [JobOffersController::class, 'show'])->middleware('verify.permissions:job-offers.index')->name('api.v1.admin.job-offers.show');
+        Route::post('job-offers', [JobOffersController::class, 'store'])->middleware('verify.permissions:job-offers.store')->name('api.v1.admin.job-offers.store');
+        Route::put('job-offers/{job_offer}', [JobOffersController::class, 'update'])->middleware('verify.permissions:job-offers.update')->name('api.v1.admin.job-offers.update');
+        Route::delete('job-offers/{job_offer}', [JobOffersController::class, 'destroy'])->middleware('verify.permissions:job-offers.destroy')->name('api.v1.admin.job-offers.destroy');
+
+        // Countries
+        Route::get('countries', [CountriesController::class, 'index'])->middleware('verify.permissions:countries.index')->name('api.v1.admin.countries.index');
+        Route::get('countries/{country}', [CountriesController::class, 'show'])->middleware('verify.permissions:countries.index')->name('api.v1.admin.countries.show');
+        Route::post('countries', [CountriesController::class, 'store'])->middleware('verify.permissions:countries.store')->name('api.v1.admin.countries.store');
+        Route::put('countries/{country}', [CountriesController::class, 'update'])->middleware('verify.permissions:countries.update')->name('api.v1.admin.countries.update');
     });
 });

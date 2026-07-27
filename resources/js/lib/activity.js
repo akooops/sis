@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'partners', 'documents', 'programs', 'streams', 'grades', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'partners', 'documents', 'programs', 'streams', 'grades', 'job-offers', 'countries', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -52,6 +52,8 @@ export const LOG_NAME_LABELS = {
     programs: 'Programs',
     streams: 'Streams',
     grades: 'Grades',
+    'job-offers': 'Job Offers',
+    countries: 'Countries',
     categories: 'Categories',
     auth: 'Authentication',
 };
@@ -79,6 +81,8 @@ export const SUBJECT_TYPE_LABELS = {
     program: 'Program',
     stream: 'Stream',
     grade: 'Grade',
+    job_offer: 'Job Offer',
+    country: 'Country',
     category: 'Category',
 };
 
@@ -217,6 +221,16 @@ const ACTIVITY_MESSAGES = {
         created: 'Created the grade :name',
         updated: 'Updated the grade :name',
         deleted: 'Deleted the grade :name',
+    },
+    'job-offers': {
+        created: 'Created the job offer :name',
+        updated: 'Updated the job offer :name',
+        deleted: 'Deleted the job offer :name',
+    },
+    countries: {
+        created: 'Created the country :name',
+        updated: 'Updated the country :name',
+        deleted: 'Deleted the country :name',
     },
     auth: {
         login: ':name signed in',

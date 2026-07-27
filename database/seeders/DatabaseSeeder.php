@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             LanguagesSeeder::class,
             TranslationKeysSeeder::class,
             CategoriesSeeder::class,
+            CountriesSeeder::class,
             PagesSeeder::class,
         ]);
 

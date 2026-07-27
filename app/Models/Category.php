@@ -53,6 +53,11 @@ class Category extends Model
         return $this->hasMany(Achievement::class);
     }
 
+    public function jobOffers(): HasMany
+    {
+        return $this->hasMany(JobOffer::class);
+    }
+
     /* -----------------------------------------
      3. Accessors
     ------------------------------------------*/

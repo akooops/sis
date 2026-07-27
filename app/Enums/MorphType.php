@@ -7,10 +7,12 @@ use App\Models\Album;
 use App\Models\ApiKey;
 use App\Models\Article;
 use App\Models\Category;
+use App\Models\Country;
 use App\Models\Document;
 use App\Models\Event;
 use App\Models\Grade;
 use App\Models\Integration;
+use App\Models\JobOffer;
 use App\Models\Language;
 use App\Models\Media;
 use App\Models\Notification;
@@ -54,6 +56,8 @@ enum MorphType: string
     case Achievement = 'achievement';
     case Partner = 'partner';
     case Document = 'document';
+    case JobOffer = 'job_offer';
+    case Country = 'country';
     case Program = 'program';
     case Stream = 'stream';
     case Grade = 'grade';
@@ -81,6 +85,8 @@ enum MorphType: string
             self::Achievement => Achievement::class,
             self::Partner => Partner::class,
             self::Document => Document::class,
+            self::JobOffer => JobOffer::class,
+            self::Country => Country::class,
             self::Program => Program::class,
             self::Stream => Stream::class,
             self::Grade => Grade::class,

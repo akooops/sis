@@ -9,7 +9,6 @@ use App\Http\Controllers\Api\ApiController;
 use App\Models\Category;
 use App\Models\Language;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -89,12 +88,7 @@ class CategoriesController extends ApiController
             ]);
         }
 
-        DB::transaction(function () use ($category, $fallback) {
-            $category->articles()->getQuery()->update(['category_id' => $fallback->id]);
-            $category->achievements()->getQuery()->update(['category_id' => $fallback->id]);
-
-            $category->delete();
-        });
+        $category->delete();
 
         return $this->respond(null, 'Category deleted successfully');
     }

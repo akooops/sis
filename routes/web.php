@@ -49,6 +49,8 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('documents', [AdminPagesController::class, 'documents'])->middleware('verify.permissions:documents.index')->name('web.admin.documents.index');
     Route::get('programs', [AdminPagesController::class, 'programs'])->middleware('verify.permissions:programs.index')->name('web.admin.programs.index');
     Route::get('streams', [AdminPagesController::class, 'streams'])->middleware('verify.permissions:streams.index')->name('web.admin.streams.index');
+    Route::get('job-offers', [AdminPagesController::class, 'jobOffers'])->middleware('verify.permissions:job-offers.index')->name('web.admin.job-offers.index');
+    Route::get('countries', [AdminPagesController::class, 'countries'])->middleware('verify.permissions:countries.index')->name('web.admin.countries.index');
     Route::get('grades', [AdminPagesController::class, 'grades'])->middleware('verify.permissions:grades.index')->name('web.admin.grades.index');
 });
 

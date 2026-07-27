@@ -108,6 +108,15 @@ class PermissionsSeeder extends Seeder
             ['code' => 'grades.update', 'name' => 'Update grades', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'grades.reorder', 'name' => 'Reorder grades', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'grades.destroy', 'name' => 'Delete grades', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'job-offers.index', 'name' => 'View job offers', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'job-offers.store', 'name' => 'Create job offers', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'job-offers.update', 'name' => 'Update job offers', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'job-offers.destroy', 'name' => 'Delete job offers', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'countries.index', 'name' => 'View countries', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'countries.store', 'name' => 'Create countries', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'countries.update', 'name' => 'Update countries', 'supports_web' => true, 'supports_api' => false],
         ];
 
         foreach ($permissions as $permission) {

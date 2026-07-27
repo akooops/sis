@@ -53,6 +53,20 @@ export const adminMenu = [
         ],
     },
     {
+        label: 'Jobs',
+        icon: 'ki-filled ki-briefcase',
+        children: [
+            { label: 'Job Offers', route: 'web.admin.job-offers.index', permission: 'job-offers.index' },
+        ],
+    },
+    {
+        label: 'Forms',
+        icon: 'ki-filled ki-questionnaire-tablet',
+        children: [
+            { label: 'Countries', route: 'web.admin.countries.index', permission: 'countries.index' },
+        ],
+    },
+    {
         label: 'Access',
         icon: 'ki-filled ki-shield-tick',
         children: [
