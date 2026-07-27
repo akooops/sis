@@ -38,6 +38,7 @@ export const adminMenu = [
             { label: 'Achievements', route: 'web.admin.achievements.index', permission: 'achievements.index' },
             { label: 'Albums', route: 'web.admin.albums.index', permission: 'albums.index' },
             { label: 'Events', route: 'web.admin.events.index', permission: 'events.index' },
+            { label: 'Partners', route: 'web.admin.partners.index', permission: 'partners.index' },
         ],
     },
     {

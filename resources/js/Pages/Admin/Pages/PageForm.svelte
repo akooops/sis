@@ -12,6 +12,7 @@
      */
     import Field from '@/components/form/Field.svelte';
     import Input from '@/components/form/Input.svelte';
+    import SlugInput from '@/components/form/SlugInput.svelte';
     import Select from '@/components/form/Select.svelte';
     import DatePicker from '@/components/form/DatePicker.svelte';
     import HtmlEditor from '@/components/form/HtmlEditor.svelte';
@@ -148,9 +149,9 @@
                     required
                     hint={page?.is_system
                         ? 'This page ships with the app — its slug is fixed.'
-                        : 'Lowercase, dash-separated. This is the public URL.'}
+                        : 'Filled in from the name until you edit it. This is the public URL.'}
                 >
-                    <Input bind:value={form.data.slug} disabled={!!page?.is_system} invalid={!!form.errors.slug} />
+                    <SlugInput bind:value={form.data.slug} source={form.data.name} disabled={!!page?.is_system} invalid={!!form.errors.slug} />
                 </Field>
             </div>
 

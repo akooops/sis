@@ -45,6 +45,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('events', [AdminPagesController::class, 'events'])->middleware('verify.permissions:events.index')->name('web.admin.events.index');
     Route::get('categories', [AdminPagesController::class, 'categories'])->middleware('verify.permissions:categories.index')->name('web.admin.categories.index');
     Route::get('achievements', [AdminPagesController::class, 'achievements'])->middleware('verify.permissions:achievements.index')->name('web.admin.achievements.index');
+    Route::get('partners', [AdminPagesController::class, 'partners'])->middleware('verify.permissions:partners.index')->name('web.admin.partners.index');
 });
 
 /*------------------------

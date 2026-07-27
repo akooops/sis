@@ -15,6 +15,7 @@ use App\Models\Notification;
 use App\Models\NotificationGroup;
 use App\Models\NotificationType;
 use App\Models\Page;
+use App\Models\Partner;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\TranslationKey;
@@ -48,6 +49,7 @@ enum MorphType: string
     case Event = 'event';
     case Category = 'category';
     case Achievement = 'achievement';
+    case Partner = 'partner';
 
     /** @return class-string */
     public function class(): string
@@ -70,6 +72,7 @@ enum MorphType: string
             self::Event => Event::class,
             self::Category => Category::class,
             self::Achievement => Achievement::class,
+            self::Partner => Partner::class,
         };
     }
 

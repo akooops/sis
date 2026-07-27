@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\Admin\NotificationGroupUsersController;
 use App\Http\Controllers\Api\Admin\NotificationsController;
 use App\Http\Controllers\Api\Admin\NotificationTypesController;
 use App\Http\Controllers\Api\Admin\PagesController;
+use App\Http\Controllers\Api\Admin\PartnersController;
 use App\Http\Controllers\Api\Admin\PermissionsController;
 use App\Http\Controllers\Api\Admin\RolePermissionsController;
 use App\Http\Controllers\Api\Admin\RolesController;
@@ -194,5 +195,14 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('achievements', [AchievementsController::class, 'store'])->middleware('verify.permissions:achievements.store')->name('api.v1.admin.achievements.store');
         Route::put('achievements/{achievement}', [AchievementsController::class, 'update'])->middleware('verify.permissions:achievements.update')->name('api.v1.admin.achievements.update');
         Route::delete('achievements/{achievement}', [AchievementsController::class, 'destroy'])->middleware('verify.permissions:achievements.destroy')->name('api.v1.admin.achievements.destroy');
+
+        // Partners
+        Route::get('partners', [PartnersController::class, 'index'])->middleware('verify.permissions:partners.index')->name('api.v1.admin.partners.index');
+        Route::get('partners/{partner}', [PartnersController::class, 'show'])->middleware('verify.permissions:partners.index')->name('api.v1.admin.partners.show');
+        Route::post('partners', [PartnersController::class, 'store'])->middleware('verify.permissions:partners.store')->name('api.v1.admin.partners.store');
+        // Declared before partners/{partner} so 'reorder' is not bound as an id.
+        Route::post('partners/reorder', [PartnersController::class, 'reorder'])->middleware('verify.permissions:partners.reorder')->name('api.v1.admin.partners.reorder');
+        Route::put('partners/{partner}', [PartnersController::class, 'update'])->middleware('verify.permissions:partners.update')->name('api.v1.admin.partners.update');
+        Route::delete('partners/{partner}', [PartnersController::class, 'destroy'])->middleware('verify.permissions:partners.destroy')->name('api.v1.admin.partners.destroy');
     });
 });

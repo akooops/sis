@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'partners', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -47,6 +47,7 @@ export const LOG_NAME_LABELS = {
     albums: 'Albums',
     events: 'Events',
     achievements: 'Achievements',
+    partners: 'Partners',
     categories: 'Categories',
     auth: 'Authentication',
 };
@@ -69,6 +70,7 @@ export const SUBJECT_TYPE_LABELS = {
     album: 'Album',
     event: 'Event',
     achievement: 'Achievement',
+    partner: 'Partner',
     category: 'Category',
 };
 
@@ -182,6 +184,11 @@ const ACTIVITY_MESSAGES = {
         created: 'Created the category :name',
         updated: 'Updated the category :name',
         deleted: 'Deleted the category :name',
+    },
+    partners: {
+        created: 'Created the partner :name',
+        updated: 'Updated the partner :name',
+        deleted: 'Deleted the partner :name',
     },
     auth: {
         login: ':name signed in',

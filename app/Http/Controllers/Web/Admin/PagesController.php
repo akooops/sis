@@ -96,4 +96,9 @@ class PagesController extends Controller
     {
         return inertia('Admin/Achievements/Index');
     }
+
+    public function partners(): Response
+    {
+        return inertia('Admin/Partners/Index');
+    }
 }

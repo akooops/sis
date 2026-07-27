@@ -19,6 +19,7 @@ use App\Models\NotificationGroupNotificationType;
 use App\Models\NotificationGroupUser;
 use App\Models\NotificationUser;
 use App\Models\Page;
+use App\Models\Partner;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RolePermission;
@@ -41,6 +42,7 @@ use App\Observers\NotificationGroupUserObserver;
 use App\Observers\NotificationObserver;
 use App\Observers\NotificationUserObserver;
 use App\Observers\PageObserver;
+use App\Observers\PartnerObserver;
 use App\Observers\PermissionObserver;
 use App\Observers\RoleObserver;
 use App\Observers\RolePermissionObserver;
@@ -103,6 +105,7 @@ class AppServiceProvider extends ServiceProvider
         Event::observe(EventObserver::class);
         Category::observe(CategoryObserver::class);
         Achievement::observe(AchievementObserver::class);
+        Partner::observe(PartnerObserver::class);
     }
 
     /**

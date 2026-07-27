@@ -79,6 +79,12 @@ class PermissionsSeeder extends Seeder
             ['code' => 'achievements.store', 'name' => 'Create achievements', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'achievements.update', 'name' => 'Update achievements', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'achievements.destroy', 'name' => 'Delete achievements', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'partners.index', 'name' => 'View partners', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'partners.store', 'name' => 'Create partners', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'partners.update', 'name' => 'Update partners', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'partners.reorder', 'name' => 'Reorder partners', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'partners.destroy', 'name' => 'Delete partners', 'supports_web' => true, 'supports_api' => false],
         ];
 
         foreach ($permissions as $permission) {

@@ -12,6 +12,7 @@
      */
     import Field from '@/components/form/Field.svelte';
     import Input from '@/components/form/Input.svelte';
+    import SlugInput from '@/components/form/SlugInput.svelte';
     import Select from '@/components/form/Select.svelte';
     import DatePicker from '@/components/form/DatePicker.svelte';
     import HtmlEditor from '@/components/form/HtmlEditor.svelte';
@@ -141,8 +142,8 @@
                 <Field label="Name" error={form.errors.name} required hint="Internal label — not shown to the public.">
                     <Input bind:value={form.data.name} invalid={!!form.errors.name} />
                 </Field>
-                <Field label="Slug" error={form.errors.slug} required hint="Lowercase, dash-separated. This is the public URL.">
-                    <Input bind:value={form.data.slug} invalid={!!form.errors.slug} />
+                <Field label="Slug" error={form.errors.slug} required hint="Filled in from the name until you edit it. This is the public URL.">
+                    <SlugInput bind:value={form.data.slug} source={form.data.name} invalid={!!form.errors.slug} />
                 </Field>
             </div>
 
@@ -250,7 +251,7 @@
             <h3 class="kt-card-title">Album files</h3>
             <span class="text-xs text-muted-foreground">Images, video and audio — drag to reorder</span>
         </div>
-        <div class="kt-card-content py-4">
+        <div class="kt-card-content py-4 px-2">
             <Field error={form.errors.files ?? form.errors['files.0']}>
                 <MediaPickerMulti
                     bind:value={form.data.files}
