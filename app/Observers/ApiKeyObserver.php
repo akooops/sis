@@ -12,9 +12,8 @@ class ApiKeyObserver extends BaseObserver
     }
 
     /**
-     * The hash is the key itself — logging it would put a working credential in
-     * the audit trail. (neverLog() already covers it; named here too because
-     * this is the model where it matters.)
+     * The hash IS the key — logging it puts a working credential in the trail.
+     * neverLog() covers it too; named here because this is where it matters.
      *
      * @return array<int, string>
      */

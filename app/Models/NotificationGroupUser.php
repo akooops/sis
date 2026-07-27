@@ -8,9 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Pivot: a membership — one user in one notification group. Audited against the
- * parent group (attached/detached) — see NotificationGroupUserObserver. Delivery
- * is decided by the group: in-app always, email when the group has an integration.
+ * Pivot: one user in one group. Audited against the group. Delivery is the
+ * group's business: in-app always, email when it has an integration.
  */
 class NotificationGroupUser extends Model
 {

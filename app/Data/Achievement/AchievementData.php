@@ -7,10 +7,7 @@ use App\Models\Achievement;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
 
-/**
- * Output DTO for an achievement. `published_at` is when the listing goes live,
- * `achieved_at` is when it happened. `category` is Lazy.
- */
+/** achieved_at is when it happened; published_at is when the page goes live. */
 class AchievementData extends Data
 {
     public function __construct(
@@ -44,10 +41,10 @@ class AchievementData extends Data
             name: $achievement->name,
             slug: $achievement->slug,
             category_id: $achievement->category_id,
-            title: $achievement->getTranslations('title'),
-            description: $achievement->getTranslations('description'),
-            content: $achievement->getTranslations('content'),
-            done_by: $achievement->getTranslations('done_by'),
+            title: $achievement->enabledTranslations('title'),
+            description: $achievement->enabledTranslations('description'),
+            content: $achievement->enabledTranslations('content'),
+            done_by: $achievement->enabledTranslations('done_by'),
             status: $achievement->status->getValue(),
             published_at: $achievement->published_at?->toIso8601String(),
             achieved_at: $achievement->achieved_at?->toDateString(),

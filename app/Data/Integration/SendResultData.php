@@ -4,11 +4,7 @@ namespace App\Data\Integration;
 
 use Spatie\LaravelData\Data;
 
-/**
- * The outcome of a send through a communication driver (mail/SMS). `reference`
- * is the provider's own id for the message (e.g. 4jawaly's job id) when it
- * returns one.
- */
+/** Outcome of a mail/SMS send. `reference` is the provider's own message id. */
 class SendResultData extends Data
 {
     public function __construct(

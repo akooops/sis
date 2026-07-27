@@ -7,10 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class MediaObserver extends BaseObserver
 {
     /**
-     * Media churns on columns nobody wants to read about: the scan job rewrites
-     * `disk` and `state`, and attach/detach rewrite the owner. The meaningful
-     * moments are logged explicitly with their own events by UploadService and
-     * ScanUpload, so the raw diff would only bury them.
+     * Media churns on columns nobody reads: the scan job rewrites disk/state, and
+     * attach/detach rewrite the owner. The moments that matter are logged with
+     * their own events by UploadService and ScanUpload.
      */
     public function updated(Model $model): void
     {

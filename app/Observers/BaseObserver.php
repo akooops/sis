@@ -9,22 +9,17 @@ use Illuminate\Support\Facades\Schema;
 use Throwable;
 
 /**
- * Turns an observer into an audit trail for its model.
- *
- * Subclasses can still do real work of their own — see UserObserver, which frees
- * media back into the pool when a user is deleted.
+ * Turns an observer into an audit trail for its model. Subclasses can still do
+ * work of their own — see UserObserver freeing media on delete.
  *
  * Two modes. By default the observed model is the subject and its own lifecycle
- * is logged (created/updated/deleted). Override isPivot() to true and
- * the observed row is treated as a link between two models: the activity is
- * recorded against the parent() as attached/detached, because nobody looks up an
- * api_key_permissions row — they look at the API key and ask who gave it that
- * permission, which is what the per-record activity drawer reads.
+ * is logged. Override isPivot() and the row is treated as a link: the activity
+ * goes against parent() as attached/detached, because nobody looks up an
+ * api_key_permissions row — they open the API key and ask who granted it.
  *
- * Properties follow the activity log's own shape: `old` and `attributes` hold
- * the two sides of a change, and `meta` carries values for the message the UI
- * renders. The message itself is derived client-side from (log_name, event);
- * `description` is only the plain-English fallback stored with the row.
+ * `old`/`attributes` hold the two sides of a change; `meta` carries values for
+ * the message, which the UI derives from (log_name, event). `description` is
+ * only the plain-English fallback stored with the row.
  */
 abstract class BaseObserver
 {
@@ -38,11 +33,8 @@ abstract class BaseObserver
     }
 
     /**
-     * Attributes that must never reach the log, whatever model they are on.
-     * The per-observer ignored() list is additive — this is the backstop, so a
-     * new observer cannot leak a secret by forgetting to name it.
-     *
-     * @return array<int, string>
+     * Never logged, whatever model they are on. ignored() is additive; this is the
+     * backstop, so a new observer cannot leak a secret by forgetting to name it.
      */
     protected function neverLog(): array
     {
@@ -57,47 +49,34 @@ abstract class BaseObserver
         ];
     }
 
-    /**
-     * Attributes to leave out of this model's diffs.
-     *
-     * @return array<int, string>
-     */
+    /** Attributes to leave out of this model's diffs. */
     protected function ignored(): array
     {
         return [];
     }
 
     /**
-     * Attributes to snapshot into a `deleted` row.
-     *
-     * A delete otherwise records only meta(), so once the record is gone its
-     * details are gone with it — name the columns worth keeping in the trail.
-     * neverLog()/ignored() still win, so a secret named here is never written.
-     *
-     * @return array<int, string>
+     * Columns to snapshot into a `deleted` row — otherwise only meta() survives the
+     * record. neverLog()/ignored() still win over this.
      */
     protected function loggedOnDelete(): array
     {
         return [];
     }
 
-    /**
-     * Values the UI interpolates into the message (e.g. :name).
-     *
-     * @return array<string, mixed>
-     */
+    /** Values the UI interpolates into the message (e.g. :name). */
     protected function meta(Model $model): array
     {
         return [];
     }
 
-    /** Pivot mode: the model the activity is recorded against (the ApiKey, Role, User…). */
+    /** Pivot mode: what the activity is recorded against. */
     protected function parent(Model $pivot): ?Model
     {
         return null;
     }
 
-    /** Pivot mode: the thing being attached or detached (the Permission, Role…). */
+    /** Pivot mode: what is being attached or detached. */
     protected function related(Model $pivot): ?Model
     {
         return null;
@@ -116,16 +95,14 @@ abstract class BaseObserver
 
     public function updated(Model $model): void
     {
-        // A pivot row only carries its two foreign keys and timestamps: changing
-        // either side is a detach plus an attach, which are logged as such.
+        // A pivot carries only its two keys: changing a side is a detach plus an attach.
         if ($this->isPivot()) {
             return;
         }
 
         $attributes = Arr::except($this->clean($model, $model->getChanges()), $this->housekeeping($model));
 
-        // Nothing loggable actually changed — a password-only update, or a
-        // plain touch. A row here would be an empty diff.
+        // Nothing loggable changed — a password-only update, or a plain touch.
         if ($attributes === []) {
             return;
         }
@@ -146,12 +123,7 @@ abstract class BaseObserver
         $this->record($model, 'deleted', $this->deleteSnapshot($model));
     }
 
-    /**
-     * The loggedOnDelete() columns, as an `attributes` payload shaped like the
-     * one an `updated` row carries (there is no `old` side to a delete).
-     *
-     * @return array<string, mixed>
-     */
+    /** loggedOnDelete() as an `attributes` payload. A delete has no `old` side. */
     protected function deleteSnapshot(Model $model): array
     {
         $keys = $this->loggedOnDelete();
@@ -165,11 +137,7 @@ abstract class BaseObserver
         return $attributes === [] ? [] : ['attributes' => $attributes];
     }
 
-    /**
-     * Columns whose change is not itself news — timestamps move on every write.
-     *
-     * @return array<int, string>
-     */
+    /** Columns whose change is not news — timestamps move on every write. */
     protected function housekeeping(Model $model): array
     {
         return array_values(array_filter([
@@ -194,16 +162,14 @@ abstract class BaseObserver
     {
         $parent = $this->parent($pivot);
 
-        // The parent is already gone (a cascading delete): there is nothing to
-        // record the activity against, and its own deletion was logged anyway.
+        // Parent already gone (cascading delete): nothing to record against.
         if ($parent === null) {
             return;
         }
 
         $related = $this->related($pivot);
 
-        // Passes its own meta, so record() keeps the related name rather than
-        // asking the parent for one.
+        // Its own meta, so record() keeps the related name.
         $this->record($parent, $event, [
             'related_id' => $related?->getKey(),
             'related_type' => MorphType::aliasFor($related?->getMorphClass()),
@@ -229,14 +195,9 @@ abstract class BaseObserver
     }
 
     /**
-     * Order a payload the way the model declares its columns — which is the
-     * order of its migration. A diff reads like the record it came from that
-     * way; sorted alphabetically it opens on `azure_ad_id` and buries `id` in
-     * the middle. Baked in at write time: an audit row is immutable, so it keeps
-     * the order the table had the day it was written.
-     *
-     * @param  array<string, mixed>  $attributes
-     * @return array<string, mixed>
+     * Order a payload by column order, i.e. migration order — a diff then reads like
+     * the record. Sorted alphabetically it opens on `azure_ad_id` and buries `id`.
+     * Baked in at write time: an audit row keeps the order the table had that day.
      */
     protected function inSchemaOrder(Model $model, array $attributes): array
     {
@@ -248,16 +209,11 @@ abstract class BaseObserver
             }
         }
 
-        // Union, so anything that is not a real column (an append, a cast-only
-        // key) survives at the end rather than being dropped.
+        // Union, so appends and cast-only keys survive at the end.
         return $ordered + $attributes;
     }
 
-    /**
-     * Column names per table, resolved once per request.
-     *
-     * @var array<string, array<int, string>>
-     */
+    /** Column names per table, resolved once per request. */
     protected static array $columnOrder = [];
 
     /**
@@ -272,8 +228,7 @@ abstract class BaseObserver
                 static::$columnOrder[$table] = Schema::connection($model->getConnectionName())
                     ->getColumnListing($table);
             } catch (Throwable) {
-                // No schema to read (an unmigrated table): leave the order alone
-                // rather than lose the diff.
+                // No schema to read: leave the order alone rather than lose the diff.
                 static::$columnOrder[$table] = [];
             }
         }

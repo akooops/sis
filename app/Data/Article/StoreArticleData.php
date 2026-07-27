@@ -2,23 +2,18 @@
 
 namespace App\Data\Article;
 
-use App\Enums\CategoryType;
 use App\Rules\CleanUpload;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
-/**
- * Creating an article asks for the DEFAULT language only — title/description/
- * content are plain strings here, and the other locales are filled in afterwards
- * through the edit form's Translations tab.
- */
+/** Create takes the default locale only; the rest come from the edit form. */
 class StoreArticleData extends Data
 {
     public function __construct(
         public string $name,
         public string $slug,
-        public string $category_id,
+        public ?string $category_id,
         public string $title,
         public string $description,
         public string $content,
@@ -37,21 +32,17 @@ class StoreArticleData extends Data
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('articles', 'slug')],
 
-            // Scoped to its own type, so an achievements category can't be filed here.
-            'category_id' => [
-                'required', 'string',
-                Rule::exists('categories', 'id')->where('type', CategoryType::Articles->value),
-            ],
+            // Blank resolves to the default category in the controller.
+            'category_id' => ['nullable', 'string', Rule::exists('categories', 'id')],
 
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:1000'],
-            // Uncapped: a JSON column, whose real ceiling is max_allowed_packet.
+            // Uncapped: JSON column, real limit is max_allowed_packet.
             'content' => ['required', 'string'],
 
-            // Hidden is excluded at birth — something never public cannot be withdrawn.
+            // No 'hidden' at birth: nothing public to withdraw yet.
             'status' => ['required', Rule::in(['draft', 'scheduled', 'published'])],
-            // Only a schedule asks for a date, and it must be in the future.
-            // Publishing is always "now": the controller stamps it.
+            // Only a schedule needs a date; publishing is stamped by the controller.
             'published_at' => $status === 'scheduled'
                 ? ['required', 'date', 'after:now']
                 : ['nullable', 'date'],

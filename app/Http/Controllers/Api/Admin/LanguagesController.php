@@ -15,10 +15,7 @@ use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * The locales the app holds translations for. The lang/{code}/ folder is created,
- * renamed and left behind by LanguageObserver — nothing here touches the disk.
- */
+/** LanguageObserver owns the lang/{code}/ folder — nothing here touches disk. */
 class LanguagesController extends ApiController
 {
     public function index(): JsonResponse

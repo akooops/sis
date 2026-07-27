@@ -5,13 +5,11 @@ namespace App\Data\Integration;
 use Spatie\LaravelData\Data;
 
 /**
- * One field a driver declares in its credential/config schema. The admin form is
- * rendered from a list of these, and the server validation is generated from
- * them too, so the PHP driver and the Svelte form can never drift.
+ * One field in a driver schema. The admin form and the server validation are
+ * both generated from these, so PHP and Svelte cannot drift.
  *
- * `secret: true` marks a field whose value is a credential — it is stored in the
- * encrypted `credentials` blob, never returned to the client (only a
- * "secrets_set" boolean), and only overwritten when a new value is submitted.
+ * secret: true means the value lives in the encrypted blob, is never returned
+ * (only a secrets_set boolean), and is overwritten only when resubmitted.
  */
 class FieldData extends Data
 {

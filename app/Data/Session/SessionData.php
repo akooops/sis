@@ -8,14 +8,10 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
 
 /**
- * Output DTO for a login session.
+ * No session_id, ever: it is the cookie value, so handing it out hands out the
+ * session. `id` is our ULID and is what the revoke routes take.
  *
- * No `session_id` and no `payload`, ever. The session id is the cookie value:
- * handing it to a client would let them assume the session. `id` is our own ULID
- * and is what the revoke routes take.
- *
- * `is_current` marks the session making this very request, so the UI can say so
- * before you revoke the device you are sitting at.
+ * `is_current` marks the session making this request.
  */
 class SessionData extends Data
 {

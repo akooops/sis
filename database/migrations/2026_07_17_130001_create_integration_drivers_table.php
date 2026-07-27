@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('code')->unique();
             $table->string('icon')->nullable();
-            
+
             $table->json('schema')->nullable();
 
             $table->ulid('integration_type_id');

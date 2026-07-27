@@ -7,7 +7,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
-/** `order` is deliberately absent — reordering is its own endpoint. */
+/** No `order`: reordering is its own endpoint. */
 class UpdatePartnerData extends Data
 {
     public function __construct(

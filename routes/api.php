@@ -8,7 +8,9 @@ use App\Http\Controllers\Api\Admin\ApiKeysController;
 use App\Http\Controllers\Api\Admin\ArticlesController;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\CategoriesController;
+use App\Http\Controllers\Api\Admin\DocumentsController;
 use App\Http\Controllers\Api\Admin\EventsController;
+use App\Http\Controllers\Api\Admin\GradesController;
 use App\Http\Controllers\Api\Admin\IntegrationsController;
 use App\Http\Controllers\Api\Admin\IntegrationTypesController;
 use App\Http\Controllers\Api\Admin\LanguagesController;
@@ -20,9 +22,11 @@ use App\Http\Controllers\Api\Admin\NotificationTypesController;
 use App\Http\Controllers\Api\Admin\PagesController;
 use App\Http\Controllers\Api\Admin\PartnersController;
 use App\Http\Controllers\Api\Admin\PermissionsController;
+use App\Http\Controllers\Api\Admin\ProgramsController;
 use App\Http\Controllers\Api\Admin\RolePermissionsController;
 use App\Http\Controllers\Api\Admin\RolesController;
 use App\Http\Controllers\Api\Admin\SessionsController;
+use App\Http\Controllers\Api\Admin\StreamsController;
 use App\Http\Controllers\Api\Admin\TranslationKeysController;
 use App\Http\Controllers\Api\Admin\TranslationsController;
 use App\Http\Controllers\Api\Admin\UserRolesController;
@@ -200,9 +204,42 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::get('partners', [PartnersController::class, 'index'])->middleware('verify.permissions:partners.index')->name('api.v1.admin.partners.index');
         Route::get('partners/{partner}', [PartnersController::class, 'show'])->middleware('verify.permissions:partners.index')->name('api.v1.admin.partners.show');
         Route::post('partners', [PartnersController::class, 'store'])->middleware('verify.permissions:partners.store')->name('api.v1.admin.partners.store');
-        // Declared before partners/{partner} so 'reorder' is not bound as an id.
         Route::post('partners/reorder', [PartnersController::class, 'reorder'])->middleware('verify.permissions:partners.reorder')->name('api.v1.admin.partners.reorder');
         Route::put('partners/{partner}', [PartnersController::class, 'update'])->middleware('verify.permissions:partners.update')->name('api.v1.admin.partners.update');
         Route::delete('partners/{partner}', [PartnersController::class, 'destroy'])->middleware('verify.permissions:partners.destroy')->name('api.v1.admin.partners.destroy');
+
+        // Documents
+        Route::get('documents', [DocumentsController::class, 'index'])->middleware('verify.permissions:documents.index')->name('api.v1.admin.documents.index');
+        Route::get('documents/{document}', [DocumentsController::class, 'show'])->middleware('verify.permissions:documents.index')->name('api.v1.admin.documents.show');
+        Route::post('documents', [DocumentsController::class, 'store'])->middleware('verify.permissions:documents.store')->name('api.v1.admin.documents.store');
+        Route::put('documents/{document}', [DocumentsController::class, 'update'])->middleware('verify.permissions:documents.update')->name('api.v1.admin.documents.update');
+        Route::delete('documents/{document}', [DocumentsController::class, 'destroy'])->middleware('verify.permissions:documents.destroy')->name('api.v1.admin.documents.destroy');
+
+        // Programs
+        Route::get('programs', [ProgramsController::class, 'index'])->middleware('verify.permissions:programs.index')->name('api.v1.admin.programs.index');
+        Route::get('programs/{program}', [ProgramsController::class, 'show'])->middleware('verify.permissions:programs.index')->name('api.v1.admin.programs.show');
+        Route::post('programs', [ProgramsController::class, 'store'])->middleware('verify.permissions:programs.store')->name('api.v1.admin.programs.store');
+        Route::post('programs/reorder', [ProgramsController::class, 'reorder'])->middleware('verify.permissions:programs.reorder')->name('api.v1.admin.programs.reorder');
+        Route::put('programs/{program}', [ProgramsController::class, 'update'])->middleware('verify.permissions:programs.update')->name('api.v1.admin.programs.update');
+        Route::delete('programs/{program}', [ProgramsController::class, 'destroy'])->middleware('verify.permissions:programs.destroy')->name('api.v1.admin.programs.destroy');
+
+        Route::get('programs/{program}/streams', [StreamsController::class, 'forProgram'])->middleware('verify.permissions:streams.index')->name('api.v1.admin.programs.streams.index');
+        Route::get('programs/{program}/grades', [GradesController::class, 'forProgram'])->middleware('verify.permissions:grades.index')->name('api.v1.admin.programs.grades.index');
+
+        // Streams
+        Route::get('streams', [StreamsController::class, 'index'])->middleware('verify.permissions:streams.index')->name('api.v1.admin.streams.index');
+        Route::get('streams/{stream}', [StreamsController::class, 'show'])->middleware('verify.permissions:streams.index')->name('api.v1.admin.streams.show');
+        Route::post('streams', [StreamsController::class, 'store'])->middleware('verify.permissions:streams.store')->name('api.v1.admin.streams.store');
+        Route::post('streams/reorder', [StreamsController::class, 'reorder'])->middleware('verify.permissions:streams.reorder')->name('api.v1.admin.streams.reorder');
+        Route::put('streams/{stream}', [StreamsController::class, 'update'])->middleware('verify.permissions:streams.update')->name('api.v1.admin.streams.update');
+        Route::delete('streams/{stream}', [StreamsController::class, 'destroy'])->middleware('verify.permissions:streams.destroy')->name('api.v1.admin.streams.destroy');
+
+        // Grades
+        Route::get('grades', [GradesController::class, 'index'])->middleware('verify.permissions:grades.index')->name('api.v1.admin.grades.index');
+        Route::get('grades/{grade}', [GradesController::class, 'show'])->middleware('verify.permissions:grades.index')->name('api.v1.admin.grades.show');
+        Route::post('grades', [GradesController::class, 'store'])->middleware('verify.permissions:grades.store')->name('api.v1.admin.grades.store');
+        Route::post('grades/reorder', [GradesController::class, 'reorder'])->middleware('verify.permissions:grades.reorder')->name('api.v1.admin.grades.reorder');
+        Route::put('grades/{grade}', [GradesController::class, 'update'])->middleware('verify.permissions:grades.update')->name('api.v1.admin.grades.update');
+        Route::delete('grades/{grade}', [GradesController::class, 'destroy'])->middleware('verify.permissions:grades.destroy')->name('api.v1.admin.grades.destroy');
     });
 });

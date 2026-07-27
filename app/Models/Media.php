@@ -12,14 +12,13 @@ use Spatie\ModelStates\HasStates;
 use Throwable;
 
 /**
- * A stored file. Owner-less until attached: `model_type`/`model_id` are null
- * while the upload sits in the reusable pool, and a file belongs to at most one
- * model at a time (App\Services\Uploads\UploadService attaches, detaches and
- * copies).
+ * A stored file. Owner-less until attached (model_type/model_id null while it
+ * sits in the reusable pool), and owned by at most one model at a time —
+ * UploadService attaches, detaches and copies.
  *
- * Every file lives in one flat folder, so `file_name` is a generated ULID and is
- * unique across the table — the owner and collection are recorded here, never in
- * the path. `name` keeps the original filename for display.
+ * One flat folder for everything, so `file_name` is a generated ULID unique
+ * across the table; the owner is recorded here, never in the path. `name` keeps
+ * the original filename for display.
  */
 class Media extends Model
 {
@@ -56,10 +55,7 @@ class Media extends Model
         return static::folder().$this->file_name;
     }
 
-    /**
-     * Public URL, or null when there isn't one: a file only reaches the public
-     * disk after it passes the scan, and the quarantine disk serves nothing.
-     */
+    /** Null until the file passes the scan — the quarantine disk serves nothing. */
     public function getUrlAttribute(): ?string
     {
         if (! $this->state instanceof Clean) {

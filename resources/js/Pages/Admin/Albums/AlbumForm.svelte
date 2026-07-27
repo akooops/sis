@@ -197,6 +197,7 @@
                     <button
                         type="button"
                         role="tab"
+                        data-kt-tab-toggle
                         class="kt-tab-toggle {activeLocale === language.code ? 'active' : ''}"
                         aria-selected={activeLocale === language.code}
                         onclick={() => (activeLocale = language.code)}

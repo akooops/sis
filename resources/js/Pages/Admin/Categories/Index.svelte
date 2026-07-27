@@ -1,5 +1,5 @@
 <script>
-    /** Categories index — filing labels, scoped by the content type they classify. */
+    /** Categories index — one flat list of filing labels, shared by every module. */
     import AdminLayout from '@/layouts/AdminLayout.svelte';
     import IndexCard from '@/components/data/IndexCard.svelte';
     import DataTable from '@/components/data/DataTable.svelte';
@@ -14,7 +14,6 @@
     import ActivityDrawer from '@/components/activity/ActivityDrawer.svelte';
     import CategoryForm from './CategoryForm.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
-    import { CATEGORY_TYPE_LABELS, CATEGORY_TYPE_OPTIONS, CATEGORY_TYPE_VARIANTS } from '@/lib/category';
     import { hasPermission } from '@/lib/permissions';
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
@@ -34,20 +33,19 @@
         { key: 'id', label: 'ID', sortable: true, width: '90px', truncate: false },
         { key: 'name', label: 'Name', sortable: true, truncate: false },
         { key: 'code', label: 'Code', sortable: true, truncate: false },
-        { key: 'type', label: 'Type', sortable: true, truncate: false },
+        { key: 'is_default', label: 'Default', truncate: false },
     ];
 
     // Mirrors the controller's allowedSorts.
     const sortOptions = [
         { value: 'name', label: 'Name' },
         { value: 'code', label: 'Code' },
-        { value: 'type', label: 'Type' },
         { value: 'created_at', label: 'Created' },
     ];
 
     // Mirrors the controller's allowedFilters.
     const filterConfig = [
-        { key: 'type', type: 'select', label: 'Type', options: CATEGORY_TYPE_OPTIONS },
+        { key: 'is_default', type: 'boolean', label: 'Default' },
     ];
 
     const create = () => { editing = null; showForm = true; };
@@ -59,7 +57,7 @@
 
     async function remove(c) {
         if (!(await confirm({
-            body: `Delete ${c.name}? Anything filed under it becomes uncategorised — nothing else is deleted.`,
+            body: `Delete ${c.name}? Anything filed under it moves to the default category — nothing else is deleted.`,
             variant: 'destructive',
         }))) return;
         try {
@@ -90,10 +88,10 @@
         title="Category"
         id={viewing?.id}
         heading={viewing?.name}
-        badge={viewing ? { label: viewing.type_label ?? viewing.type, variant: CATEGORY_TYPE_VARIANTS[viewing.type] ?? 'secondary' } : null}
         fields={[
             { label: 'Code', value: viewing?.code },
-            { label: 'Type', value: viewing?.type_label ?? viewing?.type },
+            { label: 'Colour', value: viewing?.color },
+            { label: 'Default', value: viewing?.is_default ? 'Yes' : 'No' },
         ]}
         createdAt={viewing?.created_at}
         updatedAt={viewing?.updated_at}
@@ -145,17 +143,24 @@
     {#if column.key === 'id'}
         <IdBadge id={row.id} onclick={() => view(row)} />
     {:else if column.key === 'name'}
-        <span class="text-sm font-medium text-mono">
-            <ClampText value={row.name} maxWidth="240px" title={row.name} />
-        </span>
+        <!-- The swatch is the point of the colour field: seeing the palette at a
+             glance is how you notice two categories picked the same blue. -->
+        <div class="flex items-center gap-2.5">
+            <span class="size-4 shrink-0 rounded border border-border" style="background-color: {row.color}"></span>
+            <span class="min-w-0 text-sm font-medium text-mono">
+                <ClampText value={row.name} maxWidth="240px" title={row.name} />
+            </span>
+        </div>
     {:else if column.key === 'code'}
         <Badge variant="secondary">
             <ClampText value={row.code} maxWidth="180px" title={row.code} />
         </Badge>
-    {:else if column.key === 'type'}
-        <Badge variant={CATEGORY_TYPE_VARIANTS[row.type] ?? 'secondary'}>
-            {row.type_label ?? CATEGORY_TYPE_LABELS[row.type] ?? row.type}
-        </Badge>
+    {:else if column.key === 'is_default'}
+        {#if row.is_default}
+            <Badge variant="primary">Default</Badge>
+        {:else}
+            <span class="text-xs text-muted-foreground">—</span>
+        {/if}
     {:else}
         {row[column.key] ?? '—'}
     {/if}
@@ -166,6 +171,9 @@
         { icon: 'ki-eye', label: 'View', onclick: () => view(row) },
         hasPermission('categories.update') && { icon: 'ki-pencil', label: 'Edit', onclick: () => edit(row) },
         hasPermission('activities.index') && { icon: 'ki-time', label: 'Activity', onclick: () => showActivity(row) },
-        hasPermission('categories.destroy') && { icon: 'ki-trash', label: 'Delete', onclick: () => remove(row), variant: 'destructive' },
+        // The default is what everything falls back to — there is nowhere to move
+        // its content, so it has no Delete at all rather than one that 422s.
+        hasPermission('categories.destroy') && !row.is_default
+            && { icon: 'ki-trash', label: 'Delete', onclick: () => remove(row), variant: 'destructive' },
     ].filter(Boolean)} />
 {/snippet}

@@ -33,8 +33,7 @@ class EventsController extends ApiController
                     ['title', 'description'],
                     Language::enabledCodes(),
                 ),
-                // Two distinct names bounding the same column — a Filters
-                // `daterange` keyed `start` submits exactly these.
+                // Two names bounding one column — what a Filters `daterange` submits.
                 $this->date('start_from', '>=', 'startOfDay', 'start_at'),
                 $this->date('start_to', '<=', 'endOfDay', 'start_at'),
             ])
@@ -76,7 +75,9 @@ class EventsController extends ApiController
 
     public function update(UpdateEventData $data, Event $event): JsonResponse
     {
-        $event->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at']));
+        // mergeTranslations: the form only carries the enabled locales, so a plain
+        // assignment would drop every disabled one.
+        $event->update($event->mergeTranslations(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at'])));
 
         $target = EventStatus::resolveStateClass($data->status);
 

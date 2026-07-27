@@ -22,8 +22,7 @@ class Session extends Model
     protected $hidden = [
         // The serialized session (CSRF token included).
         'payload',
-        // The cookie value itself: whoever holds it holds the session, so it
-        // never leaves the server — not in an API response, not in a log.
+        // The cookie value: whoever holds it holds the session. Never leaves the server.
         'session_id',
     ];
 
@@ -55,11 +54,9 @@ class Session extends Model
     ------------------------------------------*/
 
     /**
-     * Sessions that have not expired yet.
-     *
-     * The table is not the truth on its own: Laravel only prunes from gc(), on a
-     * `session.lottery` roll (2% of requests), so an expired session can sit here
-     * for a long time. Age it out on read as well as pruning on a schedule.
+     * Not expired. The table is not the truth on its own: Laravel prunes from gc()
+     * on a session.lottery roll (2% of requests), so expired rows linger. Age them
+     * out on read as well as on the schedule.
      */
     public function scopeActive(Builder $query): Builder
     {
@@ -71,10 +68,7 @@ class Session extends Model
         return $query->where('last_activity', '<', static::expiredBefore());
     }
 
-    /**
-     * What `model:prune` deletes (scheduled daily in App\Console\Kernel) — an
-     * expired session is unusable and no one can log out of it.
-     */
+    /** What model:prune deletes — an expired session is unusable. */
     public function prunable(): Builder
     {
         return static::query()->expired();

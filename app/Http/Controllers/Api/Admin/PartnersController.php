@@ -26,7 +26,7 @@ class PartnersController extends ApiController
                 $this->search(['id', 'name', 'url']),
             ])
             ->allowedSorts(['id', 'name', 'order', 'created_at'])
-            // Display order by default — the list is a strip, not a log.
+            // Display order by default: this is a strip, not a log.
             ->defaultSort('order')
             ->paginate($this->perPage())
             ->appends(request()->query());
@@ -74,12 +74,11 @@ class PartnersController extends ApiController
     }
 
     /**
-     * Rewrite the display order from a list of ids — position in the array is the
-     * order. Builder updates, so reordering writes no audit row per partner: the
-     * position is presentation, and a row per drag would drown the log.
+     * Position in the array is the order. Omitted ids keep theirs, which is why the
+     * drawer submits the whole list.
      *
-     * Ids the payload omits keep their current order, which is why the drawer
-     * always submits the whole list.
+     * Builder updates: position is presentation, and a row per drag would drown the
+     * audit log.
      */
     public function reorder(ReorderPartnersData $data): JsonResponse
     {

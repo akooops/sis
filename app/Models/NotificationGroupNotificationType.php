@@ -7,10 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * Pivot: a notification type a group sends. Its lifecycle is audited against the
- * parent group (attached/detached) — see NotificationGroupNotificationTypeObserver.
- */
+/** Pivot: a type a group sends. Audited against the group as attached/detached. */
 class NotificationGroupNotificationType extends Model
 {
     use HasFactory, HasUlids;

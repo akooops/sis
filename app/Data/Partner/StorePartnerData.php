@@ -6,7 +6,7 @@ use App\Rules\CleanUpload;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
-/** `order` is deliberately absent — a new partner goes last, and reordering is its own endpoint. */
+/** No `order`: a new partner goes last, and reordering is its own endpoint. */
 class StorePartnerData extends Data
 {
     public function __construct(

@@ -7,6 +7,7 @@ use App\Data\Achievement\StoreAchievementData;
 use App\Data\Achievement\UpdateAchievementData;
 use App\Http\Controllers\Api\ApiController;
 use App\Models\Achievement;
+use App\Models\Category;
 use App\Models\Language;
 use App\Services\Uploads\UploadService;
 use App\States\Achievement\AchievementStatus;
@@ -58,7 +59,7 @@ class AchievementsController extends ApiController
         $achievement = Achievement::create([
             'name' => $data->name,
             'slug' => $data->slug,
-            'category_id' => $data->category_id,
+            'category_id' => $data->category_id ?? Category::default()?->id,
             'title' => [$default => $data->title],
             'description' => [$default => $data->description],
             'content' => [$default => $data->content],
@@ -77,7 +78,12 @@ class AchievementsController extends ApiController
 
     public function update(UpdateAchievementData $data, Achievement $achievement): JsonResponse
     {
-        $achievement->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at']));
+        $attributes = Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at']);
+        $attributes['category_id'] ??= Category::default()?->id;
+
+        // mergeTranslations: the form only carries the enabled locales, so a plain
+        // assignment would drop every disabled one.
+        $achievement->update($achievement->mergeTranslations($attributes));
 
         $target = AchievementStatus::resolveStateClass($data->status);
 

@@ -63,8 +63,8 @@ class ApiKey extends Model
     ------------------------------------------*/
 
     /**
-     * Create a new key and return [model, plaintext token]. The token is only
-     * available here — the database stores just its hash.
+     * Returns [model, plaintext token]. The token exists only here — the database
+     * stores its hash.
      *
      * @return array{0: self, 1: string}
      */
@@ -82,10 +82,7 @@ class ApiKey extends Model
         return [$apiKey, $prefix.self::TOKEN_SEPARATOR.$secret];
     }
 
-    /**
-     * Issue a fresh secret (invalidating the old token) and re-activate the key.
-     * Returns the new plaintext token.
-     */
+    /** Fresh secret (invalidating the old token) and re-activate. Returns the token. */
     public function rotate(): string
     {
         $secret = Str::random(40);
@@ -104,8 +101,8 @@ class ApiKey extends Model
     }
 
     /**
-     * Resolve and authenticate a plaintext token, enforcing usability and the
-     * IP allow-list, and stamping last-used. Returns null when invalid.
+     * Authenticate a plaintext token, enforcing usability and the IP allow-list, and
+     * stamping last-used. Null when invalid.
      */
     public static function validate(string $token, ?string $ip = null): ?self
     {
@@ -145,11 +142,7 @@ class ApiKey extends Model
         return $allowed === [] || ($ip !== null && in_array($ip, $allowed, true));
     }
 
-    /**
-     * Set the key's permissions to exactly the given ids.
-     *
-     * @param  array<int, string>  $permissionIds
-     */
+    /** Set the key's permissions to exactly these ids. */
     public function syncPermissions(array $permissionIds): void
     {
         $this->apiKeyPermissions()
@@ -161,7 +154,7 @@ class ApiKey extends Model
         }
     }
 
-    // An API key acts on the api channel, so only api-enabled permissions count.
+    // API keys act on the api channel, so only api-enabled permissions count.
     public function hasPermission(string $permission): bool
     {
         return $this->permissions()

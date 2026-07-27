@@ -5,11 +5,7 @@ namespace App\Data\Media;
 use App\Models\Media;
 use Spatie\LaravelData\Data;
 
-/**
- * Output DTO for the media library index (browse/reuse existing media). Unlike
- * mediaData it also exposes a `url` (null until the file passes the scan and
- * reaches the public disk) and whether the media is currently attached.
- */
+/** Library index row. `url` is null until the scan passes and the file lands. */
 class MediaData extends Data
 {
     public function __construct(

@@ -11,19 +11,14 @@ use InvalidArgumentException;
 use RuntimeException;
 
 /**
- * The one place lang/{code}/{group}.php files are read and written.
+ * The one place lang/{code}/{group}.php is read and written.
  *
- * Translated strings live on disk, never in the database — translation_keys
- * holds the key registry only. That split is what lets the Translations page
- * paginate against the DB (with search, sorting and filters) while every value
- * it renders comes out of the file that __() and @lang() actually read.
+ * Strings live on disk, never in the DB — translation_keys is the key registry
+ * only. That split lets the Translations page paginate against the DB while
+ * every value it renders comes from the file __() actually reads.
  *
- * A write is parse -> verify -> replace, all under one lock: load the file,
- * apply the change, confirm every registered key for that group survives, then
- * swap the file atomically. A partial file is never visible.
- *
- * Registered as a singleton — load() memoises per request, and a controller can
- * hydrate a whole page of rows with one read per group.
+ * A write is parse -> verify -> replace under one lock, so a partial file is
+ * never visible. Singleton: load() memoises, so a page costs one read per group.
  */
 class TranslationService
 {
@@ -53,10 +48,7 @@ class TranslationService
             .'.php';
     }
 
-    /**
-     * A code and a group both become path segments. Anything that doesn't match
-     * its pattern is refused here rather than allowed to walk out of lang/.
-     */
+    /** Both become path segments, so anything off-pattern is refused here. */
     protected function guard(string $value, string $pattern, string $what): string
     {
         if (! preg_match($pattern, $value)) {
@@ -87,9 +79,8 @@ class TranslationService
     }
 
     /**
-     * Follow a code rename: the files ARE the translations, so they move with it.
-     * A missing source or an occupied target is left alone — this must never be
-     * able to merge or clobber two locales.
+     * Follow a code rename — the files ARE the translations. A missing source or an
+     * occupied target is left alone: this must never merge or clobber two locales.
      */
     public function renameLocale(string $from, string $to): void
     {
@@ -114,21 +105,15 @@ class TranslationService
      Reads
     ------------------------------------------*/
 
-    /**
-     * Every group the registry declares (the lang files we manage).
-     *
-     * @return array<int, string>
-     */
+    /** Every group the registry declares. */
     public function groups(): array
     {
         return array_keys(config('translations.keys', []));
     }
 
     /**
-     * The lines in one file, memoised for the request. A locale that has no file
-     * yet reads as empty rather than throwing — every key is simply untranslated.
-     *
-     * @return array<string, mixed>
+     * One file, memoised per request. A locale with no file reads as empty rather
+     * than throwing — every key is simply untranslated.
      */
     public function load(string $code, string $group): array
     {
@@ -164,24 +149,16 @@ class TranslationService
         return $value !== null && trim($value) !== '';
     }
 
-    /**
-     * Hang one locale's value on every row of a paginated key page. One file read
-     * per group thanks to load()'s memo, however many rows are on the page.
-     *
-     * @param  Collection<int, TranslationKey>  $keys
-     */
+    /** Hang one locale's value on each row. One file read per group, via the memo. */
     public function hydrate(Collection $keys, string $code): void
     {
         $keys->each(fn (TranslationKey $key) => $key->withLine($code, $this->get($code, $key->group, $key->key)));
     }
 
     /**
-     * The ids of every registry key this locale has not translated. Resolved in
-     * PHP because the values are in files, then handed back to the query builder
-     * as a primary-key whereIn — an indexed IN composes with search, group,
-     * sorting and pagination the way a computed column never could.
-     *
-     * @return array<int, string>
+     * Ids of the keys this locale has not translated. Resolved in PHP because the
+     * values are in files, then handed back as an indexed whereIn so it composes
+     * with search, group, sorting and pagination.
      */
     public function missingKeyIds(string $code): array
     {
@@ -206,16 +183,12 @@ class TranslationService
     ------------------------------------------*/
 
     /**
-     * Set one line, then rewrite the whole file.
-     *
-     * Parse -> verify -> update, all inside one exclusive lock so two admins
-     * editing different keys in the same group can't lose each other's work:
-     *  1. re-read the file INSIDE the lock (a memo from earlier in the request
-     *     may already be stale),
+     * Set one line, then rewrite the file. All four steps hold one exclusive lock,
+     * so two admins editing different keys in a group cannot lose each other:
+     *  1. re-read inside the lock (an earlier memo may be stale),
      *  2. apply the change,
-     *  3. verify every registered key for the group survives — anything missing
-     *     is written back as '' rather than silently dropped,
-     *  4. swap the file atomically and drop the memo.
+     *  3. verify every registered key survives — missing ones are written as '',
+     *  4. swap atomically and drop the memo.
      */
     public function put(string $code, string $group, string $key, ?string $value): void
     {
@@ -251,16 +224,12 @@ class TranslationService
     }
 
     /**
-     * Set many lines in one locked write. Used by the seeder, which would
-     * otherwise take a lock, rewrite the file and log an activity row per key.
+     * Many lines in one locked write, for the seeder — put() would take a lock and
+     * log an activity row per key.
      *
-     * Seeding is not an admin edit, so this deliberately writes no activity —
-     * put() remains the audited path. With $onlyMissing it fills gaps without
-     * ever touching a line someone has already translated, which is what makes
-     * reseeding safe.
-     *
-     * @param  array<string, string>  $values  dotted key => value
-     * @return int how many lines were actually written
+     * Writes no activity: seeding is not an admin edit, and put() stays the audited
+     * path. $onlyMissing fills gaps without touching a translated line, which is
+     * what makes reseeding safe.
      */
     public function putMany(string $code, string $group, array $values, bool $onlyMissing = true): int
     {
@@ -300,11 +269,8 @@ class TranslationService
     ------------------------------------------*/
 
     /**
-     * Arr::set('a.b') on lines where `a` is already a STRING replaces that string
-     * with an array — the sibling key is gone and the file still parses. Refuse
-     * instead; the controller turns this into a 422.
-     *
-     * @param  array<string, mixed>  $lines
+     * Arr::set('a.b') where `a` is already a STRING replaces it with an array: the
+     * sibling is gone and the file still parses. Refuse; the controller 422s.
      */
     protected function assertNoScalarParent(array $lines, string $key): void
     {
@@ -323,13 +289,8 @@ class TranslationService
     }
 
     /**
-     * Render and replace the file.
-     *
-     * The temp file sits in the same directory so rename() stays on one
-     * filesystem and is atomic — a concurrent request must never be able to
-     * require() a half-written file.
-     *
-     * @param  array<string, mixed>  $lines
+     * Render and replace. The temp file sits in the same directory so rename() stays
+     * on one filesystem and is atomic — nobody can require() a half-written file.
      */
     protected function write(string $code, string $group, array $lines): void
     {
@@ -348,20 +309,16 @@ class TranslationService
             throw new RuntimeException("Could not replace {$path}.");
         }
 
-        // A lang file IS a PHP file, so OPcache would keep serving the previous
-        // compiled copy. Laravel has no lang cache and this app has no
-        // application cache — this is the whole invalidation story.
+        // A lang file is a PHP file, so OPcache would serve the stale compiled copy.
+        // Laravel has no lang cache and this app has none — this is the whole story.
         if (function_exists('opcache_invalidate')) {
             opcache_invalidate($path, true);
         }
     }
 
     /**
-     * Render lines as PHP source in the house style: short arrays, 4-space
-     * indent, trailing commas, sorted at each level so diffs stay readable.
-     * Not var_export(), which emits `array (` long syntax and fails Pint.
-     *
-     * @param  array<string, mixed>  $lines
+     * PHP source in the house style: short arrays, 4-space indent, trailing commas,
+     * sorted per level. Not var_export(), which emits long syntax and fails Pint.
      */
     protected function export(array $lines, int $depth = 1): string
     {
@@ -389,11 +346,9 @@ class TranslationService
     }
 
     /**
-     * Serialise writers to one group of one locale.
-     *
-     * The lock is a sidecar, not the target file: write() replaces the target's
-     * inode via rename(), so a lock held on it would guard a file that no longer
-     * exists at that path and the read-modify-write would still interleave.
+     * Serialise writers to one group of one locale. The lock is a SIDECAR: write()
+     * replaces the target inode via rename(), so a lock on the target would guard a
+     * path that no longer exists and the read-modify-write would still interleave.
      */
     protected function withLock(string $code, string $group, callable $callback): void
     {
@@ -436,21 +391,18 @@ class TranslationService
     }
 
     /**
-     * Audit the edit against the KEY, not the locale: "who last touched
-     * common.save, and what did it say before" is the question the Translations
-     * page asks, and a per-key drawer can only filter on subject_id. The locale
-     * rides along in meta so one key's history reads across every language.
+     * Audit against the KEY, not the locale: "who last touched common.save" is the
+     * question the page asks, and a per-key drawer can only filter on subject_id.
+     * The locale rides along in meta.
      *
      * A file write has no model to observe, so this logs directly — the same
-     * exception UploadService makes for attach/detach. Controllers still never
-     * call activity().
+     * exception UploadService makes. Controllers still never call activity().
      */
     protected function log(string $code, string $group, string $key, ?string $old, ?string $value): void
     {
         $subject = TranslationKey::query()->where('group', $group)->where('key', $key)->first();
 
-        // An unregistered key has no row to hang the history off. The write
-        // itself already happened and is not worth failing over.
+        // An unregistered key has no row to hang history off; the write already happened.
         if (! $subject) {
             return;
         }

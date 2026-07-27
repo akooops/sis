@@ -5,10 +5,6 @@ namespace App\Data\Permission;
 use App\Models\Permission;
 use Spatie\LaravelData\Data;
 
-/**
- * Output DTO for a permission. Flat (no relations) — the simplest shape,
- * to contrast with the Lazy-relation examples on User/Role/ApiKey.
- */
 class PermissionData extends Data
 {
     public function __construct(

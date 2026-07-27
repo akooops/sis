@@ -9,10 +9,13 @@ use Illuminate\Console\Command;
 use Spatie\ModelStates\Exceptions\TransitionNotFound;
 
 /**
- * Flip scheduled achievements live once their published_at has passed.
+ * Flip scheduled achievements live once published_at has passed.
  *
- * Not a pruning sweep. It is a state transition on live rows, and it must fire
- * model events so AchievementObserver writes the audit row.
+ * Not a pruning sweep, so the "Prunable + model:prune, never a bespoke command"
+ * rule does not apply — this is a state transition that must fire model events so
+ * AchievementObserver writes the audit row. A builder update would tell nobody anything.
+ *
+ * Console runs have no causer, so the activity row's causer is null.
  */
 class PublishScheduledAchievements extends Command
 {

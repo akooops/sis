@@ -5,10 +5,7 @@ namespace App\Data\Integration;
 use App\Models\IntegrationType;
 use Spatie\LaravelData\Data;
 
-/**
- * Output DTO for a type card. Aggregates the type's integrations into the
- * glanceable status the card renders. Expects `$type->integrations` to be loaded.
- */
+/** Card aggregate. Expects `$type->integrations` to be loaded. */
 class IntegrationTypeData extends Data
 {
     public function __construct(

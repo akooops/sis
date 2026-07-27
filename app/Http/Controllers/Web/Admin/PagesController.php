@@ -101,4 +101,24 @@ class PagesController extends Controller
     {
         return inertia('Admin/Partners/Index');
     }
+
+    public function documents(): Response
+    {
+        return inertia('Admin/Documents/Index');
+    }
+
+    public function programs(): Response
+    {
+        return inertia('Admin/Programs/Index');
+    }
+
+    public function streams(): Response
+    {
+        return inertia('Admin/Streams/Index');
+    }
+
+    public function grades(): Response
+    {
+        return inertia('Admin/Grades/Index');
+    }
 }

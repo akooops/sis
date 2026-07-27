@@ -2,33 +2,41 @@
 
 namespace App\Models;
 
-use App\Enums\CategoryType;
-use Illuminate\Database\Eloquent\Builder;
+use App\Traits\Translations\HasEnabledTranslations;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Translatable\HasTranslations;
 
 /**
- * A classification for one kind of content. `type` scopes the whole thing: an
- * article can only ever be filed under an `articles` category, so each picker
- * shows its own list and the two never mix.
+ * A classification, shared by every kind of content — one flat list.
  *
- * `name` is plain, not translatable — a category is an editorial filing label
- * rather than published copy.
+ * Two labels: `name` is internal and never translated, `title` is the public
+ * copy and is. `color` is the chip background on the public site.
  */
 class Category extends Model
 {
-    use HasFactory, HasUlids;
+    use HasEnabledTranslations, HasFactory, HasTranslations, HasUlids;
 
     /* -----------------------------------------
      1. Attributes
     ------------------------------------------*/
 
+    public const DEFAULT_COLOR = '#1B84FF';
+
+    /**
+     * Stored as locale => value JSON. The trait casts these, so they must NOT
+     * also appear in $casts.
+     *
+     * @var array<int, string>
+     */
+    public $translatable = ['title'];
+
     protected $guarded = ['id'];
 
     protected $casts = [
-        'type' => CategoryType::class,
+        'is_default' => 'boolean',
     ];
 
     /* -----------------------------------------
@@ -53,8 +61,12 @@ class Category extends Model
      4. Methods
     ------------------------------------------*/
 
-    public function scopeOfType(Builder $query, CategoryType|string $type): Builder
+    /**
+     * The fallback: what an unfiled record gets, and where a deleted category's
+     * content moves. Seeded and undeletable, so null means unseeded.
+     */
+    public static function default(): ?self
     {
-        return $query->where('type', $type instanceof CategoryType ? $type->value : $type);
+        return static::query()->where('is_default', true)->first();
     }
 }

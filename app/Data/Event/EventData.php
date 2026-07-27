@@ -5,10 +5,7 @@ namespace App\Data\Event;
 use App\Models\Event;
 use Spatie\LaravelData\Data;
 
-/**
- * Output DTO for an event. `published_at` is when the listing goes live,
- * `start_at`/`end_at` are when the event runs.
- */
+/** start_at/end_at are when it runs; published_at is when the page goes live. */
 class EventData extends Data
 {
     public function __construct(
@@ -38,9 +35,9 @@ class EventData extends Data
             id: $event->id,
             name: $event->name,
             slug: $event->slug,
-            title: $event->getTranslations('title'),
-            description: $event->getTranslations('description'),
-            content: $event->getTranslations('content'),
+            title: $event->enabledTranslations('title'),
+            description: $event->enabledTranslations('description'),
+            content: $event->enabledTranslations('content'),
             status: $event->status->getValue(),
             published_at: $event->published_at?->toIso8601String(),
             start_at: $event->start_at?->toIso8601String(),

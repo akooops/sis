@@ -41,7 +41,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user() ? $request->user() : null,
                 'permissions' => $request->user() ? $request->user()->permissions() : null,
                 'enable_permissions' => config('app.enable_permissions'),
-                // Seeds the bell badge on first paint; kept fresh by the bell's poll.
+
                 'unread_notifications' => $request->user() ? $request->user()->unreadNotificationsCount() : 0,
             ],
             'media' => $this->mediaConfig(),
@@ -49,9 +49,8 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * Upload rules exposed to the frontend so file inputs and the media picker
-     * can display the allowed size + extensions and set the input `accept`
-     * filter. Single source of truth = config/uploads.php (env-driven).
+     * Upload rules for the frontend, so file inputs and the media picker can show
+     * the limits and set `accept`. Single source of truth is config/uploads.php.
      *
      * @return array<string, mixed>
      */

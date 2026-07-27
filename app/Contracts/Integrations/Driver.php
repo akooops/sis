@@ -3,14 +3,13 @@
 namespace App\Contracts\Integrations;
 
 /**
- * A vendor implementation within an integration type (SMTP under email, OpenAI
- * under ai). A driver self-describes — its type, code, label, icon, and the field
- * schema the admin form is built from. Registered in config('integrations.drivers')
- * and mirrored into the integration_drivers table; resolved by code through
- * App\Services\Integrations\Registry.
+ * A vendor implementation within a type (SMTP under email, OpenAI under ai). It
+ * self-describes: type, code, label, icon, and the field schema the form is
+ * built from. Registered in config('integrations.drivers'), mirrored into
+ * integration_drivers, resolved through Registry.
  *
- * Capability contracts (SendsMail, SendsSms, GeneratesText) add the actual action,
- * and each receives the integration's full decrypted config array.
+ * SendsMail/SendsSms/GeneratesText add the actual action, each receiving the
+ * integration's decrypted config.
  */
 interface Driver
 {

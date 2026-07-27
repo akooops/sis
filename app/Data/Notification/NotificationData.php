@@ -6,11 +6,9 @@ use App\Models\NotificationUser;
 use Spatie\LaravelData\Data;
 
 /**
- * Output DTO for one inbox row (the bell drawer + notifications page). Flattens
- * the notification_users pivot with its notification so the frontend has the read
- * state, the content, the type's icon, and the Ziggy route to click through to —
- * all in one row. `id` is the NOTIFICATION id — the read/delete endpoints take
- * it and resolve the current user's own row server-side.
+ * One inbox row: the pivot flattened with its notification, type icon and
+ * click-through route. `id` is the NOTIFICATION id — read/delete resolve the
+ * current user's own pivot row server-side.
  */
 class NotificationData extends Data
 {

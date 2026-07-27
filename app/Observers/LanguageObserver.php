@@ -12,9 +12,8 @@ class LanguageObserver extends BaseObserver
     public function __construct(protected TranslationService $translations) {}
 
     /**
-     * A default language that is disabled is incoherent — the Translations picker
-     * only offers enabled languages, so it would be unreachable. Coerce rather
-     * than 422: the intent is obvious.
+     * A disabled default is unreachable — the picker only offers enabled languages.
+     * Coerce rather than 422: the intent is obvious.
      */
     public function saving(Language $language): void
     {
@@ -24,9 +23,9 @@ class LanguageObserver extends BaseObserver
     }
 
     /**
-     * Audit the create (parent), then give the language its folder. This runs for
-     * the seeder too, so reseeding always restores a missing lang/{code}/.
-     * The parameter stays Model — PHP forbids narrowing BaseObserver::created().
+     * Audit the create, then give the language its folder. Runs for the seeder too,
+     * so reseeding restores a missing lang/{code}/. The param stays Model — PHP
+     * forbids narrowing the parent signature.
      */
     public function created(Model $model): void
     {
@@ -36,8 +35,8 @@ class LanguageObserver extends BaseObserver
     }
 
     /**
-     * The files ARE the translations, so renaming the code moves them. Note this
-     * is deliberately NOT symmetric with deleting(), which leaves them behind.
+     * The files ARE the translations, so a code rename moves them. Deliberately NOT
+     * symmetric with deleting(), which leaves them behind.
      */
     public function updated(Model $model): void
     {
@@ -51,9 +50,8 @@ class LanguageObserver extends BaseObserver
     }
 
     /**
-     * Free the flag back into the reusable pool rather than destroying the file.
-     * lang/{code}/ is untouched: the translations outlive the row, so re-adding
-     * the code picks them straight back up.
+     * Free the flag rather than destroying the file. lang/{code}/ is untouched: the
+     * translations outlive the row, so re-adding the code picks them back up.
      */
     public function deleting(Language $language): void
     {
@@ -63,14 +61,12 @@ class LanguageObserver extends BaseObserver
     }
 
     /**
-     * Exactly one default. A builder update fires no model events, so there is no
-     * observer recursion and no audit row per demoted language — the same reason
-     * User::syncRoles() removes with a builder delete.
+     * Exactly one default. A builder update fires no events, so there is no
+     * recursion and no audit row per demoted language.
      */
     public function saved(Model $model): void
     {
-        // Enabling, disabling or re-defaulting a language changes what the
-        // translated-search filter and every translatable DTO resolve.
+        // Changes what the translated-search filter and every translatable DTO resolve.
         Language::forgetCodes();
 
         if ($model->is_default) {

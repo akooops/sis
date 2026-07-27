@@ -13,9 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * A configured instance of a driver (this SMTP account, that OpenAI key).
  *
  * Every field lives in `config`, an encrypted:array blob that never leaves the
- * server: it is $hidden, absent from the read DTO (only non-secret values +
- * secrets_set booleans are exposed), and named in the observer's ignored() so it
- * can't reach the audit trail.
+ * server: $hidden, absent from the read DTO, and in the observer's ignored().
  */
 class Integration extends Model
 {
@@ -35,8 +33,8 @@ class Integration extends Model
     ];
 
     /**
-     * Per-request memo for activeFor(): the mail bridge resolves the active email
-     * integration on every request in AppServiceProvider::boot().
+     * Per-request memo: the mail bridge resolves the active email integration on
+     * every request in AppServiceProvider::boot().
      *
      * @var array<string, self|null>
      */
@@ -76,9 +74,8 @@ class Integration extends Model
     }
 
     /**
-     * The integration the app sends through for a type. Interim rule until a
-     * settings table governs selection: the oldest enabled one of that type.
-     * Explicit Email/Sms/Ai::for($id) pins a specific one instead.
+     * What the app sends through for a type: the oldest enabled one. Interim rule
+     * until a settings table governs it; Email/Sms/Ai::for($id) pins one instead.
      */
     public static function activeFor(string $typeCode): ?self
     {

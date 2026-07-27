@@ -13,9 +13,6 @@ return new class extends Migration
 
             $table->string('name');
             $table->string('url');
-
-            // Display position, ascending. Set by the reorder endpoint, never by
-            // the create/edit form — a new partner just goes on the end.
             $table->unsignedInteger('order')->default(0)->index();
 
             $table->timestamps();

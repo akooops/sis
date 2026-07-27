@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\States\Album\AlbumStatus;
 use App\States\Album\Published;
+use App\Traits\Translations\HasEnabledTranslations;
 use App\Traits\Uploads\HasMedia;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -13,18 +14,17 @@ use Spatie\ModelStates\HasStates;
 use Spatie\Translatable\HasTranslations;
 
 /**
- * A media album: an article that also carries an ordered gallery.
+ * An article that also carries an ordered gallery.
  *
- * Two collections. `thumbnail` is the cover (one file). `files` is the album
- * itself — images, video and audio together, ordered by media.order_column,
- * which UploadService::sync() writes from the submitted array's order.
+ * `thumbnail` is the cover (one file). `files` is the album — images, video and
+ * audio, ordered by media.order_column, which UploadService::sync() writes from
+ * the submitted order.
  *
- * Images inserted into the content are NOT a collection: they stay free media
- * in the library, because nothing prunes them.
+ * Images inserted into the content are NOT a collection: they stay free media.
  */
 class Album extends Model
 {
-    use HasFactory, HasMedia, HasStates, HasTranslations, HasUlids;
+    use HasEnabledTranslations, HasFactory, HasMedia, HasStates, HasTranslations, HasUlids;
 
     /* -----------------------------------------
      1. Attributes
@@ -35,9 +35,8 @@ class Album extends Model
     public const FILES_COLLECTION = 'files';
 
     /**
-     * The upload types an album's files may be. Mirrors the keys in
-     * config('uploads.types') — documents are deliberately excluded: an album is
-     * something you look at or listen to, not a folder.
+     * Mirrors the keys in config('uploads.types'). Documents are excluded: an album
+     * is something you look at or listen to.
      *
      * @var array<int, string>
      */
@@ -81,7 +80,7 @@ class Album extends Model
     }
 
     /**
-     * Only the cover is single-file. `files` is absent, which is what makes it
+     * Only the cover is single-file; `files` is absent, which is what makes it
      * multi-file.
      *
      * @return array<int, string>

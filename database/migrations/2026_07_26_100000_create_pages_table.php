@@ -14,10 +14,6 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
 
-            $table->json('title')->nullable();
-            $table->json('description')->nullable();
-            $table->json('content')->nullable();
-
             $table->string('status')->default('draft')->index();
             $table->dateTime('published_at')->nullable();
 
@@ -25,6 +21,10 @@ return new class extends Migration
             $table->text('custom_css')->nullable();
 
             $table->boolean('is_system')->default(false);
+
+            $table->json('title')->nullable();
+            $table->json('description')->nullable();
+            $table->json('content')->nullable();
 
             $table->index(['status', 'published_at']);
 

@@ -8,9 +8,6 @@ use App\Models\ApiKeyPermission;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
 
-/**
- * Output DTO for the api_key_permissions pivot.
- */
 class ApiKeyPermissionData extends Data
 {
     public function __construct(

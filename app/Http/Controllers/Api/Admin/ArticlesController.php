@@ -7,6 +7,7 @@ use App\Data\Article\StoreArticleData;
 use App\Data\Article\UpdateArticleData;
 use App\Http\Controllers\Api\ApiController;
 use App\Models\Article;
+use App\Models\Category;
 use App\Models\Language;
 use App\Services\Uploads\UploadService;
 use App\States\Article\ArticleStatus;
@@ -55,7 +56,7 @@ class ArticlesController extends ApiController
         $article = Article::create([
             'name' => $data->name,
             'slug' => $data->slug,
-            'category_id' => $data->category_id,
+            'category_id' => $data->category_id ?? Category::default()?->id,
             'title' => [$default => $data->title],
             'description' => [$default => $data->description],
             'content' => [$default => $data->content],
@@ -72,7 +73,12 @@ class ArticlesController extends ApiController
 
     public function update(UpdateArticleData $data, Article $article): JsonResponse
     {
-        $article->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at']));
+        $attributes = Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at']);
+        $attributes['category_id'] ??= Category::default()?->id;
+
+        // mergeTranslations: the form only carries the enabled locales, so a plain
+        // assignment would drop every disabled one.
+        $article->update($article->mergeTranslations($attributes));
 
         $target = ArticleStatus::resolveStateClass($data->status);
 

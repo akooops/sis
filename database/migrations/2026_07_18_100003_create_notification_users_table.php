@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->ulid('user_id');
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
-            
+
             $table->unique(['notification_id', 'user_id']);
 
             $table->index('notification_id');

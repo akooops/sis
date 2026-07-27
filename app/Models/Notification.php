@@ -12,18 +12,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * The content of a notification, created once — always by an observer via
- * NotificationService::send(), never by hand — and fanned out to recipients via
- * notification_users rows (the per-user inbox). Display icon comes from the type;
- * `route_name`/`route_params` let the frontend build a Ziggy click-through link.
+ * The content of a notification, created once by an observer via
+ * NotificationService::send() and fanned out through notification_users. The
+ * icon comes from the type; route_name/route_params build the click-through.
  *
- * Append-only with no delete UI, so it is MassPrunable: rows older than
- * notifications.prune_after_days go via the daily model:prune as a builder
- * delete (no model events — a per-row prune would write one audit row per
- * notification), and their notification_users rows follow via the FK cascade.
+ * Append-only with no delete UI, so it is MassPrunable: the daily model:prune
+ * builder-deletes rows past notifications.prune_after_days (no events — a
+ * per-row prune would write an audit row each), and the pivot follows by FK.
  *
- * Not to be confused with Laravel's own DatabaseNotification — this app ships its
- * own notification system on top of the Integrations module.
+ * Not Laravel's DatabaseNotification: this app ships its own on top of
+ * Integrations.
  */
 class Notification extends Model
 {

@@ -8,21 +8,18 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
- * The adapter between Laravel's session table and ours.
+ * Adapter between Laravel's session table and ours.
  *
- * Laravel keys a session row by PHP's session id and writes `last_activity` as
- * unix seconds with no timestamps. This app keys everything by ULID and dates
- * everything with datetimes, so the translation lives here rather than leaking a
- * foreign shape into App\Models\Session:
+ * Laravel keys by PHP's session id and writes last_activity as unix seconds with
+ * no timestamps. We key by ULID and use datetimes, so the translation lives here
+ * rather than leaking a foreign shape into App\Models\Session:
  *
- *   Laravel                          ours
  *   id = <php session id>       ->   id = ULID, session_id = <php session id>
  *   last_activity = 1752754…    ->   last_activity = 2026-07-17 12:28:02
  *   (no timestamps)             ->   created_at / updated_at
  *
- * Registered over the built-in `database` driver in AppServiceProvider —
- * SessionManager::callCustomCreator wraps whatever this returns in a Store, so
- * encryption and cookie config keep working untouched.
+ * Registered over the `database` driver in AppServiceProvider; callCustomCreator
+ * wraps this in a Store, so cookie and encryption config are untouched.
  */
 class SessionHandler extends BaseSessionHandler
 {
@@ -31,8 +28,7 @@ class SessionHandler extends BaseSessionHandler
      */
     public function read($sessionId): string|false
     {
-        // Parent does find($sessionId) — a primary-key lookup. Ours is keyed by
-        // ULID, so the session id is a column like any other.
+        // Parent does find($sessionId); ours is keyed by ULID, so it is a plain column.
         $session = (object) $this->getQuery()->where('session_id', $sessionId)->first();
 
         if ($this->expired($session)) {
@@ -72,8 +68,7 @@ class SessionHandler extends BaseSessionHandler
                 'updated_at' => $now,
             ]);
         } catch (QueryException) {
-            // Raced by a parallel request for the same session — the unique index
-            // on session_id is what makes that a collision rather than a double row.
+            // Raced by a parallel request; the unique index makes that a collision.
             $this->performUpdate($sessionId, $payload);
         }
     }

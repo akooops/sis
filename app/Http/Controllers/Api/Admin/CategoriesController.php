@@ -7,7 +7,9 @@ use App\Data\Category\StoreCategoryData;
 use App\Data\Category\UpdateCategoryData;
 use App\Http\Controllers\Api\ApiController;
 use App\Models\Category;
+use App\Models\Language;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\PaginatedDataCollection;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -20,11 +22,11 @@ class CategoriesController extends ApiController
         $categories = QueryBuilder::for(Category::class)
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                // What every content form's picker filters on.
-                AllowedFilter::exact('type'),
-                $this->search(['id', 'name', 'code']),
+                // How the content forms find the category to preselect.
+                AllowedFilter::exact('is_default'),
+                $this->searchTranslations(['id', 'name', 'code'], ['title'], Language::enabledCodes()),
             ])
-            ->allowedSorts(['id', 'name', 'code', 'type', 'created_at'])
+            ->allowedSorts(['id', 'name', 'code', 'created_at'])
             ->defaultSort('name')
             ->paginate($this->perPage())
             ->appends(request()->query());
@@ -42,7 +44,9 @@ class CategoriesController extends ApiController
         $category = Category::create([
             'name' => $data->name,
             'code' => $data->code,
-            'type' => $data->type,
+            'title' => [Language::defaultCode() => $data->title],
+            'color' => $data->color,
+            'is_default' => $data->is_default,
         ]);
 
         return $this->respond(CategoryData::from($category), 'Category created successfully', 201);
@@ -50,44 +54,48 @@ class CategoriesController extends ApiController
 
     public function update(UpdateCategoryData $data, Category $category): JsonResponse
     {
-        // Retyping a category in use would strand whatever is filed under it: the
-        // record keeps the id, but the picker for its own type no longer lists it.
-        if ($data->type !== $category->type->value && $this->usageCount($category) > 0) {
-            throw ValidationException::withMessages([
-                'type' => 'This category is in use, so its type cannot be changed. Move or delete what is filed under it first.',
-            ]);
-        }
-
-        $category->update([
+        // mergeTranslations: the form only carries the enabled locales, so a plain
+        // assignment would drop every disabled one.
+        $category->update($category->mergeTranslations([
             'name' => $data->name,
             'code' => $data->code,
-            'type' => $data->type,
-        ]);
+            'title' => $data->title,
+            'color' => $data->color,
+            'is_default' => $data->is_default,
+        ]));
 
         return $this->respond(CategoryData::from($category->fresh()), 'Category updated successfully');
     }
 
+    /**
+     * Delete moves the content to the default category instead of refusing.
+     *
+     * The move is not optional — the FK is restrictOnDelete, so skipping it is a
+     * raw database error. Hence the transaction.
+     */
     public function destroy(Category $category): JsonResponse
     {
-        // A category is mandatory on what it classifies, so deleting one in use
-        // would strand invalid records. The FK restricts it too — this guard is
-        // what turns that into a 422 rather than a raw database error.
-        $used = $this->usageCount($category);
-
-        if ($used > 0) {
+        if ($category->is_default) {
             throw ValidationException::withMessages([
-                'category' => "This category is used by {$used} record(s). Move them to another category first.",
+                'category' => 'This is the default category — it is what unfiled content falls back to. Make another category the default first.',
             ]);
         }
 
-        $category->delete();
+        $fallback = Category::default();
+
+        if (! $fallback) {
+            throw ValidationException::withMessages([
+                'category' => 'There is no default category to move the content to. Set one first.',
+            ]);
+        }
+
+        DB::transaction(function () use ($category, $fallback) {
+            $category->articles()->getQuery()->update(['category_id' => $fallback->id]);
+            $category->achievements()->getQuery()->update(['category_id' => $fallback->id]);
+
+            $category->delete();
+        });
 
         return $this->respond(null, 'Category deleted successfully');
-    }
-
-    /** How many records are filed under this category, across every type. */
-    protected function usageCount(Category $category): int
-    {
-        return $category->articles()->count() + $category->achievements()->count();
     }
 }

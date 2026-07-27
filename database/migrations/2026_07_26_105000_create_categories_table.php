@@ -12,15 +12,12 @@ return new class extends Migration
             $table->ulid('id')->primary();
 
             $table->string('name');
-            $table->string('code');
+            $table->string('code')->unique();
+            $table->string('color', 7)->default('#1B84FF');
 
-            // App\Enums\CategoryType — what this category classifies.
-            $table->string('type')->index();
+            $table->boolean('is_default')->default(false);
 
-            // Unique per type, not globally: "general" is a reasonable code for
-            // both an article category and an achievement one, and they are
-            // separate lists that never mix.
-            $table->unique(['type', 'code']);
+            $table->json('title')->nullable();
 
             $table->timestamps();
         });

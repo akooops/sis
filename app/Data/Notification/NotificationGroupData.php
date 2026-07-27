@@ -8,11 +8,8 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
 
 /**
- * Output DTO for a notification group. `type_ids` prefills the edit form's type
- * multiselect and `integration_id`/`integration` its email-integration select;
- * `integration` is the full IntegrationData, present when the relation is loaded
- * (null when the group is in-app only). Members are a separate pivot resource
- * (notification-group-users), so only their count appears here.
+ * `integration` is present when loaded, null when the group is in-app only.
+ * Members are a separate pivot resource, so only their count appears here.
  */
 class NotificationGroupData extends Data
 {

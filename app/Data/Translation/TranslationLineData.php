@@ -6,12 +6,11 @@ use App\Models\TranslationKey;
 use Spatie\LaravelData\Data;
 
 /**
- * One registry key as seen through one locale: the key comes from the database,
- * the value from lang/{locale}/{group}.php. `id` is the translation_keys id —
- * it is what the table rows on and what the update route binds.
+ * One key through one locale: the key from the DB, the value from
+ * lang/{locale}/{group}.php. `id` is the translation_keys id, which the table
+ * rows on and the update route binds.
  *
- * Reads the transient attributes TranslationService::hydrate() hangs on the
- * model, so a paginated key page can be collected straight into this.
+ * Reads the transient attributes TranslationService::hydrate() sets.
  */
 class TranslationLineData extends Data
 {

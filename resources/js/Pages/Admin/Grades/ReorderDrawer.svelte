@@ -1,0 +1,185 @@
+<script>
+    /**
+     * Reorder drawer — drag the grades of ONE program into the order they should
+     * appear in.
+     *
+     * Scoped to a program because `order` is: every program starts again at
+     * position 0, so a single global list would write one program's positions over
+     * another's. The picker starts on whatever the table is filtered to.
+     *
+     * Pagination: the drawer ignores the table's page/search/sort and loads its own
+     * copy of the program's grades sorted by `order`, walking every page until it
+     * has the lot — reordering only the 15 rows on screen would write positions
+     * 0-14 over grades that already hold them further down. The API caps per_page
+     * at 100, hence the loop; in practice one round-trip covers a program.
+     *
+     * Submits the whole list of ids, because the server takes position-in-array as
+     * the order and leaves anything omitted alone.
+     */
+    import Drawer from '@/components/ui/Drawer.svelte';
+    import Field from '@/components/form/Field.svelte';
+    import Select from '@/components/form/Select.svelte';
+    import Button from '@/components/ui/Button.svelte';
+    import Spinner from '@/components/ui/Spinner.svelte';
+    import EmptyState from '@/components/ui/EmptyState.svelte';
+    import { api } from '@/lib/api/client';
+    import { toast } from '@/lib/toast';
+
+    let { open = $bindable(false), programId = null, program = null, onsaved } = $props();
+
+    let selected = $state(null);
+    let items = $state([]);
+    let loading = $state(false);
+    let saving = $state(false);
+    let dragFrom = $state(null);
+
+    // Plain, not $state: switching program mid-fetch must not let the older
+    // response land, and tracking this would re-run the effect that bumps it.
+    let loadToken = 0;
+
+    // Seed from the table's filter on a fresh open only — a plain flag rather than
+    // $state, or the effect would re-run and clobber a program picked in here.
+    let wasOpen = false;
+    $effect(() => {
+        if (open && !wasOpen) selected = programId;
+        wasOpen = open;
+    });
+
+    /** Every grade in the program, in stored order — however many pages that takes. */
+    async function loadAll(id) {
+        const url = route('api.v1.admin.grades.index');
+        const all = [];
+        let page = 1;
+        let lastPage = 1;
+
+        do {
+            const res = await api.get(url, { per_page: 100, sort: 'order', page, filter: { program_id: id } });
+            all.push(...(res?.data ?? []));
+            lastPage = res?.meta?.last_page ?? 1;
+            page += 1;
+        } while (page <= lastPage);
+
+        return all;
+    }
+
+    // Reload on every open and on every program change, so it never shows a stale order.
+    $effect(() => {
+        const mine = ++loadToken;
+        items = [];
+
+        if (!open || !selected) return;
+
+        loading = true;
+        loadAll(selected)
+            .then((rows) => { if (mine === loadToken) items = rows; })
+            .catch((e) => toast.error(e?.message ?? 'Could not load grades.'))
+            .finally(() => { if (mine === loadToken) loading = false; });
+    });
+
+    function drop(to) {
+        const from = dragFrom;
+        dragFrom = null;
+        if (from === null || from === to) return;
+        const next = [...items];
+        const [moved] = next.splice(from, 1);
+        next.splice(to, 0, moved);
+        items = next;
+    }
+
+    function move(index, delta) {
+        const to = index + delta;
+        if (to < 0 || to >= items.length) return;
+        const next = [...items];
+        [next[index], next[to]] = [next[to], next[index]];
+        items = next;
+    }
+
+    async function save() {
+        saving = true;
+        try {
+            await api.post(route('api.v1.admin.grades.reorder'), { ids: items.map((i) => i.id) });
+            toast.success('Order saved.');
+            open = false;
+            onsaved?.();
+        } catch (e) {
+            toast.error(e?.message ?? 'Something went wrong. Please try again.');
+        } finally {
+            saving = false;
+        }
+    }
+</script>
+
+<Drawer bind:open title="Reorder grades">
+    <div class="flex flex-col gap-4">
+        <Field label="Program" hint="Positions are numbered within a program.">
+            <Select
+                resource="api.v1.admin.programs.index"
+                bind:value={selected}
+                labelKey="name"
+                clearable={false}
+                placeholder="Search programs…"
+                initialOptions={program ? [{ value: program.id, label: program.name }] : []}
+            />
+        </Field>
+
+        {#if !selected}
+            <EmptyState icon="ki-filled ki-abstract-26" title="Pick a program" body="Grades are ordered inside their own program." />
+        {:else if loading}
+            <div class="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+                <Spinner size="sm" /> Loading…
+            </div>
+        {:else if items.length === 0}
+            <EmptyState icon="ki-filled ki-abstract-26" title="No grades" body="Add a grade to this program first." />
+        {:else}
+            <p class="text-xs text-muted-foreground">Drag a row, or use the arrows. Nothing is saved until you press Save order.</p>
+
+            <div class="flex flex-col gap-2">
+                {#each items as item, index (item.id)}
+                    <!-- svelte-ignore a11y_no_static_element_interactions -->
+                    <div
+                        class="flex cursor-move items-center gap-3 rounded-lg border border-border p-2 hover:border-primary"
+                        draggable="true"
+                        ondragstart={() => (dragFrom = index)}
+                        ondragover={(e) => e.preventDefault()}
+                        ondrop={() => drop(index)}
+                        ondragend={() => (dragFrom = null)}
+                    >
+                        <i class="ki-filled ki-menu shrink-0 text-muted-foreground"></i>
+                        <span class="w-6 shrink-0 text-center text-xs text-muted-foreground">{index + 1}</span>
+                        <span class="min-w-0 grow truncate text-sm font-medium text-mono" title={item.name}>{item.name}</span>
+                        <span class="shrink-0 text-xs text-muted-foreground">
+                            <i class="ki-filled ki-document me-1"></i>{item.guidelines?.length ?? 0}
+                        </span>
+
+                        <!-- Arrows as well as drag: a keyboard user has no other way in. -->
+                        <div class="flex shrink-0 items-center gap-1">
+                            <button
+                                type="button"
+                                class="kt-btn kt-btn-icon kt-btn-xs kt-btn-secondary"
+                                disabled={index === 0}
+                                onclick={() => move(index, -1)}
+                                aria-label="Move up"
+                            >
+                                <i class="ki-filled ki-up"></i>
+                            </button>
+                            <button
+                                type="button"
+                                class="kt-btn kt-btn-icon kt-btn-xs kt-btn-secondary"
+                                disabled={index === items.length - 1}
+                                onclick={() => move(index, 1)}
+                                aria-label="Move down"
+                            >
+                                <i class="ki-filled ki-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                {/each}
+            </div>
+
+            <div class="flex items-center justify-end gap-3 border-t border-border pt-4">
+                <Button variant="secondary" onclick={() => (open = false)}>Cancel</Button>
+                <Button variant="primary" loading={saving} onclick={save}>Save order</Button>
+            </div>
+        {/if}
+    </div>
+</Drawer>

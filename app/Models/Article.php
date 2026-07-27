@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\States\Article\ArticleStatus;
 use App\States\Article\Published;
+use App\Traits\Translations\HasEnabledTranslations;
 use App\Traits\Uploads\HasMedia;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -14,18 +15,15 @@ use Spatie\ModelStates\HasStates;
 use Spatie\Translatable\HasTranslations;
 
 /**
- * A news article. Structurally a Page without the is_system lock — nothing about
- * an article is resolved by the app itself, so every one of them is fully
- * editable and deletable.
+ * A Page without the is_system lock — nothing here is resolved by the app, so
+ * every article is fully editable and deletable.
  *
- * `name` is the internal label an admin scans the list by; `title`,
- * `description` and `content` are translated per locale by
- * spatie/laravel-translatable into JSON columns. That is content, not UI chrome:
- * the UI string catalogue still lives in lang/*.php and is untouched.
+ * `name` is the internal label; title/description/content are translated into
+ * JSON columns. That is content — the UI catalogue is still lang/*.php.
  */
 class Article extends Model
 {
-    use HasFactory, HasMedia, HasStates, HasTranslations, HasUlids;
+    use HasEnabledTranslations, HasFactory, HasMedia, HasStates, HasTranslations, HasUlids;
 
     /* -----------------------------------------
      1. Attributes
@@ -34,8 +32,8 @@ class Article extends Model
     public const THUMBNAIL_COLLECTION = 'thumbnail';
 
     /**
-     * Columns HasTranslations stores as a locale => value JSON map. The trait
-     * casts these itself, so they must NOT be repeated in $casts.
+     * Stored as locale => value JSON. The trait casts these, so they must NOT
+     * also appear in $casts.
      *
      * @var array<int, string>
      */

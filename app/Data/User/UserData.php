@@ -6,11 +6,7 @@ use App\Models\User;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
 
-/**
- * Output DTO for a user. `roles` is Lazy — included only when eager-loaded
- * (e.g. $user->load('roles')). Note there is no `password`: output DTOs simply
- * omit write-only fields.
- */
+/** `roles` is Lazy. No `password` — output DTOs omit write-only fields. */
 class UserData extends Data
 {
     public function __construct(

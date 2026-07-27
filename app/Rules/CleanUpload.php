@@ -10,15 +10,14 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 /**
  * Form-side rule for the decoupled upload flow: the form sends a media id, and
- * this only checks it is a still-unattached upload of the expected type that
- * passed the malware scan. Size/mime were already enforced by the upload
- * endpoint (see App\Services\Uploads\UploadService). Uploads are not user-scoped.
+ * this checks it is an unattached upload of the expected type that passed the
+ * scan. Size and mime were already enforced by the upload endpoint.
  *
- *   new CleanUpload('images')                          // one type
- *   new CleanUpload(['images', 'videos', 'audio'])     // any of several
+ *   new CleanUpload('images')                       // one type
+ *   new CleanUpload(['images', 'videos', 'audio'])  // any of several
  *
- * The array form exists for a mixed collection like an album's gallery, where
- * "an image or a video or an audio file, but not a document" is the actual rule.
+ * The array form is for a mixed collection like an album gallery, where "image
+ * or video or audio, but not a document" is the actual rule.
  */
 class CleanUpload implements ValidationRule
 {
@@ -43,8 +42,7 @@ class CleanUpload implements ValidationRule
             return;
         }
 
-        // A still-unattached temp upload must match the expected type. An
-        // already-attached media may be reused as-is (it will be copied).
+        // An unattached upload must match the type; an attached one is reused (copied).
         $isUnattachedTemp = $media->model_id === null
             && $media->collection_name === UploadService::TEMP_COLLECTION;
 

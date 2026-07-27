@@ -10,12 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 
 /**
- * A locale the app can hold translations for. The row is metadata only — the
- * translated strings live in lang/{code}/*.php, never in the database.
+ * A locale. Metadata only — the strings live in lang/{code}/*.php.
  *
- * Creating a language creates its folder; renaming the code renames it. Deleting
- * is deliberately NOT symmetric: the files are source and survive the row (see
- * LanguageObserver).
+ * Creating one creates its folder and renaming the code renames it. Deleting is
+ * NOT symmetric: the files are source and survive the row (LanguageObserver).
  */
 class Language extends Model
 {
@@ -26,9 +24,9 @@ class Language extends Model
     ------------------------------------------*/
 
     /**
-     * Fallback flag artwork per seeded code — public/assets/media/flags ships the
-     * full ISO set, so a language renders a real flag without anyone uploading
-     * one. An uploaded `flag` media always wins.
+     * Fallback artwork per seeded code — public/assets/media/flags ships the full
+     * ISO set, so a language renders a flag with nothing uploaded. An uploaded
+     * `flag` media always wins.
      *
      * @var array<string, string>
      */
@@ -78,9 +76,8 @@ class Language extends Model
     }
 
     /**
-     * A language has one flag: attaching a new one frees the old back into the
-     * reusable pool. Deleting a language frees its flag rather than destroying
-     * the file — see LanguageObserver.
+     * One flag: attaching a new one frees the old back to the pool. Deleting a
+     * language frees its flag rather than destroying the file.
      *
      * @return array<int, string>
      */
@@ -96,15 +93,13 @@ class Language extends Model
     }
 
     /**
-     * Codes of the enabled locales, memoised for the request.
+     * Enabled locale codes, memoised for the request.
      *
-     * Two very different callers need this on the same request: the translated
-     * search filter (once) and every translatable DTO's fromModel() (once per
-     * row) — and that second one is the N+1 this exists to prevent. A static
-     * memo, deliberately not a Cache:: layer; this app has none and CLAUDE.md
-     * says not to introduce one. Same technique as BaseObserver::$columnOrder.
+     * Two callers need this on one request: the translated search filter, and every
+     * translatable DTO's fromModel() — that second one is the N+1 this prevents. A
+     * static memo, not a Cache:: layer: this app has none (see CLAUDE.md).
      *
-     * @var array<int, string>|null
+     * @return array<int, string>
      */
     protected static ?array $enabledCodes = null;
 

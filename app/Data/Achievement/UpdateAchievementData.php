@@ -2,7 +2,6 @@
 
 namespace App\Data\Achievement;
 
-use App\Enums\CategoryType;
 use App\Models\Language;
 use App\Rules\CleanUpload;
 use Illuminate\Validation\Rule;
@@ -15,7 +14,7 @@ class UpdateAchievementData extends Data
     public function __construct(
         public string $name,
         public string $slug,
-        public string $category_id,
+        public ?string $category_id,
         /** @var array<string, string|null> */
         public array $title,
         /** @var array<string, string|null> */
@@ -46,10 +45,8 @@ class UpdateAchievementData extends Data
                 Rule::unique('achievements', 'slug')->ignore(request()->route('achievement')),
             ],
 
-            'category_id' => [
-                'required', 'string',
-                Rule::exists('categories', 'id')->where('type', CategoryType::Achievements->value),
-            ],
+            // Blank resolves to the default category in the controller.
+            'category_id' => ['nullable', 'string', Rule::exists('categories', 'id')],
 
             'title' => ['required', 'array:'.implode(',', $codes)],
             'description' => ['required', 'array:'.implode(',', $codes)],
@@ -81,8 +78,7 @@ class UpdateAchievementData extends Data
             $rules["content.{$code}"] = $isDefault
                 ? ['required', 'string']
                 : ['nullable', 'string'];
-            // done_by is optional in every language, including the default: an
-            // achievement with no named author is normal.
+            // Optional in every locale, the default one included.
             $rules["done_by.{$code}"] = ['nullable', 'string', 'max:255'];
         }
 

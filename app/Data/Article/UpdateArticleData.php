@@ -2,7 +2,6 @@
 
 namespace App\Data\Article;
 
-use App\Enums\CategoryType;
 use App\Models\Language;
 use App\Rules\CleanUpload;
 use Illuminate\Validation\Rule;
@@ -10,18 +9,13 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
-/**
- * Updating an article carries every locale: title/description/content are
- * locale => value maps, which is what the Translations tab submits. Validation
- * errors come back keyed `title.ar`, which useForm flattens straight onto
- * form.errors['title.ar'].
- */
+/** Every locale at once. Errors come back keyed `title.ar`. */
 class UpdateArticleData extends Data
 {
     public function __construct(
         public string $name,
         public string $slug,
-        public string $category_id,
+        public ?string $category_id,
         /** @var array<string, string|null> */
         public array $title,
         /** @var array<string, string|null> */
@@ -49,13 +43,10 @@ class UpdateArticleData extends Data
                 Rule::unique('articles', 'slug')->ignore(request()->route('article')),
             ],
 
-            'category_id' => [
-                'required', 'string',
-                Rule::exists('categories', 'id')->where('type', CategoryType::Articles->value),
-            ],
+            // Blank resolves to the default category in the controller.
+            'category_id' => ['nullable', 'string', Rule::exists('categories', 'id')],
 
-            // `array:en,ar` also rejects unknown keys, so a stale locale left in a
-            // cached form can never be written to the JSON column.
+            // array:en,ar also rejects unknown keys.
             'title' => ['required', 'array:'.implode(',', $codes)],
             'description' => ['required', 'array:'.implode(',', $codes)],
             'content' => ['required', 'array:'.implode(',', $codes)],
@@ -71,9 +62,7 @@ class UpdateArticleData extends Data
             'thumbnail' => ['sometimes', 'nullable', 'string', new CleanUpload('images')],
         ];
 
-        // Written out per locale rather than leaning on `title.*` plus a `title.en`
-        // override: the merged ['nullable', 'required', …] rule set that produces
-        // is subtle enough to become a future bug.
+        // Per locale, not `title.*` plus an override: merged rule sets read badly.
         foreach ($codes as $code) {
             $isDefault = $code === $default;
 

@@ -8,10 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AchievementObserver extends BaseObserver
 {
-    /**
-     * Free the thumbnail and every attached file back into the reusable pool
-     * rather than destroying them — media outlives its owner.
-     */
+    /** Free the media back to the pool rather than destroying it: it outlives its owner. */
     public function deleting(Achievement $achievement): void
     {
         UploadService::freeModel($achievement);
@@ -23,8 +20,8 @@ class AchievementObserver extends BaseObserver
     }
 
     /**
-     * `content` is a JSON map of every locale's full HTML — two copies of it per
-     * save would make the activity log unreadable and unbounded.
+     * `content` is every locale's full HTML, and updated() writes both sides of a
+     * diff — logging it would put two copies of the body in every audit row.
      *
      * @return array<int, string>
      */

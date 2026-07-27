@@ -13,27 +13,24 @@ return new class extends Migration
 
             $table->string('name');
             $table->string('slug')->unique();
-
-            $table->foreignUlid('category_id')->nullable()->constrained('categories')->nullOnDelete();
-
-            $table->json('title')->nullable();
-            $table->json('description')->nullable();
-            $table->json('content')->nullable();
-            // Who achieved it — translatable, because a name or team renders
-            // differently per language.
-            $table->json('done_by')->nullable();
+            $table->date('achieved_at');
 
             $table->string('status')->default('draft')->index();
             $table->dateTime('published_at')->nullable();
 
-            // When the achievement happened — unrelated to when its page goes live.
-            $table->date('achieved_at');
-
             $table->string('css_url')->nullable();
             $table->text('custom_css')->nullable();
 
+            $table->json('title')->nullable();
+            $table->json('description')->nullable();
+            $table->json('content')->nullable();
+            $table->json('done_by')->nullable();
+
+            $table->ulid('category_id')->nullable();
+            $table->foreign('category_id')->references('id')->on('categories')->nullOnDelete();
+
             $table->index(['status', 'published_at']);
-            $table->index('achieved_at');
+            $table->index('category_id');
 
             $table->timestamps();
         });

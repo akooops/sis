@@ -24,8 +24,7 @@ class AlbumsController extends ApiController
     public function index(): JsonResponse
     {
         $albums = QueryBuilder::for(Album::class)
-            // Both thumbnail_url and files_count read media, so one eager load
-            // serves the whole page rather than two queries per row.
+            // thumbnail_url and files_count both read media: one eager load serves both.
             ->with('media')
             ->allowedFilters([
                 AllowedFilter::exact('id'),
@@ -75,7 +74,9 @@ class AlbumsController extends ApiController
 
     public function update(UpdateAlbumData $data, Album $album): JsonResponse
     {
-        $album->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at', 'files']));
+        // mergeTranslations: the form only carries the enabled locales, so a plain
+        // assignment would drop every disabled one.
+        $album->update($album->mergeTranslations(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at', 'files'])));
 
         $target = AlbumStatus::resolveStateClass($data->status);
 
@@ -98,8 +99,7 @@ class AlbumsController extends ApiController
             UploadService::attach($data->thumbnail, $album, Album::THUMBNAIL_COLLECTION);
         }
 
-        // Removing a file from the gallery drops its id here, which detaches it
-        // back into the media library rather than deleting it.
+        // A dropped id detaches back to the library, it is not deleted.
         UploadService::sync($data->files, $album, Album::FILES_COLLECTION);
 
         return $this->respond(AlbumData::from($album->fresh()->load('media')), 'Album updated successfully');

@@ -47,8 +47,7 @@ class StoreAlbumData extends Data
 
             'thumbnail' => ['required', 'string', new CleanUpload('images')],
 
-            // The gallery, in submitted display order. Mixed types, so a document
-            // is refused but an image, video or audio file is not.
+            // Gallery, in submitted order. Images, video and audio only.
             'files' => ['sometimes', 'array'],
             'files.*' => ['string', new CleanUpload(Album::FILE_TYPES)],
         ];

@@ -7,10 +7,8 @@ use App\Services\Integrations\Registry;
 use Spatie\LaravelData\Data;
 
 /**
- * Output DTO for a configured integration. Never exposes a secret value: the
- * encrypted `config` is split into non-secret values (for the edit form) plus a
- * `secrets_set` map of booleans, so the UI can show "••••" without the value ever
- * leaving the server.
+ * Never exposes a secret value: config is split into plain values for the form
+ * plus a secrets_set map, so the UI can render "••••" without the value.
  */
 class IntegrationData extends Data
 {

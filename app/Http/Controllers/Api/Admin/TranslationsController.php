@@ -17,10 +17,9 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 /**
- * One locale's translations. The keys are paginated from the database so search,
- * sorting and filters work like every other index; each row's value is then read
- * out of lang/{code}/{group}.php, which is the file __() itself reads. Nothing is
- * ever stored in a translations column.
+ * One locale's translations. Keys paginate from the database so search, sort and
+ * filters behave like every other index; each value is then read out of
+ * lang/{code}/{group}.php, the same file __() reads. Nothing is stored in a column.
  */
 class TranslationsController extends ApiController
 {

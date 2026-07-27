@@ -3,13 +3,11 @@
 namespace App\Contracts\Integrations;
 
 /**
- * A driver that generates text from a prompt — built for prompt engineering, not
- * a one-liner. Resolved through App\Services\Integrations\Ai.
+ * A driver that generates text from a prompt. Resolved through the Ai service.
  *
- * `$options` carries the prompt-engineering knobs, merged over the integration's
- * stored config: `system` (override the system prompt), `model`, `temperature`,
- * `max_tokens`, `variables` (interpolated `:key` placeholders in the prompts),
- * `json` (force JSON output).
+ * `$options` are the prompt-engineering knobs, merged over the integration's
+ * config: system, model, temperature, max_tokens, variables (interpolated :key
+ * placeholders) and json.
  */
 interface GeneratesText
 {

@@ -9,13 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelData\Data;
 
 /**
- * Output DTO for an activity-log entry.
- *
- * `subject_type`/`causer_type` are short aliases (App\Enums\MorphType), never
- * the stored class names — clients shouldn't filter on a namespace we might
- * refactor. The UI builds its message from (log_name, event) and interpolates
- * `properties.meta`; `description` is the stored English fallback for anything
- * it has no translation for.
+ * subject_type/causer_type are MorphType aliases, never class names.
+ * The UI builds its message from (log_name, event); description is the
+ * stored English fallback.
  */
 class ActivityData extends Data
 {
@@ -56,11 +52,7 @@ class ActivityData extends Data
         );
     }
 
-    /**
-     * A human label for either end of the morph. Users have no single `name`
-     * column, and a deleted or force-deleted record resolves to null — the UI
-     * falls back to the id it already has.
-     */
+    /** Users have no single name column; a deleted record resolves to null. */
     protected static function label(?Model $model): ?string
     {
         if ($model === null) {

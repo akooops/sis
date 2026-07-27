@@ -8,9 +8,6 @@ use App\Models\UserRole;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
 
-/**
- * Output DTO for the user_roles pivot.
- */
 class UserRoleData extends Data
 {
     public function __construct(

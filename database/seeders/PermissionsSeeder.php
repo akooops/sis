@@ -85,6 +85,29 @@ class PermissionsSeeder extends Seeder
             ['code' => 'partners.update', 'name' => 'Update partners', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'partners.reorder', 'name' => 'Reorder partners', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'partners.destroy', 'name' => 'Delete partners', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'documents.index', 'name' => 'View documents', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'documents.store', 'name' => 'Create documents', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'documents.update', 'name' => 'Update documents', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'documents.destroy', 'name' => 'Delete documents', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'programs.index', 'name' => 'View programs', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'programs.store', 'name' => 'Create programs', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'programs.update', 'name' => 'Update programs', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'programs.reorder', 'name' => 'Reorder programs', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'programs.destroy', 'name' => 'Delete programs', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'streams.index', 'name' => 'View streams', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'streams.store', 'name' => 'Create streams', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'streams.update', 'name' => 'Update streams', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'streams.reorder', 'name' => 'Reorder streams', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'streams.destroy', 'name' => 'Delete streams', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'grades.index', 'name' => 'View grades', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'grades.store', 'name' => 'Create grades', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'grades.update', 'name' => 'Update grades', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'grades.reorder', 'name' => 'Reorder grades', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'grades.destroy', 'name' => 'Delete grades', 'supports_web' => true, 'supports_api' => false],
         ];
 
         foreach ($permissions as $permission) {

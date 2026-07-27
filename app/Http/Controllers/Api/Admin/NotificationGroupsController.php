@@ -13,9 +13,8 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 /**
- * CRUD for notification groups — the routing configs (types × members × one
- * optional email integration). Members are managed as their own pivot resource
- * (NotificationGroupUsersController), never through this form.
+ * Routing configs: types x members x one optional email integration.
+ * Members are their own pivot resource, never part of this form.
  */
 class NotificationGroupsController extends ApiController
 {

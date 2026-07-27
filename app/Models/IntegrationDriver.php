@@ -7,11 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * The seeded catalogue of drivers (vendor implementations) — a DB mirror of the
- * classes registered in config('integrations.drivers'). Carries the field schema
- * so the admin UI can list drivers and build forms without booting the classes;
- * the actual send/generate logic still lives in the driver class (resolved by
- * code through App\Services\Integrations\Registry).
+ * Seeded mirror of the classes in config('integrations.drivers'). Carries the
+ * field schema so the UI can build forms without booting the classes; the send
+ * logic stays in the driver, resolved through Registry.
  */
 class IntegrationDriver extends Model
 {

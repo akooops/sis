@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 class UserObserver extends BaseObserver
 {
     /**
-     * Audit the create (parent), then tell the approvers a signup is waiting.
-     * The parameter stays Model — PHP forbids narrowing BaseObserver::created().
+     * Audit the create, then tell the approvers a signup is waiting. The param stays
+     * Model — PHP forbids narrowing the parent signature.
      */
     public function created(Model $model): void
     {
@@ -32,10 +32,7 @@ class UserObserver extends BaseObserver
         }
     }
 
-    /**
-     * Free the user's media back into the reusable pool rather than destroying
-     * the files — media outlives the user it was attached to.
-     */
+    /** Free the media back to the pool rather than destroying it: it outlives its owner. */
     public function deleting(User $user): void
     {
         UploadService::freeModel($user);

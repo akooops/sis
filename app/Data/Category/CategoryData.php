@@ -11,8 +11,10 @@ class CategoryData extends Data
         public string $id,
         public string $name,
         public string $code,
-        public string $type,
-        public string $type_label,
+        /** @var array<string, string|null> */
+        public array $title,
+        public string $color,
+        public bool $is_default,
         public ?string $created_at,
         public ?string $updated_at,
     ) {}
@@ -23,8 +25,9 @@ class CategoryData extends Data
             id: $category->id,
             name: $category->name,
             code: $category->code,
-            type: $category->type->value,
-            type_label: $category->type->label(),
+            title: $category->enabledTranslations('title'),
+            color: $category->color,
+            is_default: $category->is_default,
             created_at: $category->created_at?->toIso8601String(),
             updated_at: $category->updated_at?->toIso8601String(),
         );

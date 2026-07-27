@@ -8,10 +8,7 @@ use App\Models\RolePermission;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
 
-/**
- * Output DTO for the role_permissions pivot. Both sides are Lazy single
- * relations: each is serialised only when eager-loaded.
- */
+/** Both sides are Lazy — each serialised only when eager-loaded. */
 class RolePermissionData extends Data
 {
     public function __construct(

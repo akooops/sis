@@ -6,11 +6,7 @@ use App\Models\Role;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
 
-/**
- * Output DTO for a role. `permissions` is Lazy: it is only serialised when the
- * relation is eager-loaded (e.g. $role->load('permissions')) — the equivalent
- * of a Resource's whenLoaded(). Otherwise the key is omitted entirely.
- */
+/** `permissions` is Lazy — serialised only when eager-loaded. */
 class RoleData extends Data
 {
     public function __construct(

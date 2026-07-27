@@ -14,17 +14,21 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
 
-            $table->json('title')->nullable();
-            $table->json('description')->nullable();
-            $table->json('content')->nullable();
-
             $table->string('status')->default('draft')->index();
             $table->dateTime('published_at')->nullable();
 
             $table->string('css_url')->nullable();
             $table->text('custom_css')->nullable();
 
+            $table->json('title')->nullable();
+            $table->json('description')->nullable();
+            $table->json('content')->nullable();
+
+            $table->ulid('category_id')->nullable();
+            $table->foreign('category_id')->references('id')->on('categories')->nullOnDelete();
+
             $table->index(['status', 'published_at']);
+            $table->index('category_id');
 
             $table->timestamps();
         });

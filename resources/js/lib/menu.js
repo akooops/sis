@@ -39,6 +39,17 @@ export const adminMenu = [
             { label: 'Albums', route: 'web.admin.albums.index', permission: 'albums.index' },
             { label: 'Events', route: 'web.admin.events.index', permission: 'events.index' },
             { label: 'Partners', route: 'web.admin.partners.index', permission: 'partners.index' },
+            { label: 'Documents', route: 'web.admin.documents.index', permission: 'documents.index' },
+        ],
+    },
+    {
+        label: 'Academic',
+        icon: 'ki-filled ki-teacher',
+        children: [
+            // Programs first: streams and grades both hang off one.
+            { label: 'Programs', route: 'web.admin.programs.index', permission: 'programs.index' },
+            { label: 'Streams', route: 'web.admin.streams.index', permission: 'streams.index' },
+            { label: 'Grades', route: 'web.admin.grades.index', permission: 'grades.index' },
         ],
     },
     {

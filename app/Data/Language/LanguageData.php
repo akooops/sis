@@ -5,10 +5,7 @@ namespace App\Data\Language;
 use App\Models\Language;
 use Spatie\LaravelData\Data;
 
-/**
- * Output DTO for a language. `flag_url` is always present — it falls back to the
- * bundled flag artwork for the code when no image has been uploaded.
- */
+/** flag_url falls back to the bundled artwork when no image is uploaded. */
 class LanguageData extends Data
 {
     public function __construct(

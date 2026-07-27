@@ -8,10 +8,8 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 /**
- * Validates an incoming file against config/uploads.php: `type` must be one of
- * the configured categories, and the file must match that category's allowed
- * extensions and the global max size. This is the single place size/mime are
- * enforced (the form only later references the resulting upload id).
+ * The one place size/mime are enforced — forms only reference the resulting id.
+ * Rules come from config/uploads.php: the type's extensions plus the max size.
  */
 class StoreMediaData extends Data
 {
@@ -25,7 +23,7 @@ class StoreMediaData extends Data
         $type = is_array($context->payload) ? ($context->payload['type'] ?? null) : null;
         $extensions = is_string($type) ? (array) config("uploads.allowed_types.$type", []) : [];
 
-        // max_file_size is in bytes; Laravel's `max` for files is kilobytes.
+        // Config is bytes; Laravel's `max` for files is kilobytes.
         $maxKb = (int) floor(((int) config('uploads.max_file_size', 10485760)) / 1024);
 
         return [

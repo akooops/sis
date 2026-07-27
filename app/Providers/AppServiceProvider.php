@@ -9,7 +9,9 @@ use App\Models\ApiKey;
 use App\Models\ApiKeyPermission;
 use App\Models\Article;
 use App\Models\Category;
+use App\Models\Document;
 use App\Models\Event;
+use App\Models\Grade;
 use App\Models\Integration;
 use App\Models\Language;
 use App\Models\Media;
@@ -21,9 +23,11 @@ use App\Models\NotificationUser;
 use App\Models\Page;
 use App\Models\Partner;
 use App\Models\Permission;
+use App\Models\Program;
 use App\Models\Role;
 use App\Models\RolePermission;
 use App\Models\Session;
+use App\Models\Stream;
 use App\Models\User;
 use App\Models\UserRole;
 use App\Observers\AchievementObserver;
@@ -32,7 +36,9 @@ use App\Observers\ApiKeyObserver;
 use App\Observers\ApiKeyPermissionObserver;
 use App\Observers\ArticleObserver;
 use App\Observers\CategoryObserver;
+use App\Observers\DocumentObserver;
 use App\Observers\EventObserver;
+use App\Observers\GradeObserver;
 use App\Observers\IntegrationObserver;
 use App\Observers\LanguageObserver;
 use App\Observers\MediaObserver;
@@ -44,8 +50,10 @@ use App\Observers\NotificationUserObserver;
 use App\Observers\PageObserver;
 use App\Observers\PartnerObserver;
 use App\Observers\PermissionObserver;
+use App\Observers\ProgramObserver;
 use App\Observers\RoleObserver;
 use App\Observers\RolePermissionObserver;
+use App\Observers\StreamObserver;
 use App\Observers\UserObserver;
 use App\Observers\UserRoleObserver;
 use App\Services\Integrations\Registry;
@@ -66,11 +74,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // One registry instance per request — it caches the resolved driver map.
+        // One per request: it caches the resolved driver map.
         $this->app->singleton(Registry::class);
 
-        // Likewise one translation service per request — it memoises the lang
-        // files it has read, so a page of keys costs one read per group.
+        // One per request: it memoises the lang files it reads.
         $this->app->singleton(TranslationService::class);
     }
 
@@ -106,19 +113,18 @@ class AppServiceProvider extends ServiceProvider
         Category::observe(CategoryObserver::class);
         Achievement::observe(AchievementObserver::class);
         Partner::observe(PartnerObserver::class);
+        Document::observe(DocumentObserver::class);
+        Program::observe(ProgramObserver::class);
+        Stream::observe(StreamObserver::class);
+        Grade::observe(GradeObserver::class);
     }
 
     /**
-     * How a translatable model resolves a locale it has no value for.
-     * spatie/laravel-translatable v6 ships no config file, so this is the only
-     * place it can be set.
+     * How a translatable model resolves a locale it has no value for. v6 ships no
+     * config file, so this is the only place it can be set.
      *
-     * fallbackAny is the right call for a CMS: a page translated only into Arabic
-     * should still render something rather than an empty <title> when someone
-     * asks for a locale nobody has filled in.
-     *
-     * Note this governs page CONTENT only. The UI string catalogue is unrelated —
-     * that still lives in lang/*.php and is read by __()/@lang() (see CLAUDE.md).
+     * fallbackAny suits a CMS: a page translated only into Arabic should still
+     * render. Page CONTENT only — the UI catalogue is lang/*.php, read by __().
      */
     protected function useTranslationFallback(): void
     {
@@ -129,14 +135,11 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * If an email integration is configured and enabled, make it the default
-     * mailer for the request. File config (config/mail.php) stays the fallback
-     * when no DB integration exists, so existing Mail::send call-sites are
-     * untouched.
+     * Make the active email integration the default mailer for the request.
+     * config/mail.php stays the fallback, so Mail::send call-sites are untouched.
      *
-     * Single-tenant assumption: a boot-time override of the one default mailer is
-     * safe here. A multi-tenant app would set this per-job instead, so one
-     * tenant's secret can't leak into another job on the same worker.
+     * Single-tenant assumption: overriding the one default mailer at boot is safe.
+     * Multi-tenant would set this per job, so one tenant's secret cannot leak.
      */
     protected function useIntegrationMailer(): void
     {
@@ -173,16 +176,14 @@ class AppServiceProvider extends ServiceProvider
                 ]]);
             }
         } catch (Throwable) {
-            // A broken integration must never take down app boot — fall back to
-            // file config silently.
+            // A broken integration must never take down boot; fall back to file config.
         }
     }
 
     /**
-     * Swap Laravel's database session handler for ours, so the sessions table
-     * can be a ULID + timestamps model like everything else instead of PHP's
-     * session id and a unix integer. SessionManager::callCustomCreator wraps the
-     * handler in a Store, so cookie/encryption config is untouched.
+     * Swap Laravel's database session handler for ours, so the table is a ULID +
+     * timestamps model. callCustomCreator wraps it in a Store, so cookie and
+     * encryption config are untouched.
      */
     protected function useOurSessionTable(): void
     {
@@ -197,9 +198,8 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Teach the activity log who is acting: a request may be authenticated by a
-     * session user or by an API key (VerifyAuth stashes the resolved key on the
-     * request), and console/queue work has no causer at all.
+     * Who is acting: a session user, or an API key (VerifyAuth stashes the resolved
+     * key on the request). Console and queue work has no causer.
      */
     protected function resolveActivityCauser(): void
     {

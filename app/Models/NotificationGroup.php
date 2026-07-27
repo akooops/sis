@@ -10,12 +10,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * A routing config: a named group (with a unique code) that binds a set of
- * notification types to a set of member users. Emitting a notification of a type
- * delivers it to every member of every group that includes that type — always to
- * the in-app inbox, plus by email through the group's integration when one is
- * set (null = in-app only). Members are managed as a pivot resource
- * (NotificationGroupUsersController), not through the group form.
+ * Routing config: binds a set of notification types to a set of member users.
+ * Emitting a type delivers to every member of every group carrying it — always
+ * in-app, plus email when the group has an integration (null = in-app only).
+ * Members are a pivot resource, not part of the group form.
  */
 class NotificationGroup extends Model
 {
@@ -65,11 +63,8 @@ class NotificationGroup extends Model
     ------------------------------------------*/
 
     /**
-     * Set the group's notification types to exactly the given ids. firstOrCreate
-     * fires the pivot observer per new row so an attach is audited; removals go
-     * through a builder delete (unaudited, like syncRoles).
-     *
-     * @param  array<int, string>  $typeIds
+     * Set the types to exactly these ids. firstOrCreate fires the pivot observer so
+     * an attach is audited; removals go through a builder delete, like syncRoles.
      */
     public function syncTypes(array $typeIds): void
     {

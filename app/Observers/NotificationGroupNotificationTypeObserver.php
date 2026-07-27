@@ -4,10 +4,7 @@ namespace App\Observers;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Adding/removing a notification type on a group is an activity on the group
- * (that is where its types are managed).
- */
+/** A type change is an activity on the group — that is where types are managed. */
 class NotificationGroupNotificationTypeObserver extends BaseObserver
 {
     protected function isPivot(): bool

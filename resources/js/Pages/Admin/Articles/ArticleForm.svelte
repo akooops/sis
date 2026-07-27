@@ -31,6 +31,7 @@
     let languages = $state([]);
     let activeTab = $state('details');
     let activeLocale = $state(null);
+    let defaultCategory = $state(null);
 
     const form = useForm(
         article
@@ -92,6 +93,22 @@
             .catch(() => {});
     });
 
+    // Preselect the default category on create, so publishing is never blocked by
+    // a taxonomy decision. The server falls back to the same one when nothing is
+    // sent — this is the visible half of that.
+    $effect(() => {
+        if (editing) return;
+
+        api.get(route('api.v1.admin.categories.index'), { filter: { is_default: 1 }, per_page: 1 })
+            .then((d) => {
+                const fallback = d?.data?.[0];
+                if (!fallback || form.data.category_id) return;
+                form.data.category_id = fallback.id;
+                defaultCategory = fallback;
+            })
+            .catch(() => {});
+    });
+
     function payload(data) {
         const out = { ...data };
         if (!out.thumbnail) delete out.thumbnail;
@@ -145,21 +162,18 @@
                 </Field>
             </div>
 
-            <!--
-                Remote select: it loads page one and narrows by search rather than
-                listing everything, and the filter pins it to this content type so
-                an achievements category can never be offered here.
-            -->
-            <Field label="Category" error={form.errors.category_id} required hint="Every article is filed under a category.">
+            <!-- Remote select: loads page one and narrows by search. -->
+            <Field label="Category" error={form.errors.category_id} hint="Defaults to the fallback category if you leave it alone.">
                 <Select
                     resource="api.v1.admin.categories.index"
-                    resourceParams={{ filter: { type: 'articles' } }}
                     bind:value={form.data.category_id}
                     labelKey="name"
                     placeholder="Search categories…"
                     initialOptions={article?.category
                         ? [{ value: article.category.id, label: article.category.name }]
-                        : []}
+                        : defaultCategory
+                          ? [{ value: defaultCategory.id, label: defaultCategory.name }]
+                          : []}
                 />
             </Field>
 
@@ -213,6 +227,7 @@
                     <button
                         type="button"
                         role="tab"
+                        data-kt-tab-toggle
                         class="kt-tab-toggle {activeLocale === language.code ? 'active' : ''}"
                         aria-selected={activeLocale === language.code}
                         onclick={() => (activeLocale = language.code)}

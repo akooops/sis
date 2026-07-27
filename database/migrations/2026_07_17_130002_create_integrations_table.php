@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('driver');
             $table->string('name');
             $table->text('config')->nullable();
-            
+
             $table->boolean('is_enabled')->default(true);
 
             $table->ulid('integration_type_id');

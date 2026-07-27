@@ -11,10 +11,7 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    /**
-     * Standard response envelope: { status, message, data }. `status` follows
-     * the HTTP code (2xx = success, otherwise error).
-     */
+    /** { status, message, data }. `status` follows the HTTP code. */
     protected function respond(mixed $data = null, string $message = '', int $status = 200): JsonResponse
     {
         return response()->json([

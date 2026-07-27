@@ -5,9 +5,6 @@ namespace App\Data\Notification;
 use App\Models\NotificationType;
 use Spatie\LaravelData\Data;
 
-/**
- * Output DTO for a seeded notification type (the type picker in compose + groups).
- */
 class NotificationTypeData extends Data
 {
     public function __construct(

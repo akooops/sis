@@ -20,8 +20,8 @@ class PartnerObserver extends BaseObserver
     }
 
     /**
-     * Reordering is a builder update so it never reaches an observer, but a
-     * create still records order 0/1/2 — noise on a field the user never set.
+     * Reordering is a builder update so it never reaches an observer, but a create
+     * would still record order 0/1/2 — noise on a field nobody set.
      *
      * @return array<int, string>
      */

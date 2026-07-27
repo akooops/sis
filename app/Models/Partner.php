@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 
 /**
- * An organisation shown in the partners strip. Flat and ordered: `order` is the
- * display position and is only ever written by the reorder endpoint.
+ * A logo in the partners strip. `order` is the display position and is only
+ * written by the reorder endpoint.
  */
 class Partner extends Model
 {
@@ -48,16 +48,15 @@ class Partner extends Model
      4. Methods
     ------------------------------------------*/
 
-    /** Display order, with created_at breaking ties so it is never arbitrary. */
+    /** Display order, created_at breaking ties so it is never arbitrary. */
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('order')->orderBy('created_at');
     }
 
     /**
-     * Where a newly created partner goes: on the end. Zero-based, matching the
-     * positions the reorder endpoint writes — otherwise the very first partner
-     * would sit at 1 until someone dragged the list.
+     * A new partner goes on the end. Zero-based to match the positions reorder
+     * writes, or the first ever partner would sit at 1 until someone dragged.
      */
     public static function nextOrder(): int
     {

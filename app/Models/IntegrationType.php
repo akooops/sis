@@ -7,9 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * A capability slot (email, sms, ai…). A seeded mirror of
- * config('integrations.types'); the drivers and their schemas live in code and
- * are mirrored into integration_drivers.
+ * A capability slot (email, sms, ai…), mirroring config('integrations.types').
  */
 class IntegrationType extends Model
 {

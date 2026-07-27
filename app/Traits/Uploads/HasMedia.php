@@ -8,12 +8,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
- * Gives a model media collections. A collection is just a label on the media row
- * — nothing about it is reflected on disk — so attaching and detaching are plain
- * database writes (see App\Services\Uploads\UploadService).
+ * Media collections for a model. A collection is just a label on the media row,
+ * never anything on disk, so attach/detach are plain database writes.
  *
- * Only scanned files are ever returned: an infected or not-yet-scanned upload
- * must never be linked from the UI.
+ * Only scanned files are returned — an infected or pending upload must never be
+ * linked from the UI.
  */
 trait HasMedia
 {
@@ -25,10 +24,8 @@ trait HasMedia
     /** @return Collection<int, Media> */
     public function getMedia(string $collection): Collection
     {
-        // Use the eager-loaded relation when the caller asked for one. An index
-        // page appends a *_url accessor per row, so without this a ->with('media')
-        // still costs one query per row — the filtering has to happen in PHP to
-        // benefit from the single load.
+        // Use the eager-loaded relation when there is one. An index appends a *_url per
+        // row, so filtering has to happen in PHP or ->with('media') buys nothing.
         if ($this->relationLoaded('media')) {
             return $this->media
                 ->where('collection_name', $collection)
@@ -56,8 +53,7 @@ trait HasMedia
     }
 
     /**
-     * Collections that hold at most one file: attaching to one of these frees
-     * whatever was there before. Override per model.
+     * Collections holding at most one file — attaching frees what was there.
      *
      * @return array<int, string>
      */

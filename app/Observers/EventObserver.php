@@ -8,12 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class EventObserver extends BaseObserver
 {
-    /**
-     * Free the thumbnail and every attached file back into the reusable pool
-     * rather than destroying them — media outlives its owner, as with
-     * UserObserver and LanguageObserver. model:prune sweeps them 30 days later
-     * if nobody claims them.
-     */
+    /** Free the media back to the pool rather than destroying it: it outlives its owner. */
     public function deleting(Event $event): void
     {
         UploadService::freeModel($event);
@@ -25,10 +20,8 @@ class EventObserver extends BaseObserver
     }
 
     /**
-     * `content` is a JSON map of every locale's full HTML. BaseObserver::updated()
-     * writes both sides of a diff, so logging it would put two copies of the whole
-     * body into activity_log.properties on every save — unreadable in the drawer
-     * and unbounded on disk. Same call IntegrationObserver makes about `config`.
+     * `content` is every locale's full HTML, and updated() writes both sides of a
+     * diff — logging it would put two copies of the body in every audit row.
      *
      * @return array<int, string>
      */

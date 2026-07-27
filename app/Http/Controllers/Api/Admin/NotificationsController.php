@@ -12,15 +12,11 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 /**
- * The signed-in admin's own notification inbox (the bell drawer + notifications
- * page). Auth-only, never permission-gated — every admin has an inbox, and
- * creation happens exclusively in observers via NotificationService::send().
+ * The signed-in admin's own inbox. Auth-only, never permission-gated; rows are
+ * created exclusively by observers via NotificationService::send().
  *
- * The API is keyed by the NOTIFICATION id (what the frontend shows); read and
- * delete resolve the current user's own notification_users row for it, so a
- * notification that never reached this user is simply a 404 and one user can
- * never touch another's read state or copy. Deleting removes only this user's
- * copy — the notification itself stays for its other recipients.
+ * Keyed by NOTIFICATION id: read and delete resolve this user's own pivot row,
+ * so one user can never touch another's copy, and delete removes only theirs.
  */
 class NotificationsController extends ApiController
 {

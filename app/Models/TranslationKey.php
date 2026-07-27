@@ -6,13 +6,11 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * One translatable line, identified by its file (`group`) and dotted path
- * (`key`). A seeded mirror of config('translations.keys'); grown by code, never
- * CRUD.
+ * One translatable line, identified by file (`group`) and dotted path (`key`).
+ * Mirrors config('translations.keys'); grown by code, never CRUD.
  *
- * The registry holds keys ONLY — a key's value per locale lives in
- * lang/{code}/{group}.php. This table is what makes "every key must survive a
- * write" checkable, and what the Translations page paginates.
+ * Keys ONLY — values live in lang/{code}/{group}.php. This table is what makes
+ * "every key survives a write" checkable, and what the Translations page pages.
  */
 class TranslationKey extends Model
 {
@@ -37,9 +35,9 @@ class TranslationKey extends Model
     ------------------------------------------*/
 
     /**
-     * Hang one locale's line off the row so the paginated registry can be handed
-     * straight to TranslationLineData. `locale`/`value`/`is_translated` are
-     * transient: they have no columns and must never be saved.
+     * Hang one locale's line off the row so a paginated registry can go straight to
+     * TranslationLineData. locale/value/is_translated are transient — no columns,
+     * never saved.
      */
     public function withLine(string $locale, ?string $value): static
     {

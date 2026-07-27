@@ -37,9 +37,9 @@ class AlbumData extends Data
             id: $album->id,
             name: $album->name,
             slug: $album->slug,
-            title: $album->getTranslations('title'),
-            description: $album->getTranslations('description'),
-            content: $album->getTranslations('content'),
+            title: $album->enabledTranslations('title'),
+            description: $album->enabledTranslations('description'),
+            content: $album->enabledTranslations('content'),
             status: $album->status->getValue(),
             published_at: $album->published_at?->toIso8601String(),
             css_url: $album->css_url,
@@ -47,7 +47,7 @@ class AlbumData extends Data
             thumbnail_url: $album->thumbnail_url,
             created_at: $album->created_at?->toIso8601String(),
             updated_at: $album->updated_at?->toIso8601String(),
-            // type + mime so MediaThumb can pick an image, a video frame or an icon.
+            // type + mime drive the thumbnail the UI picks.
             files: Lazy::whenLoaded('media', $album, fn () => $album->getMedia(Album::FILES_COLLECTION)
                 ->map(fn (Media $media) => [
                     'id' => $media->id,

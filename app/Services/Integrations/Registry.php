@@ -10,10 +10,9 @@ use InvalidArgumentException;
 
 /**
  * Maps a driver `code` to its class from config('integrations.drivers') and
- * resolves it through the container — the one place a driver is looked up, so a
- * new vendor is a class plus a config line, nothing else. Also owns the two
- * schema helpers the controllers use to fold submitted fields into the single
- * encrypted `config` array and to split it back for reading.
+ * resolves it — the one place a driver is looked up, so a new vendor is a class
+ * plus a config line. Also owns the schema helpers that fold submitted fields
+ * into the encrypted `config` array and split it back for reading.
  */
 class Registry
 {
@@ -51,15 +50,9 @@ class Registry
     }
 
     /**
-     * Fold submitted field values into the single config array. On update we start
-     * from the stored config and overlay; a blank/absent secret is left untouched
-     * (so the stored one survives). On store, missing non-secret fields fall back
-     * to their declared default.
-     *
-     * @param  array<int, FieldData>  $schema
-     * @param  array<string, mixed>  $existing
-     * @param  array<string, mixed>  $submitted
-     * @return array<string, mixed>
+     * Fold submitted values into the config array. On update, start from the stored
+     * config and overlay — a blank secret is left alone. On store, missing
+     * non-secret fields fall back to their declared default.
      */
     public function applyValues(array $schema, array $existing, array $submitted, bool $forUpdate): array
     {
@@ -88,12 +81,8 @@ class Registry
     }
 
     /**
-     * Split a stored config into the non-secret values (for the edit form) and a
-     * boolean map of which secret fields are set (never the secret value itself).
-     *
-     * @param  array<int, FieldData>  $schema
-     * @param  array<string, mixed>  $config
-     * @return array{0: array<string, mixed>, 1: array<string, bool>}
+     * Split a stored config into plain values for the form plus a boolean map of
+     * which secrets are set. Never the secret itself.
      */
     public function splitForRead(array $schema, array $config): array
     {
@@ -111,13 +100,7 @@ class Registry
         return [$nonSecret, $secretsSet];
     }
 
-    /**
-     * Laravel validation rules for a driver's schema, keyed `settings.<key>`, so
-     * the store/update Data classes validate the exact shape the form submits.
-     *
-     * @param  array<int, FieldData>  $schema
-     * @return array<string, array<int, mixed>>
-     */
+    /** Rules for a driver's schema, keyed `settings.<key>` — the shape the form posts. */
     public function rulesFor(array $schema, bool $forUpdate): array
     {
         $rules = [];
@@ -134,9 +117,8 @@ class Registry
      */
     protected function fieldRules(FieldData $field, bool $forUpdate): array
     {
-        // On update every field is optional (a blank secret keeps the stored
-        // value; an omitted field keeps its config). On store, required fields
-        // must be present.
+        // Update: everything optional (a blank secret keeps the stored value).
+        // Store: required fields must be present.
         $rules = ! $forUpdate && $field->required ? ['required'] : ['sometimes', 'nullable'];
 
         $rules[] = match ($field->type) {

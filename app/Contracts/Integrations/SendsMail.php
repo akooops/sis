@@ -4,14 +4,13 @@ namespace App\Contracts\Integrations;
 
 /**
  * A driver that can act as the app's mailer. The runtime bridge builds a Laravel
- * mailer config from mailerConfig() + mailFrom() when this driver's integration
- * is the active email one.
+ * mailer from mailerConfig() + mailFrom() when this integration is the active one.
  */
 interface SendsMail
 {
     /**
-     * A Laravel `mail.mailers.*` transport config array (transport, host, port,
-     * encryption, username, password, …) built from the integration's config.
+     * A `mail.mailers.*` transport config (transport, host, port, encryption,
+     * username, password, …) built from the integration's config.
      *
      * @param  array<string, mixed>  $config
      * @return array<string, mixed>

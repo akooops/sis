@@ -5,7 +5,7 @@ namespace App\Data\Page;
 use App\Models\Page;
 use Spatie\LaravelData\Data;
 
-/** Output DTO for a page. Translatable fields are full locale => value maps. */
+/** Translatable fields are full locale => value maps. */
 class PageData extends Data
 {
     public function __construct(
@@ -34,9 +34,9 @@ class PageData extends Data
             id: $page->id,
             name: $page->name,
             slug: $page->slug,
-            title: $page->getTranslations('title'),
-            description: $page->getTranslations('description'),
-            content: $page->getTranslations('content'),
+            title: $page->enabledTranslations('title'),
+            description: $page->enabledTranslations('description'),
+            content: $page->enabledTranslations('content'),
             status: $page->status->getValue(),
             published_at: $page->published_at?->toIso8601String(),
             css_url: $page->css_url,

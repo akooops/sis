@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\States\Event\EventStatus;
 use App\States\Event\Published;
+use App\Traits\Translations\HasEnabledTranslations;
 use App\Traits\Uploads\HasMedia;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -13,16 +14,15 @@ use Spatie\ModelStates\HasStates;
 use Spatie\Translatable\HasTranslations;
 
 /**
- * A dated event: an article that also says when it happens.
+ * An article that also says when it happens.
  *
- * Two unrelated timelines, and confusing them is the easy mistake here.
- * `published_at` is when the LISTING goes live; `start_at`/`end_at` are when the
- * event itself runs. A published event can be long past, and a draft event can
- * start tomorrow — the publish pipeline never looks at start_at.
+ * Two timelines, easily confused: `published_at` is when the LISTING goes live,
+ * `start_at`/`end_at` are when the event runs. A published event can be long
+ * past and a draft can start tomorrow — the publish pipeline ignores start_at.
  */
 class Event extends Model
 {
-    use HasFactory, HasMedia, HasStates, HasTranslations, HasUlids;
+    use HasEnabledTranslations, HasFactory, HasMedia, HasStates, HasTranslations, HasUlids;
 
     /* -----------------------------------------
      1. Attributes

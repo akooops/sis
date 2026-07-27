@@ -7,9 +7,6 @@ use App\Models\NotificationGroupUser;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Lazy;
 
-/**
- * Output DTO for the notification_group_users pivot (a group membership).
- */
 class NotificationGroupUserData extends Data
 {
     public function __construct(

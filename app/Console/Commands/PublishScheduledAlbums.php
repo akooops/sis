@@ -9,15 +9,13 @@ use Illuminate\Console\Command;
 use Spatie\ModelStates\Exceptions\TransitionNotFound;
 
 /**
- * Flip scheduled albums live once their published_at has passed.
+ * Flip scheduled albums live once published_at has passed.
  *
- * Not a pruning sweep, so CLAUDE.md's "pruning is Prunable + model:prune, never
- * a bespoke command" does not apply. It is a state transition on live rows, and
- * it must fire model events so AlbumObserver writes the audit row: a builder
- * update() would be one query and would tell nobody anything.
+ * Not a pruning sweep, so the "Prunable + model:prune, never a bespoke command"
+ * rule does not apply — this is a state transition that must fire model events so
+ * AlbumObserver writes the audit row. A builder update would tell nobody anything.
  *
- * Console runs have no causer, so the activity row's causer is null — exactly as
- * AppServiceProvider's CauserResolver documents.
+ * Console runs have no causer, so the activity row's causer is null.
  */
 class PublishScheduledAlbums extends Command
 {
@@ -29,8 +27,7 @@ class PublishScheduledAlbums extends Command
     {
         $published = 0;
 
-        // The ['status', 'published_at'] composite index serves this predicate,
-        // and cursor() streams rather than hydrating every due row at once.
+        // The (status, published_at) index serves this; cursor() streams the rows.
         $due = Album::query()
             ->whereState('status', Scheduled::class)
             ->whereNotNull('published_at')

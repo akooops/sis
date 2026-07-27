@@ -10,12 +10,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
-/**
- * Updating a page carries every locale: title/description/content are
- * locale => value maps, which is what the Translations tab submits. Validation
- * errors come back keyed `title.ar`, which useForm flattens straight onto
- * form.errors['title.ar'].
- */
+/** Every locale at once. Errors come back keyed `title.ar`. */
 class UpdatePageData extends Data
 {
     public function __construct(

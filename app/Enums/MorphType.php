@@ -7,7 +7,9 @@ use App\Models\Album;
 use App\Models\ApiKey;
 use App\Models\Article;
 use App\Models\Category;
+use App\Models\Document;
 use App\Models\Event;
+use App\Models\Grade;
 use App\Models\Integration;
 use App\Models\Language;
 use App\Models\Media;
@@ -17,18 +19,19 @@ use App\Models\NotificationType;
 use App\Models\Page;
 use App\Models\Partner;
 use App\Models\Permission;
+use App\Models\Program;
 use App\Models\Role;
+use App\Models\Stream;
 use App\Models\TranslationKey;
 use App\Models\User;
 
 /**
- * Short public aliases for the models that appear in polymorphic columns
- * (activity_log.subject/causer, media.model).
+ * Public aliases for the models in polymorphic columns (activity_log.subject,
+ * media.model).
  *
- * The database stores fully-qualified class names; this only translates at the
- * API boundary, so clients filter by `api_key` rather than by a namespace we
- * would then be unable to refactor. Deliberately not a Relation::morphMap —
- * enforcing one would rewrite what gets stored and break existing rows.
+ * The DB stores class names; this translates at the API boundary only, so
+ * clients filter by `api_key` and not by a namespace we might refactor.
+ * Deliberately not a Relation::morphMap — that would rewrite what is stored.
  */
 enum MorphType: string
 {
@@ -50,6 +53,10 @@ enum MorphType: string
     case Category = 'category';
     case Achievement = 'achievement';
     case Partner = 'partner';
+    case Document = 'document';
+    case Program = 'program';
+    case Stream = 'stream';
+    case Grade = 'grade';
 
     /** @return class-string */
     public function class(): string
@@ -73,6 +80,10 @@ enum MorphType: string
             self::Category => Category::class,
             self::Achievement => Achievement::class,
             self::Partner => Partner::class,
+            self::Document => Document::class,
+            self::Program => Program::class,
+            self::Stream => Stream::class,
+            self::Grade => Grade::class,
         };
     }
 

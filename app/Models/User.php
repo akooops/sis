@@ -57,9 +57,8 @@ class User extends Authenticatable
     }
 
     /**
-     * The user's in-app notification inbox rows (per-user copies with read state).
-     * Named notificationUsers(), not notifications(), to avoid colliding with the
-     * Notifiable trait's own notifications() relation.
+     * The inbox rows. Named notificationUsers(), not notifications(), so it does not
+     * collide with the Notifiable trait's own relation.
      */
     public function notificationUsers(): HasMany
     {
@@ -90,9 +89,8 @@ class User extends Authenticatable
     ------------------------------------------*/
 
     /**
-     * Only an approved account may sign in — being Verified (Azure confirmed who
-     * you are) is not the same as being let in. The single source of truth for
-     * the gate; see AuthController.
+     * Only an approved account may sign in — Verified (Azure confirmed who you are)
+     * is not the same as being let in. The single source of truth for the gate.
      */
     public function canLogin(): bool
     {
@@ -100,9 +98,8 @@ class User extends Authenticatable
     }
 
     /**
-     * A user has one avatar: attaching a new one frees the old back into the
-     * reusable pool. Deleting a user frees their avatar back into the pool
-     * rather than destroying the file — see UserObserver.
+     * One avatar: a new one frees the old back to the pool. Deleting a user frees
+     * their avatar rather than destroying the file — see UserObserver.
      *
      * @return array<int, string>
      */
@@ -127,7 +124,7 @@ class User extends Authenticatable
         }
     }
 
-    // A user acts on the web channel, so only web-enabled permissions count.
+    // Users act on the web channel, so only web-enabled permissions count.
     public function permissions(): array
     {
         $roleIds = $this->roles()->pluck('roles.id');
@@ -152,7 +149,7 @@ class User extends Authenticatable
         return array_diff(array_unique($permissions), $this->permissions()) === [];
     }
 
-    /** How many of the user's inbox notifications are unread (drives the bell badge). */
+    /** Unread count, for the bell badge. */
     public function unreadNotificationsCount(): int
     {
         return $this->notificationUsers()->whereNull('read_at')->count();

@@ -5,10 +5,7 @@ namespace App\Data\Translation;
 use App\Models\TranslationKey;
 use Spatie\LaravelData\Data;
 
-/**
- * Output DTO for a registry key — the key itself, with no locale attached.
- * A key plus one locale's value is TranslationLineData.
- */
+/** The key alone, no locale. A key plus one locale is TranslationLineData. */
 class TranslationKeyData extends Data
 {
     public function __construct(

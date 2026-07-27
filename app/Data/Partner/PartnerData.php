@@ -5,7 +5,7 @@ namespace App\Data\Partner;
 use App\Models\Partner;
 use Spatie\LaravelData\Data;
 
-/** Output DTO for a partner. `order` is read-only — it comes from the reorder endpoint. */
+/** `order` is read-only here — it is written by the reorder endpoint. */
 class PartnerData extends Data
 {
     public function __construct(

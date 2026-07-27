@@ -2,7 +2,6 @@
 
 namespace App\Data\Achievement;
 
-use App\Enums\CategoryType;
 use App\Rules\CleanUpload;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
@@ -13,7 +12,7 @@ class StoreAchievementData extends Data
     public function __construct(
         public string $name,
         public string $slug,
-        public string $category_id,
+        public ?string $category_id,
         public string $title,
         public string $description,
         public string $content,
@@ -34,11 +33,8 @@ class StoreAchievementData extends Data
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('achievements', 'slug')],
 
-            // Scoped to its own type, so an articles category can't be filed here.
-            'category_id' => [
-                'required', 'string',
-                Rule::exists('categories', 'id')->where('type', CategoryType::Achievements->value),
-            ],
+            // Blank resolves to the default category in the controller.
+            'category_id' => ['nullable', 'string', Rule::exists('categories', 'id')],
 
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:1000'],
@@ -50,8 +46,7 @@ class StoreAchievementData extends Data
                 ? ['required', 'date', 'after:now']
                 : ['nullable', 'date'],
 
-            // When it happened. Deliberately not constrained to the past — an
-            // upcoming award can be prepared ahead of the ceremony.
+            // Not limited to the past: an upcoming award can be prepared early.
             'achieved_at' => ['required', 'date'],
 
             'css_url' => ['nullable', 'url', 'max:2048'],

@@ -7,11 +7,7 @@ use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
-/**
- * Creating a page asks for the DEFAULT language only — title/description/content
- * are plain strings here, and the other locales are filled in afterwards through
- * the edit form's Translations tab.
- */
+/** Create takes the default locale only; the rest come from the edit form. */
 class StorePageData extends Data
 {
     public function __construct(

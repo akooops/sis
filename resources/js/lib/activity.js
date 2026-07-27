@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'partners', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'partners', 'documents', 'programs', 'streams', 'grades', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -48,6 +48,10 @@ export const LOG_NAME_LABELS = {
     events: 'Events',
     achievements: 'Achievements',
     partners: 'Partners',
+    documents: 'Documents',
+    programs: 'Programs',
+    streams: 'Streams',
+    grades: 'Grades',
     categories: 'Categories',
     auth: 'Authentication',
 };
@@ -71,6 +75,10 @@ export const SUBJECT_TYPE_LABELS = {
     event: 'Event',
     achievement: 'Achievement',
     partner: 'Partner',
+    document: 'Document',
+    program: 'Program',
+    stream: 'Stream',
+    grade: 'Grade',
     category: 'Category',
 };
 
@@ -189,6 +197,26 @@ const ACTIVITY_MESSAGES = {
         created: 'Created the partner :name',
         updated: 'Updated the partner :name',
         deleted: 'Deleted the partner :name',
+    },
+    documents: {
+        created: 'Created the document :name',
+        updated: 'Updated the document :name',
+        deleted: 'Deleted the document :name',
+    },
+    programs: {
+        created: 'Created the program :name',
+        updated: 'Updated the program :name',
+        deleted: 'Deleted the program :name',
+    },
+    streams: {
+        created: 'Created the stream :name',
+        updated: 'Updated the stream :name',
+        deleted: 'Deleted the stream :name',
+    },
+    grades: {
+        created: 'Created the grade :name',
+        updated: 'Updated the grade :name',
+        deleted: 'Deleted the grade :name',
     },
     auth: {
         login: ':name signed in',

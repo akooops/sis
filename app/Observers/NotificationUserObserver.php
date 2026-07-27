@@ -5,10 +5,8 @@ namespace App\Observers;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * An inbox row: a notification reaching one recipient. Logged as a pivot against
- * the parent notification (attached/detached), so the trail records who a
- * notification reached. Read-state changes (markRead) write nothing — pivot
- * mode's updated() is a no-op, which is exactly right here.
+ * An inbox row. Logged as a pivot against the notification, so the trail records
+ * who it reached. markRead writes nothing — pivot mode's updated() is a no-op.
  */
 class NotificationUserObserver extends BaseObserver
 {

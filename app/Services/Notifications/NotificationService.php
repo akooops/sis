@@ -7,7 +7,6 @@ use App\Models\Notification;
 use App\Models\NotificationGroup;
 use App\Models\NotificationType;
 use App\Models\NotificationUser;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -34,7 +33,7 @@ class NotificationService
     {
         $type = NotificationType::where('code', $typeCode)->first();
 
-        if (!$type) {
+        if (! $type) {
             Log::channel('integrations')->warning('notification.unknown-type', ['type' => $typeCode]);
 
             return null;

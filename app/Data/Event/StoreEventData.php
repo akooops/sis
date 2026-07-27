@@ -41,9 +41,7 @@ class StoreEventData extends Data
                 ? ['required', 'date', 'after:now']
                 : ['nullable', 'date'],
 
-            // When the event runs — deliberately NOT constrained to the future.
-            // Back-filling a past event is a normal thing to want; only the
-            // ordering of the two matters.
+            // Past dates allowed: back-filling is normal. Only the ordering matters.
             'start_at' => ['required', 'date'],
             'end_at' => ['required', 'date', 'after_or_equal:start_at'],
 

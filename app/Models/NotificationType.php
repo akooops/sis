@@ -7,10 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
- * A kind of notification the app can emit (system.announcement, user.approved…).
- * A seeded mirror of config('notifications.types'); grown by code, never CRUD.
- * Groups subscribe to types — emitting a notification of a type fans it out to
- * the members of every group that includes it.
+ * A kind of notification (system.announcement, user.approved…), mirroring
+ * config('notifications.types'). Grown by code, never CRUD. Groups subscribe to
+ * types, and emitting one fans out to their members.
  */
 class NotificationType extends Model
 {

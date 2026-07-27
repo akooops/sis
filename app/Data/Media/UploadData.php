@@ -6,13 +6,10 @@ use App\Models\Media;
 use Spatie\LaravelData\Data;
 
 /**
- * Output DTO returned after an upload. The form later submits `id` as the
- * reference; poll `scan_status` until it is "clean".
+ * Returned after an upload. Forms submit `id`; poll `scan_status` until clean.
  *
- * Carries `url` for the same reason MediaData does: the media picker takes a
- * fresh upload and a pick from the library through the same code path, so the
- * two must be the same shape or the preview silently renders nothing. It is
- * null until the file passes the scan and reaches the public disk.
+ * Same shape as MediaData on purpose — the picker runs a fresh upload and a
+ * library pick through one code path, so a mismatch renders no preview.
  */
 class UploadData extends Data
 {

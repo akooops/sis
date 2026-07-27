@@ -23,9 +23,7 @@ class StoreLanguageData extends Data
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            // The code becomes a directory name under lang/ — keep it to the
-            // shape TranslationService will accept, or the create succeeds and
-            // the folder never appears.
+            // Becomes a directory name under lang/ — must match what TranslationService accepts.
             'code' => ['required', 'string', 'max:10', 'regex:'.config('translations.code_pattern'), Rule::unique('languages', 'code')],
 
             'is_default' => ['sometimes', 'boolean'],

@@ -5,11 +5,7 @@ namespace App\Data\Integration;
 use App\Models\IntegrationDriver;
 use Spatie\LaravelData\Data;
 
-/**
- * Output DTO for a driver in the catalogue — drives the "choose a provider" step
- * and the schema-driven form. `schema` is the stored field list (same shape as
- * FieldData) mirrored from the driver class at seed time.
- */
+/** `schema` is the driver's field list, mirrored into the DB at seed time. */
 class IntegrationDriverData extends Data
 {
     public function __construct(

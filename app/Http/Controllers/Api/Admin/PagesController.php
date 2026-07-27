@@ -19,11 +19,7 @@ use Spatie\ModelStates\Exceptions\TransitionNotFound;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * Content pages. Note App\Http\Controllers\Web\Admin\PagesController is a
- * different thing entirely — that one is the Inertia shell for every admin
- * screen. The name collision is a coincidence of English, not a conflict.
- */
+/** Content pages. Web\Admin\PagesController is unrelated — it is the Inertia shell. */
 class PagesController extends ApiController
 {
     public function index(): JsonResponse
@@ -76,7 +72,9 @@ class PagesController extends ApiController
 
     public function update(UpdatePageData $data, Page $page): JsonResponse
     {
-        $page->update(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at']));
+        // mergeTranslations: the form only carries the enabled locales, so a plain
+        // assignment would drop every disabled one.
+        $page->update($page->mergeTranslations(Arr::except($data->toArray(), ['status', 'thumbnail', 'published_at'])));
 
         $target = PageStatus::resolveStateClass($data->status);
 

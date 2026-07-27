@@ -7,7 +7,7 @@ use App\Services\Phone\PhoneFormatter;
 trait NormalizesPhones
 {
     /**
-     * The fields to normalize. Defaults to the usual single column.
+     * Fields to normalize.
      *
      * @return array<int, string>
      */
@@ -23,8 +23,7 @@ trait NormalizesPhones
     public static function prepareForPipeline(array $properties): array
     {
         foreach (static::phoneFields() as $field) {
-            // Only touch what was actually sent: writing the key back would turn
-            // "not provided" into "set it to null" on a partial update.
+            // Only touch what was sent: writing the key back would turn absent into null.
             if (! array_key_exists($field, $properties)) {
                 continue;
             }
@@ -35,8 +34,7 @@ trait NormalizesPhones
                 continue;
             }
 
-            // Fall back to what was typed: an unparseable number has to survive
-            // to the validator to be reported, not vanish into null.
+            // Keep what was typed: an unparseable number must reach the validator.
             $properties[$field] = PhoneFormatter::e164($value) ?? $value;
         }
 

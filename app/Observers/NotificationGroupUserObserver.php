@@ -5,8 +5,8 @@ namespace App\Observers;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Adding/removing a member is an activity on the group. Users have no `name`
- * column, so the label falls back to username/email.
+ * A membership change is an activity on the group. Users have no `name` column,
+ * so the label falls back to username/email.
  */
 class NotificationGroupUserObserver extends BaseObserver
 {

@@ -13,10 +13,8 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 /**
- * A group's memberships as a standard pivot resource (mirrors user-roles):
- * list/add/remove the users a notification group delivers to. firstOrCreate and
- * model deletes fire NotificationGroupUserObserver, so attach/detach are audited
- * against the group.
+ * Group memberships as a pivot resource (mirrors user-roles). firstOrCreate and
+ * model deletes fire the observer, so attach/detach are audited against the group.
  */
 class NotificationGroupUsersController extends ApiController
 {

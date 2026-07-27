@@ -13,12 +13,11 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
- * The one place files enter, move between owners and leave the system.
+ * The one place files enter, change owner and leave.
  *
- * Storage is flat: every file sits in the same folder under a generated ULID
- * name, and nothing about the owner or the collection is encoded in the path.
- * That is what makes attach/detach pure database writes — no file ever moves
- * except once, out of quarantine, when the scan clears it (App\Jobs\ScanUpload).
+ * Storage is flat: every file is a generated ULID name in one folder, and the
+ * owner is in the DB only. That is what makes attach/detach pure database
+ * writes — a file moves exactly once, out of quarantine (App\Jobs\ScanUpload).
  */
 class UploadService
 {
@@ -26,9 +25,8 @@ class UploadService
     public const TEMP_COLLECTION = 'temp';
 
     /**
-     * Store an uploaded file as an unattached (owner-less) media row on the
-     * quarantine disk, queue it for scanning, and return a reference. Uploads
-     * are not user-scoped — any authenticated caller may reference the id.
+     * Store a file as an owner-less media row on quarantine and queue the scan.
+     * Not user-scoped: any authenticated caller may reference the returned id.
      */
     public static function store(StoreMediaData $data): UploadData
     {
@@ -51,26 +49,21 @@ class UploadService
 
         ScanUpload::dispatch($media);
 
-        // On a sync queue the scan has already run and moved the file to the
-        // public disk, so re-read the row: the in-memory copy still says
-        // pending/quarantine, which reports a verdict that has been reached and
-        // yields no url for the client to render.
+        // On a sync queue the scan already ran and moved the file, so re-read: the
+        // in-memory row still says pending/quarantine and yields no url.
         return UploadData::from($media->fresh() ?? $media);
     }
 
     /**
-     * Attach a scanned upload to a model's media collection.
-     *  - Free upload (model_id null): re-own the existing row (no copy).
+     * Attach a scanned upload to a model's collection.
+     *  - Free upload (model_id null): re-own the row, no copy.
      *  - Already attached elsewhere: copy it onto the model.
      *
-     * For a single-file collection (e.g. avatar) the existing item is first
-     * freed back into the reusable pool. Multi-file collections keep all their
-     * items — removing one is done explicitly via detach().
+     * A single-file collection frees its existing item first; multi-file keeps all
+     * of them (remove one via detach()).
      *
-     * Returns the media the model ends up owning — which on the copy path is a
-     * NEW row, not the one whose id was passed in. Callers that need to record
-     * what was actually attached (ordering a gallery, say) must use the return
-     * value rather than the argument.
+     * Returns the media the model ENDS UP owning, which on the copy path is a new
+     * row. Callers recording what was attached must use the return value.
      */
     public static function attach(string $mediaId, Model $model, string $collection): Media
     {
@@ -98,32 +91,27 @@ class UploadService
     }
 
     /**
-     * Make one of a model's collections hold exactly the given media and nothing
-     * else: attach what is new, leave what is already here, detach the rest.
+     * Make a collection hold exactly these media: attach what is new, keep what is
+     * there, detach the rest.
      *
-     * Each incoming id goes through attach(), which decides between re-owning a
-     * free upload and COPYING one that already belongs to something else. The copy
-     * matters: picking an existing library file is a normal thing to do, and
-     * skipping owned media (as this once did) made that pick silently vanish on
-     * save. Two records must never share a row — deleting one would blank the other.
+     * Every id goes through attach(), so picking a file that already belongs to
+     * something COPIES it. Skipping owned media (as this once did) made a library
+     * pick silently vanish on save, and sharing a row would let one delete blank
+     * the other.
      *
      * A copy has a new id, so the collection ends up holding an id the caller did
-     * not send. That converges rather than looping: the response carries the new
-     * ids, the form reseeds from it, and the next save sends those instead. One
-     * copy per pick, not one per save.
+     * not send. That converges: the response carries the new ids and the form
+     * reseeds from it. One copy per pick, not one per save.
      *
-     * Multi-file collections only: on a single-file collection attach() frees the
-     * collection first, so two incoming ids would fight over it.
-     *
-     * @param  array<int, string>  $mediaIds
+     * Multi-file only: on a single-file collection attach() frees the collection,
+     * so two incoming ids would fight over it.
      */
     public static function sync(array $mediaIds, Model $model, string $collection): void
     {
         $mediaIds = array_values(array_unique(array_filter($mediaIds)));
 
-        // A raw query, deliberately NOT $model->getMedia(): that filters to the
-        // Clean state, so a still-scanning upload would be invisible here and
-        // would be neither detached nor recognised as already held.
+        // Raw query, NOT getMedia(): that filters to Clean, so a still-scanning upload
+        // would be invisible and neither detached nor recognised as held.
         $current = Media::query()
             ->where('model_type', $model->getMorphClass())
             ->where('model_id', $model->getKey())
@@ -136,8 +124,7 @@ class UploadService
             }
         }
 
-        // Resolved in submitted order, because that order IS the display order and
-        // a copy's id isn't known until attach() returns.
+        // Submitted order IS display order, and a copy's id is only known after attach().
         $ordered = [];
 
         foreach ($mediaIds as $mediaId) {
@@ -146,18 +133,16 @@ class UploadService
             $ordered[] = $held ?: static::attach($mediaId, $model, $collection);
         }
 
-        // HasMedia::getMedia() already sorts by order_column; nothing wrote it
-        // until now, so a gallery came back in creation order however the admin
-        // had arranged it. Builder updates, so reordering writes no audit rows.
+        // getMedia() sorts by order_column but nothing wrote it, so a gallery came back
+        // in creation order. Builder updates: reordering writes no audit rows.
         foreach ($ordered as $position => $media) {
             Media::query()->whereKey($media->getKey())->update(['order_column' => $position]);
         }
     }
 
     /**
-     * Detach a single media, returning it to the free (reusable) pool. The file
-     * is never deleted here — Media is Prunable, so the daily model:prune sweeps
-     * stale free media and takes each file with its row.
+     * Return a media to the free pool. The file is never deleted here, and nothing
+     * deletes it later either — DELETE media/{media} is the only exit.
      */
     public static function detach(Media $media): void
     {
@@ -180,7 +165,7 @@ class UploadService
         $media->delete();
     }
 
-    /** Free all of a model's media (used when the owner is force-deleted). */
+    /** Free all of a model's media, for when the owner is deleted. */
     public static function freeModel(Model $model): void
     {
         Media::query()
@@ -193,10 +178,7 @@ class UploadService
             ]);
     }
 
-    /**
-     * Duplicate a media that is already owned by someone else, so the two models
-     * never share a file — deleting one must not blank the other.
-     */
+    /** Duplicate an owned media so two models never share a file. */
     protected static function copy(Media $source, Model $model, string $collection): Media
     {
         $copy = new Media;
@@ -232,9 +214,8 @@ class UploadService
     }
 
     /**
-     * Record a change of owner against the file itself. The MediaObserver logs
-     * creates and deletes; attaching and detaching are not visible in a column
-     * diff worth reading, so they get their own events.
+     * Record a change of owner against the file. MediaObserver logs creates and
+     * deletes; attach/detach are not a readable column diff, so they get events.
      */
     protected static function log(Media $media, string $event, ?Model $owner, string $collection): void
     {
@@ -251,9 +232,9 @@ class UploadService
     }
 
     /**
-     * All files share one folder, so the stored name must be globally unique —
-     * two people uploading "invoice.pdf" must not collide. Only the extension
-     * survives from the original; the real name lives on in media.name.
+     * One folder for everything, so the stored name must be globally unique — two
+     * "invoice.pdf" must not collide. Only the extension survives; media.name keeps
+     * the real one.
      */
     protected static function generateFileName(string $originalName): string
     {

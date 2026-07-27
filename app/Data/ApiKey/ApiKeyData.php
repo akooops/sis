@@ -6,10 +6,7 @@ use App\Data\Permission\PermissionData;
 use App\Models\ApiKey;
 use Spatie\LaravelData\Data;
 
-/**
- * Output DTO for an API key. Never exposes the hash/secret — the plaintext
- * token is only returned once, by the controller, on create/rotate.
- */
+/** Never exposes the hash. The plaintext token is returned once, on create/rotate. */
 class ApiKeyData extends Data
 {
     public function __construct(
