@@ -117,6 +117,16 @@ class PagesController extends Controller
         return inertia('Admin/JobOffers/Index');
     }
 
+    public function menus(): Response
+    {
+        return inertia('Admin/Menus/Index');
+    }
+
+    public function menuItems(): Response
+    {
+        return inertia('Admin/MenuItems/Index');
+    }
+
     public function countries(): Response
     {
         return inertia('Admin/Countries/Index');

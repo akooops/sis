@@ -1,51 +1,55 @@
 <script>
     /**
-     * Banner create/edit. No `order` field by design — position is set by
-     * dragging in the Reorder drawer, and a new banner goes on the end.
+     * Menu item create/edit.
      *
-     * Create asks for the DEFAULT language's copy only — there is nothing to
-     * translate until the banner exists. Edit splits into [Details | Translations],
-     * matching every other translatable module.
+     * Create asks for the DEFAULT language's title only — there is nothing to
+     * translate until the item exists. Edit splits into [Details | Translations],
+     * matching every other content module.
+     *
+     * No `order` field by design: a new item goes last among its siblings, and both
+     * position and nesting are set in the Reorder drawer. Parent is here only so a
+     * child can be created without a second trip.
      */
     import Field from '@/components/form/Field.svelte';
     import Input from '@/components/form/Input.svelte';
     import Select from '@/components/form/Select.svelte';
-    import DatePicker from '@/components/form/DatePicker.svelte';
     import ContentLinkInput from '@/components/form/ContentLinkInput.svelte';
     import Tabs from '@/components/ui/Tabs.svelte';
     import Button from '@/components/ui/Button.svelte';
-    import MediaPicker from '@/components/media/MediaPicker.svelte';
     import { useForm } from '@/lib/api/useForm.svelte';
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
     import { linkKind } from '@/lib/linkable';
-    import { BANNER_STATUS_LABELS, needsPublishedAt, reachableStatuses } from '@/lib/banner';
 
-    let { banner = null, onsaved, oncancel } = $props();
+    let { menuItem = null, menuId = null, onsaved, oncancel } = $props();
 
-    const editing = $derived(!!banner);
+    const editing = $derived(!!menuItem);
 
     let languages = $state([]);
     let activeTab = $state('details');
     let activeLocale = $state(null);
+    let parents = $state([]);
 
     const form = useForm({
-        name: banner?.name ?? '',
-        status: banner?.status ?? 'draft',
-        published_at: banner?.published_at ? banner.published_at.slice(0, 16).replace('T', ' ') : null,
+        // Seeded from the page filter so a drill-down does not re-ask.
+        menu_id: menuItem?.menu_id ?? menuId ?? null,
+        parent_id: menuItem?.parent_id ?? null,
+        name: menuItem?.name ?? '',
         // The picker's kind, which is the morph alias plus a 'url' choice the
         // server does not know — payload() drops it again.
-        linkable_type: linkKind(banner),
-        linkable_id: banner?.linkable_id ?? null,
-        url: banner?.url ?? '',
-        title: banner ? { ...(banner.title ?? {}) } : '',
-        cta: banner ? { ...(banner.cta ?? {}) } : '',
-        thumbnail: null,
-        video: null,
+        linkable_type: linkKind(menuItem),
+        linkable_id: menuItem?.linkable_id ?? null,
+        url: menuItem?.url ?? '',
+        title: menuItem ? { ...(menuItem.title ?? {}) } : '',
     });
 
-    const statusOptions = $derived(
-        reachableStatuses(banner?.status ?? null).map((value) => ({ value, label: BANNER_STATUS_LABELS[value] ?? value })),
+    // Depth is capped at 2, so an item with children can never become one itself.
+    const hasChildren = $derived(!!menuItem?.children?.length);
+
+    const parentHint = $derived(
+        hasChildren
+            ? 'This item has children of its own, so it cannot be nested under another.'
+            : 'Leave empty for a top-level item. Items nest one level only.',
     );
 
     const activeLanguage = $derived(languages.find((l) => l.code === activeLocale) ?? null);
@@ -53,10 +57,51 @@
     // One error line under the picker: the server may reject any of the three.
     const linkError = $derived(form.errors.url ?? form.errors.linkable_type ?? form.errors.linkable_id ?? null);
 
+    // Plain, not $state: switching menu mid-fetch must not let the older response
+    // land, and tracking this would re-run the effect that bumps it.
+    let parentToken = 0;
+
     /** Any validation error under this locale, so a collapsed tab isn't a mystery. */
     function localeHasError(code) {
-        return ['title', 'cta'].some((field) => !!form.errors[`${field}.${code}`]);
+        return !!form.errors[`title.${code}`];
     }
+
+    /**
+     * The menu's top-level items — the only legal parents. The index has no
+     * "roots only" filter, so every item is loaded and the roots picked out here;
+     * a menu is a handful of rows, and the Reorder drawer already reads them all.
+     */
+    async function loadRoots(menu) {
+        const url = route('api.v1.admin.menu-items.index');
+        const all = [];
+        let page = 1;
+        let lastPage = 1;
+
+        do {
+            const res = await api.get(url, { per_page: 100, sort: 'name', page, filter: { menu_id: menu } });
+            all.push(...(res?.data ?? []));
+            lastPage = res?.meta?.last_page ?? 1;
+            page += 1;
+        } while (page <= lastPage);
+
+        // An item may not be its own parent, and a child parents nothing.
+        return all.filter((r) => !r.parent_id && r.id !== menuItem?.id);
+    }
+
+    // Reload on every menu change: a parent only means anything inside its menu.
+    $effect(() => {
+        const menu = form.data.menu_id;
+        const mine = ++parentToken;
+        parents = [];
+
+        if (!menu) return;
+
+        loadRoots(menu)
+            .then((rows) => {
+                if (mine === parentToken) parents = rows.map((r) => ({ value: r.id, label: r.name }));
+            })
+            .catch(() => {});
+    });
 
     $effect(() => {
         api.get(route('api.v1.admin.languages.index'), { filter: { is_enabled: 1 }, per_page: 100 })
@@ -68,9 +113,7 @@
                 // binding to an undefined key throws props_invalid_value.
                 if (editing) {
                     for (const l of languages) {
-                        for (const field of ['title', 'cta']) {
-                            if (form.data[field][l.code] === undefined) form.data[field][l.code] = '';
-                        }
+                        if (form.data.title[l.code] === undefined) form.data.title[l.code] = '';
                     }
                 }
             })
@@ -79,9 +122,6 @@
 
     function payload(data) {
         const out = { ...data };
-        if (!out.thumbnail) delete out.thumbnail;
-        if (!out.video) delete out.video;
-        if (!needsPublishedAt(out.status)) out.published_at = null;
 
         // 'url' is a picker kind, not a morph alias; '' would fail the url rule
         // instead of clearing the link.
@@ -93,7 +133,9 @@
 
     async function submit(event) {
         event.preventDefault();
-        const url = editing ? route('api.v1.admin.banners.update', banner.id) : route('api.v1.admin.banners.store');
+        const url = editing
+            ? route('api.v1.admin.menu-items.update', menuItem.id)
+            : route('api.v1.admin.menu-items.store');
         try {
             const res = await form.submit(editing ? 'put' : 'post', url, { transform: payload });
             if (res) {
@@ -124,16 +166,31 @@
     {#if !editing || activeTab === 'details'}
         <div class="flex flex-col gap-5">
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                <Field label="Thumbnail" error={form.errors.thumbnail} required={!editing} hint="The slide artwork.">
-                    <MediaPicker accept={['images']} bind:value={form.data.thumbnail} previewUrl={banner?.thumbnail_url} />
+                <Field
+                    label="Menu"
+                    error={form.errors.menu_id}
+                    required
+                    hint="Moving an item to another menu takes its children with it."
+                >
+                    <!-- Clears the parent: it belongs to the menu being left. -->
+                    <Select
+                        resource="api.v1.admin.menus.index"
+                        bind:value={form.data.menu_id}
+                        labelKey="name"
+                        placeholder="Search menus…"
+                        invalid={!!form.errors.menu_id}
+                        onchange={() => (form.data.parent_id = null)}
+                        initialOptions={menuItem?.menu ? [{ value: menuItem.menu.id, label: menuItem.menu.name }] : []}
+                    />
                 </Field>
-                <Field label="Video" error={form.errors.video} hint="Optional — plays over the image.">
-                    <MediaPicker accept={['videos']} bind:value={form.data.video} />
-                    <!-- The picker previews images only, so an already-attached
-                         video would otherwise be invisible here. -->
-                    {#if banner?.video_url && !form.data.video}
-                        <a href={banner.video_url} target="_blank" rel="noreferrer noopener" class="kt-link text-xs">Current video</a>
-                    {/if}
+                <Field label="Parent" error={form.errors.parent_id} hint={parentHint}>
+                    <Select
+                        options={parents}
+                        bind:value={form.data.parent_id}
+                        placeholder="Top level"
+                        disabled={!form.data.menu_id || hasChildren}
+                        invalid={!!form.errors.parent_id}
+                    />
                 </Field>
             </div>
 
@@ -141,23 +198,12 @@
                 <Input bind:value={form.data.name} invalid={!!form.errors.name} />
             </Field>
 
-            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                <Field label="Status" error={form.errors.status} required hint="Only a published banner appears in the carousel.">
-                    <Select options={statusOptions} bind:value={form.data.status} clearable={false} />
-                </Field>
-                {#if needsPublishedAt(form.data.status)}
-                    <Field label="Publish at" error={form.errors.published_at} required hint="Must be in the future — it goes live automatically.">
-                        <DatePicker enableTime bind:value={form.data.published_at} invalid={!!form.errors.published_at} />
-                    </Field>
-                {/if}
-            </div>
-
-            <Field label="Links to" error={linkError} hint="A record on this site, an external address, or nothing at all.">
+            <Field label="Links to" error={linkError} hint="A record on this site, an external address, or nothing at all — a parent is often just a label.">
                 <ContentLinkInput
                     bind:type={form.data.linkable_type}
                     bind:id={form.data.linkable_id}
                     bind:url={form.data.url}
-                    initialOption={banner?.linkable ? { value: banner.linkable.id, label: banner.linkable.name } : null}
+                    initialOption={menuItem?.linkable ? { value: menuItem.linkable.id, label: menuItem.linkable.name } : null}
                     invalid={!!linkError}
                 />
             </Field>
@@ -165,13 +211,10 @@
     {/if}
 
     {#if !editing}
-        <!-- Create: the default language's copy, inline. -->
+        <!-- Create: the default language's title, inline. -->
         <div class="flex flex-col gap-5 border-t border-border pt-5">
-            <Field label="Title" error={form.errors.title} required hint="The headline on the slide. Translatable once created.">
+            <Field label="Title" error={form.errors.title} required hint="The label the public site renders. Translatable once created.">
                 <Input bind:value={form.data.title} invalid={!!form.errors.title} />
-            </Field>
-            <Field label="Call to action" error={form.errors.cta} required hint="The button label, e.g. Read more.">
-                <Input bind:value={form.data.cta} invalid={!!form.errors.cta} />
             </Field>
         </div>
     {:else if activeTab === 'translations'}
@@ -199,14 +242,6 @@
                     <Input
                         bind:value={form.data.title[activeLocale]}
                         invalid={!!form.errors[`title.${activeLocale}`]}
-                        dir={activeLanguage?.is_rtl ? 'rtl' : 'ltr'}
-                    />
-                </Field>
-
-                <Field label="Call to action" error={form.errors[`cta.${activeLocale}`]} required={!!activeLanguage?.is_default}>
-                    <Input
-                        bind:value={form.data.cta[activeLocale]}
-                        invalid={!!form.errors[`cta.${activeLocale}`]}
                         dir={activeLanguage?.is_rtl ? 'rtl' : 'ltr'}
                     />
                 </Field>

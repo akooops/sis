@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'programs', 'streams', 'grades', 'job-offers', 'countries', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'programs', 'streams', 'grades', 'job-offers', 'countries', 'menus', 'menu-items', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -55,6 +55,8 @@ export const LOG_NAME_LABELS = {
     grades: 'Grades',
     'job-offers': 'Job Offers',
     countries: 'Countries',
+    menus: 'Menus',
+    'menu-items': 'Menu Items',
     categories: 'Categories',
     auth: 'Authentication',
 };
@@ -85,6 +87,8 @@ export const SUBJECT_TYPE_LABELS = {
     grade: 'Grade',
     job_offer: 'Job Offer',
     country: 'Country',
+    menu: 'Menu',
+    menu_item: 'Menu Item',
     category: 'Category',
 };
 
@@ -238,6 +242,16 @@ const ACTIVITY_MESSAGES = {
         created: 'Created the country :name',
         updated: 'Updated the country :name',
         deleted: 'Deleted the country :name',
+    },
+    menus: {
+        created: 'Created the menu :name',
+        updated: 'Updated the menu :name',
+        deleted: 'Deleted the menu :name',
+    },
+    'menu-items': {
+        created: 'Created the menu item :name',
+        updated: 'Updated the menu item :name',
+        deleted: 'Deleted the menu item :name',
     },
     auth: {
         login: ':name signed in',

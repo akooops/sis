@@ -16,6 +16,8 @@ class StoreBannerData extends Data
 {
     public function __construct(
         public string $name,
+        public string $status,
+        public ?string $published_at,
         public ?string $url,
         public ?string $linkable_type,
         public ?string $linkable_id,
@@ -27,8 +29,17 @@ class StoreBannerData extends Data
 
     public static function rules(ValidationContext $context): array
     {
+        $status = $context->payload['status'] ?? 'draft';
+
         $rules = [
             'name' => ['required', 'string', 'max:255'],
+
+            // No 'hidden' at birth: nothing public to withdraw yet.
+            'status' => ['required', Rule::in(['draft', 'scheduled', 'published'])],
+            // Only a schedule needs a date; publishing is stamped by the controller.
+            'published_at' => $status === 'scheduled'
+                ? ['required', 'date', 'after:now']
+                : ['nullable', 'date'],
 
             // Both link kinds are optional, but never both at once.
             'url' => ['nullable', 'url', 'max:2048', 'prohibits:linkable_type,linkable_id'],

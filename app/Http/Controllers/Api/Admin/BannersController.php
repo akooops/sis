@@ -11,9 +11,12 @@ use App\Http\Controllers\Api\ApiController;
 use App\Models\Banner;
 use App\Models\Language;
 use App\Services\Uploads\UploadService;
+use App\States\Banner\BannerStatus;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\PaginatedDataCollection;
+use Spatie\ModelStates\Exceptions\TransitionNotFound;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -25,7 +28,7 @@ class BannersController extends ApiController
             ->with(['media', 'linkable'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                // Takes the public alias and matches the stored class name.
+                AllowedFilter::exact('status'),
                 $this->morphType('linkable_type'),
                 $this->searchTranslations(
                     ['id', 'name', 'url'],
@@ -33,7 +36,7 @@ class BannersController extends ApiController
                     Language::enabledCodes(),
                 ),
             ])
-            ->allowedSorts(['id', 'name', 'order', 'created_at'])
+            ->allowedSorts(['id', 'name', 'order', 'status', 'published_at', 'created_at'])
             // Display order by default: this is a carousel, not a log.
             ->defaultSort('order')
             ->paginate($this->perPage())
@@ -54,6 +57,8 @@ class BannersController extends ApiController
         $banner = Banner::create([
             'name' => $data->name,
             'order' => Banner::nextOrder(),
+            'status' => BannerStatus::resolveStateClass($data->status),
+            'published_at' => $data->status === 'published' ? now() : $data->published_at,
             'url' => $data->url,
             // The column stores the class; the API only ever speaks the alias.
             'linkable_type' => MorphType::classFor($data->linkable_type),
@@ -84,6 +89,23 @@ class BannersController extends ApiController
             'title' => $data->title,
             'cta' => $data->cta,
         ]));
+
+        $target = BannerStatus::resolveStateClass($data->status);
+
+        if (! $banner->status instanceof $target) {
+            try {
+                $banner->status->transitionTo($target);
+            } catch (TransitionNotFound) {
+                throw ValidationException::withMessages([
+                    'status' => "A {$banner->status->getValue()} banner cannot become {$data->status}.",
+                ]);
+            }
+        }
+
+        $banner->published_at = $data->status === 'published'
+            ? ($banner->published_at ?? now())
+            : $data->published_at;
+        $banner->save();
 
         if (! $data->thumbnail instanceof Optional && $data->thumbnail) {
             UploadService::attach($data->thumbnail, $banner, Banner::THUMBNAIL_COLLECTION);

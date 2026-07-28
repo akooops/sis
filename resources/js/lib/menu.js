@@ -68,6 +68,15 @@ export const adminMenu = [
         ],
     },
     {
+        label: 'Navigation',
+        icon: 'ki-filled ki-menu',
+        children: [
+            // Menus first: items hang off one, and the Items action drills in from there.
+            { label: 'Menus', route: 'web.admin.menus.index', permission: 'menus.index' },
+            { label: 'Menu Items', route: 'web.admin.menu-items.index', permission: 'menu-items.index' },
+        ],
+    },
+    {
         label: 'Access',
         icon: 'ki-filled ki-shield-tick',
         children: [

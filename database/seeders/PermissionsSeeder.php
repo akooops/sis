@@ -123,6 +123,17 @@ class PermissionsSeeder extends Seeder
             ['code' => 'countries.index', 'name' => 'View countries', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'countries.store', 'name' => 'Create countries', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'countries.update', 'name' => 'Update countries', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'menus.index', 'name' => 'View menus', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'menus.store', 'name' => 'Create menus', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'menus.update', 'name' => 'Update menus', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'menus.destroy', 'name' => 'Delete menus', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'menu-items.index', 'name' => 'View menu items', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'menu-items.store', 'name' => 'Create menu items', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'menu-items.update', 'name' => 'Update menu items', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'menu-items.reorder', 'name' => 'Reorder menu items', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'menu-items.destroy', 'name' => 'Delete menu items', 'supports_web' => true, 'supports_api' => false],
         ];
 
         foreach ($permissions as $permission) {

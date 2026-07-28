@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\MorphType;
+use App\States\Banner\BannerStatus;
+use App\States\Banner\Published;
 use App\Traits\Translations\HasEnabledTranslations;
 use App\Traits\Uploads\HasMedia;
 use Illuminate\Database\Eloquent\Builder;
@@ -10,6 +12,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Spatie\ModelStates\HasStates;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -18,10 +21,14 @@ use Spatie\Translatable\HasTranslations;
  *
  * `name` is the internal label; `order` is the display position and is only
  * written by the reorder endpoint.
+ *
+ * `status` is the publish workflow every content module shares — only a
+ * published banner reaches the carousel. It is independent of `order`: a hidden
+ * banner keeps its position so re-publishing puts it back where it was.
  */
 class Banner extends Model
 {
-    use HasEnabledTranslations, HasFactory, HasMedia, HasTranslations, HasUlids;
+    use HasEnabledTranslations, HasFactory, HasMedia, HasStates, HasTranslations, HasUlids;
 
     /* -----------------------------------------
      1. Attributes
@@ -61,6 +68,8 @@ class Banner extends Model
 
     protected $casts = [
         'order' => 'integer',
+        'status' => BannerStatus::class,
+        'published_at' => 'datetime',
     ];
 
     /* -----------------------------------------
@@ -90,6 +99,12 @@ class Banner extends Model
     /* -----------------------------------------
      4. Methods
     ------------------------------------------*/
+
+    /** Banners the public site may serve. Pair with ordered() for the carousel. */
+    public function scopeLive(Builder $query): Builder
+    {
+        return $query->whereState('status', Published::class);
+    }
 
     /** Display order, created_at breaking ties so it is never arbitrary. */
     public function scopeOrdered(Builder $query): Builder

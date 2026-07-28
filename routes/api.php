@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\Admin\IntegrationTypesController;
 use App\Http\Controllers\Api\Admin\JobOffersController;
 use App\Http\Controllers\Api\Admin\LanguagesController;
 use App\Http\Controllers\Api\Admin\MediaController;
+use App\Http\Controllers\Api\Admin\MenuItemsController;
+use App\Http\Controllers\Api\Admin\MenusController;
 use App\Http\Controllers\Api\Admin\NotificationGroupsController;
 use App\Http\Controllers\Api\Admin\NotificationGroupUsersController;
 use App\Http\Controllers\Api\Admin\NotificationsController;
@@ -226,6 +228,24 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('banners/reorder', [BannersController::class, 'reorder'])->middleware('verify.permissions:banners.reorder')->name('api.v1.admin.banners.reorder');
         Route::put('banners/{banner}', [BannersController::class, 'update'])->middleware('verify.permissions:banners.update')->name('api.v1.admin.banners.update');
         Route::delete('banners/{banner}', [BannersController::class, 'destroy'])->middleware('verify.permissions:banners.destroy')->name('api.v1.admin.banners.destroy');
+
+        // Menus
+        Route::get('menus', [MenusController::class, 'index'])->middleware('verify.permissions:menus.index')->name('api.v1.admin.menus.index');
+        Route::get('menus/{menu}', [MenusController::class, 'show'])->middleware('verify.permissions:menus.index')->name('api.v1.admin.menus.show');
+        Route::post('menus', [MenusController::class, 'store'])->middleware('verify.permissions:menus.store')->name('api.v1.admin.menus.store');
+        Route::put('menus/{menu}', [MenusController::class, 'update'])->middleware('verify.permissions:menus.update')->name('api.v1.admin.menus.update');
+        Route::delete('menus/{menu}', [MenusController::class, 'destroy'])->middleware('verify.permissions:menus.destroy')->name('api.v1.admin.menus.destroy');
+        // Nested read: the same index, with the menu pinned server-side.
+        Route::get('menus/{menu}/items', [MenuItemsController::class, 'forMenu'])->middleware('verify.permissions:menu-items.index')->name('api.v1.admin.menus.items.index');
+
+        // Menu items
+        Route::get('menu-items', [MenuItemsController::class, 'index'])->middleware('verify.permissions:menu-items.index')->name('api.v1.admin.menu-items.index');
+        Route::get('menu-items/{menu_item}', [MenuItemsController::class, 'show'])->middleware('verify.permissions:menu-items.index')->name('api.v1.admin.menu-items.show');
+        Route::post('menu-items', [MenuItemsController::class, 'store'])->middleware('verify.permissions:menu-items.store')->name('api.v1.admin.menu-items.store');
+        // Declared before menu-items/{menu_item} so 'reorder' is not bound as an id.
+        Route::post('menu-items/reorder', [MenuItemsController::class, 'reorder'])->middleware('verify.permissions:menu-items.reorder')->name('api.v1.admin.menu-items.reorder');
+        Route::put('menu-items/{menu_item}', [MenuItemsController::class, 'update'])->middleware('verify.permissions:menu-items.update')->name('api.v1.admin.menu-items.update');
+        Route::delete('menu-items/{menu_item}', [MenuItemsController::class, 'destroy'])->middleware('verify.permissions:menu-items.destroy')->name('api.v1.admin.menu-items.destroy');
 
         // Programs
         Route::get('programs', [ProgramsController::class, 'index'])->middleware('verify.permissions:programs.index')->name('api.v1.admin.programs.index');

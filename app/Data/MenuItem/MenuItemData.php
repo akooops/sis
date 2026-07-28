@@ -1,58 +1,59 @@
 <?php
 
-namespace App\Data\Banner;
+namespace App\Data\MenuItem;
 
+use App\Data\Menu\MenuData;
 use App\Enums\MorphType;
-use App\Models\Banner;
+use App\Models\MenuItem;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Lazy;
 
 /**
  * `order` is read-only here — it is written by the reorder endpoint.
  * `linkable_type` is a MorphType alias, never a class name, and `linkable` is
  * the linked record inlined rather than one DTO per linkable model.
  */
-class BannerData extends Data
+class MenuItemData extends Data
 {
     public function __construct(
         public string $id,
+        public string $menu_id,
+        public ?string $parent_id,
         public string $name,
-        public int $order,
-        public string $status,
-        public ?string $published_at,
         public ?string $url,
         public ?string $linkable_type,
         public ?string $linkable_id,
         /** @var array<string, string|null> */
         public array $title,
-        /** @var array<string, string|null> */
-        public array $cta,
-        public ?string $thumbnail_url,
-        public ?string $video_url,
+        public int $order,
         public ?string $created_at,
         public ?string $updated_at,
         /** @var array<string, string|null>|null */
         public ?array $linkable,
+        /** @var Lazy|array<int, MenuItemData> */
+        public Lazy|array $children,
+        public Lazy|MenuData|null $menu,
     ) {}
 
-    public static function fromModel(Banner $banner): self
+    public static function fromModel(MenuItem $item): self
     {
         return new self(
-            id: $banner->id,
-            name: $banner->name,
-            order: $banner->order,
-            status: $banner->status->getValue(),
-            published_at: $banner->published_at?->toIso8601String(),
-            url: $banner->url,
-            linkable_type: MorphType::aliasFor($banner->linkable_type),
-            linkable_id: $banner->linkable_id,
-            title: $banner->enabledTranslations('title'),
-            cta: $banner->enabledTranslations('cta'),
-            thumbnail_url: $banner->thumbnail_url,
-            video_url: $banner->video_url,
-            created_at: $banner->created_at?->toIso8601String(),
-            updated_at: $banner->updated_at?->toIso8601String(),
-            linkable: static::link($banner->linkable),
+            id: $item->id,
+            menu_id: $item->menu_id,
+            parent_id: $item->parent_id,
+            name: $item->name,
+            url: $item->url,
+            linkable_type: MorphType::aliasFor($item->linkable_type),
+            linkable_id: $item->linkable_id,
+            title: $item->enabledTranslations('title'),
+            order: $item->order,
+            created_at: $item->created_at?->toIso8601String(),
+            updated_at: $item->updated_at?->toIso8601String(),
+            linkable: static::link($item->linkable),
+            // Depth 2, so this recurses exactly once: a child's children are never loaded.
+            children: Lazy::whenLoaded('children', $item, fn () => static::collect($item->children->all())),
+            menu: Lazy::whenLoaded('menu', $item, fn () => $item->menu ? MenuData::from($item->menu) : null),
         );
     }
 

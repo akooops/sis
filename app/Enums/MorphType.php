@@ -16,6 +16,8 @@ use App\Models\Integration;
 use App\Models\JobOffer;
 use App\Models\Language;
 use App\Models\Media;
+use App\Models\Menu;
+use App\Models\MenuItem;
 use App\Models\Notification;
 use App\Models\NotificationGroup;
 use App\Models\NotificationType;
@@ -58,6 +60,8 @@ enum MorphType: string
     case Partner = 'partner';
     case Document = 'document';
     case Banner = 'banner';
+    case Menu = 'menu';
+    case MenuItem = 'menu_item';
     case JobOffer = 'job_offer';
     case Country = 'country';
     case Program = 'program';
@@ -88,6 +92,8 @@ enum MorphType: string
             self::Partner => Partner::class,
             self::Document => Document::class,
             self::Banner => Banner::class,
+            self::Menu => Menu::class,
+            self::MenuItem => MenuItem::class,
             self::JobOffer => JobOffer::class,
             self::Country => Country::class,
             self::Program => Program::class,

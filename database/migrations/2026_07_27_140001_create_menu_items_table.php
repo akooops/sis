@@ -8,25 +8,26 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('banners', function (Blueprint $table) {
+        Schema::create('menu_items', function (Blueprint $table) {
             $table->ulid('id')->primary();
 
             $table->string('name');
-            $table->unsignedInteger('order')->default(0)->index();
-
-            $table->string('status')->default('draft')->index();
-            $table->dateTime('published_at')->nullable();
-
             $table->string('url')->nullable();
-
-            $table->json('title')->nullable();
-            $table->json('cta')->nullable();
+            $table->unsignedInteger('order')->default(0);
 
             $table->string('linkable_type')->nullable();
             $table->ulid('linkable_id')->nullable();
 
+            $table->json('title')->nullable();
+
+            $table->ulid('menu_id');
+            $table->foreign('menu_id')->references('id')->on('menus')->cascadeOnDelete();
+
+            $table->ulid('parent_id')->nullable();
+            $table->foreign('parent_id')->references('id')->on('menu_items')->nullOnDelete();
+
             $table->index(['linkable_type', 'linkable_id']);
-            $table->index(['status', 'published_at']);
+            $table->index(['menu_id', 'parent_id', 'order']);
 
             $table->timestamps();
         });
@@ -34,6 +35,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('banners');
+        Schema::dropIfExists('menu_items');
     }
 };

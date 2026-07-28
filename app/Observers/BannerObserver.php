@@ -35,7 +35,7 @@ class BannerObserver extends BaseObserver
      */
     protected function loggedOnDelete(): array
     {
-        return ['name', 'url'];
+        return ['name', 'url', 'status', 'published_at'];
     }
 
     /**
