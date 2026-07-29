@@ -43,7 +43,7 @@
     import 'tinymce/plugins/wordcount';
 
     import { untrack } from 'svelte';
-    import { uploadFile } from '@/lib/upload';
+    import { acceptForTypes, typeForFile, uploadFile } from '@/lib/upload';
 
     let {
         value = $bindable(''),
@@ -56,6 +56,13 @@
         contentStyle = '',
         height = 480,
         disabled = false,
+        // Opt-in extras, both off so no existing caller changes behaviour.
+        // Let the link dialog upload a document and link to it.
+        fileUpload = false,
+        // Tokens the caller lets the admin drop into the body, as
+        // [{ label, value, html? }]. Non-empty adds ONE "Placeholders" menu, so a
+        // further token is one array entry rather than another boolean prop.
+        placeholders = [],
     } = $props();
 
     // Two nested divs on purpose: TinyMCE replaces `target` and restores it on
@@ -115,6 +122,43 @@
         input.click();
     }
 
+    /**
+     * The link dialog's Browse button (fileUpload only) — attach a document and
+     * link to it. Images are allowed too, so `typeForFile` resolves which type to
+     * upload as: hardcoding 'documents' would make uploadFile reject a PNG the
+     * picker had just offered.
+     */
+    function pickDocument(callback) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = acceptForTypes(['documents', 'images']);
+        input.onchange = async () => {
+            const file = input.files?.[0];
+            if (!file) return;
+            try {
+                const media = await uploadFile(file, typeForFile(file.name, ['documents', 'images']) ?? 'documents');
+                // Same guard as the image path: a file still being scanned has no
+                // url yet, and an empty href is worse than no link.
+                if (media?.url) callback(media.url, { text: media.name });
+            } catch {
+                // The dialog stays open; the admin can retry or cancel.
+            }
+        };
+        input.click();
+    }
+
+    /** TinyMCE routes every Browse button here; `meta.filetype` says which dialog asked. */
+    function pickMedia(callback, value_, meta) {
+        if (meta?.filetype === 'file') pickDocument(callback);
+        else pickImage(callback);
+    }
+
+    const BASE_TOOLBAR =
+        'undo redo | blocks | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist outdent indent | ltr rtl | link image table | removeformat code preview fullscreen';
+
+    // Only names the button when there is at least one token behind it.
+    const toolbar = $derived(placeholders.length ? `${BASE_TOOLBAR} | placeholders` : BASE_TOOLBAR);
+
     // Init + teardown. rtl/height/css are read through untrack() so they seed the
     // first paint without becoming dependencies — otherwise flipping RTL would
     // rebuild the editor, which is the whole thing this design avoids. Only
@@ -155,16 +199,35 @@
                 toolbar_mode: 'sliding',
                 plugins:
                     'advlist anchor autolink charmap code directionality fullscreen image link lists preview searchreplace table visualblocks wordcount',
-                toolbar:
-                    'undo redo | blocks | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist outdent indent | ltr rtl | link image table | removeformat code preview fullscreen',
+                toolbar: untrack(() => toolbar),
 
                 automatic_uploads: true,
                 images_upload_handler: handleUpload,
-                file_picker_types: 'image',
-                file_picker_callback: pickImage,
+                file_picker_types: untrack(() => (fileUpload ? 'image file' : 'image')),
+                file_picker_callback: pickMedia,
 
                 setup: (ed) => {
                     if (untrack(() => disabled)) ed.mode.set('readonly');
+
+                    // Registered only when asked for, or the toolbar would name a
+                    // button that does not exist.
+                    const tokens = untrack(() => placeholders);
+
+                    if (tokens.length) {
+                        ed.ui.registry.addMenuButton('placeholders', {
+                            text: 'Placeholders',
+                            tooltip: 'Insert a placeholder — each recipient gets their own value',
+                            fetch: (callback) =>
+                                callback(
+                                    tokens.map((token) => ({
+                                        type: 'menuitem',
+                                        text: token.label,
+                                        // `html` for a token that must land as markup (a link); the bare token otherwise.
+                                        onAction: () => ed.insertContent(token.html ?? token.value),
+                                    })),
+                                ),
+                        });
+                    }
                 },
             })
             .then(([ed]) => {

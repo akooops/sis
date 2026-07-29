@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Admin\ApiKeysController;
 use App\Http\Controllers\Api\Admin\ArticlesController;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\BannersController;
+use App\Http\Controllers\Api\Admin\CalendarsController;
 use App\Http\Controllers\Api\Admin\CategoriesController;
 use App\Http\Controllers\Api\Admin\CountriesController;
 use App\Http\Controllers\Api\Admin\DocumentsController;
@@ -20,6 +21,9 @@ use App\Http\Controllers\Api\Admin\LanguagesController;
 use App\Http\Controllers\Api\Admin\MediaController;
 use App\Http\Controllers\Api\Admin\MenuItemsController;
 use App\Http\Controllers\Api\Admin\MenusController;
+use App\Http\Controllers\Api\Admin\NewsletterGroupsController;
+use App\Http\Controllers\Api\Admin\NewsletterGroupSubscribersController;
+use App\Http\Controllers\Api\Admin\NewslettersController;
 use App\Http\Controllers\Api\Admin\NotificationGroupsController;
 use App\Http\Controllers\Api\Admin\NotificationGroupUsersController;
 use App\Http\Controllers\Api\Admin\NotificationsController;
@@ -228,6 +232,36 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('banners/reorder', [BannersController::class, 'reorder'])->middleware('verify.permissions:banners.reorder')->name('api.v1.admin.banners.reorder');
         Route::put('banners/{banner}', [BannersController::class, 'update'])->middleware('verify.permissions:banners.update')->name('api.v1.admin.banners.update');
         Route::delete('banners/{banner}', [BannersController::class, 'destroy'])->middleware('verify.permissions:banners.destroy')->name('api.v1.admin.banners.destroy');
+
+        // Calendars
+        Route::get('calendars', [CalendarsController::class, 'index'])->middleware('verify.permissions:calendars.index')->name('api.v1.admin.calendars.index');
+        Route::get('calendars/{calendar}', [CalendarsController::class, 'show'])->middleware('verify.permissions:calendars.index')->name('api.v1.admin.calendars.show');
+        Route::post('calendars', [CalendarsController::class, 'store'])->middleware('verify.permissions:calendars.store')->name('api.v1.admin.calendars.store');
+        Route::put('calendars/{calendar}', [CalendarsController::class, 'update'])->middleware('verify.permissions:calendars.update')->name('api.v1.admin.calendars.update');
+        Route::delete('calendars/{calendar}', [CalendarsController::class, 'destroy'])->middleware('verify.permissions:calendars.destroy')->name('api.v1.admin.calendars.destroy');
+
+        // Newsletter Groups
+        Route::get('newsletter-groups', [NewsletterGroupsController::class, 'index'])->middleware('verify.permissions:newsletter-groups.index')->name('api.v1.admin.newsletter-groups.index');
+        Route::get('newsletter-groups/{newsletter_group}', [NewsletterGroupsController::class, 'show'])->middleware('verify.permissions:newsletter-groups.index')->name('api.v1.admin.newsletter-groups.show');
+        Route::post('newsletter-groups', [NewsletterGroupsController::class, 'store'])->middleware('verify.permissions:newsletter-groups.store')->name('api.v1.admin.newsletter-groups.store');
+        Route::put('newsletter-groups/{newsletter_group}', [NewsletterGroupsController::class, 'update'])->middleware('verify.permissions:newsletter-groups.update')->name('api.v1.admin.newsletter-groups.update');
+        Route::delete('newsletter-groups/{newsletter_group}', [NewsletterGroupsController::class, 'destroy'])->middleware('verify.permissions:newsletter-groups.destroy')->name('api.v1.admin.newsletter-groups.destroy');
+        // Nested read: the same index, with the group pinned server-side.
+        Route::get('newsletter-groups/{newsletter_group}/subscribers', [NewsletterGroupSubscribersController::class, 'forGroup'])->middleware('verify.permissions:newsletter-group-subscribers.index')->name('api.v1.admin.newsletter-groups.subscribers.index');
+
+        // Newsletter Group Subscribers
+        Route::get('newsletter-group-subscribers', [NewsletterGroupSubscribersController::class, 'index'])->middleware('verify.permissions:newsletter-group-subscribers.index')->name('api.v1.admin.newsletter-group-subscribers.index');
+        Route::get('newsletter-group-subscribers/{newsletter_group_subscriber}', [NewsletterGroupSubscribersController::class, 'show'])->middleware('verify.permissions:newsletter-group-subscribers.index')->name('api.v1.admin.newsletter-group-subscribers.show');
+        Route::post('newsletter-group-subscribers', [NewsletterGroupSubscribersController::class, 'store'])->middleware('verify.permissions:newsletter-group-subscribers.store')->name('api.v1.admin.newsletter-group-subscribers.store');
+        Route::put('newsletter-group-subscribers/{newsletter_group_subscriber}', [NewsletterGroupSubscribersController::class, 'update'])->middleware('verify.permissions:newsletter-group-subscribers.update')->name('api.v1.admin.newsletter-group-subscribers.update');
+        Route::delete('newsletter-group-subscribers/{newsletter_group_subscriber}', [NewsletterGroupSubscribersController::class, 'destroy'])->middleware('verify.permissions:newsletter-group-subscribers.destroy')->name('api.v1.admin.newsletter-group-subscribers.destroy');
+
+        // Newsletters
+        Route::get('newsletters', [NewslettersController::class, 'index'])->middleware('verify.permissions:newsletters.index')->name('api.v1.admin.newsletters.index');
+        Route::get('newsletters/{newsletter}', [NewslettersController::class, 'show'])->middleware('verify.permissions:newsletters.index')->name('api.v1.admin.newsletters.show');
+        Route::post('newsletters', [NewslettersController::class, 'store'])->middleware('verify.permissions:newsletters.store')->name('api.v1.admin.newsletters.store');
+        Route::put('newsletters/{newsletter}', [NewslettersController::class, 'update'])->middleware('verify.permissions:newsletters.update')->name('api.v1.admin.newsletters.update');
+        Route::delete('newsletters/{newsletter}', [NewslettersController::class, 'destroy'])->middleware('verify.permissions:newsletters.destroy')->name('api.v1.admin.newsletters.destroy');
 
         // Menus
         Route::get('menus', [MenusController::class, 'index'])->middleware('verify.permissions:menus.index')->name('api.v1.admin.menus.index');

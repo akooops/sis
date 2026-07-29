@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             TranslationKeysSeeder::class,
             CategoriesSeeder::class,
             CountriesSeeder::class,
+            NewsletterGroupsSeeder::class,
             PagesSeeder::class,
         ]);
 

@@ -41,6 +41,7 @@ export const adminMenu = [
             { label: 'Partners', route: 'web.admin.partners.index', permission: 'partners.index' },
             { label: 'Documents', route: 'web.admin.documents.index', permission: 'documents.index' },
             { label: 'Banners', route: 'web.admin.banners.index', permission: 'banners.index' },
+            { label: 'Calendars', route: 'web.admin.calendars.index', permission: 'calendars.index' },
         ],
     },
     {
@@ -65,6 +66,16 @@ export const adminMenu = [
         icon: 'ki-filled ki-questionnaire-tablet',
         children: [
             { label: 'Countries', route: 'web.admin.countries.index', permission: 'countries.index' },
+        ],
+    },
+    {
+        label: 'Newsletter',
+        icon: 'ki-filled ki-sms',
+        children: [
+            { label: 'Newsletters', route: 'web.admin.newsletters.index', permission: 'newsletters.index' },
+            // Groups first: subscribers hang off one, and the Subscribers action drills in from there.
+            { label: 'Groups', route: 'web.admin.newsletter-groups.index', permission: 'newsletter-groups.index' },
+            { label: 'Subscribers', route: 'web.admin.newsletter-group-subscribers.index', permission: 'newsletter-group-subscribers.index' },
         ],
     },
     {

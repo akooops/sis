@@ -102,6 +102,26 @@ class PagesController extends Controller
         return inertia('Admin/Partners/Index');
     }
 
+    public function newsletters(): Response
+    {
+        return inertia('Admin/Newsletters/Index');
+    }
+
+    public function newsletterGroups(): Response
+    {
+        return inertia('Admin/NewsletterGroups/Index');
+    }
+
+    public function newsletterGroupSubscribers(): Response
+    {
+        return inertia('Admin/NewsletterGroupSubscribers/Index');
+    }
+
+    public function calendars(): Response
+    {
+        return inertia('Admin/Calendars/Index');
+    }
+
     public function banners(): Response
     {
         return inertia('Admin/Banners/Index');

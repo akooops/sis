@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Web\Admin\AuthController;
 use App\Http\Controllers\Web\Admin\PagesController as AdminPagesController;
+use App\Http\Controllers\Web\NewsletterController;
 use App\Http\Controllers\Web\PagesController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +47,10 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('categories', [AdminPagesController::class, 'categories'])->middleware('verify.permissions:categories.index')->name('web.admin.categories.index');
     Route::get('achievements', [AdminPagesController::class, 'achievements'])->middleware('verify.permissions:achievements.index')->name('web.admin.achievements.index');
     Route::get('partners', [AdminPagesController::class, 'partners'])->middleware('verify.permissions:partners.index')->name('web.admin.partners.index');
+    Route::get('newsletters', [AdminPagesController::class, 'newsletters'])->middleware('verify.permissions:newsletters.index')->name('web.admin.newsletters.index');
+    Route::get('newsletter-groups', [AdminPagesController::class, 'newsletterGroups'])->middleware('verify.permissions:newsletter-groups.index')->name('web.admin.newsletter-groups.index');
+    Route::get('newsletter-group-subscribers', [AdminPagesController::class, 'newsletterGroupSubscribers'])->middleware('verify.permissions:newsletter-group-subscribers.index')->name('web.admin.newsletter-group-subscribers.index');
+    Route::get('calendars', [AdminPagesController::class, 'calendars'])->middleware('verify.permissions:calendars.index')->name('web.admin.calendars.index');
     Route::get('banners', [AdminPagesController::class, 'banners'])->middleware('verify.permissions:banners.index')->name('web.admin.banners.index');
     Route::get('documents', [AdminPagesController::class, 'documents'])->middleware('verify.permissions:documents.index')->name('web.admin.documents.index');
     Route::get('programs', [AdminPagesController::class, 'programs'])->middleware('verify.permissions:programs.index')->name('web.admin.programs.index');
@@ -56,6 +61,11 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('countries', [AdminPagesController::class, 'countries'])->middleware('verify.permissions:countries.index')->name('web.admin.countries.index');
     Route::get('grades', [AdminPagesController::class, 'grades'])->middleware('verify.permissions:grades.index')->name('web.admin.grades.index');
 });
+
+/*------------------------
+| Public (no auth — reached from an email)
+|------------------------*/
+Route::get('newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe'])->name('web.user.newsletter-groups.unsubscribe');
 
 /*------------------------
 | Root

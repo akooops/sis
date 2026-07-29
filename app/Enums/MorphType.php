@@ -7,6 +7,7 @@ use App\Models\Album;
 use App\Models\ApiKey;
 use App\Models\Article;
 use App\Models\Banner;
+use App\Models\Calendar;
 use App\Models\Category;
 use App\Models\Country;
 use App\Models\Document;
@@ -18,6 +19,9 @@ use App\Models\Language;
 use App\Models\Media;
 use App\Models\Menu;
 use App\Models\MenuItem;
+use App\Models\Newsletter;
+use App\Models\NewsletterGroup;
+use App\Models\NewsletterGroupSubscriber;
 use App\Models\Notification;
 use App\Models\NotificationGroup;
 use App\Models\NotificationType;
@@ -60,6 +64,10 @@ enum MorphType: string
     case Partner = 'partner';
     case Document = 'document';
     case Banner = 'banner';
+    case Calendar = 'calendar';
+    case Newsletter = 'newsletter';
+    case NewsletterGroup = 'newsletter_group';
+    case NewsletterGroupSubscriber = 'newsletter_group_subscriber';
     case Menu = 'menu';
     case MenuItem = 'menu_item';
     case JobOffer = 'job_offer';
@@ -92,6 +100,10 @@ enum MorphType: string
             self::Partner => Partner::class,
             self::Document => Document::class,
             self::Banner => Banner::class,
+            self::Calendar => Calendar::class,
+            self::Newsletter => Newsletter::class,
+            self::NewsletterGroup => NewsletterGroup::class,
+            self::NewsletterGroupSubscriber => NewsletterGroupSubscriber::class,
             self::Menu => Menu::class,
             self::MenuItem => MenuItem::class,
             self::JobOffer => JobOffer::class,

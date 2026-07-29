@@ -97,6 +97,26 @@ class PermissionsSeeder extends Seeder
             ['code' => 'banners.reorder', 'name' => 'Reorder banners', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'banners.destroy', 'name' => 'Delete banners', 'supports_web' => true, 'supports_api' => false],
 
+            ['code' => 'calendars.index', 'name' => 'View calendars', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'calendars.store', 'name' => 'Create calendars', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'calendars.update', 'name' => 'Update calendars', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'calendars.destroy', 'name' => 'Delete calendars', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'newsletters.index', 'name' => 'View newsletters', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'newsletters.store', 'name' => 'Create newsletters', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'newsletters.update', 'name' => 'Update newsletters', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'newsletters.destroy', 'name' => 'Delete newsletters', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'newsletter-groups.index', 'name' => 'View newsletter groups', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'newsletter-groups.store', 'name' => 'Create newsletter groups', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'newsletter-groups.update', 'name' => 'Update newsletter groups', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'newsletter-groups.destroy', 'name' => 'Delete newsletter groups', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'newsletter-group-subscribers.index', 'name' => 'View newsletter subscribers', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'newsletter-group-subscribers.store', 'name' => 'Create newsletter subscribers', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'newsletter-group-subscribers.update', 'name' => 'Update newsletter subscribers', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'newsletter-group-subscribers.destroy', 'name' => 'Delete newsletter subscribers', 'supports_web' => true, 'supports_api' => false],
+
             ['code' => 'programs.index', 'name' => 'View programs', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'programs.store', 'name' => 'Create programs', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'programs.update', 'name' => 'Update programs', 'supports_web' => true, 'supports_api' => false],

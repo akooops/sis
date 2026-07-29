@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'programs', 'streams', 'grades', 'job-offers', 'countries', 'menus', 'menu-items', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'calendars', 'newsletters', 'newsletter-groups', 'newsletter-group-subscribers', 'programs', 'streams', 'grades', 'job-offers', 'countries', 'menus', 'menu-items', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -50,6 +50,10 @@ export const LOG_NAME_LABELS = {
     partners: 'Partners',
     documents: 'Documents',
     banners: 'Banners',
+    calendars: 'Calendars',
+    newsletters: 'Newsletters',
+    'newsletter-groups': 'Newsletter Groups',
+    'newsletter-group-subscribers': 'Subscribers',
     programs: 'Programs',
     streams: 'Streams',
     grades: 'Grades',
@@ -82,6 +86,10 @@ export const SUBJECT_TYPE_LABELS = {
     partner: 'Partner',
     document: 'Document',
     banner: 'Banner',
+    calendar: 'Calendar',
+    newsletter: 'Newsletter',
+    newsletter_group: 'Newsletter Group',
+    newsletter_group_subscriber: 'Subscriber',
     program: 'Program',
     stream: 'Stream',
     grade: 'Grade',
@@ -217,6 +225,28 @@ const ACTIVITY_MESSAGES = {
         created: 'Created the banner :name',
         updated: 'Updated the banner :name',
         deleted: 'Deleted the banner :name',
+    },
+    calendars: {
+        created: 'Created the calendar :name',
+        updated: 'Updated the calendar :name',
+        deleted: 'Deleted the calendar :name',
+    },
+    newsletters: {
+        created: 'Created the newsletter :name',
+        updated: 'Updated the newsletter :name',
+        deleted: 'Deleted the newsletter :name',
+        attached: 'Added :name to a newsletter',
+        detached: 'Removed :name from a newsletter',
+    },
+    'newsletter-groups': {
+        created: 'Created the newsletter group :name',
+        updated: 'Updated the newsletter group :name',
+        deleted: 'Deleted the newsletter group :name',
+    },
+    'newsletter-group-subscribers': {
+        created: 'Subscribed :name',
+        updated: 'Updated the subscriber :name',
+        deleted: 'Unsubscribed :name',
     },
     programs: {
         created: 'Created the program :name',
