@@ -11,4 +11,10 @@ class ContactSubmission extends Model
 
     //Properties
     protected $guarded = ['id'];
+
+    //Relationships
+    public function facility()
+    {
+        return $this->belongsTo(Facility::class);
+    }
 }

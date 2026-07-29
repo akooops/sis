@@ -21,6 +21,7 @@ class UpdateMenuRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'facility_id' => 'nullable|exists:facilities,id',
             'name' => 'required|string|max:255',
         ];
     }

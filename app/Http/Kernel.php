@@ -67,6 +67,7 @@ class Kernel extends HttpKernel
         'check.permission' => \App\Http\Middleware\CheckPermission::class,
         'force.admin.english' => \App\Http\Middleware\ForceAdminEnglish::class,
         'set.locale' => \App\Http\Middleware\SetLocale::class,
+        'resolve.facility' => \App\Http\Middleware\ResolveFacility::class,
         'handle.inertia' => \App\Http\Middleware\HandleInertiaRequests::class,
     ];
 }

@@ -23,6 +23,7 @@ class UpdateArticleRequest extends FormRequest
         $article = $this->route('article');
 
         return [
+            'facility_id' => 'nullable|exists:facilities,id',
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:500|unique:articles,slug,'.$article->id,
             'status' => 'required|string|in:draft,hidden,published',

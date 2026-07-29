@@ -8,7 +8,9 @@ use App\Models\Album;
 use App\Models\Article;
 use App\Models\Banner;
 use App\Models\Calendar;
+use App\Models\Brand;
 use App\Models\Event;
+use App\Models\Facility;
 use App\Models\Form;
 use App\Models\Grade;
 use App\Models\JobPosting;
@@ -40,7 +42,7 @@ class PagesController extends Controller
      */
     public function index(Request $request)
     {
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => 'home',
             'status' => 'published',
         ])->first();
@@ -49,10 +51,10 @@ class PagesController extends Controller
             abort(404);
         }
 
-        $banners = Banner::orderBy('order')->get();
+        $banners = Banner::inRandomOrder()->limit(1)->get();
         $programs = getPrograms();
-        $articles = Article::latest()->where('status', 'published')->limit(6)->get();
-        $albums = Album::latest()->where('status', 'published')->limit(6)->get();
+        $articles = Article::main()->latest()->where('status', 'published')->limit(6)->get();
+        $albums = Album::main()->latest()->where('status', 'published')->limit(6)->get();
         $achievements = Achievement::with('category')
             ->where('status', 'published')
             ->orderBy('achievement_date', 'desc')
@@ -66,7 +68,7 @@ class PagesController extends Controller
 
     public function page(Request $request, $slug = null)
     {
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => $slug,
             'status' => 'published',
         ])->first();
@@ -78,10 +80,64 @@ class PagesController extends Controller
         return view('page', compact('page'));
     }
 
+    public function facilities(Request $request)
+    {
+        $page = Page::main()->where([
+            'slug' => 'facilities',
+            'status' => 'published',
+        ])->first();
+
+        if (! $page) {
+            abort(404);
+        }
+
+        $facilities = Facility::published()->orderBy('order')->get();
+
+        return view('facilities', [
+            'page' => $page,
+            'facilities' => $facilities,
+        ]);
+    }
+
+    public function identity(Request $request)
+    {
+        $page = Page::main()->where([
+            'slug' => 'identity',
+            'status' => 'published',
+        ])->first();
+
+        if (! $page) {
+            abort(404);
+        }
+
+        $brands = Brand::published()->orderBy('order')->get();
+
+        return view('identity', [
+            'page' => $page,
+            'brands' => $brands,
+        ]);
+    }
+
+    public function brand(Request $request, $slug = null)
+    {
+        $brand = Brand::published()->where('slug', $slug)->first();
+
+        if (! $brand) {
+            abort(404);
+        }
+
+        $brand->load('assets.file');
+
+        return view('brand', [
+            'brand' => $brand,
+            'groupedAssets' => $brand->groupedAssets(),
+        ]);
+    }
+
     public function visits(Request $request)
     {
 
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => 'visits',
             'status' => 'published',
         ])->first();
@@ -100,7 +156,7 @@ class PagesController extends Controller
 
     public function inquiries(Request $request)
     {
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => 'inquiries',
             'status' => 'published',
         ])->first();
@@ -116,7 +172,7 @@ class PagesController extends Controller
 
     public function contact(Request $request)
     {
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => 'contact',
             'status' => 'published',
         ])->first();
@@ -132,7 +188,7 @@ class PagesController extends Controller
 
     public function jobs(Request $request)
     {
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => 'jobs',
             'status' => 'published',
         ])->first();
@@ -185,7 +241,7 @@ class PagesController extends Controller
 
     public function jobApplication(Request $request)
     {
-        $jobsPage = Page::where([
+        $jobsPage = Page::main()->where([
             'slug' => 'jobs',
             'status' => 'published',
         ])->first();
@@ -227,7 +283,7 @@ class PagesController extends Controller
 
     public function articles(Request $request)
     {
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => 'articles',
             'status' => 'published',
         ])->first();
@@ -239,7 +295,7 @@ class PagesController extends Controller
         $pageNumber = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $articles = Article::latest()->where('status', 'published');
+        $articles = Article::main()->latest()->where('status', 'published');
 
         if ($search) {
             $articles->where(function ($query) use ($search) {
@@ -250,7 +306,7 @@ class PagesController extends Controller
 
         $articles = $articles->paginate('10', ['*'], 'page', $pageNumber);
 
-        $popularArticles = Article::inRandomOrder()->limit(6)->where('status', 'published')->whereNotIn('id', $articles->pluck('id'))->get();
+        $popularArticles = Article::main()->inRandomOrder()->limit(6)->where('status', 'published')->whereNotIn('id', $articles->pluck('id'))->get();
 
         return view('articles', [
             'page' => $page,
@@ -262,7 +318,7 @@ class PagesController extends Controller
 
     public function article(Request $request, $slug = null)
     {
-        $article = Article::where([
+        $article = Article::main()->where([
             'slug' => $slug,
             'status' => 'published',
         ])->first();
@@ -271,7 +327,7 @@ class PagesController extends Controller
             abort(404);
         }
 
-        $popularArticles = Article::inRandomOrder()->limit(6)->where('status', 'published')->whereNotIn('id', [$article->id])->get();
+        $popularArticles = Article::main()->inRandomOrder()->limit(6)->where('status', 'published')->whereNotIn('id', [$article->id])->get();
 
         return view('article', compact('article', 'popularArticles'));
     }
@@ -294,7 +350,7 @@ class PagesController extends Controller
 
     public function albums(Request $request)
     {
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => 'albums',
             'status' => 'published',
         ])->first();
@@ -306,7 +362,7 @@ class PagesController extends Controller
         $pageNumber = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $albums = Album::latest()->where('status', 'published');
+        $albums = Album::main()->latest()->where('status', 'published');
 
         if ($search) {
             $albums->where(function ($query) use ($search) {
@@ -326,7 +382,7 @@ class PagesController extends Controller
 
     public function album(Request $request, $slug)
     {
-        $album = Album::where([
+        $album = Album::main()->where([
             'slug' => $slug,
             'status' => 'published',
         ])->first();
@@ -340,7 +396,7 @@ class PagesController extends Controller
 
     public function events(Request $request)
     {
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => 'events',
             'status' => 'published',
         ])->first();
@@ -349,7 +405,7 @@ class PagesController extends Controller
             abort(404);
         }
 
-        $events = Event::latest()->where('status', 'published')->get();
+        $events = Event::main()->latest()->where('status', 'published')->get();
 
         return view('events', [
             'page' => $page,
@@ -359,7 +415,7 @@ class PagesController extends Controller
 
     public function event(Request $request, $slug)
     {
-        $event = Event::where([
+        $event = Event::main()->where([
             'slug' => $slug,
             'status' => 'published',
         ])->first();
@@ -422,7 +478,7 @@ class PagesController extends Controller
 
     public function forms(Request $request)
     {
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => 'forms',
             'status' => 'published',
         ])->first();
@@ -441,7 +497,7 @@ class PagesController extends Controller
 
     public function newsletters(Request $request)
     {
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => 'newsletters',
             'status' => 'published',
         ])->first();
@@ -460,7 +516,7 @@ class PagesController extends Controller
 
     public function guidelines(Request $request)
     {
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => 'guidelines',
             'status' => 'published',
         ])->first();
@@ -479,7 +535,7 @@ class PagesController extends Controller
 
     public function calendars(Request $request)
     {
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => 'calendars',
             'status' => 'published',
         ])->first();
@@ -498,7 +554,7 @@ class PagesController extends Controller
 
     public function achievements(Request $request)
     {
-        $page = Page::where([
+        $page = Page::main()->where([
             'slug' => 'achievements',
             'status' => 'published',
         ])->first();

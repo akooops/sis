@@ -25,6 +25,8 @@
     let pagination = {};
     let loading = true;
     let search = '';
+    let facilityFilter = '';
+    export let facilities = [];
     let perPage = 10;
     let currentPage = 1;
     let searchTimeout;
@@ -36,7 +38,8 @@
             const params = new URLSearchParams({
                 page: currentPage,
                 perPage: perPage,
-                search: search
+                search: search,
+                facility_id: facilityFilter
             });
             
             const response = await fetch(route('admin.contact-submissions.index', {
@@ -202,6 +205,14 @@
                                 on:input={handleSearchInput}
                             />
                         </div>
+
+                        <select class="kt-select max-w-48 w-48" bind:value={facilityFilter} on:change={() => { currentPage = 1; fetchContactSubmissions(); }}>
+                            <option value="">All sources</option>
+                            <option value="main">Main website</option>
+                            {#each facilities as facilityOption}
+                                <option value={facilityOption.id}>{facilityOption.name}</option>
+                            {/each}
+                        </select>
                     </div>
                 </div>
                 
@@ -226,6 +237,11 @@
                                     <th class="min-w-[200px]">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Subject</span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[120px]">
+                                        <span class="kt-table-col">
+                                            <span class="kt-table-col-label">Source</span>
                                         </span>
                                     </th>
                                     <th class="min-w-[120px]">
@@ -307,6 +323,17 @@
                                                 <span class="text-sm font-medium text-mono">
                                                     {contactSubmission.subject}
                                                 </span>
+                                            </td>
+                                            <td>
+                                                {#if contactSubmission.facility}
+                                                    <span class="kt-badge kt-badge-outline kt-badge-info">
+                                                        {contactSubmission.facility.name}
+                                                    </span>
+                                                {:else}
+                                                    <span class="kt-badge kt-badge-outline">
+                                                        Main website
+                                                    </span>
+                                                {/if}
                                             </td>
                                             <td>
                                                 <span class="text-sm text-secondary-foreground">

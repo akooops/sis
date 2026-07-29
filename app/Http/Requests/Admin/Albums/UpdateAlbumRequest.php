@@ -23,6 +23,7 @@ class UpdateAlbumRequest extends FormRequest
         $album = $this->route('album');
 
         return [
+            'facility_id' => 'nullable|exists:facilities,id',
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:500|unique:albums,slug,'.$album->id,
             'status' => 'required|string|in:draft,hidden,published',

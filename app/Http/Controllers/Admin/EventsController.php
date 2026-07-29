@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\Events\UpdateEventTranslationRequest;
 use App\Models\File;
 use App\Models\Language;
 use App\Models\Permission;
+use App\Models\Facility;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\Media;
@@ -29,7 +30,15 @@ class EventsController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $events = Event::latest();
+        $events = Event::with('facility')->latest();
+
+        $facilityId = $this->indexService->checkIfEmpty($request->query('facility_id'));
+
+        if ($facilityId === 'main') {
+            $events->whereNull('facility_id');
+        } elseif ($facilityId) {
+            $events->where('facility_id', $facilityId);
+        }
 
         if ($search) {
             $events->where(function($query) use ($search) {
@@ -47,7 +56,9 @@ class EventsController extends Controller
             ]);
         }
 
-        return inertia('Events/Index');
+        return inertia('Events/Index', [
+            'facilities' => Facility::orderBy('name')->get(['id', 'name']),
+        ]);
     }
     
     /**
@@ -61,7 +72,9 @@ class EventsController extends Controller
             'is_default' => true,
         ])->first();
 
-        return inertia('Events/Create', compact('defaultLanguage'));
+        $facilities = Facility::orderBy('name')->get(['id', 'name']);
+
+        return inertia('Events/Create', compact('defaultLanguage', 'facilities'));
     }
     
     /**
@@ -175,7 +188,9 @@ class EventsController extends Controller
         $languages = Language::orderBy('is_default', 'DESC')->get();
         $translations = $event->getTranslatableFieldsByLanguages();
 
-        return inertia('Events/Edit', compact('event', 'languages', 'translations'));
+        $facilities = Facility::orderBy('name')->get(['id', 'name']);
+
+        return inertia('Events/Edit', compact('event', 'languages', 'translations', 'facilities'));
     }
     
     /**

@@ -24,6 +24,17 @@ class Article extends Model
         return $this->morphOne(File::class, 'model');
     }
 
+    public function facility()
+    {
+        return $this->belongsTo(Facility::class);
+    }
+
+    //Scopes
+    public function scopeMain($query)
+    {
+        return $query->whereNull('facility_id');
+    }
+
     //Accessors & Mutators
     public function getThumbnailUrlAttribute()
     {

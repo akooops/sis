@@ -41,7 +41,7 @@ class StoreContactSubmissionRequest extends FormRequest
             'subject' => 'required|string|max:1000',
             'message' => 'required|string',
 
-            'g-recaptcha-response' => ['required', new ReCaptcha()],
+            'g-recaptcha-response' => ['nullable', new ReCaptcha()],
         ];
     }
 

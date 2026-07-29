@@ -25,6 +25,7 @@ class UpdatePageRequest extends FormRequest
         $page = request()->route('page');
 
         $data = [
+            'facility_id' => 'nullable|exists:facilities,id',
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:500|unique:pages,slug,'.$page->id,
             'status' => 'required|string|in:draft,hidden,published',

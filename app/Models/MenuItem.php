@@ -50,31 +50,45 @@ class MenuItem extends Model
     {
         if ($this->linkable) {
             $type = class_basename($this->linkable_type);
-            
+
+            // Facility-scoped content links to the facility mini-site route
+            $facility = null;
+            if (in_array(strtolower($type), ['page', 'article', 'album', 'event']) && $this->linkable->facility_id) {
+                $facility = $this->linkable->facility;
+            }
+
             switch (strtolower($type)) {
                 case 'program':
                     return route('program', ['slug' => $this->linkable->slug]);
-                    
+
                 case 'page':
-                    return route('page', ['slug' => $this->linkable->slug]);
-                    
+                    return $facility
+                        ? facilityRoute('page', ['facility' => $facility, 'slug' => $this->linkable->slug])
+                        : route('page', ['slug' => $this->linkable->slug]);
+
                 case 'article':
-                    return route('article', ['slug' => $this->linkable->slug]);
-                    
+                    return $facility
+                        ? facilityRoute('article', ['facility' => $facility, 'slug' => $this->linkable->slug])
+                        : route('article', ['slug' => $this->linkable->slug]);
+
                 case 'album':
-                    return route('album', ['slug' => $this->linkable->slug]);
-                    
+                    return $facility
+                        ? facilityRoute('album', ['facility' => $facility, 'slug' => $this->linkable->slug])
+                        : route('album', ['slug' => $this->linkable->slug]);
+
                 case 'event':
-                    return route('event', ['slug' => $this->linkable->slug]);
-                    
+                    return $facility
+                        ? facilityRoute('event', ['facility' => $facility, 'slug' => $this->linkable->slug])
+                        : route('event', ['slug' => $this->linkable->slug]);
+
                 case 'jobposting':
                     return route('job', ['slug' => $this->linkable->slug]);
-                    
+
                 default:
                     return $this->attributes['url'] ?? '#';
             }
         }
-        
+
         return $this->attributes['url'] ?? '#';
     }
 

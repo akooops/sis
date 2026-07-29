@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\ContactSubmission;
 use App\Models\Inquiry;
+use App\Models\Facility;
 use Illuminate\Http\Request;
 
 class ContactSubmissionsController extends Controller
@@ -14,7 +15,15 @@ class ContactSubmissionsController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $contactSubmissions = ContactSubmission::latest();
+        $contactSubmissions = ContactSubmission::with('facility')->latest();
+
+        $facilityId = $this->indexService->checkIfEmpty($request->query('facility_id'));
+
+        if ($facilityId === 'main') {
+            $contactSubmissions->whereNull('facility_id');
+        } elseif ($facilityId) {
+            $contactSubmissions->where('facility_id', $facilityId);
+        }
 
         if ($search) {
             $contactSubmissions->where(function($query) use ($search) {
@@ -36,7 +45,9 @@ class ContactSubmissionsController extends Controller
             ]);
         }
 
-        return inertia('ContactSubmissions/Index');
+        return inertia('ContactSubmissions/Index', [
+            'facilities' => Facility::orderBy('name')->get(['id', 'name']),
+        ]);
     }
 
     /**

@@ -20,3 +20,6 @@ yarn-error.log
 
 .gguf
 /hr-ai-model
+content/*
+metronic/*
+lang/*

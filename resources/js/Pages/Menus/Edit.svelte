@@ -4,6 +4,7 @@
 
     // Props from the server
     export let menu;
+    export let facilities = [];
 
     // Define breadcrumbs for this menu
     const breadcrumbs = [
@@ -23,6 +24,7 @@
 
     // Form data for basic menu info
     let form = {
+        facility_id: menu?.facility_id || '',
         name: menu?.name || ''
     };
 
@@ -38,6 +40,8 @@
         
         // Add method override for PATCH
         const formData = new FormData();
+        formData.set('facility_id', form.facility_id ?? '');
+
         formData.append('_method', 'PATCH');
         formData.append('name', form.name);
 
@@ -100,6 +104,23 @@
                                 />
                                 {#if errors.name}
                                     <p class="text-sm text-destructive">{errors.name}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Facility -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="facility_id">
+                                    Facility
+                                </label>
+                                <select id="facility_id" class="kt-select {errors.facility_id ? 'kt-input-error' : ''}" bind:value={form.facility_id}>
+                                    <option value="">Main website</option>
+                                    {#each facilities as facilityOption}
+                                        <option value={facilityOption.id}>{facilityOption.name}</option>
+                                    {/each}
+                                </select>
+                                <p class="text-xs text-secondary-foreground">Assign to a facility mini-site, or keep it on the main website.</p>
+                                {#if errors.facility_id}
+                                    <p class="text-sm text-destructive">{errors.facility_id}</p>
                                 {/if}
                             </div>
                         </div>

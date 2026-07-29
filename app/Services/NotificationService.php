@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\ContactSubmission;
+use App\Models\FacilityReservation;
 use App\Models\Inquiry;
 use App\Models\VisitBooking;
 use App\Models\JobApplication;
@@ -66,6 +67,50 @@ class NotificationService
                 'visit_service_name' => $visitService->name,
                 'visitors_count' => $visitBooking->visitors_count,
                 'booking_date' => $visitBooking->visitTimeSlot->date ?? null,
+            ],
+        ]);
+    }
+
+    /**
+     * Create a notification for facility reservation
+     */
+    public function createFacilityReservationNotification(FacilityReservation $reservation)
+    {
+        $facility = $reservation->facility;
+
+        return Notification::create([
+            'type' => Notification::TYPE_FACILITY_RESERVATION,
+            'title' => 'New Facility Reservation',
+            'message' => "New reservation request from {$reservation->name} for {$facility->name}",
+            'url' => route('admin.facility-reservations.show', $reservation->id),
+            'data' => [
+                'facility_reservation_id' => $reservation->id,
+                'name' => $reservation->name,
+                'facility_name' => $facility->name,
+                'guests_count' => $reservation->guests_count,
+                'starts_at' => $reservation->facilityTimeSlot->starts_at ?? null,
+            ],
+        ]);
+    }
+
+    /**
+     * Create a notification for facility contact submission
+     */
+    public function createFacilityContactNotification(ContactSubmission $contactSubmission)
+    {
+        $facility = $contactSubmission->facility;
+
+        return Notification::create([
+            'type' => Notification::TYPE_FACILITY_CONTACT,
+            'title' => 'New Facility Contact Message',
+            'message' => "New contact message from {$contactSubmission->name} for {$facility->name}",
+            'url' => route('admin.contact-submissions.show', $contactSubmission->id),
+            'data' => [
+                'contact_submission_id' => $contactSubmission->id,
+                'name' => $contactSubmission->name,
+                'email' => $contactSubmission->email,
+                'subject' => $contactSubmission->subject,
+                'facility_name' => $facility->name,
             ],
         ]);
     }

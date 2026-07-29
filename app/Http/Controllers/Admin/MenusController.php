@@ -6,6 +6,7 @@ use App\Http\Requests\Admin\Menus\DeleteMenuRequest;
 use App\Http\Requests\Admin\Menus\StoreMenuRequest;
 use App\Http\Requests\Admin\Menus\UpdateMenuRequest;
 use App\Models\Permission;
+use App\Models\Facility;
 use Illuminate\Http\Request;
 use App\Models\Menu;
 use Illuminate\Support\Facades\Route;
@@ -23,7 +24,15 @@ class MenusController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $menus = Menu::latest();
+        $menus = Menu::with('facility')->latest();
+
+        $facilityId = $this->indexService->checkIfEmpty($request->query('facility_id'));
+
+        if ($facilityId === 'main') {
+            $menus->whereNull('facility_id');
+        } elseif ($facilityId) {
+            $menus->where('facility_id', $facilityId);
+        }
 
         if ($search) {
             $menus->where(function($query) use ($search) {
@@ -41,7 +50,9 @@ class MenusController extends Controller
             ]);
         }
 
-        return inertia('Menus/Index');
+        return inertia('Menus/Index', [
+            'facilities' => Facility::orderBy('name')->get(['id', 'name']),
+        ]);
     }
     
     /**
@@ -51,7 +62,9 @@ class MenusController extends Controller
      */
     public function create()
     {
-        return inertia('Menus/Create');
+        $facilities = Facility::orderBy('name')->get(['id', 'name']);
+
+        return inertia('Menus/Create', compact('facilities'));
     }
     
     /**
@@ -88,7 +101,9 @@ class MenusController extends Controller
      */
     public function edit(Menu $menu)
     {
-        return inertia('Menus/Edit', compact('menu'));
+        $facilities = Facility::orderBy('name')->get(['id', 'name']);
+
+        return inertia('Menus/Edit', compact('menu', 'facilities'));
     }
     
     /**

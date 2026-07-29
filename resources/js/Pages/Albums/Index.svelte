@@ -25,6 +25,8 @@
     let pagination = {};
     let loading = true;
     let search = '';
+    let facilityFilter = '';
+    export let facilities = [];
     let perPage = 10;
     let currentPage = 1;
     let searchTimeout;
@@ -36,7 +38,8 @@
             const params = new URLSearchParams({
                 page: currentPage,
                 perPage: perPage,
-                search: search
+                search: search,
+                facility_id: facilityFilter
             });
             
             const response = await fetch(route('admin.albums.index', {
@@ -238,6 +241,14 @@
                                 on:input={handleSearchInput}
                             />
                         </div>
+
+                        <select class="kt-select max-w-48 w-48" bind:value={facilityFilter} on:change={() => { currentPage = 1; fetchAlbums(); }}>
+                            <option value="">All sources</option>
+                            <option value="main">Main website</option>
+                            {#each facilities as facilityOption}
+                                <option value={facilityOption.id}>{facilityOption.name}</option>
+                            {/each}
+                        </select>
                     </div>
                 </div>
                 

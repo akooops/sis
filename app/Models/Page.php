@@ -31,7 +31,18 @@ class Page extends Model
     {
         return $this->belongsTo(Menu::class, 'menu_id');
     }
+
+    public function facility()
+    {
+        return $this->belongsTo(Facility::class);
+    }
     
+    //Scopes
+    public function scopeMain($query)
+    {
+        return $query->whereNull('facility_id');
+    }
+
     //Accessors & Mutators
     public function getThumbnailUrlAttribute()
     {

@@ -21,6 +21,8 @@ class Notification extends Model
     const TYPE_INQUIRY = 'inquiry';
     const TYPE_VISIT_BOOKING = 'visit_booking';
     const TYPE_JOB_APPLICATION = 'job_application';
+    const TYPE_FACILITY_RESERVATION = 'facility_reservation';
+    const TYPE_FACILITY_CONTACT = 'facility_contact';
 
     // Icons for different notification types
     const ICONS = [
@@ -28,6 +30,8 @@ class Notification extends Model
         self::TYPE_INQUIRY => 'ki-filled ki-message-text-2',
         self::TYPE_VISIT_BOOKING => 'ki-filled ki-calendar-8',
         self::TYPE_JOB_APPLICATION => 'ki-filled ki-briefcase',
+        self::TYPE_FACILITY_RESERVATION => 'ki-filled ki-calendar-8',
+        self::TYPE_FACILITY_CONTACT => 'ki-filled ki-message-text-2',
     ];
 
     // Scopes

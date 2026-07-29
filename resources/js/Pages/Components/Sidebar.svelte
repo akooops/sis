@@ -671,6 +671,54 @@
                     data-kt-menu-accordion-expand-all="false"
                     id="sidebar_primary_menu"
                 >
+                    {#if hasPermission("admin.brands.index")}
+                        <div class="kt-menu-item">
+                            <a
+                                class="kt-menu-link gap-2.5 py-2 px-2.5 rounded-md {isActiveRoute(
+                                    'admin.brands.index',
+                                )
+                                    ? 'kt-menu-item-active:bg-accent/60'
+                                    : ''} kt-menu-link-hover:bg-accent/60"
+                                href={route("admin.brands.index")}
+                            >
+                                <span
+                                    class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono"
+                                >
+                                    <i class="ki-outline ki-abstract-25"></i>
+                                </span>
+                                <span
+                                    class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono"
+                                >
+                                    Brand Identity
+                                </span>
+                            </a>
+                        </div>
+                    {/if}
+
+                    {#if hasPermission("admin.facilities.index")}
+                        <div class="kt-menu-item">
+                            <a
+                                class="kt-menu-link gap-2.5 py-2 px-2.5 rounded-md {isActiveRoute(
+                                    'admin.facilities.index',
+                                )
+                                    ? 'kt-menu-item-active:bg-accent/60'
+                                    : ''} kt-menu-link-hover:bg-accent/60"
+                                href={route("admin.facilities.index")}
+                            >
+                                <span
+                                    class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono"
+                                >
+                                    <i class="ki-outline ki-home-3"></i>
+                                </span>
+                                <span
+                                    class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono"
+                                >
+                                    Facilities
+                                </span>
+                            </a>
+                        </div>
+                    {/if}
+
                     {#if hasPermission("admin.visit-services.index")}
                         <div class="kt-menu-item">
                             <a

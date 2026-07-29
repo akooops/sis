@@ -13,7 +13,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Safety net: composer's files-autoload has been regenerated without
+        // the app helpers entry before (stale vendor dumps) — require_once is
+        // a no-op when composer already loaded it.
+        require_once app_path('Helpers/helpers.php');
     }
 
     /**

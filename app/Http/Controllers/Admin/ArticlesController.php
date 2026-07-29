@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\Articles\UpdateArticleRequest;
 use App\Http\Requests\Admin\Articles\UpdateArticleTranslationRequest;
 use App\Models\Language;
 use App\Models\Permission;
+use App\Models\Facility;
 use Illuminate\Http\Request;
 use App\Models\Article;
 use App\Models\Media;
@@ -27,7 +28,15 @@ class ArticlesController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $articles = Article::latest();
+        $articles = Article::with('facility')->latest();
+
+        $facilityId = $this->indexService->checkIfEmpty($request->query('facility_id'));
+
+        if ($facilityId === 'main') {
+            $articles->whereNull('facility_id');
+        } elseif ($facilityId) {
+            $articles->where('facility_id', $facilityId);
+        }
 
         if ($search) {
             $articles->where(function($query) use ($search) {
@@ -45,7 +54,9 @@ class ArticlesController extends Controller
             ]);
         }
 
-        return inertia('Articles/Index');
+        return inertia('Articles/Index', [
+            'facilities' => Facility::orderBy('name')->get(['id', 'name']),
+        ]);
     }
     
     /**
@@ -59,7 +70,9 @@ class ArticlesController extends Controller
             'is_default' => true,
         ])->first();
 
-        return inertia('Articles/Create', compact('defaultLanguage'));
+        $facilities = Facility::orderBy('name')->get(['id', 'name']);
+
+        return inertia('Articles/Create', compact('defaultLanguage', 'facilities'));
     }
     
     /**
@@ -155,7 +168,9 @@ class ArticlesController extends Controller
         $languages = Language::orderBy('is_default', 'DESC')->get();
         $translations = $article->getTranslatableFieldsByLanguages();
 
-        return inertia('Articles/Edit', compact('article', 'languages', 'translations'));
+        $facilities = Facility::orderBy('name')->get(['id', 'name']);
+
+        return inertia('Articles/Edit', compact('article', 'languages', 'translations', 'facilities'));
     }
     
     /**

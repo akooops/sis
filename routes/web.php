@@ -6,10 +6,14 @@ use App\Http\Controllers\Admin\AlbumsController;
 use App\Http\Controllers\Admin\ArticlesController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BannersController;
+use App\Http\Controllers\Admin\BrandsController;
 use App\Http\Controllers\Admin\CalendarsController;
 use App\Http\Controllers\Admin\ContactSubmissionsController;
 use App\Http\Controllers\Admin\DashboardContoller;
 use App\Http\Controllers\Admin\EventsController;
+use App\Http\Controllers\Admin\FacilitiesController;
+use App\Http\Controllers\Admin\FacilityReservationsController;
+use App\Http\Controllers\Admin\FacilityTimeSlotsController;
 use App\Http\Controllers\Admin\FilesController;
 use App\Http\Controllers\Admin\FormsController;
 use App\Http\Controllers\Admin\GradesController;
@@ -36,6 +40,9 @@ use App\Http\Controllers\Admin\VisitBookingsController;
 use App\Http\Controllers\Admin\VisitServicesController;
 use App\Http\Controllers\Admin\VisitTimeSlotsController;
 use App\Http\Controllers\ContactSubmissionsController as ControllersContactSubmissionsController;
+use App\Http\Controllers\Facility\FacilityContactController;
+use App\Http\Controllers\Facility\FacilityReservationsController as FacilityFacilityReservationsController;
+use App\Http\Controllers\Facility\FacilitySiteController;
 use App\Http\Controllers\InquiriesController as ControllersInquiriesController;
 use App\Http\Controllers\JobApplicationsController as ControllersJobApplicationsController;
 use App\Http\Controllers\PagesController as ControllersPagesController;
@@ -299,6 +306,38 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::get('settings', [SettingsController::class, 'index'])->middleware('check.permission:admin.settings.index')->name('admin.settings.index');
     Route::post('settings/{setting}', [SettingsController::class, 'update'])->middleware('check.permission:admin.settings.update')->name('admin.settings.update');
 
+    // Brands (identity)
+    Route::get('brands', [BrandsController::class, 'index'])->middleware('check.permission:admin.brands.index')->name('admin.brands.index');
+    Route::get('brands/create', [BrandsController::class, 'create'])->middleware('check.permission:admin.brands.store')->name('admin.brands.create');
+    Route::post('brands', [BrandsController::class, 'store'])->middleware('check.permission:admin.brands.store')->name('admin.brands.store');
+    Route::get('brands/{brand}', [BrandsController::class, 'show'])->middleware('check.permission:admin.brands.show')->name('admin.brands.show');
+    Route::get('brands/{brand}/edit', [BrandsController::class, 'edit'])->middleware('check.permission:admin.brands.update')->name('admin.brands.edit');
+    Route::patch('brands/{brand}/update-translation', [BrandsController::class, 'updateTranslation'])->middleware('check.permission:admin.brands.update')->name('admin.brands.update-translation');
+    Route::patch('brands/{brand}', [BrandsController::class, 'update'])->middleware('check.permission:admin.brands.update')->name('admin.brands.update');
+    Route::delete('brands/{brand}', [BrandsController::class, 'destroy'])->middleware('check.permission:admin.brands.destroy')->name('admin.brands.destroy');
+
+    // Facilities
+    Route::get('facilities', [FacilitiesController::class, 'index'])->middleware('check.permission:admin.facilities.index')->name('admin.facilities.index');
+    Route::get('facilities/create', [FacilitiesController::class, 'create'])->middleware('check.permission:admin.facilities.store')->name('admin.facilities.create');
+    Route::post('facilities', [FacilitiesController::class, 'store'])->middleware('check.permission:admin.facilities.store')->name('admin.facilities.store');
+    Route::get('facilities/{facility}', [FacilitiesController::class, 'show'])->middleware('check.permission:admin.facilities.show')->name('admin.facilities.show');
+    Route::get('facilities/{facility}/edit', [FacilitiesController::class, 'edit'])->middleware('check.permission:admin.facilities.update')->name('admin.facilities.edit');
+    Route::patch('facilities/{facility}/update-translation', [FacilitiesController::class, 'updateTranslation'])->middleware('check.permission:admin.facilities.update')->name('admin.facilities.update-translation');
+    Route::patch('facilities/{facility}', [FacilitiesController::class, 'update'])->middleware('check.permission:admin.facilities.update')->name('admin.facilities.update');
+    Route::delete('facilities/{facility}', [FacilitiesController::class, 'destroy'])->middleware('check.permission:admin.facilities.destroy')->name('admin.facilities.destroy');
+
+    // Facility Time Slots
+    Route::get('facilities/{facility}/facility-time-slots', [FacilityTimeSlotsController::class, 'index'])->middleware('check.permission:admin.facility-time-slots.index')->name('admin.facility-time-slots.index');
+    Route::post('facilities/{facility}/facility-time-slots', [FacilityTimeSlotsController::class, 'store'])->middleware('check.permission:admin.facility-time-slots.store')->name('admin.facility-time-slots.store');
+    Route::post('facilities/{facility}/facility-time-slots/bulk', [FacilityTimeSlotsController::class, 'bulkStore'])->middleware('check.permission:admin.facility-time-slots.store')->name('admin.facility-time-slots.bulk-store');
+    Route::patch('facility-time-slots/{facilityTimeSlot}', [FacilityTimeSlotsController::class, 'update'])->middleware('check.permission:admin.facility-time-slots.update')->name('admin.facility-time-slots.update');
+    Route::delete('facility-time-slots/{facilityTimeSlot}', [FacilityTimeSlotsController::class, 'destroy'])->middleware('check.permission:admin.facility-time-slots.destroy')->name('admin.facility-time-slots.destroy');
+
+    // Facility Reservations
+    Route::get('facilities/{facility}/facility-reservations', [FacilityReservationsController::class, 'index'])->middleware('check.permission:admin.facility-reservations.index')->name('admin.facility-reservations.index');
+    Route::get('facility-reservations/{facilityReservation}', [FacilityReservationsController::class, 'show'])->middleware('check.permission:admin.facility-reservations.show')->name('admin.facility-reservations.show');
+    Route::delete('facility-reservations/{facilityReservation}', [FacilityReservationsController::class, 'destroy'])->middleware('check.permission:admin.facility-reservations.destroy')->name('admin.facility-reservations.destroy');
+
     // Visits Services
     Route::get('visit-services/order', [VisitServicesController::class, 'orderPage'])->middleware('check.permission:admin.visit-services.order')->name('admin.visit-services.order-page');
     Route::post('visit-services/order', [VisitServicesController::class, 'order'])->middleware('check.permission:admin.visit-services.order')->name('admin.visit-services.order');
@@ -391,10 +430,56 @@ Route::middleware(['auth', 'force.admin.english', 'handle.inertia'])->prefix('ad
     Route::delete('newsletters/{newsletter}', [NewslettersController::class, 'destroy'])->middleware('check.permission:admin.newsletters.destroy')->name('admin.newsletters.destroy');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Facility Mini-Websites
+|--------------------------------------------------------------------------
+|
+| Each published facility is served both on a wildcard subdomain
+| ({domain}.FACILITY_ROOT_DOMAIN) and under /facilities/{slug}. The same
+| routes are registered for both access modes; ResolveFacility binds the
+| facility and facilityRoute() generates links for the active mode.
+|
+*/
+
+$facilityRoutes = function () {
+    Route::get('/', [FacilitySiteController::class, 'home'])->name('home');
+
+    Route::get('/articles', [FacilitySiteController::class, 'articles'])->name('articles');
+    Route::get('/articles/{slug}', [FacilitySiteController::class, 'article'])->name('article');
+    Route::get('/albums', [FacilitySiteController::class, 'albums'])->name('albums');
+    Route::get('/albums/{slug}', [FacilitySiteController::class, 'album'])->name('album');
+    Route::get('/events', [FacilitySiteController::class, 'events'])->name('events');
+    Route::get('/events/{slug}', [FacilitySiteController::class, 'event'])->name('event');
+
+    Route::get('/contact', [FacilitySiteController::class, 'contact'])->name('contact');
+    Route::post('/contact', [FacilityContactController::class, 'store'])->name('contact.store');
+
+    Route::get('/reserve', [FacilitySiteController::class, 'reserve'])->name('reserve');
+    Route::post('/reservations', [FacilityFacilityReservationsController::class, 'store'])->name('reservations.store');
+
+    Route::get('/{slug}', [FacilitySiteController::class, 'page'])->name('page');
+};
+
+if (config('facilities.root_domain')) {
+    Route::domain('{facilityDomain}.' . config('facilities.root_domain'))
+        ->middleware(['set.locale', 'resolve.facility'])
+        ->as('facility.domain.')
+        ->group($facilityRoutes);
+}
+
+Route::prefix('facilities/{facilitySlug}')
+    ->middleware(['set.locale', 'resolve.facility'])
+    ->as('facility.')
+    ->group($facilityRoutes);
+
 Route::middleware(['set.locale'])->group(function () {
     Route::get('/', [ControllersPagesController::class, 'index'])->name('index');
     Route::get('/home', [ControllersPagesController::class, 'index'])->name('index');
 
+    Route::get('/facilities', [ControllersPagesController::class, 'facilities'])->name('facilities');
+    Route::get('/identity', [ControllersPagesController::class, 'identity'])->name('identity');
+    Route::get('/identity/{slug}', [ControllersPagesController::class, 'brand'])->name('brand');
     Route::get('/visits', [ControllersPagesController::class, 'visits'])->name('visits');
     Route::get('/inquiries', [ControllersPagesController::class, 'inquiries'])->name('inquiries');
     Route::get('/contact', [ControllersPagesController::class, 'contact'])->name('contact');

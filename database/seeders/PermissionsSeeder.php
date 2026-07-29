@@ -146,6 +146,31 @@ class PermissionsSeeder extends Seeder
             'admin.calendars.update',
             'admin.calendars.destroy',
 
+            // Brands (Identity) Management
+            'admin.brands.index',
+            'admin.brands.store',
+            'admin.brands.show',
+            'admin.brands.update',
+            'admin.brands.destroy',
+
+            // Facilities Management
+            'admin.facilities.index',
+            'admin.facilities.store',
+            'admin.facilities.show',
+            'admin.facilities.update',
+            'admin.facilities.destroy',
+
+            // Facility Time Slots Management
+            'admin.facility-time-slots.index',
+            'admin.facility-time-slots.store',
+            'admin.facility-time-slots.update',
+            'admin.facility-time-slots.destroy',
+
+            // Facility Reservations Management
+            'admin.facility-reservations.index',
+            'admin.facility-reservations.show',
+            'admin.facility-reservations.destroy',
+
             // Visit Services Management
             'admin.visit-services.index',
             'admin.visit-services.store',
@@ -277,7 +302,8 @@ class PermissionsSeeder extends Seeder
         $adminRole->permissions()->sync($adminPermissions->pluck('id'));
 
         // Assign content management permissions to Editor
-        $editorPermissions = Permission::where('name', 'like', '%articles%')
+        $editorPermissions = Permission::where('name', 'like', '%brands%')
+            ->orWhere('name', 'like', '%articles%')
             ->orWhere('name', 'like', '%nationalities%')
             ->orWhere('name', 'like', '%pages%')
             ->orWhere('name', 'like', '%albums%')

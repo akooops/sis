@@ -2,6 +2,9 @@
     import AdminLayout from '../Layouts/AdminLayout.svelte';
     import { router } from '@inertiajs/svelte';
 
+    // Props from the server
+    export let facilities = [];
+
     // Define breadcrumbs for this menu
     const breadcrumbs = [
         {
@@ -20,6 +23,7 @@
 
     // Form data
     let form = {
+        facility_id: '',
         name: ''
     };
 
@@ -93,6 +97,23 @@
                                 />
                                 {#if errors.name}
                                     <p class="text-sm text-destructive">{errors.name}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Facility -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="facility_id">
+                                    Facility
+                                </label>
+                                <select id="facility_id" class="kt-select {errors.facility_id ? 'kt-input-error' : ''}" bind:value={form.facility_id}>
+                                    <option value="">Main website</option>
+                                    {#each facilities as facilityOption}
+                                        <option value={facilityOption.id}>{facilityOption.name}</option>
+                                    {/each}
+                                </select>
+                                <p class="text-xs text-secondary-foreground">Assign to a facility mini-site, or keep it on the main website.</p>
+                                {#if errors.facility_id}
+                                    <p class="text-sm text-destructive">{errors.facility_id}</p>
                                 {/if}
                             </div>
                         </div>

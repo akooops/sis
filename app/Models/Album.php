@@ -28,6 +28,17 @@ class Album extends Model
         return $this->morphMany(File::class, 'model')->where('is_main', 0);
     }
 
+    public function facility()
+    {
+        return $this->belongsTo(Facility::class);
+    }
+
+    //Scopes
+    public function scopeMain($query)
+    {
+        return $query->whereNull('facility_id');
+    }
+
     //Accessors & Mutators
     public function getThumbnailUrlAttribute()
     {

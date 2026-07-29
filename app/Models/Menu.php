@@ -22,4 +22,9 @@ class Menu extends Model
     {
         return $this->hasMany(MenuItem::class);
     }
+
+    public function facility()
+    {
+        return $this->belongsTo(Facility::class);
+    }
 }

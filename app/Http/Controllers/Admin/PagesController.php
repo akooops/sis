@@ -10,6 +10,7 @@ use App\Models\Language;
 use App\Models\Media;
 use App\Models\Menu;
 use App\Models\Permission;
+use App\Models\Facility;
 use Illuminate\Http\Request;
 use App\Models\Page;
 use Illuminate\Support\Facades\Route;
@@ -29,7 +30,15 @@ class PagesController extends Controller
         $page = $this->indexService->checkPageIfNull($request->query('page', 1));
         $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
 
-        $pages = Page::latest();
+        $pages = Page::with('facility')->latest();
+
+        $facilityId = $this->indexService->checkIfEmpty($request->query('facility_id'));
+
+        if ($facilityId === 'main') {
+            $pages->whereNull('facility_id');
+        } elseif ($facilityId) {
+            $pages->where('facility_id', $facilityId);
+        }
 
         if ($search) {
             $pages->where(function($query) use ($search) {
@@ -47,7 +56,9 @@ class PagesController extends Controller
             ]);
         }
 
-        return inertia('Pages/Index');
+        return inertia('Pages/Index', [
+            'facilities' => Facility::orderBy('name')->get(['id', 'name']),
+        ]);
     }
     
     /**
@@ -61,7 +72,9 @@ class PagesController extends Controller
             'is_default' => true,
         ])->first();
 
-        return inertia('Pages/Create', compact('defaultLanguage'));
+        $facilities = Facility::orderBy('name')->get(['id', 'name']);
+
+        return inertia('Pages/Create', compact('defaultLanguage', 'facilities'));
     }
     
     /**
@@ -161,7 +174,9 @@ class PagesController extends Controller
     
         $languages = Language::orderBy('is_default', 'DESC')->get();
         $translations = $page->getTranslatableFieldsByLanguages();
-        return inertia('Pages/Edit', compact('page', 'languages', 'translations'));
+        $facilities = Facility::orderBy('name')->get(['id', 'name']);
+
+        return inertia('Pages/Edit', compact('page', 'languages', 'translations', 'facilities'));
     }
     
     /**

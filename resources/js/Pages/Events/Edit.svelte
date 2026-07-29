@@ -10,6 +10,7 @@
     export let event;
     export let languages;
     export let translations;
+    export let facilities = [];
     export let medias;
 
     // Define breadcrumbs for this event
@@ -30,6 +31,7 @@
 
     // Form data for basic event info
     let form = {
+        facility_id: event?.facility_id || '',
         name: event?.name || '',
         slug: event?.slug || '',
         status: event?.status || 'draft',
@@ -168,6 +170,8 @@
         });
 
         // Add method override for PATCH
+        formData.set('facility_id', form.facility_id ?? '');
+
         formData.append('_method', 'PATCH');
 
         router.post(route('admin.events.update', { event: event.id }), formData, {
@@ -328,6 +332,23 @@
                                                 <p class="text-sm text-destructive">{errors.name}</p>
                                             {/if}
                                         </div>
+
+                            <!-- Facility -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="facility_id">
+                                    Facility
+                                </label>
+                                <select id="facility_id" class="kt-select {errors.facility_id ? 'kt-input-error' : ''}" bind:value={form.facility_id}>
+                                    <option value="">Main website</option>
+                                    {#each facilities as facilityOption}
+                                        <option value={facilityOption.id}>{facilityOption.name}</option>
+                                    {/each}
+                                </select>
+                                <p class="text-xs text-secondary-foreground">Assign to a facility mini-site, or keep it on the main website.</p>
+                                {#if errors.facility_id}
+                                    <p class="text-sm text-destructive">{errors.facility_id}</p>
+                                {/if}
+                            </div>
 
                                         <!-- Event Slug -->
                                         <div class="flex flex-col gap-2">
