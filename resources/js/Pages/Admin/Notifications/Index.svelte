@@ -23,7 +23,7 @@
     import { confirm } from '@/lib/confirm';
     import { unread, notificationIcon } from '@/lib/notifications.svelte';
 
-    const list = useIndex('api.v1.admin.notifications.index', { perPage: 15, sort: '-created_at', pollMs: 20000 });
+    const list = useIndex('api.v1.admin.notifications.index', { perPage: 15, sort: '-created_at' });
 
     let filtersOpen = $state(false);
     let viewOpen = $state(false);

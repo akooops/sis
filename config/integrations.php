@@ -12,6 +12,7 @@ return [
         'email' => ['name' => 'Email', 'icon' => 'ki-sms', 'sort' => 1],
         'sms' => ['name' => 'SMS', 'icon' => 'ki-message-text', 'sort' => 2],
         'ai' => ['name' => 'AI', 'icon' => 'ki-abstract-26', 'sort' => 3],
+        'captcha' => ['name' => 'Bot protection', 'icon' => 'ki-shield-tick', 'sort' => 4],
     ],
 
     /*
@@ -27,6 +28,7 @@ return [
         App\Services\Integrations\Drivers\TwilioEmailDriver::class,
         App\Services\Integrations\Drivers\FourJawalyDriver::class,
         App\Services\Integrations\Drivers\OpenAiDriver::class,
+        App\Services\Integrations\Drivers\RecaptchaDriver::class,
     ],
 
     /*

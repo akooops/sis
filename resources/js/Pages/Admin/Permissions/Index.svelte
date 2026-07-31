@@ -16,7 +16,7 @@
     import { useIndex } from '@/lib/api/useIndex.svelte';
     import { hasPermission } from '@/lib/permissions';
 
-    const list = useIndex('api.v1.admin.permissions.index', { perPage: 15, sort: '-created_at', pollMs: 0 });
+    const list = useIndex('api.v1.admin.permissions.index', { perPage: 15, sort: '-created_at' });
     let filtersOpen = $state(false);
     let viewOpen = $state(false);
     let viewing = $state(null);

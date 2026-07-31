@@ -164,6 +164,8 @@ return [
     'phone' => 'Il campo :attribute deve essere un numero di telefono valido in formato internazionale (es. +213555123456).',
     'upload_invalid' => 'Il file selezionato per :attribute non è valido.',
     'upload_unscanned' => 'Il campo :attribute non ha ancora superato il controllo di sicurezza.',
+    'captcha' => 'La verifica non è stata superata. Conferma di non essere un robot e riprova.',
+    'captcha_unavailable' => 'Non è stato possibile completare la verifica in questo momento. Riprova tra qualche istante.',
 
     /*
     |--------------------------------------------------------------------------

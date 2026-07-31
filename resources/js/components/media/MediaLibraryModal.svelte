@@ -44,7 +44,7 @@
     let activeType = $state('__all'); // __all | <type>
     let selected = $state(null);
 
-    const list = useIndex('api.v1.admin.media.index', { perPage: 15, immediate: false });
+    const list = useIndex('api.v1.admin.media.index', { perPage: 15, immediate: false, pollMs: 0 });
 
     // The `filter[type]` value for the current tab: a single type, the restricted
     // subset (comma-joined) for "All", or nothing when everything is allowed.

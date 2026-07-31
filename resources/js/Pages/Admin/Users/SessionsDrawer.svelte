@@ -37,6 +37,7 @@
         sort: '-last_activity',
         readUrl: false,
         immediate: false,
+        pollMs: 0,
         routeParams: () => user?.id,
     });
 

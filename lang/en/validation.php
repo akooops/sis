@@ -164,6 +164,8 @@ return [
     'phone' => 'The :attribute field must be a valid phone number in international format (e.g. +213555123456).',
     'upload_invalid' => 'The selected :attribute is invalid.',
     'upload_unscanned' => 'The :attribute has not passed the security scan yet.',
+    'captcha' => 'The verification was not passed. Please confirm you are not a robot and try again.',
+    'captcha_unavailable' => 'We could not complete the verification right now. Please try again in a moment.',
 
     /*
     |--------------------------------------------------------------------------

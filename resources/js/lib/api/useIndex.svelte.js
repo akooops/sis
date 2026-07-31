@@ -4,11 +4,11 @@
  * Owns the query state (filter / sort / page / per_page / include), fetches
  * against the JSON API using the spatie query-builder contract, and exposes
  * reactive rows + pagination meta. Also provides 3-state column sorting and
- * optional periodic polling ("live" tables).
+ * periodic polling, which is ON by default (pollMs: 0 opts out).
  *
  * Usage (in a component <script>):
  *   const list = useIndex('api.v1.admin.users.index', {
- *       perPage: 15, sort: '-created_at', include: 'roles', pollMs: 15000,
+ *       perPage: 15, sort: '-created_at', include: 'roles',
  *   });
  *   // list.rows, list.meta, list.loading, list.error
  *   // list.setFilters({...}), list.setSearch('x'), list.toggleSort('email')
@@ -57,7 +57,10 @@ export function useIndex(routeName, options = {}) {
         sort = null,
         filter = {},
         include = null,
-        pollMs = 0,
+        // Polls by default: a list can change without this admin acting (a public
+        // unsubscribe, a scheduled send, another admin's write). Pass 0 to opt out
+        // — drawers and modals must, since they stay mounted while closed.
+        pollMs = 20000,
         immediate = true,
         routeParams = undefined,
         readUrl = true,

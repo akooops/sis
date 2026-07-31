@@ -109,6 +109,7 @@
         sort: '-created_at',
         readUrl: false,
         immediate: false,
+        pollMs: 0,
         routeParams: parentFilter ? undefined : () => parentId,
     });
 

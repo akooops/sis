@@ -25,7 +25,7 @@
     const TAB_LABELS = { images: 'Images', audio: 'Audio', videos: 'Videos', documents: 'Documents' };
     const TYPE_LABELS = { images: 'Image', audio: 'Audio', videos: 'Video', documents: 'Document' };
 
-    const list = useIndex('api.v1.admin.media.index', { perPage: 15, sort: '-created_at', pollMs: 0 });
+    const list = useIndex('api.v1.admin.media.index', { perPage: 15, sort: '-created_at' });
     let filtersOpen = $state(false);
     let viewOpen = $state(false);
     let viewing = $state(null);
