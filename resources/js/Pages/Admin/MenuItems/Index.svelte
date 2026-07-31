@@ -86,17 +86,17 @@
 
     /** One line for the drawer: the address, or the type and the record's name. */
     function linkSummary(row) {
-        if (!row) return '—';
+        if (!row) return '';
         const kind = linkKind(row);
         if (!kind) return 'No link';
         if (kind === 'url') return row.url;
 
-        return `${linkKindLabel(kind)} — ${linkTarget(row) ?? '—'}`;
+        return `${linkKindLabel(kind)} — ${linkTarget(row) ?? ''}`;
     }
 
     /** The parent's name when it is on this page — a row carries only its id. */
     function parentName(row) {
-        if (!row) return '—';
+        if (!row) return '';
         if (!row.parent_id) return 'Top level';
 
         return list.rows.find((r) => r.id === row.parent_id)?.name ?? row.parent_id;
@@ -147,7 +147,7 @@
         heading={viewing?.name}
         badge={viewing ? { label: `Position ${viewing.order + 1}`, variant: 'secondary' } : null}
         fields={[
-            { label: 'Menu', value: viewing?.menu?.name || '—' },
+            { label: 'Menu', value: viewing?.menu?.name || '' },
             { label: 'Parent', value: parentName(viewing) },
             { label: 'Link', value: linkSummary(viewing) },
             { label: 'Children', value: String(viewing?.children?.length ?? 0) },
@@ -224,7 +224,7 @@
                 <ClampText value={row.menu.name} maxWidth="160px" title={row.menu.name} />
             </Badge>
         {:else}
-            <span class="text-xs text-muted-foreground">—</span>
+            
         {/if}
     {:else if column.key === 'link'}
         {#if row.url}
@@ -240,12 +240,12 @@
                 </span>
             </div>
         {:else}
-            <span class="text-xs text-muted-foreground">—</span>
+            
         {/if}
     {:else if column.key === 'order'}
         <Badge variant="secondary">{row.order + 1}</Badge>
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

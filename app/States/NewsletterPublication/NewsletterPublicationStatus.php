@@ -6,20 +6,23 @@ use Spatie\ModelStates\State;
 use Spatie\ModelStates\StateConfig;
 
 /**
- * Where an issue sits on the website archive. Only Published is served.
+ * The website archive alone — the email side is NewsletterSendStatus, and neither
+ * ever reads the other. Article-shaped: published_at is the future date while
+ * scheduled, and the real timestamp once live.
  *
- *  - Draft     : the default. Being prepared, never listed.
+ *  - Draft     : the default. Not listed anywhere.
  *  - Scheduled : waiting for published_at; newsletters:publish-scheduled flips it.
- *  - Published : live. published_at records when it went live.
+ *  - Published : live in the archive.
  *  - Hidden    : was public and has been withdrawn. published_at is kept.
- *
- * Its own namespace rather than App\States\Newsletter because that one is the SEND
- * pipeline: two state machines on one model must not share a namespace.
  *
  * Published is reachable from everywhere so an issue can always go back up, and
  * Hidden from anything that was public so it can always come down. Published ->
  * Draft is barred (taking a live issue down is an explicit Hidden, worth its own
  * audit row) and so is Draft -> Hidden (a draft was never public).
+ *
+ * Its own directory, not shared with NewsletterSend: spatie resolves a state map
+ * by scanning the base class's own folder, so two machines on one model must live
+ * in two namespaces.
  */
 abstract class NewsletterPublicationStatus extends State
 {

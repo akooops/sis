@@ -14,74 +14,16 @@ export const UNSUBSCRIBE_PLACEHOLDER = '{{unsubscribe_url}}';
  */
 export const EMAIL_PLACEHOLDER = '{{email}}';
 
-/* ---------- Email send pipeline: NEWSLETTER_STATUS_*, reachableStatuses, needsScheduledAt ---------- */
+/* ------------------------------------------------------------------ *
+ * WEBSITE side — published_status + published_at. Never the email one.
+ * ------------------------------------------------------------------ */
 
 /**
- * Newsletter status — mirrors App\States\Newsletter\NewsletterStatus.
+ * Mirrors App\States\NewsletterPublication\NewsletterPublicationStatus.
  *
- * Only draft and scheduled are ever settable: sending/sent/failed are written by
- * newsletters:send-scheduled and ShipNewsletter, so they are display-only here.
- */
-export const NEWSLETTER_STATUS_LABELS = {
-    draft: 'Draft',
-    scheduled: 'Scheduled',
-    sending: 'Sending',
-    sent: 'Sent',
-    failed: 'Failed',
-};
-
-/** Badge variant per status — `sent` is the only success, `sending` is in flight. */
-export const NEWSLETTER_STATUS_VARIANTS = {
-    draft: 'secondary',
-    scheduled: 'warning',
-    sending: 'info',
-    sent: 'success',
-    failed: 'destructive',
-};
-
-/** The only two the form may offer — the rest belong to the command and the job. */
-const FORM_STATUSES = ['draft', 'scheduled'];
-
-/**
- * Mirrors NewsletterStatus::config(). The 422 stays the enforcement — this only
- * stops the form offering a door the server has locked.
- *
- * Sent is terminal and Sending is mid-flight, so neither leads anywhere here.
- */
-export const NEWSLETTER_STATUS_TRANSITIONS = {
-    draft: ['scheduled'],
-    scheduled: ['draft'],
-    sending: [],
-    sent: [],
-    failed: ['draft', 'scheduled'],
-};
-
-/**
- * Statuses reachable from `current`, including staying put. Create has no current.
- * Filtered to FORM_STATUSES so a failed newsletter is offered a way out but never
- * a way back into failed.
- */
-export function reachableStatuses(current = null) {
-    if (!current) return [...FORM_STATUSES];
-
-    return [current, ...(NEWSLETTER_STATUS_TRANSITIONS[current] ?? [])].filter((s) => FORM_STATUSES.includes(s));
-}
-
-/**
- * Only a schedule needs a date from the user. There is no send-now endpoint, so
- * "send now" is a schedule for now — the date is always the user's to give.
- */
-export function needsScheduledAt(status) {
-    return status === 'scheduled';
-}
-
-/* ---------- Website publish pipeline: NEWSLETTER_PUBLISH_STATUS_*, publishReachableStatuses, needsPublishedAt ---------- */
-
-/**
- * Publish status — mirrors App\States\NewsletterPublication\NewsletterPublicationStatus.
- *
- * The website archive alone, and nothing above it: an issue can be live on the
- * site and unsent, or sent and unlisted. Never read one set for the other.
+ * The archive alone: an issue can be live on the site and unsent, or sent and
+ * unlisted. published_at is the future date while scheduled and the moment it went
+ * live once published.
  */
 export const NEWSLETTER_PUBLISH_STATUS_LABELS = {
     draft: 'Draft',
@@ -112,7 +54,10 @@ export const NEWSLETTER_PUBLISH_STATUS_TRANSITIONS = {
     hidden: ['draft', 'scheduled', 'published'],
 };
 
-/** Publish statuses reachable from `current`, including staying put. Create has no current. */
+/**
+ * Publish statuses reachable from `current`, including staying put. Create has no
+ * current, and no issue is born hidden — there is nothing public to withdraw yet.
+ */
 export function publishReachableStatuses(current = null) {
     if (!current) return ['draft', 'scheduled', 'published'];
 
@@ -121,9 +66,69 @@ export function publishReachableStatuses(current = null) {
 
 /**
  * Only a schedule needs a date from the user. Publishing is always "now" — the
- * server stamps published_at — so asking for it would be a field with one
+ * server schedules it for this instant — so asking would be a field with one
  * correct answer.
  */
-export function needsPublishedAt(status) {
+export function needsPublishAt(status) {
+    return status === 'scheduled';
+}
+
+/* ------------------------------------------------------------------ *
+ * EMAIL side — sent_status + sent_at. Never the website one.
+ * ------------------------------------------------------------------ */
+
+/**
+ * Mirrors App\States\NewsletterSend\NewsletterSendStatus.
+ *
+ * The broadcast alone. sent_at is the future date while scheduled and the moment
+ * it went out once sent.
+ */
+export const NEWSLETTER_SEND_STATUS_LABELS = {
+    draft: 'Draft',
+    scheduled: 'Scheduled',
+    sent: 'Sent',
+    failed: 'Failed',
+};
+
+/** Badge variant per send status — `sent` is the only success. */
+export const NEWSLETTER_SEND_STATUS_VARIANTS = {
+    draft: 'secondary',
+    scheduled: 'warning',
+    sent: 'success',
+    failed: 'destructive',
+};
+
+/**
+ * Mirrors NewsletterSendStatus::config(). Sent is NOT terminal: Sent -> Scheduled
+ * re-sends the issue to every subscriber, so the form confirms before allowing it.
+ * Failed only leads back to Draft or Scheduled — fix the audience, then re-queue.
+ */
+export const NEWSLETTER_SEND_STATUS_TRANSITIONS = {
+    draft: ['scheduled'],
+    scheduled: ['draft', 'sent'],
+    sent: ['scheduled'],
+    failed: ['draft', 'scheduled'],
+};
+
+/**
+ * Send statuses reachable from `current`, including staying put. Create has no
+ * current.
+ *
+ * `failed` is stripped even when it IS the current status: only
+ * newsletters:send-scheduled writes it, the DTO's Rule::in refuses it from a
+ * client, and a failed issue needs a way out rather than a way to stay put.
+ */
+export function sendReachableStatuses(current = null) {
+    if (!current) return ['draft', 'scheduled', 'sent'];
+
+    return [current, ...(NEWSLETTER_SEND_STATUS_TRANSITIONS[current] ?? [])].filter((s) => s !== 'failed');
+}
+
+/**
+ * Only a schedule needs a date from the user. There is no send-now endpoint — all
+ * sending goes through the command — so "send now" is a schedule for this instant
+ * that the server stamps itself.
+ */
+export function needsSendAt(status) {
     return status === 'scheduled';
 }

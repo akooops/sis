@@ -167,10 +167,10 @@
         {#if row.is_default}
             <Badge variant="primary">Default</Badge>
         {:else}
-            <span class="text-xs text-muted-foreground">—</span>
+            
         {/if}
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

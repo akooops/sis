@@ -8,7 +8,7 @@
      */
     import { formatDate, formatDateTime, formatTime, formatRelative } from '@/lib/date';
 
-    let { value, format = 'datetime', fallback = '—' } = $props();
+    let { value, format = 'datetime', fallback = '' } = $props();
 
     const formatters = {
         date: formatDate,

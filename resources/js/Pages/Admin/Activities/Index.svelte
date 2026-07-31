@@ -47,10 +47,10 @@
             ? [
                   { label: 'Module', value: LOG_NAME_LABELS[viewing.log_name] ?? viewing.log_name },
                   { label: 'Event', value: EVENT_LABELS[viewing.event] ?? viewing.event },
-                  { label: 'Type', value: SUBJECT_TYPE_LABELS[viewing.subject_type] ?? viewing.subject_type ?? '—' },
+                  { label: 'Type', value: SUBJECT_TYPE_LABELS[viewing.subject_type] ?? viewing.subject_type ?? '' },
                   {
                       label: 'Record',
-                      value: viewing.subject_id ? (viewing.subject_label ?? viewing.subject_id) : '—',
+                      value: viewing.subject_id ? (viewing.subject_label ?? viewing.subject_id) : '',
                   },
                   {
                       label: 'Performed by',
@@ -181,7 +181,7 @@
         {#if row.subject_type}
             <Badge variant="secondary">{SUBJECT_TYPE_LABELS[row.subject_type] ?? row.subject_type}</Badge>
         {:else}
-            <span class="text-muted-foreground">—</span>
+            
         {/if}
     {:else if column.key === 'description'}
         {activityMessage(row)}
@@ -201,9 +201,9 @@
                 <span class="text-xs text-muted-foreground">{SUBJECT_TYPE_LABELS[row.subject_type] ?? row.subject_type}</span>
             </span>
         {:else}
-            <span class="text-muted-foreground">—</span>
+            
         {/if}
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}

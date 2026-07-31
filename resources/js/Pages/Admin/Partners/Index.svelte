@@ -169,7 +169,7 @@
             <ClampText value={row.url} maxWidth="260px" title={row.url} />
         </a>
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

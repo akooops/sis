@@ -9,10 +9,10 @@ use App\Http\Controllers\Api\ApiController;
 use App\Models\Language;
 use App\Models\Newsletter;
 use App\Services\Uploads\UploadService;
-use App\States\Newsletter\NewsletterStatus;
-use App\States\Newsletter\Sending;
-use App\States\Newsletter\Sent;
 use App\States\NewsletterPublication\NewsletterPublicationStatus;
+use App\States\NewsletterPublication\Published;
+use App\States\NewsletterSend\NewsletterSendStatus;
+use App\States\NewsletterSend\Sent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Optional;
@@ -22,16 +22,16 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 /**
- * Broadcasts. There is deliberately NO send-now endpoint: sending is always
- * newsletters:send-scheduled dispatching ShipNewsletter, so "send now" from the
- * UI means status=scheduled with scheduled_at=now and the command picks it up on
- * its next tick. Don't add a direct send here — it would skip the Sending/Sent
- * audit trail and the queue's retries.
+ * Two sides that never read each other: published_status + published_at put the
+ * issue in the website archive (newsletters:publish-scheduled), sent_status +
+ * sent_at email it (newsletters:send-scheduled). A publish-only issue stays draft
+ * on the email side forever, and a send-only issue stays draft on the website side.
  *
- * Two pipelines that never read each other: `publish_status` + `published_at` put
- * the issue in the website archive (newsletters:publish-scheduled), `status` +
- * `scheduled_at` email it. A publish-only issue stays draft on the email side
- * forever, and a send-only issue stays draft on the website side.
+ * PICKING THE TERMINAL STATE MEANS "NOW", NEVER A DIRECT WRITE: choosing published
+ * stores scheduled + published_at = now, choosing sent stores scheduled + sent_at =
+ * now, and the commands do the work on their next tick. That is what keeps all
+ * sending inside a command dispatching jobs — a direct send here would bypass the
+ * queue, its retries and the audit row.
  */
 class NewslettersController extends ApiController
 {
@@ -42,15 +42,15 @@ class NewslettersController extends ApiController
             ->with(['groups', 'integration', 'media'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
-                AllowedFilter::exact('status'),
-                AllowedFilter::exact('publish_status'),
+                AllowedFilter::exact('published_status'),
+                AllowedFilter::exact('sent_status'),
                 AllowedFilter::exact('is_published'),
                 AllowedFilter::exact('is_sendable'),
                 AllowedFilter::exact('integration_id'),
                 $this->searchRelationById('newsletter_group_id', 'groups'),
                 $this->search(['id', 'name', 'subject']),
             ])
-            ->allowedSorts(['id', 'name', 'subject', 'status', 'publish_status', 'published_at', 'scheduled_at', 'sent_at', 'created_at'])
+            ->allowedSorts(['id', 'name', 'subject', 'published_status', 'published_at', 'sent_status', 'sent_at', 'created_at'])
             ->defaultSort('-created_at')
             ->paginate($this->perPage())
             ->appends(request()->query());
@@ -65,23 +65,22 @@ class NewslettersController extends ApiController
 
     public function store(StoreNewsletterData $data): JsonResponse
     {
-        $status = $this->sendingStatus($data->is_sendable, $data->status);
-        $publishStatus = $this->publicationStatus($data->is_published, $data->publish_status);
+        [$publishedStatus, $publishedAt] = $this->publicationState($data->is_published, $data->published_status, $data->published_at);
+        [$sentStatus, $sentAt] = $this->sendState($data->is_sendable, $data->sent_status, $data->sent_at);
 
         $newsletter = Newsletter::create([
             'name' => $data->name,
             'is_published' => $data->is_published,
             'is_sendable' => $data->is_sendable,
             'title' => $data->title ? [Language::defaultCode() => $data->title] : [],
-            // The column is NOT NULL; a publish-only issue simply has no subject line.
+            // The column is nullable; a publish-only issue simply has no subject line.
             'subject' => $data->subject,
             'content' => $data->content,
             'integration_id' => $data->integration_id,
-            'publish_status' => NewsletterPublicationStatus::resolveStateClass($publishStatus),
-            // Publishing is always "now": the admin picks the status, we stamp the moment.
-            'published_at' => $publishStatus === 'published' ? now() : $data->published_at,
-            'status' => NewsletterStatus::resolveStateClass($status),
-            'scheduled_at' => $status === 'scheduled' ? $data->scheduled_at : null,
+            'published_status' => NewsletterPublicationStatus::resolveStateClass($publishedStatus),
+            'published_at' => $publishedAt,
+            'sent_status' => NewsletterSendStatus::resolveStateClass($sentStatus),
+            'sent_at' => $sentAt,
         ]);
 
         if ($data->file) {
@@ -95,8 +94,6 @@ class NewslettersController extends ApiController
 
     public function update(UpdateNewsletterData $data, Newsletter $newsletter): JsonResponse
     {
-        $this->guardInFlight($newsletter, 'edited');
-
         // mergeTranslations: the form only carries the enabled locales, so a plain
         // assignment would drop every disabled one.
         $newsletter->update($newsletter->mergeTranslations([
@@ -109,39 +106,35 @@ class NewslettersController extends ApiController
             'integration_id' => $data->integration_id,
         ]));
 
-        $publishStatus = $this->publicationStatus($data->is_published, $data->publish_status);
-        $publishTarget = NewsletterPublicationStatus::resolveStateClass($publishStatus);
+        [$publishedStatus, $publishedAt] = $this->publicationState($data->is_published, $data->published_status, $data->published_at, $newsletter);
+        $publishTarget = NewsletterPublicationStatus::resolveStateClass($publishedStatus);
 
-        if (! $newsletter->publish_status instanceof $publishTarget) {
+        if (! $newsletter->published_status instanceof $publishTarget) {
             try {
-                $newsletter->publish_status->transitionTo($publishTarget);
+                $newsletter->published_status->transitionTo($publishTarget);
             } catch (TransitionNotFound) {
                 throw ValidationException::withMessages([
-                    'publish_status' => "A {$newsletter->publish_status->getValue()} newsletter cannot become {$publishStatus}.",
+                    'published_status' => "A {$newsletter->published_status->getValue()} newsletter cannot become {$publishedStatus}.",
                 ]);
             }
         }
 
-        // Keep the first publication date on a re-publish; a hidden issue that goes
-        // back up still says when it originally went live.
-        $newsletter->published_at = $publishStatus === 'published'
-            ? ($newsletter->published_at ?? now())
-            : $data->published_at;
+        $newsletter->published_at = $publishedAt;
 
-        $status = $this->sendingStatus($data->is_sendable, $data->status);
-        $target = NewsletterStatus::resolveStateClass($status);
+        [$sentStatus, $sentAt] = $this->sendState($data->is_sendable, $data->sent_status, $data->sent_at, $newsletter);
+        $sendTarget = NewsletterSendStatus::resolveStateClass($sentStatus);
 
-        if (! $newsletter->status instanceof $target) {
+        if (! $newsletter->sent_status instanceof $sendTarget) {
             try {
-                $newsletter->status->transitionTo($target);
+                $newsletter->sent_status->transitionTo($sendTarget);
             } catch (TransitionNotFound) {
                 throw ValidationException::withMessages([
-                    'status' => "A {$newsletter->status->getValue()} newsletter cannot become {$status}.",
+                    'sent_status' => "A {$newsletter->sent_status->getValue()} newsletter cannot become {$sentStatus}.",
                 ]);
             }
         }
 
-        $newsletter->scheduled_at = $status === 'scheduled' ? $data->scheduled_at : null;
+        $newsletter->sent_at = $sentAt;
         $newsletter->save();
 
         if (! $data->file instanceof Optional && $data->file) {
@@ -155,50 +148,70 @@ class NewslettersController extends ApiController
 
     public function destroy(Newsletter $newsletter): JsonResponse
     {
-        $this->guardInFlight($newsletter, 'deleted');
-
         $newsletter->delete();
 
         return $this->respond(null, 'Newsletter deleted successfully');
     }
 
     /**
-     * The status pipeline governs sending only, so an issue that is not sendable
-     * can never be scheduled — it stays draft forever and the command skips it.
-     */
-    protected function sendingStatus(bool $sendable, ?string $status): string
-    {
-        return $sendable ? ($status ?? 'draft') : 'draft';
-    }
-
-    /**
-     * The publish_status pipeline governs the website archive alone, so an issue
-     * that is not published can never be scheduled or live.
+     * The website side: [status, date].
      *
-     * Switching the website off on a LIVE issue is a withdrawal, so it lands on
-     * hidden rather than draft: Published -> Draft is barred, and forcing it would
-     * 422 on a field the form has already hidden — a save that silently does
-     * nothing. Hidden also keeps published_at, so re-publishing remembers.
+     * Off means draft with no date — the command skips it. Switching it off on a
+     * LIVE issue is a withdrawal, so it lands on hidden rather than draft:
+     * Published -> Draft is barred, and forcing it would 422 on a field the form
+     * has already hidden, a save that silently does nothing. Hidden keeps
+     * published_at, so re-publishing remembers when it first went live.
+     *
+     * @return array{0: string, 1: mixed}
      */
-    protected function publicationStatus(bool $published, ?string $status, ?Newsletter $newsletter = null): string
+    protected function publicationState(bool $on, ?string $status, ?string $date, ?Newsletter $existing = null): array
     {
-        if ($published) {
-            return $status ?? 'draft';
+        if (! $on) {
+            return $existing?->published_status instanceof Published
+                ? ['hidden', $existing->published_at]
+                : ['draft', null];
         }
 
-        return $newsletter?->publish_status instanceof PublicationPublished ? 'hidden' : 'draft';
+        // Picking published means "put it up now": schedule it for this instant and
+        // let newsletters:publish-scheduled make it live. Already live is a re-save,
+        // not a re-publish — stay put and keep the original date.
+        if ($status === 'published') {
+            return $existing?->published_status instanceof Published
+                ? ['published', $existing->published_at]
+                : ['scheduled', now()];
+        }
+
+        return [$status ?? 'draft', $date];
     }
 
     /**
-     * Once the jobs are out the content is already on its way to real inboxes —
-     * editing or deleting it would only rewrite our copy of history.
+     * The email side: [status, date]. Reads exactly like publicationState.
+     *
+     * Off means draft with no date. Switching it off on an issue that was already
+     * SENT leaves it sent and keeps sent_at: Sent -> Draft is barred, and the mail
+     * genuinely went out, so pretending otherwise would lose history.
+     *
+     * @return array{0: string, 1: mixed}
      */
-    protected function guardInFlight(Newsletter $newsletter, string $action): void
+    protected function sendState(bool $on, ?string $status, ?string $date, ?Newsletter $existing = null): array
     {
-        if ($newsletter->status instanceof Sending || $newsletter->status instanceof Sent) {
-            throw ValidationException::withMessages([
-                'status' => "This newsletter is {$newsletter->status->getValue()} and can no longer be {$action}.",
-            ]);
+        if (! $on) {
+            return $existing?->sent_status instanceof Sent
+                ? ['sent', $existing->sent_at]
+                : ['draft', null];
         }
+
+        // Picking sent means "send it now": schedule it for this instant and let
+        // newsletters:send-scheduled dispatch the jobs. Already sent is a re-save,
+        // not a re-send — editing the subject of a sent issue must not mail it out
+        // again. Re-sending is an explicit move back to scheduled, which the UI
+        // confirms first.
+        if ($status === 'sent') {
+            return $existing?->sent_status instanceof Sent
+                ? ['sent', $existing->sent_at]
+                : ['scheduled', now()];
+        }
+
+        return [$status ?? 'draft', $date];
     }
 }

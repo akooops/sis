@@ -104,8 +104,8 @@
         badge={viewing ? { label: PAGE_STATUS_LABELS[viewing.status] ?? viewing.status, variant: PAGE_STATUS_VARIANTS[viewing.status] ?? 'secondary' } : null}
         fields={[
             { label: 'Slug', value: viewing?.slug },
-            { label: 'Published at', value: viewing?.published_at ?? '—' },
-            { label: 'Stylesheet', value: viewing?.css_url || '—' },
+            { label: 'Published at', value: viewing?.published_at ?? '' },
+            { label: 'Stylesheet', value: viewing?.css_url || '' },
             { label: 'System page', value: viewing?.is_system ? 'Yes' : 'No' },
         ]}
         createdAt={viewing?.created_at}
@@ -180,9 +180,9 @@
             {PAGE_STATUS_LABELS[row.status] ?? row.status}
         </Badge>
     {:else if column.key === 'published_at'}
-        {#if row.published_at}<DateTime value={row.published_at} />{:else}<span class="text-xs text-muted-foreground">—</span>{/if}
+        {#if row.published_at}<DateTime value={row.published_at} />{:else}{/if}
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

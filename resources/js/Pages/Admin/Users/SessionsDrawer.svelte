@@ -82,7 +82,7 @@
     /** The row's details table — everything the one-line summary leaves out. */
     function details(row) {
         return [
-            { label: 'IP address', value: row.ip_address ?? '—' },
+            { label: 'IP address', value: row.ip_address ?? '' },
             { label: 'Device', value: row.user_agent ?? 'Unknown device' },
             { label: 'Last active', value: formatDateTime(row.last_activity) },
             { label: 'Signed in', value: formatDateTime(row.created_at) },
@@ -170,7 +170,7 @@
 
                         <div class="flex min-w-0 grow flex-col gap-1.5">
                             <div class="flex min-w-0 flex-wrap items-center gap-2">
-                                <span class="text-sm font-medium text-mono">{row.ip_address ?? '—'}</span>
+                                <span class="text-sm font-medium text-mono">{row.ip_address ?? ''}</span>
                                 {#if row.is_current}
                                     <Badge variant="success" size="sm">This device</Badge>
                                 {/if}

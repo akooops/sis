@@ -74,7 +74,7 @@ class ShipNewsletter implements ShouldQueue
         // The admin writes the placeholders once; each recipient gets their own values.
         // One strtr over a map, so a third token is one more array line.
         $body = strtr((string) $newsletter->content, [
-            Newsletter::UNSUBSCRIBE_PLACEHOLDER => route('web.user.newsletter-groups.unsubscribe', ['email' => $subscriber->email]),
+            Newsletter::UNSUBSCRIBE_PLACEHOLDER => $subscriber->unsubscribeUrl(),
             Newsletter::EMAIL_PLACEHOLDER => $subscriber->email,
         ]);
 

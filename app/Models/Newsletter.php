@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\States\Newsletter\NewsletterStatus;
 use App\States\NewsletterPublication\NewsletterPublicationStatus;
 use App\States\NewsletterPublication\Published;
+use App\States\NewsletterSend\NewsletterSendStatus;
 use App\Traits\Translations\HasEnabledTranslations;
 use App\Traits\Uploads\HasMedia;
 use Illuminate\Database\Eloquent\Builder;
@@ -26,10 +26,10 @@ use Spatie\Translatable\HasTranslations;
  * because the body is written once, in whatever language it is written in. Only
  * the public `title` is translated.
  *
- * Two pipelines, never conflated: publish_status + published_at decide when the
- * website archive shows it (newsletters:publish-scheduled), status +
- * scheduled_at/sent_at decide when it is emailed (newsletters:send-scheduled).
- * Neither is ever immediate, and neither reads the other.
+ * TWO independent sides, each Article-shaped — one status and one date that is the
+ * schedule while pending and the moment it happened once done:
+ * published_status + published_at is the website archive (newsletters:publish-scheduled),
+ * sent_status + sent_at is the email broadcast (newsletters:send-scheduled).
  */
 class Newsletter extends Model
 {
@@ -66,12 +66,11 @@ class Newsletter extends Model
     protected $appends = ['file_url'];
 
     protected $casts = [
-        'status' => NewsletterStatus::class,
-        'publish_status' => NewsletterPublicationStatus::class,
+        'published_status' => NewsletterPublicationStatus::class,
+        'sent_status' => NewsletterSendStatus::class,
         'is_published' => 'boolean',
         'is_sendable' => 'boolean',
         'published_at' => 'datetime',
-        'scheduled_at' => 'datetime',
         'sent_at' => 'datetime',
     ];
 
@@ -108,11 +107,11 @@ class Newsletter extends Model
      4. Methods
     ------------------------------------------*/
 
-    /** Issues the public archive may serve — the switch on, and the pipeline live. */
+    /** Issues the archive may serve — the switch on, and the website side live. */
     public function scopeLive(Builder $query): Builder
     {
         return $query->where('is_published', true)
-            ->whereState('publish_status', Published::class);
+            ->whereState('published_status', Published::class);
     }
 
     /**

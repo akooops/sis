@@ -11,9 +11,9 @@ use Spatie\ModelStates\Exceptions\TransitionNotFound;
 /**
  * Put scheduled newsletters in the website archive once published_at has passed.
  *
- * The website pipeline only: it never reads or writes the email `status`, and
- * newsletters:send-scheduled never touches publish_status. An issue can be live on
- * the site and unsent, or sent and unlisted — the two are independent.
+ * The website side only: it never reads or writes sent_status, and
+ * newsletters:send-scheduled never touches published_status. An issue can be live
+ * on the site and unsent, or sent and unlisted — the two are independent.
  *
  * Not a pruning sweep, so the "Prunable + model:prune, never a bespoke command"
  * rule does not apply — this is a state transition that must fire model events so
@@ -31,10 +31,10 @@ class PublishScheduledNewsletters extends Command
     {
         $published = 0;
 
-        // The (publish_status, published_at) index serves this; cursor() streams the rows.
+        // The (published_status, published_at) index serves this; cursor() streams the rows.
         $due = Newsletter::query()
-            ->whereState('publish_status', Scheduled::class)
-            // A send-only issue is never listed, whatever its publish_status says.
+            ->whereState('published_status', Scheduled::class)
+            // A send-only issue is never listed, whatever its published_status says.
             ->where('is_published', true)
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
@@ -42,10 +42,11 @@ class PublishScheduledNewsletters extends Command
 
         foreach ($due->cursor() as $newsletter) {
             try {
-                $newsletter->publish_status->transitionTo(Published::class);
+                // published_at is left alone: the scheduled moment IS when it went live.
+                $newsletter->published_status->transitionTo(Published::class);
                 $published++;
             } catch (TransitionNotFound) {
-                $this->warn("Skipped {$newsletter->name}: {$newsletter->publish_status->getValue()} cannot become published.");
+                $this->warn("Skipped {$newsletter->name}: {$newsletter->published_status->getValue()} cannot become published.");
             }
         }
 

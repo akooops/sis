@@ -86,7 +86,7 @@
             <Badge variant={row.is_enabled ? 'success' : 'secondary'}>{row.is_enabled ? 'On' : 'Off'}</Badge>
         {/if}
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

@@ -190,6 +190,14 @@
                 height: untrack(() => height),
                 directionality: untrack(() => (rtl ? 'rtl' : 'ltr')),
 
+                // TinyMCE validates against the HTML5 schema, where <style> is a
+                // <head> element — so a <style> block typed into the source view is
+                // body content with no valid parent, and it is silently dropped on
+                // OK. Naming it a legal child of body is the whole fix. Inline
+                // style="" attributes were never affected.
+                valid_children: '+body[style]',
+                extended_valid_elements: 'style[type|media]',
+
                 promotion: false,
                 branding: false,
                 menubar: false,

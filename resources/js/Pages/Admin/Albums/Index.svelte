@@ -104,8 +104,8 @@
         fields={[
             { label: 'Slug', value: viewing?.slug },
             { label: 'Files', value: String(viewing?.files?.length ?? 0) },
-            { label: 'Published at', value: viewing?.published_at ?? '—' },
-            { label: 'Stylesheet', value: viewing?.css_url || '—' },
+            { label: 'Published at', value: viewing?.published_at ?? '' },
+            { label: 'Stylesheet', value: viewing?.css_url || '' },
         ]}
         collections={viewing?.files?.length ? [{ label: 'Album files', items: viewing.files }] : []}
         createdAt={viewing?.created_at}
@@ -184,9 +184,9 @@
             {ALBUM_STATUS_LABELS[row.status] ?? row.status}
         </Badge>
     {:else if column.key === 'published_at'}
-        {#if row.published_at}<DateTime value={row.published_at} />{:else}<span class="text-xs text-muted-foreground">—</span>{/if}
+        {#if row.published_at}<DateTime value={row.published_at} />{:else}{/if}
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

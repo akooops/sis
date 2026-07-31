@@ -123,7 +123,7 @@
         subheading={viewing?.name ? viewing.email : null}
         badge={viewing ? { label: viewing.is_active ? 'Active' : 'Inactive', variant: viewing.is_active ? 'success' : 'secondary' } : null}
         fields={[
-            { label: 'Group', value: viewing?.group?.name || '—' },
+            { label: 'Group', value: viewing?.group?.name || '' },
             { label: 'Email', value: viewing?.email },
             { label: 'Subscribed', value: formatDateTime(viewing?.subscribed_at) },
         ]}
@@ -182,7 +182,7 @@
                 <ClampText value={row.name} maxWidth="200px" title={row.name} />
             </span>
         {:else}
-            <span class="text-xs text-muted-foreground">—</span>
+            
         {/if}
     {:else if column.key === 'email'}
         <span class="text-sm text-mono">
@@ -194,14 +194,14 @@
                 <ClampText value={row.group.name} maxWidth="180px" title={row.group.name} />
             </Badge>
         {:else}
-            <span class="text-xs text-muted-foreground">—</span>
+            
         {/if}
     {:else if column.key === 'is_active'}
         <Badge variant={row.is_active ? 'success' : 'secondary'}>{row.is_active ? 'Active' : 'Inactive'}</Badge>
     {:else if column.key === 'subscribed_at'}
-        {#if row.subscribed_at}<DateTime value={row.subscribed_at} />{:else}<span class="text-xs text-muted-foreground">—</span>{/if}
+        {#if row.subscribed_at}<DateTime value={row.subscribed_at} />{:else}{/if}
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

@@ -86,7 +86,7 @@
         badge={viewing ? { label: viewing.code, variant: 'secondary' } : null}
         fields={[
             { label: 'Code', value: viewing?.code },
-            { label: 'Alpha-3', value: viewing?.alpha3 || '—' },
+            { label: 'Alpha-3', value: viewing?.alpha3 || '' },
             { label: 'Status', value: viewing?.is_enabled ? 'Enabled' : 'Disabled' },
         ]}
         createdAt={viewing?.created_at}
@@ -151,14 +151,14 @@
         {#if defaultLocale && row.nationality?.[defaultLocale]}
             <span class="text-sm text-mono">{row.nationality[defaultLocale]}</span>
         {:else}
-            <span class="text-xs text-muted-foreground">—</span>
+            
         {/if}
     {:else if column.key === 'is_enabled'}
         <Badge variant={row.is_enabled ? 'success' : 'secondary'}>
             {row.is_enabled ? 'Enabled' : 'Disabled'}
         </Badge>
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

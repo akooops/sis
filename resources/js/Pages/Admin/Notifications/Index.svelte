@@ -124,8 +124,8 @@
         heading={viewing?.title}
         badge={viewing ? { label: viewing.is_read ? 'Read' : 'Unread', variant: viewing.is_read ? 'secondary' : 'primary' } : null}
         fields={[
-            { label: 'Type', value: viewing?.type_name ?? '—' },
-            { label: 'Message', value: viewing?.body ?? '—' },
+            { label: 'Type', value: viewing?.type_name ?? '' },
+            { label: 'Message', value: viewing?.body ?? '' },
             { label: 'Received', date: viewing?.created_at },
             { label: 'Read', date: viewing?.read_at },
         ]}
@@ -184,7 +184,7 @@
     {:else if column.key === 'is_read'}
         <Badge variant={row.is_read ? 'secondary' : 'primary'}>{row.is_read ? 'Read' : 'Unread'}</Badge>
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

@@ -76,7 +76,7 @@
                   // "none" — say so rather than showing a blank.
                   { label: 'Allowed IPs', value: viewing.allowed_ips?.length ? viewing.allowed_ips.join(', ') : 'Any IP' },
                   { label: 'Last used', date: viewing.last_used_at },
-                  { label: 'Last used IP', value: viewing.last_used_ip || '—' },
+                  { label: 'Last used IP', value: viewing.last_used_ip || '' },
                   { label: 'Expires at', date: viewing.expires_at },
                   { label: 'Revoked at', date: viewing.revoked_at },
               ]
@@ -163,11 +163,11 @@
     {:else if column.key === 'status'}
         <Badge variant={row.is_active ? 'success' : 'secondary'}>{row.is_active ? 'Active' : 'Inactive'}</Badge>
     {:else if column.key === 'last_used_at'}
-        {#if row.last_used_at}<DateTime value={row.last_used_at} />{:else}<span class="text-muted-foreground">—</span>{/if}
+        {#if row.last_used_at}<DateTime value={row.last_used_at} />{:else}{/if}
     {:else if column.key === 'created_at'}
         <DateTime value={row.created_at} />
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

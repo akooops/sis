@@ -73,12 +73,12 @@
 
     /** One line for the drawer: the address, or the type and the record's name. */
     function linkSummary(row) {
-        if (!row) return '—';
+        if (!row) return '';
         const kind = linkKind(row);
         if (!kind) return 'No link';
         if (kind === 'url') return row.url;
 
-        return `${linkKindLabel(kind)} — ${linkTarget(row) ?? '—'}`;
+        return `${linkKindLabel(kind)} — ${linkTarget(row) ?? ''}`;
     }
 
     const create = () => { editing = null; showForm = true; };
@@ -126,9 +126,9 @@
         badge={viewing ? { label: BANNER_STATUS_LABELS[viewing.status] ?? viewing.status, variant: BANNER_STATUS_VARIANTS[viewing.status] ?? 'secondary' } : null}
         fields={[
             { label: 'Link', value: linkSummary(viewing) },
-            { label: 'Published at', value: viewing?.published_at ?? '—' },
+            { label: 'Published at', value: viewing?.published_at ?? '' },
             { label: 'Video', value: viewing?.video_url ? 'Yes' : 'No' },
-            { label: 'Position', value: viewing ? String(viewing.order + 1) : '—' },
+            { label: 'Position', value: viewing ? String(viewing.order + 1) : '' },
         ]}
         createdAt={viewing?.created_at}
         updatedAt={viewing?.updated_at}
@@ -215,18 +215,18 @@
                 </span>
             </div>
         {:else}
-            <span class="text-xs text-muted-foreground">—</span>
+            
         {/if}
     {:else if column.key === 'status'}
         <Badge variant={BANNER_STATUS_VARIANTS[row.status] ?? 'secondary'}>
             {BANNER_STATUS_LABELS[row.status] ?? row.status}
         </Badge>
     {:else if column.key === 'published_at'}
-        {#if row.published_at}<DateTime value={row.published_at} />{:else}<span class="text-xs text-muted-foreground">—</span>{/if}
+        {#if row.published_at}<DateTime value={row.published_at} />{:else}{/if}
     {:else if column.key === 'order'}
         <Badge variant="secondary">{row.order + 1}</Badge>
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

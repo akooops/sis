@@ -164,10 +164,10 @@
         {#if row.is_system}
             <Badge variant="info">System</Badge>
         {:else}
-            <span class="text-xs text-muted-foreground">—</span>
+            
         {/if}
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

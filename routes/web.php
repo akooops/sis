@@ -65,7 +65,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
 /*------------------------
 | Public (no auth — reached from an email)
 |------------------------*/
-Route::get('newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe'])->name('web.user.newsletter-groups.unsubscribe');
+Route::get('newsletter/unsubscribe/{signature}', [NewsletterController::class, 'unsubscribe'])->name('web.user.newsletter-groups.unsubscribe');
 
 /*------------------------
 | Root

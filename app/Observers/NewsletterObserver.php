@@ -27,8 +27,8 @@ class NewsletterObserver extends BaseObserver
      */
     protected function loggedOnDelete(): array
     {
-        // Both pipelines: a deleted issue still records whether it had been public.
-        return ['name', 'subject', 'status', 'publish_status', 'published_at'];
+        // Both sides: a deleted issue still records whether it went public and whether it went out.
+        return ['name', 'subject', 'published_status', 'published_at', 'sent_status', 'sent_at'];
     }
 
     /**

@@ -111,7 +111,7 @@
         heading={viewing?.name}
         badge={viewing ? { label: `Position ${viewing.order + 1}`, variant: 'secondary' } : null}
         fields={[
-            { label: 'Program', value: viewing?.program?.name || '—' },
+            { label: 'Program', value: viewing?.program?.name || '' },
         ]}
         collections={viewing?.guidelines?.length ? [{ label: 'Guidelines', items: viewing.guidelines }] : []}
         createdAt={viewing?.created_at}
@@ -180,12 +180,12 @@
                 <ClampText value={row.program.name} maxWidth="180px" title={row.program.name} />
             </Badge>
         {:else}
-            <span class="text-xs text-muted-foreground">—</span>
+            
         {/if}
     {:else if column.key === 'order'}
         <Badge variant="secondary">{row.order + 1}</Badge>
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

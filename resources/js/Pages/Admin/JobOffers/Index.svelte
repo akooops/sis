@@ -146,16 +146,16 @@
         badge={viewing ? { label: JOB_OFFER_STATUS_LABELS[viewing.status] ?? viewing.status, variant: JOB_OFFER_STATUS_VARIANTS[viewing.status] ?? 'secondary' } : null}
         fields={[
             { label: 'Slug', value: viewing?.slug },
-            { label: 'Category', value: viewing?.category?.name || '—' },
-            { label: 'Employment type', value: EMPLOYMENT_TYPE_LABELS[viewing?.employment_type] ?? viewing?.employment_type ?? '—' },
-            { label: 'Work mode', value: WORK_MODE_LABELS[viewing?.work_mode] ?? viewing?.work_mode ?? '—' },
+            { label: 'Category', value: viewing?.category?.name || '' },
+            { label: 'Employment type', value: EMPLOYMENT_TYPE_LABELS[viewing?.employment_type] ?? viewing?.employment_type ?? '' },
+            { label: 'Work mode', value: WORK_MODE_LABELS[viewing?.work_mode] ?? viewing?.work_mode ?? '' },
             { label: 'Experience', value: experienceLabel(viewing?.experience_years) },
             { label: 'Education', value: EDUCATION_LEVEL_LABELS[viewing?.education_level] ?? 'Unspecified' },
             { label: 'Start date', date: viewing?.start_date },
             { label: 'Deadline', date: viewing?.deadline_at },
             { label: 'Applications', value: viewing?.is_open ? 'Open' : 'Closed' },
-            { label: 'Published at', value: viewing?.published_at ?? '—' },
-            { label: 'Stylesheet', value: viewing?.css_url || '—' },
+            { label: 'Published at', value: viewing?.published_at ?? '' },
+            { label: 'Stylesheet', value: viewing?.css_url || '' },
         ]}
         createdAt={viewing?.created_at}
         updatedAt={viewing?.updated_at}
@@ -235,10 +235,10 @@
                 {/if}
             </span>
         {:else}
-            <span class="text-xs text-muted-foreground">—</span>
+            
         {/if}
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

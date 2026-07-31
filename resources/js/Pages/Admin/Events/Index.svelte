@@ -117,8 +117,8 @@
             { label: 'Slug', value: viewing?.slug },
             { label: 'Starts at', date: viewing?.start_at },
             { label: 'Ends at', date: viewing?.end_at },
-            { label: 'Published at', value: viewing?.published_at ?? '—' },
-            { label: 'Stylesheet', value: viewing?.css_url || '—' },
+            { label: 'Published at', value: viewing?.published_at ?? '' },
+            { label: 'Stylesheet', value: viewing?.css_url || '' },
         ]}
         createdAt={viewing?.created_at}
         updatedAt={viewing?.updated_at}
@@ -193,9 +193,9 @@
     {:else if column.key === 'end_at'}
         <DateTime value={row.end_at} />
     {:else if column.key === 'published_at'}
-        {#if row.published_at}<DateTime value={row.published_at} />{:else}<span class="text-xs text-muted-foreground">—</span>{/if}
+        {#if row.published_at}<DateTime value={row.published_at} />{:else}{/if}
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

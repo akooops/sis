@@ -73,7 +73,7 @@
             ? [
                   { label: 'Username', value: viewing.username },
                   { label: 'Email', value: viewing.email },
-                  { label: 'Phone', value: viewing.phone || '—' },
+                  { label: 'Phone', value: viewing.phone || '' },
               ]
             : [],
     );
@@ -230,7 +230,7 @@
     {:else if column.key === 'created_at'}
         <DateTime value={row.created_at} />
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

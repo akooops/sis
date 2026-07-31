@@ -13,25 +13,28 @@ use Illuminate\Http\Response;
  */
 class NewsletterController extends Controller
 {
-    public function unsubscribe(Request $request): Response
+    /**
+     * Both the signature and the email must match the SAME row. The signature is
+     * what makes the link unguessable; the email means a signature on its own —
+     * copied from a forwarded mail, say — cannot unsubscribe somebody else.
+     *
+     * Still a GET, so a link-prefetching mail scanner can trigger it on the
+     * recipient's behalf. The remaining fix is a POST confirmation page.
+     */
+    public function unsubscribe(Request $request, string $signature): Response
     {
-        // Known limitation: the link carries only an email, so anyone can unsubscribe
-        // anyone and a link-prefetching mail scanner can do it for the recipient —
-        // move to URL::signedRoute or a per-subscriber token when this stops being a stub.
-        $email = $request->validate(['email' => ['required', 'email']])['email'];
+        $email = (string) $request->query('email');
 
         // Iterate: a builder update fires no events, so the observer would audit nothing.
-        $subscribers = NewsletterGroupSubscriber::query()
+        NewsletterGroupSubscriber::query()
+            ->where('signature', $signature)
             ->where('email', $email)
             ->where('is_active', true)
-            ->get();
+            ->get()
+            ->each(fn (NewsletterGroupSubscriber $subscriber) => $subscriber->update(['is_active' => false]));
 
-        foreach ($subscribers as $subscriber) {
-            $subscriber->update(['is_active' => false]);
-        }
-
-        // Unknown and already-inactive addresses get this same answer: a 404 would
-        // tell a stranger which addresses are on our lists.
+        // A wrong pair, an unknown signature and an already-inactive row all get
+        // this same answer: anything else would let a stranger probe the list.
         return response('You have been unsubscribed and will no longer receive these emails.')
             ->header('Content-Type', 'text/plain');
     }

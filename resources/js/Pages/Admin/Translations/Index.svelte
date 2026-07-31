@@ -202,7 +202,7 @@
             onsave={(v) => save(row, v)}
         />
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

@@ -179,7 +179,7 @@
     {:else if column.key === 'order'}
         <Badge variant="secondary">{row.order + 1}</Badge>
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

@@ -109,7 +109,7 @@
         id={viewing?.id}
         heading={viewing?.name}
         fields={[
-            { label: 'Program', value: viewing?.program?.name || '—' },
+            { label: 'Program', value: viewing?.program?.name || '' },
             { label: 'Slug', value: viewing?.slug },
             { label: 'Colour', value: viewing?.color },
             { label: 'Order', value: viewing ? `Position ${viewing.order + 1}` : null },
@@ -187,7 +187,7 @@
                 <ClampText value={row.program.name} maxWidth="160px" title={row.program.name} />
             </Badge>
         {:else}
-            <span class="text-xs text-muted-foreground">—</span>
+            
         {/if}
     {:else if column.key === 'slug'}
         <Badge variant="secondary">
@@ -197,7 +197,7 @@
         <!-- Position within its program, so the same number recurs across programs. -->
         <Badge variant="secondary">{row.order + 1}</Badge>
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

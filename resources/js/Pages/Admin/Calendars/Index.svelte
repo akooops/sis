@@ -100,7 +100,7 @@
         id={viewing?.id}
         heading={viewing?.name}
         fields={[
-            { label: 'File', value: viewing?.file_name || '—' },
+            { label: 'File', value: viewing?.file_name || '' },
             { label: 'Start date', value: formatDate(viewing?.start_date) },
             { label: 'End date', value: formatDate(viewing?.end_date) },
             { label: 'Status', value: viewing?.is_active ? 'Active' : 'Inactive' },
@@ -183,7 +183,7 @@
             <Badge variant="secondary">Missing</Badge>
         {/if}
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

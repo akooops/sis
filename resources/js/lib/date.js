@@ -36,7 +36,7 @@ function toDate(value) {
  * @param {string} [fallback]
  * @param {string} [locale]
  */
-function format(value, options, fallback = '—', locale) {
+function format(value, options, fallback = '', locale) {
     const date = toDate(value);
     if (!date) return fallback;
     try {
@@ -47,12 +47,12 @@ function format(value, options, fallback = '—', locale) {
 }
 
 /** e.g. "13 Jul 2026" */
-export function formatDate(value, { fallback = '—', locale } = {}) {
+export function formatDate(value, { fallback = '', locale } = {}) {
     return format(value, { day: '2-digit', month: 'short', year: 'numeric' }, fallback, locale);
 }
 
 /** e.g. "13 Jul 2026, 14:32" (local time) */
-export function formatDateTime(value, { fallback = '—', locale } = {}) {
+export function formatDateTime(value, { fallback = '', locale } = {}) {
     return format(
         value,
         { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' },
@@ -62,7 +62,7 @@ export function formatDateTime(value, { fallback = '—', locale } = {}) {
 }
 
 /** e.g. "14:32" (local time) */
-export function formatTime(value, { fallback = '—', locale } = {}) {
+export function formatTime(value, { fallback = '', locale } = {}) {
     return format(value, { hour: '2-digit', minute: '2-digit' }, fallback, locale);
 }
 
@@ -70,7 +70,7 @@ export function formatTime(value, { fallback = '—', locale } = {}) {
  * Relative time, e.g. "3 hours ago" / "in 2 days".
  * @param {string | number | Date | null | undefined} value
  */
-export function formatRelative(value, { fallback = '—', locale } = {}) {
+export function formatRelative(value, { fallback = '', locale } = {}) {
     const date = toDate(value);
     if (!date) return fallback;
 

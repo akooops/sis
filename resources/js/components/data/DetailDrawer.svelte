@@ -106,7 +106,7 @@
                             {#if field.date}
                                 <DateTime value={field.date} />
                             {:else}
-                                <ClampText value={field.value ?? '—'} lines={4} toggle copy />
+                                <ClampText value={field.value ?? ''} lines={4} toggle copy />
                             {/if}
                         </dd>
                     </div>

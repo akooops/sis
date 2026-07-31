@@ -19,7 +19,7 @@
      */
     import Spinner from '@/components/ui/Spinner.svelte';
 
-    let { value = '', placeholder = '—', disabled = false, onsave } = $props();
+    let { value = '', placeholder = '', disabled = false, onsave } = $props();
 
     let draft = $state(value ?? '');
     let saving = $state(false);

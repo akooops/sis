@@ -11,8 +11,9 @@ use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 /**
- * Same two switches as create, but the title arrives as the full locale map —
- * errors come back keyed `title.ar`. Omitting `file` keeps the current one.
+ * Same two switches and two statuses as create, but the title arrives as the full
+ * locale map — errors come back keyed `title.ar`. Omitting `file` keeps the
+ * current one.
  */
 class UpdateNewsletterData extends Data
 {
@@ -22,13 +23,13 @@ class UpdateNewsletterData extends Data
      */
     public function __construct(
         public string $name,
-        public ?string $publish_status,
-        public ?string $published_at,
         public ?string $subject,
         public ?string $content,
         public ?string $integration_id,
-        public ?string $status,
-        public ?string $scheduled_at,
+        public ?string $published_status,
+        public ?string $published_at,
+        public ?string $sent_status,
+        public ?string $sent_at,
         public string|Optional|null $file = null,
         public array $title = [],
         public bool $is_published = false,
@@ -44,8 +45,8 @@ class UpdateNewsletterData extends Data
         // Checkboxes arrive as booleans over JSON but as "1"/"0" over form data.
         $published = filter_var($context->payload['is_published'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $sendable = filter_var($context->payload['is_sendable'] ?? true, FILTER_VALIDATE_BOOLEAN);
-        $status = $context->payload['status'] ?? 'draft';
-        $publishStatus = $context->payload['publish_status'] ?? 'draft';
+        $publishedStatus = $context->payload['published_status'] ?? 'draft';
+        $sentStatus = $context->payload['sent_status'] ?? 'draft';
 
         $rules = [
             'name' => ['required', 'string', 'max:255'],
@@ -69,15 +70,15 @@ class UpdateNewsletterData extends Data
                 ? ['required', 'array:'.implode(',', $codes)]
                 : ['sometimes', 'array:'.implode(',', $codes)],
 
-            // The archive pipeline, independent of `status` below.
-            // Not published: the controller forces draft and clears the date.
-            'publish_status' => $published
+            // Hidden is reachable now — the issue may already have been public.
+            // Not published: the controller decides, so whatever arrives is ignored.
+            'published_status' => $published
                 ? ['required', Rule::in(['draft', 'scheduled', 'published', 'hidden'])]
                 : ['nullable', Rule::in(['draft', 'scheduled', 'published', 'hidden'])],
-            // Only a schedule asks for a date; publishing is stamped by the controller.
-            'published_at' => $published
-                ? ($publishStatus === 'scheduled' ? ['required', 'date', 'after:now'] : ['nullable', 'date'])
-                : ['prohibited'],
+            // Only a schedule asks for a date; picking published is a schedule for now.
+            'published_at' => $published && $publishedStatus === 'scheduled'
+                ? ['required', 'date', 'after:now']
+                : ['nullable', 'date'],
 
             /* --- Email side --- */
 
@@ -86,19 +87,24 @@ class UpdateNewsletterData extends Data
                 : ['nullable', 'string', 'max:255'],
             'content' => $sendable ? ['required', 'string'] : ['nullable', 'string'],
 
-            'integration_id' => ['nullable', 'string', Rule::exists('integrations', 'id')->where(
-                fn ($query) => $query->whereIn('integration_type_id', IntegrationType::query()->where('code', 'email')->select('id'))
-            )],
+            // Required on the email side — see StoreNewsletterData.
+            'integration_id' => [
+                $sendable ? 'required' : 'nullable',
+                'string',
+                Rule::exists('integrations', 'id')->where(
+                    fn ($query) => $query->whereIn('integration_type_id', IntegrationType::query()->where('code', 'email')->select('id'))
+                ),
+            ],
 
             'group_ids' => $sendable ? ['required', 'array', 'min:1'] : ['nullable', 'array'],
             'group_ids.*' => ['string', 'exists:newsletter_groups,id'],
 
-            // The API can only ever put a newsletter back to draft or re-queue it.
-            // Not sendable: the controller forces draft and clears the schedule.
-            'status' => $sendable
-                ? ['required', Rule::in(['draft', 'scheduled'])]
-                : ['nullable', Rule::in(['draft', 'scheduled'])],
-            'scheduled_at' => $sendable && $status === 'scheduled'
+            // 'failed' never comes from a client — only the command writes it.
+            'sent_status' => $sendable
+                ? ['required', Rule::in(['draft', 'scheduled', 'sent'])]
+                : ['nullable', Rule::in(['draft', 'scheduled', 'sent'])],
+            // Only a schedule asks for a date; picking sent is a schedule for now.
+            'sent_at' => $sendable && $sentStatus === 'scheduled'
                 ? ['required', 'date', 'after:now']
                 : ['nullable', 'date'],
         ];

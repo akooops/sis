@@ -114,10 +114,10 @@
         badge={viewing ? { label: ACHIEVEMENT_STATUS_LABELS[viewing.status] ?? viewing.status, variant: ACHIEVEMENT_STATUS_VARIANTS[viewing.status] ?? 'secondary' } : null}
         fields={[
             { label: 'Slug', value: viewing?.slug },
-            { label: 'Category', value: viewing?.category?.name || '—' },
-            { label: 'Achieved on', value: viewing?.achieved_at ?? '—' },
-            { label: 'Published at', value: viewing?.published_at ?? '—' },
-            { label: 'Stylesheet', value: viewing?.css_url || '—' },
+            { label: 'Category', value: viewing?.category?.name || '' },
+            { label: 'Achieved on', value: viewing?.achieved_at ?? '' },
+            { label: 'Published at', value: viewing?.published_at ?? '' },
+            { label: 'Stylesheet', value: viewing?.css_url || '' },
         ]}
         createdAt={viewing?.created_at}
         updatedAt={viewing?.updated_at}
@@ -189,7 +189,7 @@
                 <ClampText value={row.category.name} maxWidth="140px" title={row.category.name} />
             </Badge>
         {:else}
-            <span class="text-xs text-muted-foreground">—</span>
+            
         {/if}
     {:else if column.key === 'achieved_at'}
         <DateTime value={row.achieved_at} />
@@ -198,9 +198,9 @@
             {ACHIEVEMENT_STATUS_LABELS[row.status] ?? row.status}
         </Badge>
     {:else if column.key === 'published_at'}
-        {#if row.published_at}<DateTime value={row.published_at} />{:else}<span class="text-xs text-muted-foreground">—</span>{/if}
+        {#if row.published_at}<DateTime value={row.published_at} />{:else}{/if}
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

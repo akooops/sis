@@ -120,12 +120,12 @@
                                 {#if column.truncate === false}
                                     <!-- Rich cell (badges/avatar/id): bound the width, wrap naturally. -->
                                     <div class="overflow-hidden" style="max-width:{column.maxWidth ?? '260px'}">
-                                        {#if cells}{@render cells(row, column)}{:else}{row[column.key] ?? '—'}{/if}
+                                        {#if cells}{@render cells(row, column)}{:else}{row[column.key] ?? ''}{/if}
                                     </div>
                                 {:else}
                                     <!-- Text cell: single-line, fade + primary … (non-toggling). -->
                                     <ClampText maxWidth={column.maxWidth ?? '260px'} title={cellTitle(row, column)}>
-                                        {#snippet children()}{#if cells}{@render cells(row, column)}{:else}{row[column.key] ?? '—'}{/if}{/snippet}
+                                        {#snippet children()}{#if cells}{@render cells(row, column)}{:else}{row[column.key] ?? ''}{/if}{/snippet}
                                     </ClampText>
                                 {/if}
                             </td>

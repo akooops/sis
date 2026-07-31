@@ -96,13 +96,13 @@
     {:else if column.key === 'code'}
         <span class="font-mono text-xs text-mono">{row.code}</span>
     {:else if column.key === 'supports_web'}
-        {#if row.supports_web}<Badge variant="success">Yes</Badge>{:else}<span class="text-muted-foreground">—</span>{/if}
+        {#if row.supports_web}<Badge variant="success">Yes</Badge>{:else}{/if}
     {:else if column.key === 'supports_api'}
-        {#if row.supports_api}<Badge variant="success">Yes</Badge>{:else}<span class="text-muted-foreground">—</span>{/if}
+        {#if row.supports_api}<Badge variant="success">Yes</Badge>{:else}{/if}
     {:else if column.key === 'created_at'}
         <DateTime value={row.created_at} />
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

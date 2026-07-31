@@ -98,7 +98,7 @@
             { label: 'Default', value: viewing?.is_default ? 'Yes' : 'No' },
             { label: 'Direction', value: viewing?.is_rtl ? 'Right-to-left' : 'Left-to-right' },
             { label: 'Status', value: viewing?.is_enabled ? 'Enabled' : 'Disabled' },
-            { label: 'Lang folder', value: viewing ? `lang/${viewing.code}` : '—' },
+            { label: 'Lang folder', value: viewing ? `lang/${viewing.code}` : '' },
         ]}
         createdAt={viewing?.created_at}
         updatedAt={viewing?.updated_at}
@@ -158,7 +158,7 @@
         {#if row.is_default}
             <Badge variant="primary">Default</Badge>
         {:else}
-            <span class="text-xs text-muted-foreground">—</span>
+            
         {/if}
     {:else if column.key === 'is_rtl'}
         <Badge variant="secondary">{row.is_rtl ? 'RTL' : 'LTR'}</Badge>
@@ -167,7 +167,7 @@
             {row.is_enabled ? 'Enabled' : 'Disabled'}
         </Badge>
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

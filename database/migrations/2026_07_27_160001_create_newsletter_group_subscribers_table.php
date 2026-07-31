@@ -11,8 +11,10 @@ return new class extends Migration
         Schema::create('newsletter_group_subscribers', function (Blueprint $table) {
             $table->ulid('id')->primary();
 
-            $table->string('email');
             $table->string('name')->nullable();
+
+            $table->string('signature', 64)->unique();
+            $table->string('email');
 
             $table->boolean('is_active')->default(true);
             $table->dateTime('subscribed_at')->nullable();

@@ -5,19 +5,20 @@ namespace App\Console\Commands;
 use App\Jobs\ShipNewsletter;
 use App\Models\Newsletter;
 use App\Models\NewsletterGroupSubscriber;
-use App\States\Newsletter\Failed;
-use App\States\Newsletter\Scheduled;
-use App\States\Newsletter\Sending;
-use App\States\Newsletter\Sent;
+use App\States\NewsletterSend\Failed;
+use App\States\NewsletterSend\Scheduled;
+use App\States\NewsletterSend\Sent;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Spatie\ModelStates\Exceptions\TransitionNotFound;
 use Throwable;
 
 /**
- * Send scheduled newsletters whose scheduled_at has passed. This is the ONLY way
- * a newsletter ever goes out — there is no send-now endpoint, so "send now" is a
- * scheduled newsletter dated now that this command picks up on its next tick.
+ * Email scheduled newsletters whose sent_at has passed. This is the ONLY way a
+ * newsletter ever goes out — there is no send-now endpoint, so "send now" is an
+ * issue scheduled for this instant that this command picks up on its next tick.
+ *
+ * The email side only: it never reads or writes published_status.
  *
  * Not a pruning sweep, so the "Prunable + model:prune, never a bespoke command"
  * rule does not apply — these are state transitions that must fire model events so
@@ -29,26 +30,27 @@ class SendScheduledNewsletters extends Command
 {
     protected $signature = 'newsletters:send-scheduled';
 
-    protected $description = 'Send scheduled newsletters whose scheduled_at has passed';
+    protected $description = 'Send scheduled newsletters whose sent_at has passed';
 
     public function handle(): int
     {
         $sent = 0;
 
-        // The (status, scheduled_at) index serves this; cursor() streams the rows.
+        // The (sent_status, sent_at) index serves this; cursor() streams the rows.
         $due = Newsletter::query()
-            ->whereState('status', Scheduled::class)
-            // A publish-only issue is never emailed, whatever its status says.
+            ->whereState('sent_status', Scheduled::class)
+            // A publish-only issue is never emailed, whatever its sent_status says.
             ->where('is_sendable', true)
-            ->whereNotNull('scheduled_at')
-            ->where('scheduled_at', '<=', now())
-            ->orderBy('scheduled_at');
+            ->whereNotNull('sent_at')
+            ->where('sent_at', '<=', now())
+            ->orderBy('sent_at');
 
         foreach ($due->cursor() as $newsletter) {
-            try {
-                $newsletter->status->transitionTo(Sending::class);
-            } catch (TransitionNotFound) {
-                $this->warn("Skipped {$newsletter->name}: {$newsletter->status->getValue()} cannot become sending.");
+            // The form requires one, so null here means the integration was deleted
+            // out from under a scheduled issue (the FK nulls on delete). Fail it —
+            // falling back to the app default would mail from the wrong account.
+            if (! $newsletter->integration_id) {
+                $this->markFailed($newsletter, 'its email integration no longer exists');
 
                 continue;
             }
@@ -56,7 +58,7 @@ class SendScheduledNewsletters extends Command
             try {
                 $dispatched = $this->dispatchFor($newsletter);
             } catch (Throwable $e) {
-                // Never leave a claimed newsletter in sending — it has no way out.
+                // Never leave a claimed issue in scheduled — the next tick would re-send it.
                 $this->markFailed($newsletter, $e->getMessage());
 
                 continue;
@@ -68,9 +70,14 @@ class SendScheduledNewsletters extends Command
                 continue;
             }
 
-            $newsletter->status->transitionTo(Sent::class);
-            $newsletter->sent_at = now();
-            $newsletter->save();
+            try {
+                // sent_at is left alone: the scheduled moment IS when it went out.
+                $newsletter->sent_status->transitionTo(Sent::class);
+            } catch (TransitionNotFound) {
+                $this->warn("Skipped {$newsletter->name}: {$newsletter->sent_status->getValue()} cannot become sent.");
+
+                continue;
+            }
 
             $sent++;
             $this->info("Queued {$dispatched} recipient(s) for {$newsletter->name}.");
@@ -115,8 +122,8 @@ class SendScheduledNewsletters extends Command
                     $seen[$email] = true;
 
                     // On the sync queue a dispatch IS the send, so one unreachable
-                    // provider would abort the run and strand the newsletter in
-                    // sending. Log the recipient and carry on.
+                    // provider would abort the run and strand the issue. Log the
+                    // recipient and carry on.
                     try {
                         ShipNewsletter::dispatch($newsletter->id, $subscriber->id, $newsletter->integration_id);
                         $dispatched++;
@@ -136,7 +143,7 @@ class SendScheduledNewsletters extends Command
     /** No recipients, or the run blew up — marking it Sent would be a lie. */
     protected function markFailed(Newsletter $newsletter, ?string $reason = null): void
     {
-        $newsletter->status->transitionTo(Failed::class);
+        $newsletter->sent_status->transitionTo(Failed::class);
 
         Log::channel('integrations')->warning('newsletter.failed', [
             'newsletter_id' => $newsletter->id,

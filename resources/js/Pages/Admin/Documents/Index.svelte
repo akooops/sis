@@ -86,7 +86,7 @@
         id={viewing?.id}
         heading={viewing?.name}
         fields={[
-            { label: 'File', value: viewing?.file_name || '—' },
+            { label: 'File', value: viewing?.file_name || '' },
         ]}
         createdAt={viewing?.created_at}
         updatedAt={viewing?.updated_at}
@@ -158,7 +158,7 @@
             <Badge variant="secondary">Missing</Badge>
         {/if}
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

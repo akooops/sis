@@ -71,7 +71,7 @@
         badge={viewing ? { label: viewing.code, variant: 'secondary' } : null}
         fields={[
             { label: 'Delivery', value: viewing?.integration?.name ?? 'In-app only' },
-            { label: 'Types', value: viewing?.types?.length ? viewing.types.map((t) => t.name).join(', ') : '—' },
+            { label: 'Types', value: viewing?.types?.length ? viewing.types.map((t) => t.name).join(', ') : '' },
             { label: 'Members', value: String(viewing?.members_count ?? 0) },
         ]}
         createdAt={viewing?.created_at}
@@ -135,7 +135,7 @@
     {:else if column.key === 'members_count'}
         <span class="text-sm text-mono">{row.members_count}</span>
     {:else}
-        {row[column.key] ?? '—'}
+        {row[column.key] ?? ''}
     {/if}
 {/snippet}
 

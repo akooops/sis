@@ -232,7 +232,7 @@
 <!-- A cell reads the related record first, then the pivot's own column — so the
      default Name/Code and a caller's custom columns both resolve. -->
 {#snippet defaultCells(row, column)}
-    {row[relation]?.[column.key] ?? row[column.key] ?? '—'}
+    {row[relation]?.[column.key] ?? row[column.key] ?? ''}
 {/snippet}
 
 {#snippet defaultRowActions(row)}

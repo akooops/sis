@@ -1,19 +1,23 @@
 <script>
     /**
-     * Newsletter create/edit.
+     * Newsletter create/edit — THREE cards, one per concern, so the two sides can
+     * never be read as one:
      *
-     * Two independent switches, not a type: "Publish on website" wants a file and
-     * a translated title, "Send by email" wants a subject, a body and an audience.
-     * Both may be on — that is the normal case. Each switch's fields are hidden
-     * AND stripped from the payload when it is off, so a switch turned back off
-     * never leaves stale values behind on the record.
+     *   General  — the name and the two switches.
+     *   Website  — file, translated title, published_status + published_at.
+     *   Email    — subject, groups, integration, sent_status + sent_at, body.
      *
-     * Each switch also carries its own pipeline, and the two never read each other:
-     * publish_status/published_at say when the website archive lists it,
-     * status/scheduled_at when it is emailed.
+     * Each side card only exists while its switch is on, and its fields are
+     * stripped from the payload when it is off, so a switch turned back off never
+     * leaves stale values on the record.
      *
-     * `title` is the only translatable field, so the [Details | Translations] tabs
-     * exist only while publishing is on; otherwise the form has no tabs at all.
+     * Neither status is a direct write: picking Published or Sent means "now", and
+     * the server schedules it for this instant for the matching command to pick up.
+     * That is why re-scheduling an already-sent issue is confirmed here, at the
+     * moment of the decision, rather than on submit.
+     *
+     * `title` is the only translatable field, so the per-language tabs live inside
+     * the Website card — with publishing off there are no tabs at all.
      *
      * Edit prefills straight from the index row (it carries group_ids, the group
      * labels and the integration), so opening the form never waits on a show
@@ -26,31 +30,37 @@
     import DatePicker from '@/components/form/DatePicker.svelte';
     import HtmlEditor from '@/components/form/HtmlEditor.svelte';
     import MediaPicker from '@/components/media/MediaPicker.svelte';
-    import Tabs from '@/components/ui/Tabs.svelte';
     import Button from '@/components/ui/Button.svelte';
     import { useForm } from '@/lib/api/useForm.svelte';
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
+    import { confirm } from '@/lib/confirm';
+    import { formatDateTime } from '@/lib/date';
     import {
         EMAIL_PLACEHOLDER,
         NEWSLETTER_PUBLISH_STATUS_LABELS,
-        NEWSLETTER_STATUS_LABELS,
+        NEWSLETTER_SEND_STATUS_LABELS,
         UNSUBSCRIBE_PLACEHOLDER,
-        needsPublishedAt,
-        needsScheduledAt,
+        needsPublishAt,
+        needsSendAt,
         publishReachableStatuses,
-        reachableStatuses,
+        sendReachableStatuses,
     } from '@/lib/newsletter';
 
     let { newsletter = null, ready = true, onsaved, oncancel } = $props();
 
     const editing = $derived(!!newsletter);
 
-    // A failed newsletter can only leave failed, so fall back to the first door open to it.
-    const statuses = reachableStatuses(newsletter?.status ?? null);
+    // The two ladders, resolved separately and never crossed. A failed issue is
+    // offered a way out but never a way back into failed.
+    const publishStatuses = publishReachableStatuses(newsletter?.published_status ?? null);
+    const sendStatuses = sendReachableStatuses(newsletter?.sent_status ?? null);
 
-    // The website pipeline, resolved the same way and entirely separate from it.
-    const publishStatuses = publishReachableStatuses(newsletter?.publish_status ?? null);
+    const publishStatusOptions = publishStatuses.map((value) => ({ value, label: NEWSLETTER_PUBLISH_STATUS_LABELS[value] ?? value }));
+    const sendStatusOptions = sendStatuses.map((value) => ({ value, label: NEWSLETTER_SEND_STATUS_LABELS[value] ?? value }));
+
+    // The mail genuinely went out — leaving `sent` re-sends it, so ask first.
+    const alreadySent = !!(newsletter?.sent_status === 'sent' && newsletter?.sent_at);
 
     // Both tokens ShipNewsletter substitutes; the unsubscribe one must land as a link.
     const placeholders = [
@@ -59,7 +69,6 @@
     ];
 
     let languages = $state([]);
-    let activeTab = $state('details');
     let activeLocale = $state(null);
     let emailTypeId = $state(null);
 
@@ -71,25 +80,20 @@
         // Create sends the default locale as a plain string, edit the whole map.
         title: newsletter ? { ...(newsletter.title ?? {}) } : '',
         file: null,
-        publish_status: publishStatuses.includes(newsletter?.publish_status) ? newsletter.publish_status : publishStatuses[0],
+        published_status: publishStatuses.includes(newsletter?.published_status) ? newsletter.published_status : publishStatuses[0],
         published_at: newsletter?.published_at ? newsletter.published_at.slice(0, 16).replace('T', ' ') : null,
         subject: newsletter?.subject ?? '',
         content: newsletter?.content ?? '',
         integration_id: newsletter?.integration_id ?? null,
-        status: statuses.includes(newsletter?.status) ? newsletter.status : statuses[0],
-        scheduled_at: newsletter?.scheduled_at ? newsletter.scheduled_at.slice(0, 16).replace('T', ' ') : null,
+        sent_status: sendStatuses.includes(newsletter?.sent_status) ? newsletter.sent_status : sendStatuses[0],
+        sent_at: newsletter?.sent_at ? newsletter.sent_at.slice(0, 16).replace('T', ' ') : null,
         group_ids: [...(newsletter?.group_ids ?? [])],
     });
 
-    // Nothing to translate unless the issue is published — title is the only
-    // translatable field, so with publishing off there are no tabs at all.
-    const showTabs = $derived(editing && form.data.is_published);
+    // The last send status the admin has agreed to — what a declined confirm reverts to.
+    let lastSendStatus = $state(form.data.sent_status);
 
     const activeLanguage = $derived(languages.find((l) => l.code === activeLocale) ?? null);
-
-    const statusOptions = statuses.map((value) => ({ value, label: NEWSLETTER_STATUS_LABELS[value] ?? value }));
-
-    const publishStatusOptions = publishStatuses.map((value) => ({ value, label: NEWSLETTER_PUBLISH_STATUS_LABELS[value] ?? value }));
 
     // Label seeds from the same row, so both selects render names instantly
     // while their option lists load in the background.
@@ -128,34 +132,59 @@
             .catch(() => {});
     });
 
+    /**
+     * Confirm at the moment of the decision, not on submit: leaving `sent` puts the
+     * issue back in the queue and every subscriber gets it a second time. Going
+     * back to `sent` is the safe original, so it never asks.
+     */
+    async function onSendStatusChange(next) {
+        if (!alreadySent || next === 'sent') {
+            lastSendStatus = next;
+
+            return;
+        }
+
+        const ok = await confirm({
+            title: 'Send this newsletter again?',
+            body: `This newsletter was already sent on ${formatDateTime(newsletter.sent_at)}. Re-scheduling it will send it again to every subscriber of its groups.`,
+            confirmLabel: 'Re-schedule',
+            variant: 'destructive',
+        });
+
+        if (!ok) {
+            form.data.sent_status = lastSendStatus;
+
+            return;
+        }
+
+        lastSendStatus = next;
+    }
+
     function payload(data) {
         const out = { ...data };
 
         // Send nothing for a switch that is off: the server must see nulls, not
-        // whatever the hidden fields still held from before it was turned off.
+        // whatever the hidden card still held from before it was turned off.
         if (out.is_published) {
             // No new pick means "keep the current file" — omitting it says so.
             if (!out.file) delete out.file;
-            if (!needsPublishedAt(out.publish_status)) out.published_at = null;
+            if (!needsPublishAt(out.published_status)) out.published_at = null;
         } else {
             delete out.file;
+            // {} merges nothing, so switching publishing back on finds its title intact.
             out.title = editing ? {} : null;
-            // The publish pipeline governs the website alone; the controller forces
-            // this too, but a form that shows draft should also send draft.
-            out.publish_status = 'draft';
+            out.published_status = 'draft';
             out.published_at = null;
         }
 
         if (out.is_sendable) {
-            if (!needsScheduledAt(out.status)) out.scheduled_at = null;
+            if (!needsSendAt(out.sent_status)) out.sent_at = null;
         } else {
             out.subject = null;
             out.content = null;
             out.group_ids = [];
-            // The status pipeline governs sending alone; the controller forces
-            // this too, but a form that shows draft should also send draft.
-            out.status = 'draft';
-            out.scheduled_at = null;
+            out.sent_status = 'draft';
+            out.sent_at = null;
         }
 
         return out;
@@ -169,10 +198,10 @@
             if (res) {
                 toast.success(editing ? 'Updated successfully.' : 'Created successfully.');
                 onsaved?.();
-            } else if (showTabs && languages.some((l) => localeHasError(l.code))) {
-                // The failing field may be behind a tab the user can't see.
-                activeTab = 'translations';
-                activeLocale = languages.find((l) => localeHasError(l.code))?.code ?? activeLocale;
+            } else if (editing && form.data.is_published) {
+                // The failing title may be behind a tab the user can't see.
+                const failing = languages.find((l) => localeHasError(l.code));
+                if (failing) activeLocale = failing.code;
             }
         } catch (err) {
             toast.error(err?.message ?? 'Something went wrong. Please try again.');
@@ -181,18 +210,12 @@
 </script>
 
 <form class="flex w-full flex-col gap-5" onsubmit={submit}>
-    {#if showTabs}
-        <Tabs
-            tabs={[
-                { id: 'details', label: 'Details', icon: 'ki-filled ki-sms' },
-                { id: 'translations', label: 'Translations', icon: 'ki-filled ki-flag' },
-            ]}
-            bind:active={activeTab}
-        />
-    {/if}
-
-    {#if !showTabs || activeTab === 'details'}
-        <div class="flex flex-col gap-5">
+    <!-- CARD 1 — what the issue is, and which of the two sides apply at all. -->
+    <div class="kt-card">
+        <div class="kt-card-header">
+            <h3 class="kt-card-title">General</h3>
+        </div>
+        <div class="kt-card-content flex flex-col gap-5 p-5">
             <Field label="Name" error={form.errors.name} required hint="Internal label — not shown to the public or to subscribers.">
                 <Input bind:value={form.data.name} invalid={!!form.errors.name} />
             </Field>
@@ -203,12 +226,9 @@
                 <Field
                     label="Publish on website"
                     error={form.errors.is_published}
-                    hint="Puts the issue on the public site — needs a file and a title."
+                    hint="Puts the issue in the public archive — needs a file and a title."
                 >
-                    <Switch
-                        bind:value={form.data.is_published}
-                        onchange={(v) => { if (!v) activeTab = 'details'; }}
-                    />
+                    <Switch bind:value={form.data.is_published} />
                 </Field>
                 <Field
                     label="Send by email"
@@ -218,135 +238,170 @@
                     <Switch bind:value={form.data.is_sendable} />
                 </Field>
             </div>
+        </div>
+    </div>
 
-            {#if form.data.is_published}
-                <div class="flex flex-col gap-5 border-t border-border pt-5">
-                    <Field
-                        label="File"
-                        error={form.errors.file}
-                        required={!editing}
-                        hint={editing ? 'Pick a new file to replace the current one.' : 'The issue people download — usually a PDF.'}
-                    >
-                        <MediaPicker accept={['documents', 'images']} bind:value={form.data.file} previewUrl={newsletter?.file_url} />
+    {#if form.data.is_published}
+        <!-- CARD 2 — the website archive alone. Nothing here affects the email. -->
+        <div class="kt-card">
+            <div class="kt-card-header">
+                <h3 class="kt-card-title">Website</h3>
+                <span class="text-xs text-muted-foreground">The public archive</span>
+            </div>
+            <div class="kt-card-content flex flex-col gap-5 p-5">
+                <Field
+                    label="File"
+                    error={form.errors.file}
+                    required={!editing}
+                    hint={editing ? 'Pick a new file to replace the current one.' : 'The issue people download — usually a PDF.'}
+                >
+                    <MediaPicker accept={['documents', 'images']} bind:value={form.data.file} previewUrl={newsletter?.file_url} />
+                </Field>
+
+                {#if !editing}
+                    <!-- Create: the default language's title, inline. -->
+                    <Field label="Title" error={form.errors.title} required hint="The public label. Translatable once created.">
+                        <Input bind:value={form.data.title} invalid={!!form.errors.title} />
                     </Field>
+                {:else}
+                    <div class="flex flex-col gap-5">
+                        <div class="kt-tabs kt-tabs-line overflow-x-auto" role="tablist">
+                            {#each languages as language (language.code)}
+                                <!-- The BARE data-kt-tab-toggle attribute is what Metronic
+                                     styles the active tab off — the class alone is not enough. -->
+                                <button
+                                    type="button"
+                                    role="tab"
+                                    data-kt-tab-toggle
+                                    class="kt-tab-toggle {activeLocale === language.code ? 'active' : ''}"
+                                    aria-selected={activeLocale === language.code}
+                                    onclick={() => (activeLocale = language.code)}
+                                >
+                                    {language.name}
+                                    {#if localeHasError(language.code)}
+                                        <span class="ms-1.5 inline-block size-1.5 rounded-full bg-destructive"></span>
+                                    {/if}
+                                </button>
+                            {/each}
+                        </div>
 
-                    {#if !editing}
-                        <!-- Create: the default language's title, inline. -->
-                        <Field label="Title" error={form.errors.title} required hint="The public label. Translatable once created.">
-                            <Input bind:value={form.data.title} invalid={!!form.errors.title} />
+                        {#if activeLocale}
+                            <Field
+                                label="Title"
+                                error={form.errors[`title.${activeLocale}`]}
+                                required={!!activeLanguage?.is_default}
+                                hint="The public label, per language."
+                            >
+                                <Input
+                                    bind:value={form.data.title[activeLocale]}
+                                    invalid={!!form.errors[`title.${activeLocale}`]}
+                                    dir={activeLanguage?.is_rtl ? 'rtl' : 'ltr'}
+                                />
+                            </Field>
+                        {/if}
+                    </div>
+                {/if}
+
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <Field
+                        label="Publish status"
+                        error={form.errors.published_status}
+                        required
+                        hint="The archive only — it never affects the email send. Publishing goes live on the next minute's run."
+                    >
+                        <Select options={publishStatusOptions} bind:value={form.data.published_status} clearable={false} />
+                    </Field>
+                    {#if needsPublishAt(form.data.published_status)}
+                        <Field label="Publish at" error={form.errors.published_at} required hint="Must be in the future — it goes live automatically.">
+                            <DatePicker enableTime bind:value={form.data.published_at} invalid={!!form.errors.published_at} />
                         </Field>
                     {/if}
-
-                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                        <Field
-                            label="Publish status"
-                            error={form.errors.publish_status}
-                            required
-                            hint="The website archive only — it never affects the email send."
-                        >
-                            <Select options={publishStatusOptions} bind:value={form.data.publish_status} clearable={false} />
-                        </Field>
-                        {#if needsPublishedAt(form.data.publish_status)}
-                            <Field label="Publish at" error={form.errors.published_at} required hint="Must be in the future — it goes live automatically.">
-                                <DatePicker enableTime bind:value={form.data.published_at} invalid={!!form.errors.published_at} />
-                            </Field>
-                        {/if}
-                    </div>
                 </div>
-            {/if}
-
-            {#if form.data.is_sendable}
-                <div class="flex flex-col gap-5 border-t border-border pt-5">
-                    <Field label="Subject" error={form.errors.subject} required hint="The email subject line.">
-                        <Input bind:value={form.data.subject} invalid={!!form.errors.subject} />
-                    </Field>
-
-                    <!-- Remote multiselect: the groups list is paginated, so it searches rather
-                         than loading everything. -->
-                    <Field label="Groups" error={form.errors.group_ids} required hint="Every active subscriber of these groups receives it.">
-                        <Select
-                            resource="api.v1.admin.newsletter-groups.index"
-                            initialOptions={groupSeed}
-                            bind:value={form.data.group_ids}
-                            multiple
-                            placeholder="Select groups"
-                        />
-                    </Field>
-
-                    <Field label="Email integration" error={form.errors.integration_id} hint="Leave empty to use the app default mailer.">
-                        <Select
-                            resource={emailTypeId ? 'api.v1.admin.integrations.index' : null}
-                            resourceParams={{ filter: { integration_type_id: emailTypeId } }}
-                            bind:value={form.data.integration_id}
-                            clearable
-                            initialOptions={integrationSeed}
-                            placeholder="App default mailer"
-                        />
-                    </Field>
-
-                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                        <Field
-                            label="Status"
-                            error={form.errors.status}
-                            required
-                            hint="Sending happens on the scheduled minute, through the queue — there is no send-now, so sending now means scheduling it for now."
-                        >
-                            <Select options={statusOptions} bind:value={form.data.status} clearable={false} />
-                        </Field>
-                        {#if needsScheduledAt(form.data.status)}
-                            <Field label="Schedule at" error={form.errors.scheduled_at} required hint="Must be in the future.">
-                                <DatePicker enableTime bind:value={form.data.scheduled_at} invalid={!!form.errors.scheduled_at} />
-                            </Field>
-                        {/if}
-                    </div>
-
-                    <div class="flex flex-col gap-1.5">
-                        <Field label="Content" error={form.errors.content} required hint="The email body.">
-                            <!-- The only place these two are on: links may attach a
-                                 document, and the body needs the send-time tokens. -->
-                            <HtmlEditor bind:value={form.data.content} {ready} fileUpload {placeholders} />
-                        </Field>
-                        <p class="text-xs text-muted-foreground">
-                            The <span class="font-medium text-mono">Placeholders</span> menu inserts
-                            <span class="font-medium text-mono">{UNSUBSCRIBE_PLACEHOLDER}</span> and
-                            <span class="font-medium text-mono">{EMAIL_PLACEHOLDER}</span> — each is filled in with that
-                            recipient's own unsubscribe link and address when the newsletter is sent.
-                        </p>
-                    </div>
-                </div>
-            {/if}
+            </div>
         </div>
     {/if}
 
-    {#if showTabs && activeTab === 'translations'}
-        <div class="flex flex-col gap-5">
-            <div class="kt-tabs kt-tabs-line overflow-x-auto" role="tablist">
-                {#each languages as language (language.code)}
-                    <button
-                        type="button"
-                        role="tab"
-                        data-kt-tab-toggle
-                        class="kt-tab-toggle {activeLocale === language.code ? 'active' : ''}"
-                        aria-selected={activeLocale === language.code}
-                        onclick={() => (activeLocale = language.code)}
-                    >
-                        {language.name}
-                        {#if localeHasError(language.code)}
-                            <span class="ms-1.5 inline-block size-1.5 rounded-full bg-destructive"></span>
-                        {/if}
-                    </button>
-                {/each}
+    {#if form.data.is_sendable}
+        <!-- CARD 3 — the email broadcast alone. Nothing here affects the archive. -->
+        <div class="kt-card">
+            <div class="kt-card-header">
+                <h3 class="kt-card-title">Email</h3>
+                <span class="text-xs text-muted-foreground">The broadcast to subscribers</span>
             </div>
+            <div class="kt-card-content flex flex-col gap-5 p-5">
+                {#if alreadySent}
+                    <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <i class="ki-filled ki-check-circle text-success"></i>
+                        Sent on {formatDateTime(newsletter.sent_at)}
+                    </div>
+                {/if}
 
-            {#if activeLocale}
-                <Field label="Title" error={form.errors[`title.${activeLocale}`]} required={!!activeLanguage?.is_default}>
-                    <Input
-                        bind:value={form.data.title[activeLocale]}
-                        invalid={!!form.errors[`title.${activeLocale}`]}
-                        dir={activeLanguage?.is_rtl ? 'rtl' : 'ltr'}
+                <Field label="Subject" error={form.errors.subject} required hint="The email subject line.">
+                    <Input bind:value={form.data.subject} invalid={!!form.errors.subject} />
+                </Field>
+
+                <!-- Remote multiselect: the groups list is paginated, so it searches rather
+                     than loading everything. -->
+                <Field label="Groups" error={form.errors.group_ids} required hint="Every active subscriber of these groups receives it.">
+                    <Select
+                        resource="api.v1.admin.newsletter-groups.index"
+                        initialOptions={groupSeed}
+                        bind:value={form.data.group_ids}
+                        multiple
+                        placeholder="Select groups"
                     />
                 </Field>
-            {/if}
+
+                <Field
+                    label="Email integration"
+                    error={form.errors.integration_id}
+                    required
+                    hint="The account this broadcast goes out from."
+                >
+                    <Select
+                        resource={emailTypeId ? 'api.v1.admin.integrations.index' : null}
+                        resourceParams={{ filter: { integration_type_id: emailTypeId } }}
+                        bind:value={form.data.integration_id}
+                        initialOptions={integrationSeed}
+                        placeholder="Select an integration"
+                    />
+                </Field>
+
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <Field
+                        label="Send status"
+                        error={form.errors.sent_status}
+                        required
+                        hint="Sending happens on the scheduled minute, through the queue — there is no send-now, so sending now means scheduling it for now."
+                    >
+                        <Select
+                            options={sendStatusOptions}
+                            bind:value={form.data.sent_status}
+                            onchange={onSendStatusChange}
+                            clearable={false}
+                        />
+                    </Field>
+                    {#if needsSendAt(form.data.sent_status)}
+                        <Field label="Send at" error={form.errors.sent_at} required hint="Must be in the future.">
+                            <DatePicker enableTime bind:value={form.data.sent_at} invalid={!!form.errors.sent_at} />
+                        </Field>
+                    {/if}
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <Field label="Content" error={form.errors.content} required hint="The email body.">
+                        <!-- The only place these two are on: links may attach a
+                             document, and the body needs the send-time tokens. -->
+                        <HtmlEditor bind:value={form.data.content} {ready} fileUpload {placeholders} />
+                    </Field>
+                    <p class="text-xs text-muted-foreground">
+                        The <span class="font-medium text-mono">Placeholders</span> menu inserts
+                        <span class="font-medium text-mono">{UNSUBSCRIBE_PLACEHOLDER}</span> and
+                        <span class="font-medium text-mono">{EMAIL_PLACEHOLDER}</span> — each is filled in with that
+                        recipient's own unsubscribe link and address when the newsletter is sent.
+                    </p>
+                </div>
+            </div>
         </div>
     {/if}
 
