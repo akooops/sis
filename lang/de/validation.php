@@ -166,6 +166,8 @@ return [
     'upload_unscanned' => 'Das Feld :attribute hat die Sicherheitsprüfung noch nicht bestanden.',
     'captcha' => 'Die Überprüfung war nicht erfolgreich. Bitte bestätigen Sie, dass Sie kein Roboter sind, und versuchen Sie es erneut.',
     'captcha_unavailable' => 'Die Überprüfung konnte im Moment nicht abgeschlossen werden. Bitte versuchen Sie es in Kürze noch einmal.',
+    'step' => 'Das Feld :attribute muss ein Vielfaches von :step sein.',
+    'ip_or_cidr' => 'Das Feld :attribute muss eine gültige IP-Adresse oder ein CIDR-Bereich sein (z. B. 203.0.113.5 oder 203.0.113.0/24).',
 
     /*
     |--------------------------------------------------------------------------

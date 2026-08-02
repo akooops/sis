@@ -154,6 +154,56 @@ class PermissionsSeeder extends Seeder
             ['code' => 'menu-items.update', 'name' => 'Update menu items', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'menu-items.reorder', 'name' => 'Reorder menu items', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'menu-items.destroy', 'name' => 'Delete menu items', 'supports_web' => true, 'supports_api' => false],
+
+            // Forms. The builder has no code of its own — it is gated by the
+            // page/field permissions, matching the <module>.<route-action> shape
+            // every other module uses.
+            ['code' => 'forms.index', 'name' => 'View forms', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'forms.show', 'name' => 'View a form', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'forms.store', 'name' => 'Create forms', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'forms.update', 'name' => 'Update forms', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'forms.destroy', 'name' => 'Delete forms', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'form-pages.index', 'name' => 'View form pages', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-pages.store', 'name' => 'Create form pages', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-pages.update', 'name' => 'Update form pages', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-pages.reorder', 'name' => 'Reorder form pages', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-pages.destroy', 'name' => 'Delete form pages', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'form-fields.index', 'name' => 'View form fields', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-fields.store', 'name' => 'Create form fields', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-fields.update', 'name' => 'Update form fields', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-fields.reorder', 'name' => 'Reorder form fields', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-fields.destroy', 'name' => 'Delete form fields', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'form-field-options.index', 'name' => 'View field options', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-field-options.store', 'name' => 'Create field options', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-field-options.update', 'name' => 'Update field options', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-field-options.reorder', 'name' => 'Reorder field options', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-field-options.destroy', 'name' => 'Delete field options', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'form-webhooks.index', 'name' => 'View form webhooks', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-webhooks.store', 'name' => 'Create form webhooks', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-webhooks.update', 'name' => 'Update form webhooks', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-webhooks.destroy', 'name' => 'Delete form webhooks', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'form-notification-groups.index', 'name' => 'View form notification groups', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-notification-groups.store', 'name' => 'Add form notification groups', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-notification-groups.destroy', 'name' => 'Remove form notification groups', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'form-blocked-countries.index', 'name' => 'View blocked countries', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-blocked-countries.store', 'name' => 'Block a country', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-blocked-countries.destroy', 'name' => 'Unblock a country', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'form-blocked-ips.index', 'name' => 'View blocked IPs', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-blocked-ips.store', 'name' => 'Block an IP', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-blocked-ips.destroy', 'name' => 'Unblock an IP', 'supports_web' => true, 'supports_api' => false],
+
+            // Read-only: a submission is never deleted, so there is no
+            // form-submissions.destroy code to grant.
+            ['code' => 'form-submissions.index', 'name' => 'View form submissions', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-submissions.show', 'name' => 'View a form submission', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'form-submissions.export', 'name' => 'Export form submissions', 'supports_web' => true, 'supports_api' => false],
         ];
 
         foreach ($permissions as $permission) {

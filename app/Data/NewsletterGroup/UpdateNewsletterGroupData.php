@@ -30,7 +30,7 @@ class UpdateNewsletterGroupData extends Data
             'code' => [
                 'required', 'string', 'max:255',
                 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
-                Rule::unique('newsletter_groups', 'code')->ignore(request()->route('newsletter_group')),
+                Rule::unique('newsletter_groups', 'code')->ignore(request()->route('newsletterGroup')),
             ],
 
             // array:en,ar also rejects unknown keys.

@@ -135,11 +135,95 @@ async function request(url, { method = 'GET', body, params, signal, headers = {}
     return payload && 'data' in payload ? payload.data : payload;
 }
 
+/**
+ * The filename the server named the download, out of Content-Disposition.
+ * RFC 5987's `filename*=UTF-8''…` wins when present — it is the one that
+ * survives non-ASCII.
+ */
+function filenameFrom(disposition, fallback) {
+    if (!disposition) return fallback;
+
+    const encoded = disposition.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+    if (encoded) {
+        try {
+            return decodeURIComponent(encoded);
+        } catch {
+            // fall through to the plain parameter
+        }
+    }
+
+    return disposition.match(/filename="?([^";]+)"?/i)?.[1] ?? fallback;
+}
+
+/**
+ * A file download rather than a JSON envelope.
+ *
+ * Goes through this client instead of a bare `<a href>` or `window.location`
+ * for one reason: a top-level navigation to an API route sends no
+ * `X-Requested-With` — which is part of what Sanctum's stateful guard reads to
+ * decide the request belongs to this session — and a rejection then REPLACES
+ * the admin page with raw JSON. A rejected fetch is just a toast.
+ *
+ * Resolves to `{ blob, filename }`, the filename being the server's own, so a
+ * timestamped export name survives. Errors are the same ApiError as everywhere
+ * else: a failed download still answers JSON, so the 403/422 message is read
+ * out of the body rather than swallowed.
+ */
+async function requestBlob(url, { params, signal, headers = {}, fallbackFilename = 'download' } = {}) {
+    let target = url;
+    if (params) {
+        const qs = buildQuery(params);
+        if (qs) target += (target.includes('?') ? '&' : '?') + qs;
+    }
+
+    let response;
+    try {
+        response = await fetch(target, {
+            method: 'GET',
+            signal,
+            credentials: 'same-origin',
+            headers: {
+                Accept: '*/*',
+                'X-Requested-With': 'XMLHttpRequest',
+                ...csrfHeader(),
+                ...headers,
+            },
+        });
+    } catch (err) {
+        if (err?.name === 'AbortError') throw err;
+        throw new ApiError('Network error. Please try again.', { status: 0 });
+    }
+
+    if (!response.ok) {
+        let payload = null;
+        const text = await response.text();
+        if (text) {
+            try {
+                payload = JSON.parse(text);
+            } catch {
+                payload = null;
+            }
+        }
+        throw new ApiError(payload?.message || `Request failed (${response.status})`, {
+            status: response.status,
+            errors: payload?.errors || {},
+            data: payload?.data ?? null,
+        });
+    }
+
+    return {
+        blob: await response.blob(),
+        filename: filenameFrom(response.headers.get('Content-Disposition'), fallbackFilename),
+    };
+}
+
 export const api = {
     get: (url, params, opts) => request(url, { method: 'GET', params, ...opts }),
+    blob: (url, params, opts) => requestBlob(url, { params, ...opts }),
     post: (url, body, opts) => request(url, { method: 'POST', body, ...opts }),
     put: (url, body, opts) => request(url, { method: 'PUT', body, ...opts }),
     patch: (url, body, opts) => request(url, { method: 'PATCH', body, ...opts }),
     delete: (url, opts) => request(url, { method: 'DELETE', ...opts }),
     request,
+    requestBlob,
 };

@@ -166,6 +166,8 @@ return [
     'upload_unscanned' => 'The :attribute has not passed the security scan yet.',
     'captcha' => 'The verification was not passed. Please confirm you are not a robot and try again.',
     'captcha_unavailable' => 'We could not complete the verification right now. Please try again in a moment.',
+    'step' => 'The :attribute field must be a multiple of :step.',
+    'ip_or_cidr' => 'The :attribute field must be a valid IP address or CIDR range (e.g. 203.0.113.5 or 203.0.113.0/24).',
 
     /*
     |--------------------------------------------------------------------------

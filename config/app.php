@@ -61,6 +61,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Trusted Proxies
+    |--------------------------------------------------------------------------
+    |
+    | Read by App\Http\Middleware\TrustProxies. Null (the default) means no
+    | proxy is trusted and request()->ip() is the connecting address. Set this
+    | to '*' when the app is only reachable through a load balancer or CDN you
+    | control, otherwise a comma-separated list of proxy addresses.
+    |
+    | Public forms enforce per-IP submission caps and IP/country blocks off
+    | request()->ip(), so this being wrong is a correctness bug, not just a
+    | logging one — see the docblock on TrustProxies.
+    |
+    */
+
+    'trusted_proxies' => env('TRUSTED_PROXIES'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

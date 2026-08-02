@@ -28,8 +28,9 @@ class UpdateNotificationGroupData extends Data
             'integration_id' => ['nullable', 'string', Rule::exists('integrations', 'id')->where(
                 fn ($query) => $query->whereIn('integration_type_id', IntegrationType::query()->where('code', 'email')->select('id'))
             )],
+            // The whole catalogue is subscribable — see StoreNotificationGroupData.
             'notification_type_ids' => ['sometimes', 'array'],
-            'notification_type_ids.*' => ['string', 'exists:notification_types,id'],
+            'notification_type_ids.*' => ['string', Rule::exists('notification_types', 'id')],
         ];
     }
 }

@@ -13,7 +13,7 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 /**
  * The signed-in admin's own inbox. Auth-only, never permission-gated; rows are
- * created exclusively by observers via NotificationService::send().
+ * created exclusively by observers and jobs, through NotificationService.
  *
  * Keyed by NOTIFICATION id: read and delete resolve this user's own pivot row,
  * so one user can never touch another's copy, and delete removes only theirs.

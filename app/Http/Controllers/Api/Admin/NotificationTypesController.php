@@ -7,7 +7,12 @@ use App\Http\Controllers\Api\ApiController;
 use App\Models\NotificationType;
 use Illuminate\Http\JsonResponse;
 
-/** Read-only: the catalogue is grown by code, so there is no write side. */
+/**
+ * Read-only: the catalogue is grown by code, so there is no write side.
+ *
+ * Every row is offered — the whole table is subscribable, and nothing is
+ * withheld from the group form.
+ */
 class NotificationTypesController extends ApiController
 {
     public function index(): JsonResponse

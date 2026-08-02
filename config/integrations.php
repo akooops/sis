@@ -13,6 +13,7 @@ return [
         'sms' => ['name' => 'SMS', 'icon' => 'ki-message-text', 'sort' => 2],
         'ai' => ['name' => 'AI', 'icon' => 'ki-abstract-26', 'sort' => 3],
         'captcha' => ['name' => 'Bot protection', 'icon' => 'ki-shield-tick', 'sort' => 4],
+        'analytics' => ['name' => 'Analytics', 'icon' => 'ki-chart-line-up', 'sort' => 5],
     ],
 
     /*
@@ -29,6 +30,7 @@ return [
         App\Services\Integrations\Drivers\FourJawalyDriver::class,
         App\Services\Integrations\Drivers\OpenAiDriver::class,
         App\Services\Integrations\Drivers\RecaptchaDriver::class,
+        App\Services\Integrations\Drivers\GoogleAnalyticsDriver::class,
     ],
 
     /*

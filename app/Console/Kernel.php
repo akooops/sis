@@ -23,6 +23,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('newsletters:publish-scheduled')->everyMinute()->withoutOverlapping();
         $schedule->command('newsletters:send-scheduled')->everyMinute()->withoutOverlapping();
         $schedule->command('banners:publish-scheduled')->everyMinute()->withoutOverlapping();
+        $schedule->command('forms:publish-scheduled')->everyMinute()->withoutOverlapping();
+        $schedule->command('forms:close-abandoned')->everyFifteenMinutes()->withoutOverlapping();
     }
 
     /**

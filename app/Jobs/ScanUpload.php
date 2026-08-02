@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Media;
 use App\Services\Uploads\ScannerManager;
+use App\Services\Uploads\UploadService;
 use App\States\Media\Clean;
 use App\States\Media\Failed;
 use App\States\Media\Infected;
@@ -52,9 +53,10 @@ class ScanUpload implements ShouldQueue
             return;
         }
 
-        // Clean -> move out of quarantine onto the public disk. The path is the
-        // same on both disks, so the url resolves as soon as the state flips.
-        $targetDisk = config('uploads.disk', 'public');
+        // Clean -> move out of quarantine onto the target disk, which is public
+        // for most uploads and a private disk for things like form attachments.
+        // The path is the same on both disks, so nothing has to be recomputed.
+        $targetDisk = UploadService::targetDiskFor($this->media);
 
         if ($targetDisk !== $quarantineDisk) {
             Storage::disk($targetDisk)->writeStream(

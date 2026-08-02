@@ -26,7 +26,9 @@
      * The parent reaches the list one of two ways: `parentId` for a nested route
      * (…/sessions/{user}), or `parentFilter` for a flat index scoped by a filter
      * (…/integrations?filter[integration_type_id]=…). Give whichever the endpoint
-     * expects.
+     * expects. A flat resource has nowhere to put the parent on a POST either, so
+     * pass it in `storePayload` ({ form_id }) — a pivot edited from both ends has
+     * no owner to nest under.
      *
      * COLUMNS are the caller's — a pivot is not always name + code. Pass the exact
      * DataTable `columns` you want (a permission's name/code, or a supplier_product's
@@ -75,9 +77,15 @@
         storeRoute = null, // only the bulk-assign path uses this; a form owns its own submit
         destroyRoute,
         parentFilter = null, // flat index scoped by a filter instead of a route param
+        width = 'w-[450px]', // Drawer's default; widen it for a form-shaped child
         resource,
         resourceLabelKey = 'name',
+        resourceParams = {}, // extra query params for the assign Select (e.g. exclude what is already linked)
+        resourceOption, // optional per-row rendering for the assign Select's dropdown
         payloadKey,
+        // Extra body fields for the bulk assign. A flat store route cannot carry
+        // its parent in the URL, so it travels in the payload: { form_id }.
+        storePayload = null,
         relation,
         columns, // DataTable columns — required; a pivot is not always name/code
         addable = true,
@@ -90,6 +98,7 @@
         perPage = 10,
         cells, // optional custom cell snippet, same as DataTable
         rowActions, // optional custom per-row actions snippet
+        banner, // optional snippet above the add row — a caveat the list cannot show
         form,
     } = $props();
 
@@ -150,7 +159,11 @@
         if (!selected.length) return;
         saving = true;
         try {
-            await api.post(route(storeRoute, parentId), { [payloadKey]: selected });
+            // A flat resource (parentFilter) has no room for the parent in its
+            // URL — passing one would only append it as a stray query param, so
+            // it goes in the body via storePayload instead.
+            const url = parentFilter ? route(storeRoute) : route(storeRoute, parentId);
+            await api.post(url, { ...(storePayload ?? {}), [payloadKey]: selected });
             toast.success('Updated successfully.');
             selected = [];
             await list.refresh();
@@ -177,13 +190,17 @@
     }
 </script>
 
-<Drawer bind:open {title}>
+<Drawer bind:open {title} {width}>
     {#if showForm && form}
         <div class="flex flex-col gap-5" in:fly={{ x: '100%', duration: 750 }}>
             {@render form({ parentId, row: editing, close: closeForm, saved })}
         </div>
     {:else}
         <div class="flex flex-col gap-4" in:fly={{ x: '-100%', duration: 750 }}>
+            <!-- A caveat about the whole list: it belongs above the control that
+                 adds to it, not under the table where it would be scrolled past. -->
+            {@render banner?.()}
+
             <!-- add -->
             {#if !addable}
                 <!-- Nothing to add: the table is the whole drawer. -->
@@ -201,7 +218,7 @@
                         <!-- min-w-0: without it this column cannot shrink below the
                              Select's content, so one long option widens the drawer. -->
                         <div class="min-w-0 grow">
-                            <Select {resource} labelKey={resourceLabelKey} valueKey="id" multiple bind:value={selected} />
+                            <Select {resource} {resourceParams} labelKey={resourceLabelKey} valueKey="id" multiple bind:value={selected} option={resourceOption} />
                         </div>
                         <Button variant="primary" onclick={assign} loading={saving} disabled={!selected.length}>{addLabel}</Button>
                     </div>

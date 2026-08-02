@@ -1,0 +1,20 @@
+/**
+ * Public stylesheet — the end-user side.
+ *
+ * Separate from app.css on purpose. app.css pulls in the whole Metronic 9
+ * theme, KTUI and the demo1 layout, which the admin needs and a public form
+ * page must never ship.
+ *
+ * Note the @source: Tailwind scans the BLADE views here, not resources/js/**.
+ * Putting that scan in app.css would do nothing, because the public page does
+ * not load app.css.
+ */
+
+@import 'tailwindcss';
+
+@source '../views/**/*.blade.php';
+@source '../js/public.js';
+@source '../js/components/forms/**/*.svelte';
+
+/* The form's own stylesheet. Tailwind-free by design — see the file header. */
+@import './forms.css';

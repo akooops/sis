@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             CountriesSeeder::class,
             NewsletterGroupsSeeder::class,
             PagesSeeder::class,
+            FormsSeeder::class,
         ]);
 
         if (app()->environment('local')) {

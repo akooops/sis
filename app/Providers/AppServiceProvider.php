@@ -14,6 +14,15 @@ use App\Models\Category;
 use App\Models\Country;
 use App\Models\Document;
 use App\Models\Event;
+use App\Models\Form;
+use App\Models\FormBlockedCountry;
+use App\Models\FormBlockedIp;
+use App\Models\FormField;
+use App\Models\FormFieldOption;
+use App\Models\FormNotificationGroup;
+use App\Models\FormPage;
+use App\Models\FormSubmission;
+use App\Models\FormWebhook;
 use App\Models\Grade;
 use App\Models\Integration;
 use App\Models\JobOffer;
@@ -74,8 +83,18 @@ use App\Observers\ProgramObserver;
 use App\Observers\RoleObserver;
 use App\Observers\RolePermissionObserver;
 use App\Observers\StreamObserver;
+use App\Observers\FormBlockedCountryObserver;
+use App\Observers\FormBlockedIpObserver;
+use App\Observers\FormFieldObserver;
+use App\Observers\FormFieldOptionObserver;
+use App\Observers\FormNotificationGroupObserver;
+use App\Observers\FormObserver;
+use App\Observers\FormPageObserver;
+use App\Observers\FormSubmissionObserver;
+use App\Observers\FormWebhookObserver;
 use App\Observers\UserObserver;
 use App\Observers\UserRoleObserver;
+use App\Services\Forms\FieldTypeRegistry;
 use App\Services\Integrations\Registry;
 use App\Services\Sessions\SessionHandler;
 use App\Services\Translations\TranslationService;
@@ -96,6 +115,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // One per request: it caches the resolved driver map.
         $this->app->singleton(Registry::class);
+
+        // Same reason: it caches the resolved element map.
+        $this->app->singleton(FieldTypeRegistry::class);
 
         // One per request: it memoises the lang files it reads.
         $this->app->singleton(TranslationService::class);
@@ -147,6 +169,15 @@ class AppServiceProvider extends ServiceProvider
         Program::observe(ProgramObserver::class);
         Stream::observe(StreamObserver::class);
         Grade::observe(GradeObserver::class);
+        Form::observe(FormObserver::class);
+        FormPage::observe(FormPageObserver::class);
+        FormField::observe(FormFieldObserver::class);
+        FormFieldOption::observe(FormFieldOptionObserver::class);
+        FormWebhook::observe(FormWebhookObserver::class);
+        FormBlockedCountry::observe(FormBlockedCountryObserver::class);
+        FormBlockedIp::observe(FormBlockedIpObserver::class);
+        FormNotificationGroup::observe(FormNotificationGroupObserver::class);
+        FormSubmission::observe(FormSubmissionObserver::class);
     }
 
     /**

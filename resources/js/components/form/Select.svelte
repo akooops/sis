@@ -34,6 +34,11 @@
         disabled = false,
         invalid = false,
         initialOptions = [], // seed labels for preselected values (edit forms)
+        // Optional per-row rendering for the dropdown list. Receives
+        // { value, label, raw } — `raw` is the whole record in remote mode, so a
+        // country picker can draw its flag. The chips/trigger keep the plain
+        // label either way: a chip strip is not a place for images.
+        option,
         onchange,
     } = $props();
 
@@ -314,7 +319,11 @@
                     role="option"
                     aria-selected={isSelected(item.value)}
                 >
-                    <span class="min-w-0 truncate" title={item.label}>{item.label}</span>
+                    {#if option}
+                        {@render option(item)}
+                    {:else}
+                        <span class="min-w-0 truncate" title={item.label}>{item.label}</span>
+                    {/if}
                     {#if isSelected(item.value)}<i class="ki-filled ki-check text-primary"></i>{/if}
                 </button>
             {/each}

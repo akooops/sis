@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Web\Admin\AuthController;
 use App\Http\Controllers\Web\Admin\PagesController as AdminPagesController;
+use App\Http\Controllers\Web\FormsController as PublicFormsController;
 use App\Http\Controllers\Web\NewsletterController;
 use App\Http\Controllers\Web\PagesController;
 use Illuminate\Support\Facades\Route;
@@ -60,12 +61,60 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('menu-items', [AdminPagesController::class, 'menuItems'])->middleware('verify.permissions:menu-items.index')->name('web.admin.menu-items.index');
     Route::get('countries', [AdminPagesController::class, 'countries'])->middleware('verify.permissions:countries.index')->name('web.admin.countries.index');
     Route::get('grades', [AdminPagesController::class, 'grades'])->middleware('verify.permissions:grades.index')->name('web.admin.grades.index');
+    Route::get('forms', [AdminPagesController::class, 'forms'])->middleware('verify.permissions:forms.index')->name('web.admin.forms.index');
+    Route::get('form-submissions', [AdminPagesController::class, 'formSubmissions'])->middleware('verify.permissions:form-submissions.index')->name('web.admin.form-submissions.index');
+    Route::get('forms/{form}/build', [AdminPagesController::class, 'formBuilder'])->middleware('verify.permissions:forms.index')->name('web.admin.forms.builder');
+    Route::get('forms/{form}/analytics', [AdminPagesController::class, 'formAnalytics'])->middleware('verify.permissions:forms.show')->name('web.admin.forms.analytics');
 });
 
 /*------------------------
 | Public (no auth — reached from an email)
 |------------------------*/
 Route::get('newsletter/unsubscribe/{signature}', [NewsletterController::class, 'unsubscribe'])->name('web.user.newsletter-groups.unsubscribe');
+
+/*
+ * Public forms.
+ *
+ * In the `web` group deliberately: a session-less group has no
+ * ShareErrorsFromSession, so every validation failure on this non-JSON POST
+ * would 500 with "Session store not set" rather than redirecting back.
+ *
+ * The locale is an explicit URL segment rather than content negotiation — a
+ * public link has to render the same thing for everyone who opens it. The
+ * `[a-z]{2}` constraint is compilable, so route:cache still works.
+ */
+Route::prefix('forms')->group(function () {
+    Route::get('{locale}/{slug}', [PublicFormsController::class, 'show'])
+        ->where('locale', '[a-z]{2}')->name('web.user.forms.show');
+
+    Route::get('{locale}/{slug}/thanks', [PublicFormsController::class, 'thanks'])
+        ->where('locale', '[a-z]{2}')->name('web.user.forms.thanks');
+
+    Route::post('{locale}/{slug}', [PublicFormsController::class, 'submit'])
+        ->where('locale', '[a-z]{2}')
+        ->middleware('throttle:form-submits')
+        ->name('web.user.forms.submit');
+
+    // Files go up before the form is submitted: they have to survive a page
+    // change and a virus scan, and the answer only carries the media id.
+    Route::post('{locale}/{slug}/uploads', [PublicFormsController::class, 'upload'])
+        ->where('locale', '[a-z]{2}')
+        ->middleware('throttle:form-uploads')
+        ->name('web.user.forms.upload');
+
+    // The analytics beacon. EXCEPTED FROM CSRF in App\Http\Middleware\
+    // VerifyCsrfToken, because navigator.sendBeacon cannot set a header — the
+    // encrypted submission token authenticates it instead, and the throttle
+    // keeps the cost of an unauthenticated POST bounded.
+    Route::post('{locale}/{slug}/telemetry', [PublicFormsController::class, 'telemetry'])
+        ->where('locale', '[a-z]{2}')
+        ->middleware('throttle:form-telemetry')
+        ->name('web.user.forms.telemetry');
+
+    // Bare slug: pick a locale the visitor can read and redirect. Declared last
+    // so it never swallows the two-letter locale segment above.
+    Route::get('{slug}', [PublicFormsController::class, 'redirectToLocale'])->name('web.user.forms.entry');
+});
 
 /*------------------------
 | Root

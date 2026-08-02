@@ -54,6 +54,18 @@ class NotificationGroup extends Model
         return $this->hasMany(NotificationGroupUser::class);
     }
 
+    /**
+     * Forms whose submissions notify this group — the other end of
+     * Form::notificationGroups(). Read-only here: the pivot is written through
+     * FormNotificationGroupsController from whichever side the admin is on. It
+     * exists so `filter[form_id]` on the index can be a relation filter, which
+     * is what makes "the groups this form notifies" a linkable page.
+     */
+    public function forms(): BelongsToMany
+    {
+        return $this->belongsToMany(Form::class, 'form_notification_groups');
+    }
+
     /* -----------------------------------------
      3. Accessors
     ------------------------------------------*/

@@ -8,7 +8,14 @@ export default defineConfig({
     plugins: [
         tailwindcss(),
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            // app.* is the admin (Inertia + the whole Metronic theme); public.*
+            // is the standalone public form page, which must not ship either.
+            input: [
+                'resources/css/app.css',
+                'resources/js/app.js',
+                'resources/css/public.css',
+                'resources/js/public.js',
+            ],
             refresh: true,
         }),
         svelte(),

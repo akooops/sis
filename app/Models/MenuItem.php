@@ -43,6 +43,7 @@ class MenuItem extends Model
         'job_offer',
         'program',
         'stream',
+        'form',
     ];
 
     /**

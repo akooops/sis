@@ -1,10 +1,11 @@
 /**
- * Where a content link may point: the eight models with a public slug, plus a
+ * Where a content link may point: the nine models with a public slug, plus a
  * plain external URL.
  *
- * Mirrors Banner::LINKABLE_TYPES — the key IS the MorphType alias the API
- * speaks, so a new sluggable model has to be added in both places. The route is
- * what ContentLinkInput searches; `name` is the label column all eight share.
+ * Mirrors Banner::LINKABLE_TYPES and MenuItem::LINKABLE_TYPES — the key IS the
+ * MorphType alias the API speaks, so a new sluggable model has to be added in
+ * all three places. The route is what ContentLinkInput searches; `name` is the
+ * label column they all share.
  */
 export const LINKABLE_RESOURCES = {
     page: { label: 'Page', route: 'api.v1.admin.pages.index', labelKey: 'name' },
@@ -15,6 +16,7 @@ export const LINKABLE_RESOURCES = {
     job_offer: { label: 'Job offer', route: 'api.v1.admin.job-offers.index', labelKey: 'name' },
     program: { label: 'Program', route: 'api.v1.admin.programs.index', labelKey: 'name' },
     stream: { label: 'Stream', route: 'api.v1.admin.streams.index', labelKey: 'name' },
+    form: { label: 'Form', route: 'api.v1.admin.forms.index', labelKey: 'name' },
 };
 
 /** Kind choices for a Select: every record type, then the external URL. */

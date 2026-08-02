@@ -1,0 +1,417 @@
+/**
+ * Public form stylesheet.
+ *
+ * DELIBERATELY TAILWIND-FREE. This file is loaded in three places that do not
+ * share a cascade: the public page, the builder's preview <iframe>, and the
+ * builder canvas. Only the admin ships Tailwind's preflight, so anything that
+ * leaned on it would work in the preview and silently break in production.
+ * Everything here is plain CSS with its own scoped reset.
+ *
+ * THE CONTAINER CONTRACT — the whole point of this file. Every element renders
+ * the same wrapper, and the admin's `css_id` / `css_class` land on the WRAPPER,
+ * never on the control:
+ *
+ *   <div class="sisf-el sisf-el--text is-required my-class" id="my-id"
+ *        data-sisf-type="text" data-sisf-key="first_name">
+ *     <label class="sisf-label">…<span class="sisf-required">*</span></label>
+ *     <div class="sisf-control"><input class="sisf-input"></div>
+ *     <p class="sisf-error" role="alert" hidden>…</p>
+ *   </div>
+ *
+ * so an admin styles the container AND its control with `.my-class input`,
+ * `.my-class .sisf-label`, `.my-class.is-invalid input`, and so on. The
+ * data-attributes give a second, class-free handle.
+ *
+ * Logical properties throughout (margin-inline-start, not margin-left) so one
+ * stylesheet serves both LTR and RTL; only the handful of things that cannot be
+ * expressed logically get a [dir=rtl] rule.
+ */
+
+/* -----------------------------------------
+ 1. Tokens
+------------------------------------------*/
+
+.sisf {
+    --sisf-fg: #1f2937;
+    --sisf-muted: #6b7280;
+    --sisf-bg: #ffffff;
+    --sisf-border: #d1d5db;
+    --sisf-border-strong: #9ca3af;
+    --sisf-primary: #1b84ff;
+    --sisf-primary-fg: #ffffff;
+    --sisf-danger: #dc2626;
+    --sisf-danger-bg: #fef2f2;
+    --sisf-success: #16a34a;
+    --sisf-radius: 6px;
+    --sisf-gap: 20px;
+    --sisf-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --sisf-font-size: 15px;
+    --sisf-control-height: 42px;
+}
+
+/* -----------------------------------------
+ 2. Scoped reset
+------------------------------------------*/
+
+.sisf,
+.sisf *,
+.sisf *::before,
+.sisf *::after {
+    box-sizing: border-box;
+}
+
+.sisf {
+    color: var(--sisf-fg);
+    font-family: var(--sisf-font);
+    font-size: var(--sisf-font-size);
+    line-height: 1.5;
+}
+
+.sisf p,
+.sisf h1,
+.sisf h2,
+.sisf h3,
+.sisf h4,
+.sisf h5,
+.sisf h6,
+.sisf fieldset,
+.sisf legend {
+    margin: 0;
+    padding: 0;
+}
+
+.sisf fieldset {
+    border: 0;
+    min-inline-size: 0;
+}
+
+.sisf [hidden] {
+    display: none !important;
+}
+
+/* -----------------------------------------
+ 3. Layout
+------------------------------------------*/
+
+.sisf-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sisf-gap);
+}
+
+.sisf-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sisf-gap);
+}
+
+.sisf-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+/* -----------------------------------------
+ 4. The element container
+------------------------------------------*/
+
+.sisf-el {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sisf-label {
+    font-weight: 500;
+    color: var(--sisf-fg);
+}
+
+.sisf-required {
+    color: var(--sisf-danger);
+    margin-inline-start: 3px;
+}
+
+.sisf-help {
+    font-size: 0.875em;
+    color: var(--sisf-muted);
+}
+
+.sisf-error {
+    font-size: 0.875em;
+    color: var(--sisf-danger);
+}
+
+/* -----------------------------------------
+ 5. Controls
+------------------------------------------*/
+
+.sisf-input,
+.sisf-textarea,
+.sisf-select {
+    inline-size: 100%;
+    min-block-size: var(--sisf-control-height);
+    padding: 8px 12px;
+    font: inherit;
+    color: inherit;
+    background-color: var(--sisf-bg);
+    border: 1px solid var(--sisf-border);
+    border-radius: var(--sisf-radius);
+}
+
+.sisf-textarea {
+    min-block-size: 110px;
+    resize: vertical;
+}
+
+.sisf-input:focus,
+.sisf-textarea:focus,
+.sisf-select:focus {
+    outline: 2px solid var(--sisf-primary);
+    outline-offset: 1px;
+    border-color: var(--sisf-primary);
+}
+
+/* Numbers and phone numbers are read left-to-right even in an RTL form. */
+.sisf-el--number .sisf-input,
+.sisf-el--phone .sisf-input {
+    direction: ltr;
+    text-align: start;
+}
+
+.sisf-choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.sisf-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* -----------------------------------------
+ 6. State
+------------------------------------------*/
+
+.sisf-el.is-invalid .sisf-input,
+.sisf-el.is-invalid .sisf-textarea,
+.sisf-el.is-invalid .sisf-select {
+    border-color: var(--sisf-danger);
+    background-color: var(--sisf-danger-bg);
+}
+
+/* -----------------------------------------
+ 7. Buttons
+------------------------------------------*/
+
+.sisf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-block-size: var(--sisf-control-height);
+    padding: 8px 18px;
+    font: inherit;
+    font-weight: 500;
+    border: 1px solid transparent;
+    border-radius: var(--sisf-radius);
+    cursor: pointer;
+}
+
+.sisf-btn[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.sisf-btn--primary {
+    background-color: var(--sisf-primary);
+    color: var(--sisf-primary-fg);
+}
+
+.sisf-btn--secondary {
+    background-color: transparent;
+    color: var(--sisf-fg);
+    border-color: var(--sisf-border-strong);
+}
+
+/* -----------------------------------------
+ 8. Form and page typography
+------------------------------------------*/
+
+.sisf-title {
+    font-size: 1.5em;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.sisf-description {
+    color: var(--sisf-muted);
+}
+
+.sisf-content :is(p, ul, ol) {
+    margin-block: 0.5em;
+}
+
+.sisf-content :is(ul, ol) {
+    padding-inline-start: 1.5em;
+}
+
+.sisf-progress {
+    font-size: 0.875em;
+    color: var(--sisf-muted);
+}
+
+.sisf-page-title {
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.sisf-heading {
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.sisf-heading:is(h1) { font-size: 1.6em; }
+.sisf-heading:is(h2) { font-size: 1.4em; }
+.sisf-heading:is(h3) { font-size: 1.2em; }
+.sisf-heading:is(h4) { font-size: 1.05em; }
+.sisf-heading:is(h5, h6) { font-size: 1em; }
+
+.sisf-html :is(p, ul, ol) {
+    margin-block: 0.5em;
+}
+
+.sisf-html :is(ul, ol) {
+    padding-inline-start: 1.5em;
+}
+
+.sisf-html img {
+    max-inline-size: 100%;
+    block-size: auto;
+}
+
+/* -----------------------------------------
+ 9. Choices
+------------------------------------------*/
+
+.sisf-choices--inline {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.sisf-radio,
+.sisf-checkbox {
+    inline-size: 1em;
+    block-size: 1em;
+    margin-block-start: 0.25em;
+    flex-shrink: 0;
+    accent-color: var(--sisf-primary);
+}
+
+.sisf-choice-label {
+    cursor: pointer;
+}
+
+/* -----------------------------------------
+ 10. File uploads
+------------------------------------------*/
+
+.sisf-file {
+    font: inherit;
+    color: inherit;
+}
+
+.sisf-file-status {
+    font-size: 0.875em;
+    color: var(--sisf-muted);
+    margin-block-start: 6px;
+}
+
+.sisf-file-list {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sisf-file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border: 1px solid var(--sisf-border);
+    border-radius: var(--sisf-radius);
+}
+
+.sisf-file-name {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.9375em;
+}
+
+.sisf-file-remove {
+    flex-shrink: 0;
+    border: 0;
+    background: transparent;
+    color: var(--sisf-danger);
+    font-size: 1.1em;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 6px;
+}
+
+/* -----------------------------------------
+ 11. RTL exceptions
+------------------------------------------*/
+
+/* A native select's chevron is painted by the UA on the inline-end edge in LTR
+   only; these three cannot be expressed with logical properties alone. */
+:where([dir='rtl']) .sisf-select {
+    background-position: left 12px center;
+}
+
+/* -----------------------------------------
+ 12. Captcha
+------------------------------------------*/
+
+/* The provider paints the widget itself in a fixed-size iframe; all this owns
+   is the space around it, and the room for a load failure message. Empty on a
+   v3 form, which renders no widget at all. */
+.sisf-captcha {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* An iframe wider than a narrow phone would otherwise push the page sideways. */
+.sisf-captcha iframe {
+    max-width: 100%;
+}
+
+/* -----------------------------------------
+ 13. Server-rendered messages
+------------------------------------------*/
+
+.sisf-alert {
+    margin-block-end: 20px;
+    padding: 12px 16px;
+    border: 1px solid var(--sisf-danger);
+    border-radius: var(--sisf-radius);
+    background-color: var(--sisf-danger-bg);
+    color: var(--sisf-danger);
+    font-family: var(--sisf-font);
+    font-size: 0.9375em;
+}
+
+.sisf-alert ul {
+    margin: 0;
+    padding-inline-start: 1.2em;
+}

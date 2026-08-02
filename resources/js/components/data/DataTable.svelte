@@ -11,7 +11,7 @@
      *       {cells} {rowActions} onRowClick={openView}
      *   />
      *   {#snippet cells(row, column)} … {/snippet}   // optional custom cells
-     *   {#snippet rowActions(row)} <Dropdown/> {/snippet}
+     *   {#snippet rowActions(row)} <RowActions/> {/snippet}
      *
      * Columns: { key, label, sortable?, align?, width?, headerClass?, cellClass? }.
      * Sorting toggles asc → desc → none and hits the query builder via onSort.
@@ -36,6 +36,10 @@
         emptyIcon = 'ki-filled ki-document',
         cells,
         rowActions,
+        // Wide enough for four icons. A row that carries more (Forms carries
+        // ten, all inline) passes its own width so the buttons sit on one line
+        // instead of stealing it from the data columns.
+        actionsWidth = '80px',
     } = $props();
 
     const skeletonRows = $derived(meta?.per_page ?? 10);
@@ -86,7 +90,7 @@
                     </th>
                 {/each}
                 {#if rowActions}
-                    <th class="w-[80px] text-center">
+                    <th class="text-center" style="width:{actionsWidth}">
                         <span class="kt-table-col whitespace-nowrap">Actions</span>
                     </th>
                 {/if}
@@ -131,7 +135,7 @@
                             </td>
                         {/each}
                         {#if rowActions}
-                            <td class="text-center">{@render rowActions(row)}</td>
+                            <td class="whitespace-nowrap text-center">{@render rowActions(row)}</td>
                         {/if}
                     </tr>
                 {/each}

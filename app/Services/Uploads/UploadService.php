@@ -11,6 +11,7 @@ use App\States\Media\Pending;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 /**
  * The one place files enter, change owner and leave.
@@ -27,9 +28,22 @@ class UploadService
     /**
      * Store a file as an owner-less media row on quarantine and queue the scan.
      * Not user-scoped: any authenticated caller may reference the returned id.
+     *
+     * `$target` names a destination from config('uploads.disks') — `public` for
+     * everything the admin links to, `private:<feature>` for files that must
+     * never get a public URL. The target is recorded in custom_properties so
+     * ScanUpload knows which disk to promote the file onto; the FOLDER is
+     * written now, so the path is identical on quarantine and on the target and
+     * the file still moves exactly once.
+     *
+     * `$properties` is merged into custom_properties, so a caller can stamp its
+     * own scoping (a form session, say) without a second write and a second
+     * observer row.
      */
-    public static function store(StoreMediaData $data): UploadData
+    public static function store(StoreMediaData $data, array $properties = [], string $target = 'public'): UploadData
     {
+        ['folder' => $folder] = static::resolveTarget($target);
+
         $disk = config('uploads.quarantine_disk', 'quarantine');
 
         $media = new Media;
@@ -40,18 +54,65 @@ class UploadService
         $media->file_name = static::generateFileName($data->file->getClientOriginalName());
         $media->mime_type = $data->file->getMimeType();
         $media->disk = $disk;
+        $media->folder = $folder;
         $media->size = $data->file->getSize();
-        $media->custom_properties = ['type' => $data->type];
+        $media->custom_properties = $properties + ['type' => $data->type, 'target' => $target];
         $media->state = Pending::class;
         $media->save();
 
-        Storage::disk($disk)->putFileAs(Media::folder(), $data->file, $media->file_name);
+        Storage::disk($disk)->putFileAs($folder, $data->file, $media->file_name);
 
         ScanUpload::dispatch($media);
 
         // On a sync queue the scan already ran and moved the file, so re-read: the
         // in-memory row still says pending/quarantine and yields no url.
         return UploadData::from($media->fresh() ?? $media);
+    }
+
+    /**
+     * Resolve a target name to its disk and folder.
+     *
+     * @return array{disk: string, folder: string}
+     */
+    public static function resolveTarget(string $target): array
+    {
+        [$name, $feature] = array_pad(explode(':', $target, 2), 2, null);
+
+        $config = config("uploads.disks.{$name}");
+
+        if (! is_array($config)) {
+            throw new InvalidArgumentException("Unknown upload target [{$target}].");
+        }
+
+        $folder = $feature === null
+            ? ($config['folder'] ?? null)
+            : ($config['folders'][$feature] ?? null);
+
+        if (! is_string($folder) || $folder === '') {
+            throw new InvalidArgumentException("Unknown upload target [{$target}].");
+        }
+
+        return ['disk' => $config['disk'], 'folder' => trim($folder, '/')];
+    }
+
+    /**
+     * The disk a scanned file belongs on. Rows written before targets existed
+     * carry no `target` property, so they fall back to the historic public disk.
+     */
+    public static function targetDiskFor(Media $media): string
+    {
+        $target = $media->getCustomProperty('target');
+
+        if (! is_string($target) || $target === '') {
+            return config('uploads.disk', 'public');
+        }
+
+        try {
+            return static::resolveTarget($target)['disk'];
+        } catch (InvalidArgumentException) {
+            // A target dropped from config must not strand the file in quarantine.
+            return config('uploads.disk', 'public');
+        }
     }
 
     /**
@@ -189,6 +250,9 @@ class UploadService
         $copy->file_name = static::generateFileName($source->file_name);
         $copy->mime_type = $source->mime_type;
         $copy->disk = $source->disk;
+        // Same folder as the source, or the copy would land on a path the disk
+        // never created and Storage::copy would fail.
+        $copy->folder = $source->folder;
         $copy->size = $source->size;
         $copy->custom_properties = $source->custom_properties;
         $copy->state = $source->state::class;

@@ -166,6 +166,8 @@ return [
     'upload_unscanned' => 'Il campo :attribute non ha ancora superato il controllo di sicurezza.',
     'captcha' => 'La verifica non è stata superata. Conferma di non essere un robot e riprova.',
     'captcha_unavailable' => 'Non è stato possibile completare la verifica in questo momento. Riprova tra qualche istante.',
+    'step' => 'Il campo :attribute deve essere un multiplo di :step.',
+    'ip_or_cidr' => 'Il campo :attribute deve essere un indirizzo IP valido o un intervallo CIDR (ad esempio 203.0.113.5 o 203.0.113.0/24).',
 
     /*
     |--------------------------------------------------------------------------

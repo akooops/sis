@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'calendars', 'newsletters', 'newsletter-groups', 'newsletter-group-subscribers', 'programs', 'streams', 'grades', 'job-offers', 'countries', 'menus', 'menu-items', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'calendars', 'newsletters', 'newsletter-groups', 'newsletter-group-subscribers', 'programs', 'streams', 'grades', 'job-offers', 'countries', 'menus', 'menu-items', 'forms', 'form-pages', 'form-fields', 'form-webhooks', 'form-submissions', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -25,6 +25,7 @@ export const ACTIVITY_EVENTS = [
     'scanned-clean',
     'scanned-infected',
     'scan-failed',
+    'exported',
     'login',
     'logout',
     'login-failed',
@@ -62,6 +63,11 @@ export const LOG_NAME_LABELS = {
     menus: 'Menus',
     'menu-items': 'Menu Items',
     categories: 'Categories',
+    forms: 'Forms',
+    'form-pages': 'Form Pages',
+    'form-fields': 'Form Fields',
+    'form-webhooks': 'Form Webhooks',
+    'form-submissions': 'Form Submissions',
     auth: 'Authentication',
 };
 
@@ -98,6 +104,12 @@ export const SUBJECT_TYPE_LABELS = {
     menu: 'Menu',
     menu_item: 'Menu Item',
     category: 'Category',
+    form: 'Form',
+    form_page: 'Form page',
+    form_field: 'Form field',
+    form_webhook: 'Form webhook',
+    form_blocked_ip: 'Blocked IP',
+    form_submission: 'Form submission',
 };
 
 /** Generic fallback wording, used when there is no per-module message below. */
@@ -110,6 +122,7 @@ export const EVENT_LABELS = {
     'scanned-clean': 'Scan passed',
     'scanned-infected': 'Malware found',
     'scan-failed': 'Scan failed',
+    exported: 'Exported',
     login: 'Signed in',
     logout: 'Signed out',
     'login-failed': 'Failed sign-in',
@@ -283,10 +296,59 @@ const ACTIVITY_MESSAGES = {
         updated: 'Updated the menu item :name',
         deleted: 'Deleted the menu item :name',
     },
+    forms: {
+        created: 'Created the form :name',
+        updated: 'Updated the form :name',
+        deleted: 'Deleted the form :name',
+        // Blocked countries, blocked IPs and notification groups all log
+        // against the form rather than against a link nobody opens.
+        attached: 'Added :name to the form',
+        detached: 'Removed :name from the form',
+    },
+    'form-pages': {
+        created: 'Added the form page :name',
+        updated: 'Updated the form page :name',
+        deleted: 'Removed the form page :name',
+    },
+    'form-fields': {
+        created: 'Added the field :name',
+        updated: 'Updated the field :name',
+        deleted: 'Removed the field :name',
+    },
+    'form-webhooks': {
+        created: 'Added the webhook :name',
+        updated: 'Updated the webhook :name',
+        deleted: 'Removed the webhook :name',
+    },
+    'form-submissions': {
+        // Submissions are not audited on create or update — the table is the
+        // record. Only an admin destroying one is worth a row.
+        deleted: 'Deleted the submission :name',
+        // Reading data out changes no column, so there is nothing to diff — the
+        // export writes this row by hand. The subject is the FORM.
+        exported: 'Exported :count submission(s) from :name',
+    },
     auth: {
         login: ':name signed in',
         logout: ':name signed out',
         'login-failed': 'Failed sign-in attempt for :name',
+    },
+};
+
+/**
+ * Wording that depends on the SUBJECT rather than the module, consulted before
+ * ACTIVITY_MESSAGES and only where the module's own wording would be wrong.
+ *
+ * A blocked IP is logged under `forms` — blocking an address IS an activity on
+ * the form, and the form is where it is read — but the subject of the row is the
+ * blocked-IP record, not the form. On the (log_name, event) pair alone its
+ * `created` row renders as "Created the form 203.0.113.5". Every other subject
+ * falls straight through to the module wording below.
+ */
+const SUBJECT_TYPE_MESSAGES = {
+    form_blocked_ip: {
+        created: 'Blocked the address :name',
+        deleted: 'Unblocked the address :name',
     },
 };
 
@@ -301,12 +363,19 @@ function interpolate(text, values) {
 /**
  * Most specific wording available, falling back to the stored English so a row
  * is never unreadable:
- *   messages.<log_name>.<event>  ->  events.<event>  ->  description
+ *   subject.<subject_type>.<event>  ->  messages.<log_name>.<event>
+ *   ->  events.<event>  ->  description
  */
 export function activityMessage(row) {
     if (!row) return '';
 
     const meta = row.properties?.meta ?? {};
+
+    // A subject that is not what its module logs about wins over the module —
+    // see SUBJECT_TYPE_MESSAGES.
+    const bySubject = SUBJECT_TYPE_MESSAGES[row.subject_type]?.[row.event];
+    if (bySubject) return interpolate(bySubject, meta);
+
     const specific = ACTIVITY_MESSAGES[row.log_name]?.[row.event];
     if (specific) return interpolate(specific, meta);
 

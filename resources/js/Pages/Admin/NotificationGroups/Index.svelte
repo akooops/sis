@@ -4,6 +4,8 @@
     import IndexCard from '@/components/data/IndexCard.svelte';
     import DataTable from '@/components/data/DataTable.svelte';
     import SearchBar from '@/components/data/SearchBar.svelte';
+    import Filters from '@/components/data/Filters.svelte';
+    import FilterButton from '@/components/data/FilterButton.svelte';
     import Badge from '@/components/ui/Badge.svelte';
     import IdBadge from '@/components/data/IdBadge.svelte';
     import RowActions from '@/components/data/RowActions.svelte';
@@ -11,6 +13,7 @@
     import ActivityDrawer from '@/components/activity/ActivityDrawer.svelte';
     import NotificationGroupForm from './NotificationGroupForm.svelte';
     import MembersDrawer from './MembersDrawer.svelte';
+    import FormsDrawer from './FormsDrawer.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
     import { hasPermission } from '@/lib/permissions';
     import { api } from '@/lib/api/client';
@@ -21,8 +24,11 @@
 
     let showForm = $state(false);
     let editing = $state(null);
+    let filtersOpen = $state(false);
     let membersOpen = $state(false);
     let membersGroup = $state(null);
+    let formsOpen = $state(false);
+    let formsGroup = $state(null);
     let viewOpen = $state(false);
     let viewing = $state(null);
     let activityOpen = $state(false);
@@ -37,11 +43,43 @@
         { key: 'members_count', label: 'Members', truncate: false },
     ];
 
+    // Mirrors the controller's allowedSorts.
+    const sortOptions = [
+        { value: 'id', label: 'ID' },
+        { value: 'name', label: 'Name' },
+        { value: 'code', label: 'Code' },
+        { value: 'created_at', label: 'Created' },
+    ];
+
+    // Mirrors the controller's allowedFilters.
+    const filterConfig = [
+        {
+            key: 'integration_id',
+            type: 'resource-select',
+            label: 'Delivery',
+            resource: 'api.v1.admin.integrations.index',
+            placeholder: 'Any integration',
+        },
+        {
+            // Where "Open these groups" from a form lands. Declared here as well
+            // as on the controller so the deep link arrives as a VISIBLE,
+            // clearable filter rather than a silent narrowing of the list.
+            key: 'form_id',
+            type: 'resource-select',
+            label: 'Notified by form',
+            resource: 'api.v1.admin.forms.index',
+            placeholder: 'Any form',
+        },
+    ];
+
     const create = () => { editing = null; showForm = true; };
     const edit = (g) => { editing = g; showForm = true; };
     const closeForm = () => { showForm = false; editing = null; };
     const saved = () => { closeForm(); list.refresh(); };
     const manageMembers = (g) => { membersGroup = g; membersOpen = true; };
+    // The other end of Forms → Notified groups: same pivot, same rows, opened
+    // from whichever side the admin happens to be standing on.
+    const manageForms = (g) => { formsGroup = g; formsOpen = true; };
     const view = (g) => { viewing = g; viewOpen = true; };
     const showActivity = (g) => { activityRow = g; activityOpen = true; };
 
@@ -62,6 +100,16 @@
 <AdminLayout title="Notification Groups">
     <IndexCard {showForm} {toolbar} {form} {table} />
     <MembersDrawer bind:open={membersOpen} group={membersGroup} />
+    <FormsDrawer bind:open={formsOpen} group={formsGroup} />
+
+    <Filters
+        bind:open={filtersOpen}
+        config={filterConfig}
+        values={list.params.filter}
+        sort={list.sort}
+        {sortOptions}
+        onapply={(filter, sort) => list.apply({ filter, sort })}
+    />
 
     <DetailDrawer
         bind:open={viewOpen}
@@ -84,6 +132,7 @@
     {#if !inForm}
         <div class="flex items-center gap-2">
             <SearchBar placeholder="Search groups…" value={list.search} onsearch={(v) => list.setSearch(v)} />
+            <FilterButton count={list.activeFilters} onclick={() => (filtersOpen = true)} />
         </div>
         {#if hasPermission('notification-groups.store')}
             <button class="kt-btn kt-btn-sm kt-btn-primary" onclick={create}>
@@ -145,6 +194,7 @@
         hasPermission('notification-groups.update') && { icon: 'ki-pencil', label: 'Edit', onclick: () => edit(row) },
         hasPermission('activities.index') && { icon: 'ki-time', label: 'Activity', onclick: () => showActivity(row) },
         hasPermission('notification-group-users.index') && { icon: 'ki-people', label: 'Manage members', onclick: () => manageMembers(row) },
+        hasPermission('form-notification-groups.index') && { icon: 'ki-questionnaire-tablet', label: 'Forms', onclick: () => manageForms(row) },
         hasPermission('notification-groups.destroy') && { icon: 'ki-trash', label: 'Delete', onclick: () => remove(row), variant: 'destructive' },
     ].filter(Boolean)} />
 {/snippet}

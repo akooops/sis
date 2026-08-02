@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('size');
 
             $table->string('disk');
+            $table->string('folder')->nullable();
             $table->json('custom_properties')->nullable();
 
             $table->string('state')->nullable();
@@ -30,6 +31,7 @@ return new class extends Migration
             $table->index('order_column');
             $table->index('state');
             $table->index(['model_type', 'model_id']);
+            $table->index(['disk', 'folder']);
 
             $table->timestamps();
         });

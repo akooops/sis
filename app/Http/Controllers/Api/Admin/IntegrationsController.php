@@ -24,6 +24,14 @@ class IntegrationsController extends ApiController
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('integration_type_id'),
+                AllowedFilter::exact('is_enabled'),
+                /*
+                 * By type CODE rather than id, so a picker can ask for "the
+                 * enabled captcha integrations" without first resolving the
+                 * type row. An unknown code matches nothing, which is the right
+                 * answer — a slot for a type nobody has configured is empty.
+                 */
+                AllowedFilter::callback('type', fn ($query, $value) => $query->ofType((string) $value)),
                 $this->search(['id', 'name']),
             ])
             ->allowedSorts(['id', 'name', 'created_at'])

@@ -12,9 +12,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * The content of a notification, created once by an observer via
+ * The content of a notification, created once by an observer or job via
  * NotificationService::send() and fanned out through notification_users. The
  * icon comes from the type; route_name/route_params build the click-through.
+ *
+ * Every notification carries a type — notification_type_id is NOT NULL. The
+ * type is what groups subscribe to; a caller may route to extra groups on top
+ * of the subscribers (a form's own groups), but never without a type.
  *
  * Append-only with no delete UI, so it is MassPrunable: the daily model:prune
  * builder-deletes rows past notifications.prune_after_days (no events — a

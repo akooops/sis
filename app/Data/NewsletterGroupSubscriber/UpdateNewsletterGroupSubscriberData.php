@@ -27,7 +27,7 @@ class UpdateNewsletterGroupSubscriberData extends Data
                 'required', 'email', 'max:255',
                 Rule::unique('newsletter_group_subscribers', 'email')
                     ->where('newsletter_group_id', $context->payload['newsletter_group_id'] ?? null)
-                    ->ignore(request()->route('newsletter_group_subscriber')),
+                    ->ignore(request()->route('newsletterGroupSubscriber')),
             ],
             'name' => ['nullable', 'string', 'max:255'],
 

@@ -51,7 +51,7 @@ class UpdateJobOfferData extends Data
             'slug' => [
                 'required', 'string', 'max:255',
                 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
-                Rule::unique('job_offers', 'slug')->ignore(request()->route('job_offer')),
+                Rule::unique('job_offers', 'slug')->ignore(request()->route('jobOffer')),
             ],
 
             // Blank resolves to the default category in the controller.

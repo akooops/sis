@@ -13,6 +13,15 @@ use App\Http\Controllers\Api\Admin\CategoriesController;
 use App\Http\Controllers\Api\Admin\CountriesController;
 use App\Http\Controllers\Api\Admin\DocumentsController;
 use App\Http\Controllers\Api\Admin\EventsController;
+use App\Http\Controllers\Api\Admin\FormAnalyticsController;
+use App\Http\Controllers\Api\Admin\FormBlockedCountriesController;
+use App\Http\Controllers\Api\Admin\FormBlockedIpsController;
+use App\Http\Controllers\Api\Admin\FormBuilderController;
+use App\Http\Controllers\Api\Admin\FormFieldTypesController;
+use App\Http\Controllers\Api\Admin\FormNotificationGroupsController;
+use App\Http\Controllers\Api\Admin\FormsController;
+use App\Http\Controllers\Api\Admin\FormSubmissionsController;
+use App\Http\Controllers\Api\Admin\FormWebhooksController;
 use App\Http\Controllers\Api\Admin\GradesController;
 use App\Http\Controllers\Api\Admin\IntegrationsController;
 use App\Http\Controllers\Api\Admin\IntegrationTypesController;
@@ -242,19 +251,19 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
 
         // Newsletter Groups
         Route::get('newsletter-groups', [NewsletterGroupsController::class, 'index'])->middleware('verify.permissions:newsletter-groups.index')->name('api.v1.admin.newsletter-groups.index');
-        Route::get('newsletter-groups/{newsletter_group}', [NewsletterGroupsController::class, 'show'])->middleware('verify.permissions:newsletter-groups.index')->name('api.v1.admin.newsletter-groups.show');
+        Route::get('newsletter-groups/{newsletterGroup}', [NewsletterGroupsController::class, 'show'])->middleware('verify.permissions:newsletter-groups.index')->name('api.v1.admin.newsletter-groups.show');
         Route::post('newsletter-groups', [NewsletterGroupsController::class, 'store'])->middleware('verify.permissions:newsletter-groups.store')->name('api.v1.admin.newsletter-groups.store');
-        Route::put('newsletter-groups/{newsletter_group}', [NewsletterGroupsController::class, 'update'])->middleware('verify.permissions:newsletter-groups.update')->name('api.v1.admin.newsletter-groups.update');
-        Route::delete('newsletter-groups/{newsletter_group}', [NewsletterGroupsController::class, 'destroy'])->middleware('verify.permissions:newsletter-groups.destroy')->name('api.v1.admin.newsletter-groups.destroy');
+        Route::put('newsletter-groups/{newsletterGroup}', [NewsletterGroupsController::class, 'update'])->middleware('verify.permissions:newsletter-groups.update')->name('api.v1.admin.newsletter-groups.update');
+        Route::delete('newsletter-groups/{newsletterGroup}', [NewsletterGroupsController::class, 'destroy'])->middleware('verify.permissions:newsletter-groups.destroy')->name('api.v1.admin.newsletter-groups.destroy');
         // Nested read: the same index, with the group pinned server-side.
-        Route::get('newsletter-groups/{newsletter_group}/subscribers', [NewsletterGroupSubscribersController::class, 'forGroup'])->middleware('verify.permissions:newsletter-group-subscribers.index')->name('api.v1.admin.newsletter-groups.subscribers.index');
+        Route::get('newsletter-groups/{newsletterGroup}/subscribers', [NewsletterGroupSubscribersController::class, 'forGroup'])->middleware('verify.permissions:newsletter-group-subscribers.index')->name('api.v1.admin.newsletter-groups.subscribers.index');
 
         // Newsletter Group Subscribers
         Route::get('newsletter-group-subscribers', [NewsletterGroupSubscribersController::class, 'index'])->middleware('verify.permissions:newsletter-group-subscribers.index')->name('api.v1.admin.newsletter-group-subscribers.index');
-        Route::get('newsletter-group-subscribers/{newsletter_group_subscriber}', [NewsletterGroupSubscribersController::class, 'show'])->middleware('verify.permissions:newsletter-group-subscribers.index')->name('api.v1.admin.newsletter-group-subscribers.show');
+        Route::get('newsletter-group-subscribers/{newsletterGroupSubscriber}', [NewsletterGroupSubscribersController::class, 'show'])->middleware('verify.permissions:newsletter-group-subscribers.index')->name('api.v1.admin.newsletter-group-subscribers.show');
         Route::post('newsletter-group-subscribers', [NewsletterGroupSubscribersController::class, 'store'])->middleware('verify.permissions:newsletter-group-subscribers.store')->name('api.v1.admin.newsletter-group-subscribers.store');
-        Route::put('newsletter-group-subscribers/{newsletter_group_subscriber}', [NewsletterGroupSubscribersController::class, 'update'])->middleware('verify.permissions:newsletter-group-subscribers.update')->name('api.v1.admin.newsletter-group-subscribers.update');
-        Route::delete('newsletter-group-subscribers/{newsletter_group_subscriber}', [NewsletterGroupSubscribersController::class, 'destroy'])->middleware('verify.permissions:newsletter-group-subscribers.destroy')->name('api.v1.admin.newsletter-group-subscribers.destroy');
+        Route::put('newsletter-group-subscribers/{newsletterGroupSubscriber}', [NewsletterGroupSubscribersController::class, 'update'])->middleware('verify.permissions:newsletter-group-subscribers.update')->name('api.v1.admin.newsletter-group-subscribers.update');
+        Route::delete('newsletter-group-subscribers/{newsletterGroupSubscriber}', [NewsletterGroupSubscribersController::class, 'destroy'])->middleware('verify.permissions:newsletter-group-subscribers.destroy')->name('api.v1.admin.newsletter-group-subscribers.destroy');
 
         // Newsletters
         Route::get('newsletters', [NewslettersController::class, 'index'])->middleware('verify.permissions:newsletters.index')->name('api.v1.admin.newsletters.index');
@@ -274,12 +283,12 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
 
         // Menu items
         Route::get('menu-items', [MenuItemsController::class, 'index'])->middleware('verify.permissions:menu-items.index')->name('api.v1.admin.menu-items.index');
-        Route::get('menu-items/{menu_item}', [MenuItemsController::class, 'show'])->middleware('verify.permissions:menu-items.index')->name('api.v1.admin.menu-items.show');
+        Route::get('menu-items/{menuItem}', [MenuItemsController::class, 'show'])->middleware('verify.permissions:menu-items.index')->name('api.v1.admin.menu-items.show');
         Route::post('menu-items', [MenuItemsController::class, 'store'])->middleware('verify.permissions:menu-items.store')->name('api.v1.admin.menu-items.store');
-        // Declared before menu-items/{menu_item} so 'reorder' is not bound as an id.
+        // Declared before menu-items/{menuItem} so 'reorder' is not bound as an id.
         Route::post('menu-items/reorder', [MenuItemsController::class, 'reorder'])->middleware('verify.permissions:menu-items.reorder')->name('api.v1.admin.menu-items.reorder');
-        Route::put('menu-items/{menu_item}', [MenuItemsController::class, 'update'])->middleware('verify.permissions:menu-items.update')->name('api.v1.admin.menu-items.update');
-        Route::delete('menu-items/{menu_item}', [MenuItemsController::class, 'destroy'])->middleware('verify.permissions:menu-items.destroy')->name('api.v1.admin.menu-items.destroy');
+        Route::put('menu-items/{menuItem}', [MenuItemsController::class, 'update'])->middleware('verify.permissions:menu-items.update')->name('api.v1.admin.menu-items.update');
+        Route::delete('menu-items/{menuItem}', [MenuItemsController::class, 'destroy'])->middleware('verify.permissions:menu-items.destroy')->name('api.v1.admin.menu-items.destroy');
 
         // Programs
         Route::get('programs', [ProgramsController::class, 'index'])->middleware('verify.permissions:programs.index')->name('api.v1.admin.programs.index');
@@ -310,15 +319,56 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
 
         // Job Offers
         Route::get('job-offers', [JobOffersController::class, 'index'])->middleware('verify.permissions:job-offers.index')->name('api.v1.admin.job-offers.index');
-        Route::get('job-offers/{job_offer}', [JobOffersController::class, 'show'])->middleware('verify.permissions:job-offers.index')->name('api.v1.admin.job-offers.show');
+        Route::get('job-offers/{jobOffer}', [JobOffersController::class, 'show'])->middleware('verify.permissions:job-offers.index')->name('api.v1.admin.job-offers.show');
         Route::post('job-offers', [JobOffersController::class, 'store'])->middleware('verify.permissions:job-offers.store')->name('api.v1.admin.job-offers.store');
-        Route::put('job-offers/{job_offer}', [JobOffersController::class, 'update'])->middleware('verify.permissions:job-offers.update')->name('api.v1.admin.job-offers.update');
-        Route::delete('job-offers/{job_offer}', [JobOffersController::class, 'destroy'])->middleware('verify.permissions:job-offers.destroy')->name('api.v1.admin.job-offers.destroy');
+        Route::put('job-offers/{jobOffer}', [JobOffersController::class, 'update'])->middleware('verify.permissions:job-offers.update')->name('api.v1.admin.job-offers.update');
+        Route::delete('job-offers/{jobOffer}', [JobOffersController::class, 'destroy'])->middleware('verify.permissions:job-offers.destroy')->name('api.v1.admin.job-offers.destroy');
 
         // Countries
         Route::get('countries', [CountriesController::class, 'index'])->middleware('verify.permissions:countries.index')->name('api.v1.admin.countries.index');
         Route::get('countries/{country}', [CountriesController::class, 'show'])->middleware('verify.permissions:countries.index')->name('api.v1.admin.countries.show');
         Route::post('countries', [CountriesController::class, 'store'])->middleware('verify.permissions:countries.store')->name('api.v1.admin.countries.store');
         Route::put('countries/{country}', [CountriesController::class, 'update'])->middleware('verify.permissions:countries.update')->name('api.v1.admin.countries.update');
+
+        // Forms. 
+        Route::get('form-field-types', [FormFieldTypesController::class, 'index'])->middleware('verify.permissions:form-fields.index')->name('api.v1.admin.form-field-types.index');
+        Route::get('forms', [FormsController::class, 'index'])->middleware('verify.permissions:forms.index')->name('api.v1.admin.forms.index');
+        Route::get('forms/{form}', [FormsController::class, 'show'])->middleware('verify.permissions:forms.show')->name('api.v1.admin.forms.show');
+        Route::post('forms', [FormsController::class, 'store'])->middleware('verify.permissions:forms.store')->name('api.v1.admin.forms.store');
+        Route::put('forms/{form}', [FormsController::class, 'update'])->middleware('verify.permissions:forms.update')->name('api.v1.admin.forms.update');
+        Route::delete('forms/{form}', [FormsController::class, 'destroy'])->middleware('verify.permissions:forms.destroy')->name('api.v1.admin.forms.destroy');
+        Route::get('forms/{form}/builder', [FormBuilderController::class, 'show'])->middleware('verify.permissions:forms.index')->name('api.v1.admin.forms.builder.show');
+        Route::put('forms/{form}/builder', [FormBuilderController::class, 'update'])->middleware('verify.permissions:forms.update')->name('api.v1.admin.forms.builder.update');
+
+        // Analytic
+        Route::get('forms/{form}/analytics', [FormAnalyticsController::class, 'show'])->middleware('verify.permissions:forms.show')->name('api.v1.admin.forms.analytics');
+
+        // Webhooks.
+        Route::get('form-webhooks', [FormWebhooksController::class, 'index'])->middleware('verify.permissions:form-webhooks.index')->name('api.v1.admin.form-webhooks.index');
+        Route::post('form-webhooks/{form}', [FormWebhooksController::class, 'store'])->middleware('verify.permissions:form-webhooks.store')->name('api.v1.admin.form-webhooks.store');
+        Route::put('form-webhooks/{formWebhook}', [FormWebhooksController::class, 'update'])->middleware('verify.permissions:form-webhooks.update')->name('api.v1.admin.form-webhooks.update');
+        Route::delete('form-webhooks/{formWebhook}', [FormWebhooksController::class, 'destroy'])->middleware('verify.permissions:form-webhooks.destroy')->name('api.v1.admin.form-webhooks.destroy');
+
+        // Blocked addresses.
+        Route::get('form-blocked-ips', [FormBlockedIpsController::class, 'index'])->middleware('verify.permissions:form-blocked-ips.index')->name('api.v1.admin.form-blocked-ips.index');
+        Route::post('form-blocked-ips', [FormBlockedIpsController::class, 'store'])->middleware('verify.permissions:form-blocked-ips.store')->name('api.v1.admin.form-blocked-ips.store');
+        Route::delete('form-blocked-ips/{formBlockedIp}', [FormBlockedIpsController::class, 'destroy'])->middleware('verify.permissions:form-blocked-ips.destroy')->name('api.v1.admin.form-blocked-ips.destroy');
+
+        // Blocked countries.
+        Route::get('form-blocked-countries/geo-status', [FormBlockedCountriesController::class, 'geoStatus'])->middleware('verify.permissions:form-blocked-countries.index')->name('api.v1.admin.form-blocked-countries.geo-status');
+        Route::get('form-blocked-countries', [FormBlockedCountriesController::class, 'index'])->middleware('verify.permissions:form-blocked-countries.index')->name('api.v1.admin.form-blocked-countries.index');
+        Route::post('form-blocked-countries', [FormBlockedCountriesController::class, 'store'])->middleware('verify.permissions:form-blocked-countries.store')->name('api.v1.admin.form-blocked-countries.store');
+        Route::delete('form-blocked-countries/{formBlockedCountry}', [FormBlockedCountriesController::class, 'destroy'])->middleware('verify.permissions:form-blocked-countries.destroy')->name('api.v1.admin.form-blocked-countries.destroy');
+
+        // Notification routing.
+        Route::get('form-notification-groups', [FormNotificationGroupsController::class, 'index'])->middleware('verify.permissions:form-notification-groups.index')->name('api.v1.admin.form-notification-groups.index');
+        Route::post('form-notification-groups', [FormNotificationGroupsController::class, 'store'])->middleware('verify.permissions:form-notification-groups.store')->name('api.v1.admin.form-notification-groups.store');
+        Route::delete('form-notification-groups/{formNotificationGroup}', [FormNotificationGroupsController::class, 'destroy'])->middleware('verify.permissions:form-notification-groups.destroy')->name('api.v1.admin.form-notification-groups.destroy');
+
+        // Submissions 
+        Route::get('form-submissions', [FormSubmissionsController::class, 'index'])->middleware('verify.permissions:form-submissions.index')->name('api.v1.admin.form-submissions.index');
+        Route::get('form-submissions/{form}/export', [FormSubmissionsController::class, 'export'])->middleware('verify.permissions:form-submissions.export')->name('api.v1.admin.form-submissions.export');
+        Route::get('form-submissions/{formSubmission}/files/{media}', [FormSubmissionsController::class, 'file'])->middleware(['signed', 'verify.permissions:form-submissions.show'])->name('api.v1.admin.form-submissions.file');
+        Route::get('form-submissions/{formSubmission}', [FormSubmissionsController::class, 'show'])->middleware('verify.permissions:form-submissions.show')->name('api.v1.admin.form-submissions.show');
     });
 });

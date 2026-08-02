@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
- * A kind of notification (system.announcement, user.approved…), mirroring
- * config('notifications.types'). Grown by code, never CRUD. Groups subscribe to
- * types, and emitting one fans out to their members.
+ * A kind of notification (user.pending_approval, form.submission_received…),
+ * mirroring config('notifications.types'). Grown by code, never CRUD. Groups
+ * subscribe to types, and emitting one fans out to their members.
+ *
+ * There is one flavour and it is subscribable — nothing here is hidden from the
+ * picker. A caller may hand send() extra group ids (a form hands in the groups
+ * attached to it), but that is on TOP of the subscribers, never instead of the
+ * type: every notification carries one.
  */
 class NotificationType extends Model
 {

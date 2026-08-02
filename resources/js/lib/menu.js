@@ -65,6 +65,9 @@ export const adminMenu = [
         label: 'Forms',
         icon: 'ki-filled ki-questionnaire-tablet',
         children: [
+            // Forms first: submissions hang off one, and the Submissions action drills in from there.
+            { label: 'Forms', route: 'web.admin.forms.index', permission: 'forms.index' },
+            { label: 'Submissions', route: 'web.admin.form-submissions.index', permission: 'form-submissions.index' },
             { label: 'Countries', route: 'web.admin.countries.index', permission: 'countries.index' },
         ],
     },

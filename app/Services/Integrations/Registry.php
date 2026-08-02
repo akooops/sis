@@ -117,9 +117,32 @@ class Registry
      */
     protected function fieldRules(FieldData $field, bool $forUpdate): array
     {
-        // Update: everything optional (a blank secret keeps the stored value).
-        // Store: required fields must be present.
-        $rules = ! $forUpdate && $field->required ? ['required'] : ['sometimes', 'nullable'];
+        /*
+         * Store: required fields must be present and non-blank.
+         *
+         * Update: `sometimes` + `required` is NOT "required on update". Laravel
+         * skips every rule on an attribute the payload does not carry, so a key
+         * may still be OMITTED to leave the stored value alone — which is what
+         * applyValues(forUpdate: true) does by starting from the stored config.
+         * What the pair stops is sending the key BLANK, which used to overwrite a
+         * working value with '' and half-configure the integration: a captcha with
+         * no site key renders no widget yet still demands a token, an SMTP row
+         * with no host cannot send, a GA4 row with no measurement id draws no tag.
+         * No driver has a required non-secret field that is legitimately blank, so
+         * nothing legitimate is refused.
+         *
+         * Falsy values are safe: Laravel's `required` only rejects null, a
+         * whitespace-only string and an empty array/Countable, so 0, '0' and false
+         * all pass it — a required number (SMTP port) or switch is not caught out.
+         *
+         * Secrets stay nullable on update because blank is how the form says "keep
+         * the stored one" (see applyValues()).
+         */
+        if ($field->required) {
+            $rules = ! $forUpdate ? ['required'] : ($field->secret ? ['sometimes', 'nullable'] : ['sometimes', 'required']);
+        } else {
+            $rules = ['sometimes', 'nullable'];
+        }
 
         $rules[] = match ($field->type) {
             'number' => 'numeric',
@@ -129,6 +152,12 @@ class Registry
             'select' => Rule::in(array_map(fn ($o) => $o['value'], $field->options ?? [])),
             default => 'string',
         };
+
+        // Shape, when the driver declares one. Last, so the type rule still
+        // reports first on a value that is not even a string.
+        if ($field->pattern !== null) {
+            $rules[] = 'regex:'.$field->pattern;
+        }
 
         return $rules;
     }

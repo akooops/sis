@@ -21,6 +21,17 @@ class RecaptchaDriver implements Driver, VerifiesCaptcha
 {
     protected const VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
 
+    /**
+     * The v3 action our client mints tokens for.
+     *
+     * Must match the literal in FormRenderer.svelte's
+     * `grecaptcha.execute(siteKey, { action: 'submit' })` — a token carries the
+     * action it was minted for, and the two ends have to agree or every real
+     * visitor is rejected. Not a schema field on purpose: the renderer is the
+     * only client, so an admin-settable value could only ever be set wrong.
+     */
+    protected const V3_ACTION = 'submit';
+
     public function code(): string
     {
         return 'recaptcha';
@@ -109,6 +120,33 @@ class RecaptchaDriver implements Driver, VerifiesCaptcha
 
         if (($config['version'] ?? 'v2') !== 'v3') {
             return CaptchaResultData::passed();
+        }
+
+        /*
+         * v3 only, and BEFORE the score: `success` alone just says the token is a
+         * real, unspent token for this site key. A token is minted FOR an action,
+         * and the response echoes that action back — so one harvested from another
+         * v3 flow on the same key (a login widget, another page of ours) is
+         * rejected here rather than scored and waved through.
+         *
+         * Checked only when the body carries it. Every real v3 response does; if
+         * Google ever drops the field, degrading to the score check is far better
+         * than rejecting every human on every form.
+         *
+         * `hostname` is deliberately NOT checked. This driver has no request
+         * context to compare it against, a site key may legitimately be registered
+         * for several domains (staging, a second brand, a proxied host that does
+         * not match what the browser sent), and there is no config here to express
+         * the allowed set — so the check would break real deployments silently.
+         * Google's own key-level domain validation, on by default, is what stops a
+         * token being minted on somebody else's site in the first place.
+         */
+        $action = $json['action'] ?? null;
+
+        if (is_string($action) && $action !== '' && $action !== self::V3_ACTION) {
+            Log::channel('integrations')->warning('reCAPTCHA action mismatch', ['action' => $action, 'expected' => self::V3_ACTION]);
+
+            return CaptchaResultData::failed();
         }
 
         $score = (float) ($json['score'] ?? 0);

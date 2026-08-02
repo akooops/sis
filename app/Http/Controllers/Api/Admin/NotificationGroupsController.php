@@ -26,6 +26,10 @@ class NotificationGroupsController extends ApiController
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('integration_id'),
+                // "Which groups does this form notify?" — the destination of the
+                // Forms page's drill-through, so the link carries the filter
+                // instead of dropping the admin into the unfiltered list.
+                AllowedFilter::exact('form_id', 'forms.id'),
                 $this->search(['id', 'name', 'code']),
             ])
             ->allowedSorts(['id', 'name', 'code', 'created_at'])

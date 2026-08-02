@@ -12,6 +12,12 @@ use App\Models\Category;
 use App\Models\Country;
 use App\Models\Document;
 use App\Models\Event;
+use App\Models\Form;
+use App\Models\FormBlockedIp;
+use App\Models\FormField;
+use App\Models\FormPage;
+use App\Models\FormSubmission;
+use App\Models\FormWebhook;
 use App\Models\Grade;
 use App\Models\Integration;
 use App\Models\JobOffer;
@@ -75,6 +81,12 @@ enum MorphType: string
     case Program = 'program';
     case Stream = 'stream';
     case Grade = 'grade';
+    case Form = 'form';
+    case FormPage = 'form_page';
+    case FormField = 'form_field';
+    case FormWebhook = 'form_webhook';
+    case FormBlockedIp = 'form_blocked_ip';
+    case FormSubmission = 'form_submission';
 
     /** @return class-string */
     public function class(): string
@@ -111,6 +123,12 @@ enum MorphType: string
             self::Program => Program::class,
             self::Stream => Stream::class,
             self::Grade => Grade::class,
+            self::Form => Form::class,
+            self::FormPage => FormPage::class,
+            self::FormField => FormField::class,
+            self::FormWebhook => FormWebhook::class,
+            self::FormBlockedIp => FormBlockedIp::class,
+            self::FormSubmission => FormSubmission::class,
         };
     }
 

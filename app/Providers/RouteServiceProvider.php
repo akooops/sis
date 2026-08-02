@@ -28,6 +28,24 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        // Public form endpoints. Keyed by IP because the caller is anonymous —
+        // which is also why App\Http\Middleware\TrustProxies must be configured
+        // in production, or every visitor shares one bucket.
+        RateLimiter::for('form-submits', function (Request $request) {
+            return Limit::perMinute((int) config('forms.limits.submits_per_minute', 10))->by($request->ip());
+        });
+
+        RateLimiter::for('form-uploads', function (Request $request) {
+            return Limit::perMinute((int) config('forms.limits.uploads_per_minute', 20))->by($request->ip());
+        });
+
+        // The analytics beacon. CSRF-excepted (sendBeacon cannot set a header),
+        // so this and the submission token are what stand between the endpoint
+        // and anyone at all.
+        RateLimiter::for('form-telemetry', function (Request $request) {
+            return Limit::perMinute((int) config('forms.limits.telemetry_per_minute', 60))->by($request->ip());
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')

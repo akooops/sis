@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Form;
 use Inertia\Response;
 
 class PagesController extends Controller
@@ -165,5 +166,56 @@ class PagesController extends Controller
     public function grades(): Response
     {
         return inertia('Admin/Grades/Index');
+    }
+
+    /**
+     * `trustsProxies` is deployment state, not form data, so it comes down with
+     * the shell rather than from the API.
+     *
+     * The blocked-addresses drawer needs it to tell the admin the truth: every
+     * per-form IP block is enforced against request()->ip(), and with no trusted
+     * proxy configured behind a load balancer that address is the balancer's.
+     * Blocking it blocks everyone; blocking a visitor's real address blocks
+     * no one. A block list that quietly does neither is worse than an empty one.
+     */
+    public function forms(): Response
+    {
+        return inertia('Admin/Forms/Index', [
+            'trustsProxies' => filled(config('app.trusted_proxies')),
+        ]);
+    }
+
+    /**
+     * Its own page rather than a drawer off Forms: the Forms table drills in
+     * with ?filter[form_id]=…, which the client reads out of the URL, so a
+     * filtered list stays linkable and exportable.
+     */
+    public function formSubmissions(): Response
+    {
+        return inertia('Admin/FormSubmissions/Index');
+    }
+
+    /**
+     * The one shell in this controller that takes an argument.
+     *
+     * The builder cannot fetch anything until it knows which form it is
+     * building, and binding here means an unknown id 404s before the page
+     * renders rather than after. Only the id is passed — everything else comes
+     * from the API, like every other page.
+     */
+    public function formBuilder(Form $form): Response
+    {
+        return inertia('Admin/Forms/Builder', ['formId' => $form->id]);
+    }
+
+    /**
+     * The analytics dashboard for one form. Parameterised for the same reason
+     * the builder is: there is nothing to render until it is known which form's
+     * numbers are being read, and an unknown id should 404 here rather than
+     * after a page of empty charts has already drawn.
+     */
+    public function formAnalytics(Form $form): Response
+    {
+        return inertia('Admin/Forms/Analytics', ['formId' => $form->id]);
     }
 }

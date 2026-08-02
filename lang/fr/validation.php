@@ -166,6 +166,8 @@ return [
     'upload_unscanned' => 'Le champ :attribute n\'a pas encore passé l\'analyse de sécurité.',
     'captcha' => 'La vérification a échoué. Veuillez confirmer que vous n\'êtes pas un robot, puis réessayer.',
     'captcha_unavailable' => 'La vérification n\'a pas pu être effectuée pour le moment. Veuillez réessayer dans un instant.',
+    'step' => 'Le champ :attribute doit être un multiple de :step.',
+    'ip_or_cidr' => 'Le champ :attribute doit être une adresse IP valide ou une plage CIDR (par exemple 203.0.113.5 ou 203.0.113.0/24).',
 
     /*
     |--------------------------------------------------------------------------

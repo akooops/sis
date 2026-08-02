@@ -31,7 +31,7 @@ class UpdateMenuItemData extends Data
         $codes = Language::enabledCodes();
         $default = Language::defaultCode();
 
-        $item = request()->route('menu_item');
+        $item = request()->route('menuItem');
         $item = $item instanceof MenuItem ? $item : null;
 
         // Depth 2: the parent must be a root item of the SAME menu, never itself.
