@@ -3,6 +3,7 @@
 namespace App\Data\Brand;
 
 use App\Rules\CleanUpload;
+use App\Traits\Css\SanitisesCustomCss;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
@@ -10,6 +11,8 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 /** Create takes the default locale only; the rest come from the edit form. */
 class StoreBrandData extends Data
 {
+    use SanitisesCustomCss;
+
     public function __construct(
         public string $name,
         public string $slug,
@@ -43,7 +46,10 @@ class StoreBrandData extends Data
                 ? ['required', 'date', 'after:now']
                 : ['nullable', 'date'],
 
-            'css_url' => ['nullable', 'url', 'max:2048'],
+            'css_url' => ['nullable', 'url:http,https', 'max:2048'],
+            // Counted AFTER SanitisesCustomCss has stripped the value, so the
+            // limit measures what will be stored — in characters, not bytes: the
+            // column is TEXT, so a heavily multibyte sheet can still overflow it.
             'custom_css' => ['nullable', 'string', 'max:65535'],
 
             'thumbnail' => ['required', 'string', new CleanUpload('images')],

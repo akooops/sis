@@ -4,6 +4,7 @@ namespace App\Data\Form;
 
 use App\Models\Form;
 use App\Rules\CleanUpload;
+use App\Traits\Css\SanitisesCustomCss;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
@@ -43,6 +44,10 @@ class StoreFormData extends Data
         public bool $is_spam_filtered = true,
         public ?int $min_submit_seconds = null,
         public bool $is_captcha_enabled = false,
+        // Required by the rules below and read by FormsController::store(), so
+        // it has to be declared: a rule without a property validates the key and
+        // then throws "Undefined property" the moment the controller reads it.
+        public bool $is_ip_stored = true,
 
         public string $confirmation_type = 'message',
         public ?string $redirect_url = null,
@@ -71,8 +76,9 @@ class StoreFormData extends Data
                 : ['nullable', 'date'],
 
             'css_url' => ['nullable', 'url:http,https', 'max:2048'],
-            // Measured AFTER SanitisesCustomCss has run, so the limit applies to
-            // what will actually be stored.
+            // Counted AFTER SanitisesCustomCss has stripped the value, so the
+            // limit measures what will be stored — in characters, not bytes: the
+            // column is TEXT, so a heavily multibyte sheet can still overflow it.
             'custom_css' => ['nullable', 'string', 'max:65535'],
 
             'category_id' => ['nullable', 'string', Rule::exists('categories', 'id')],

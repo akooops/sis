@@ -43,7 +43,23 @@
     onDestroy(() => iti?.destroy());
 </script>
 
-<input bind:this={el} type="tel" class="kt-input w-full {invalid ? 'border-destructive' : ''}" {disabled} />
+<!--
+    The wrapper is load-bearing, not layout.
+
+    intl-tel-input builds its own `.iti` container and MOVES this input inside it
+    (insertBefore + append), so the flag and dial code live in DOM that Svelte
+    never created and will not remove. destroy() unwinds that by reading
+    `telInput.parentNode` — but every step of it is optional-chained, so once
+    Svelte has detached the input there is no parent to find and the call
+    silently does nothing, stranding the container. That is the "+966" that hung
+    over the Email field after switching a contact detail away from a phone.
+
+    Wrapping the input in an element Svelte owns makes the whole subtree go at
+    once, so the leak cannot depend on teardown order.
+-->
+<div class="w-full">
+    <input bind:this={el} type="tel" class="kt-input w-full {invalid ? 'border-destructive' : ''}" {disabled} />
+</div>
 
 <style>
     :global(.iti) {

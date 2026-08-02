@@ -12,6 +12,7 @@ use App\Models\BrandAsset;
 use App\Models\BrandAssetGroup;
 use App\Models\Calendar;
 use App\Models\Category;
+use App\Models\ContactDetail;
 use App\Models\Country;
 use App\Models\Document;
 use App\Models\Event;
@@ -77,6 +78,7 @@ enum MorphType: string
     case Document = 'document';
     case Banner = 'banner';
     case Calendar = 'calendar';
+    case ContactDetail = 'contact_detail';
     case Newsletter = 'newsletter';
     case NewsletterGroup = 'newsletter_group';
     case NewsletterGroupSubscriber = 'newsletter_group_subscriber';
@@ -122,6 +124,7 @@ enum MorphType: string
             self::Document => Document::class,
             self::Banner => Banner::class,
             self::Calendar => Calendar::class,
+            self::ContactDetail => ContactDetail::class,
             self::Newsletter => Newsletter::class,
             self::NewsletterGroup => NewsletterGroup::class,
             self::NewsletterGroupSubscriber => NewsletterGroupSubscriber::class,

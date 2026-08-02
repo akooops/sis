@@ -148,6 +148,11 @@ class PagesController extends Controller
         return inertia('Admin/Documents/Index');
     }
 
+    public function contactDetails(): Response
+    {
+        return inertia('Admin/ContactDetails/Index');
+    }
+
     public function jobOffers(): Response
     {
         return inertia('Admin/JobOffers/Index');

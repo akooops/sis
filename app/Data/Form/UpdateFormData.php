@@ -5,6 +5,7 @@ namespace App\Data\Form;
 use App\Models\Form;
 use App\Models\Language;
 use App\Rules\CleanUpload;
+use App\Traits\Css\SanitisesCustomCss;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
@@ -88,8 +89,9 @@ class UpdateFormData extends Data
                 : ['nullable', 'date'],
 
             'css_url' => ['nullable', 'url:http,https', 'max:2048'],
-            // Measured AFTER SanitisesCustomCss has run, so the limit applies to
-            // what will actually be stored.
+            // Counted AFTER SanitisesCustomCss has stripped the value, so the
+            // limit measures what will be stored — in characters, not bytes: the
+            // column is TEXT, so a heavily multibyte sheet can still overflow it.
             'custom_css' => ['nullable', 'string', 'max:65535'],
 
             'category_id' => ['nullable', 'string', Rule::exists('categories', 'id')],

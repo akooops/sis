@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'brands', 'brand-asset-groups', 'brand-assets', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'calendars', 'newsletters', 'newsletter-groups', 'newsletter-group-subscribers', 'programs', 'streams', 'grades', 'job-offers', 'countries', 'menus', 'menu-items', 'forms', 'form-pages', 'form-fields', 'form-webhooks', 'form-submissions', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'pages', 'articles', 'albums', 'brands', 'brand-asset-groups', 'brand-assets', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'calendars', 'contact-details', 'newsletters', 'newsletter-groups', 'newsletter-group-subscribers', 'programs', 'streams', 'grades', 'job-offers', 'countries', 'menus', 'menu-items', 'forms', 'form-pages', 'form-fields', 'form-webhooks', 'form-submissions', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -55,6 +55,7 @@ export const LOG_NAME_LABELS = {
     documents: 'Documents',
     banners: 'Banners',
     calendars: 'Calendars',
+    'contact-details': 'Contact Details',
     newsletters: 'Newsletters',
     'newsletter-groups': 'Newsletter Groups',
     'newsletter-group-subscribers': 'Subscribers',
@@ -99,6 +100,7 @@ export const SUBJECT_TYPE_LABELS = {
     document: 'Document',
     banner: 'Banner',
     calendar: 'Calendar',
+    contact_detail: 'Contact detail',
     newsletter: 'Newsletter',
     newsletter_group: 'Newsletter Group',
     newsletter_group_subscriber: 'Subscriber',
@@ -264,6 +266,11 @@ const ACTIVITY_MESSAGES = {
         created: 'Created the calendar :name',
         updated: 'Updated the calendar :name',
         deleted: 'Deleted the calendar :name',
+    },
+    'contact-details': {
+        created: 'Created the contact detail :name',
+        updated: 'Updated the contact detail :name',
+        deleted: 'Deleted the contact detail :name',
     },
     newsletters: {
         created: 'Created the newsletter :name',

@@ -119,6 +119,14 @@ class PermissionsSeeder extends Seeder
             ['code' => 'calendars.update', 'name' => 'Update calendars', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'calendars.destroy', 'name' => 'Delete calendars', 'supports_web' => true, 'supports_api' => false],
 
+            // The read-only type registry is gated by contact-details.index — it
+            // has no code of its own.
+            ['code' => 'contact-details.index', 'name' => 'View contact details', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'contact-details.store', 'name' => 'Create contact details', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'contact-details.update', 'name' => 'Update contact details', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'contact-details.reorder', 'name' => 'Reorder contact details', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'contact-details.destroy', 'name' => 'Delete contact details', 'supports_web' => true, 'supports_api' => false],
+
             ['code' => 'newsletters.index', 'name' => 'View newsletters', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'newsletters.store', 'name' => 'Create newsletters', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'newsletters.update', 'name' => 'Update newsletters', 'supports_web' => true, 'supports_api' => false],

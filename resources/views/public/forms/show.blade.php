@@ -92,11 +92,17 @@
 
          {!! !!} is deliberate: escaping would turn `>` into &gt; and every
          descendant selector with it, which breaks the one thing this field is
-         for. It is safe because nothing unescaped ever gets INTO the column —
-         App\Data\Form\SanitisesCustomCss strips `</style`, `<script`,
-         `expression(`, `javascript:` and `@import` in prepareForPipeline, on
-         both the create and the update payload, so a value that could close this
-         block never reaches the database. --}}
+         for. It is safe HERE because App\Traits\Css\SanitisesCustomCss strips
+         `</style` and `<script` on the way into the column, on both the create
+         and the update payload, so a value that could close this block never
+         reaches the database — and <style> is RAWTEXT, so with those gone
+         nothing left in the value can start a tag.
+
+         That is a guarantee about THIS context and no other. The value still
+         carries whatever else the admin typed (`<img onerror=…>` survives the
+         strip untouched), so it is inert in a <style> block and live XSS in a
+         text node or a style="" attribute. Copy this block as-is; do not
+         interpolate the column anywhere else. --}}
     @if ($form->custom_css)
         <style>{!! $form->custom_css !!}</style>
     @endif

@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\Admin\BrandAssetsController;
 use App\Http\Controllers\Api\Admin\BrandsController;
 use App\Http\Controllers\Api\Admin\CalendarsController;
 use App\Http\Controllers\Api\Admin\CategoriesController;
+use App\Http\Controllers\Api\Admin\ContactDetailsController;
+use App\Http\Controllers\Api\Admin\ContactTypesController;
 use App\Http\Controllers\Api\Admin\CountriesController;
 use App\Http\Controllers\Api\Admin\DocumentsController;
 use App\Http\Controllers\Api\Admin\EventsController;
@@ -228,6 +230,17 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('brand-assets/reorder', [BrandAssetsController::class, 'reorder'])->middleware('verify.permissions:brand-assets.reorder')->name('api.v1.admin.brand-assets.reorder');
         Route::put('brand-assets/{brandAsset}', [BrandAssetsController::class, 'update'])->middleware('verify.permissions:brand-assets.update')->name('api.v1.admin.brand-assets.update');
         Route::delete('brand-assets/{brandAsset}', [BrandAssetsController::class, 'destroy'])->middleware('verify.permissions:brand-assets.destroy')->name('api.v1.admin.brand-assets.destroy');
+
+        // Contact details
+        Route::get('contact-types', [ContactTypesController::class, 'index'])->middleware('verify.permissions:contact-details.index')->name('api.v1.admin.contact-types.index');
+
+        Route::get('contact-details', [ContactDetailsController::class, 'index'])->middleware('verify.permissions:contact-details.index')->name('api.v1.admin.contact-details.index');
+        Route::get('contact-details/{contactDetail}', [ContactDetailsController::class, 'show'])->middleware('verify.permissions:contact-details.index')->name('api.v1.admin.contact-details.show');
+        Route::post('contact-details', [ContactDetailsController::class, 'store'])->middleware('verify.permissions:contact-details.store')->name('api.v1.admin.contact-details.store');
+        // Declared before contact-details/{contactDetail} so 'reorder' is not bound as an id.
+        Route::post('contact-details/reorder', [ContactDetailsController::class, 'reorder'])->middleware('verify.permissions:contact-details.reorder')->name('api.v1.admin.contact-details.reorder');
+        Route::put('contact-details/{contactDetail}', [ContactDetailsController::class, 'update'])->middleware('verify.permissions:contact-details.update')->name('api.v1.admin.contact-details.update');
+        Route::delete('contact-details/{contactDetail}', [ContactDetailsController::class, 'destroy'])->middleware('verify.permissions:contact-details.destroy')->name('api.v1.admin.contact-details.destroy');
 
         // Events
         Route::get('events', [EventsController::class, 'index'])->middleware('verify.permissions:events.index')->name('api.v1.admin.events.index');

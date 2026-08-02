@@ -57,6 +57,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('calendars', [AdminPagesController::class, 'calendars'])->middleware('verify.permissions:calendars.index')->name('web.admin.calendars.index');
     Route::get('banners', [AdminPagesController::class, 'banners'])->middleware('verify.permissions:banners.index')->name('web.admin.banners.index');
     Route::get('documents', [AdminPagesController::class, 'documents'])->middleware('verify.permissions:documents.index')->name('web.admin.documents.index');
+    Route::get('contact-details', [AdminPagesController::class, 'contactDetails'])->middleware('verify.permissions:contact-details.index')->name('web.admin.contact-details.index');
     Route::get('programs', [AdminPagesController::class, 'programs'])->middleware('verify.permissions:programs.index')->name('web.admin.programs.index');
     Route::get('streams', [AdminPagesController::class, 'streams'])->middleware('verify.permissions:streams.index')->name('web.admin.streams.index');
     Route::get('job-offers', [AdminPagesController::class, 'jobOffers'])->middleware('verify.permissions:job-offers.index')->name('web.admin.job-offers.index');

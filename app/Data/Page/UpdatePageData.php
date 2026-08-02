@@ -5,6 +5,7 @@ namespace App\Data\Page;
 use App\Models\Language;
 use App\Models\Page;
 use App\Rules\CleanUpload;
+use App\Traits\Css\SanitisesCustomCss;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
@@ -13,6 +14,8 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 /** Every locale at once. Errors come back keyed `title.ar`. */
 class UpdatePageData extends Data
 {
+    use SanitisesCustomCss;
+
     public function __construct(
         public string $name,
         public string $slug,
@@ -63,7 +66,10 @@ class UpdatePageData extends Data
                 ? ['required', 'date', 'after:now']
                 : ['nullable', 'date'],
 
-            'css_url' => ['nullable', 'url', 'max:2048'],
+            'css_url' => ['nullable', 'url:http,https', 'max:2048'],
+            // Counted AFTER SanitisesCustomCss has stripped the value, so the
+            // limit measures what will be stored — in characters, not bytes: the
+            // column is TEXT, so a heavily multibyte sheet can still overflow it.
             'custom_css' => ['nullable', 'string', 'max:65535'],
 
             'thumbnail' => ['sometimes', 'nullable', 'string', new CleanUpload('images')],
