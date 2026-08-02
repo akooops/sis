@@ -65,6 +65,23 @@ class PermissionsSeeder extends Seeder
             ['code' => 'albums.update', 'name' => 'Update albums', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'albums.destroy', 'name' => 'Delete albums', 'supports_web' => true, 'supports_api' => false],
 
+            ['code' => 'brands.index', 'name' => 'View brands', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'brands.store', 'name' => 'Create brands', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'brands.update', 'name' => 'Update brands', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'brands.destroy', 'name' => 'Delete brands', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'brand-asset-groups.index', 'name' => 'View brand asset groups', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'brand-asset-groups.store', 'name' => 'Create brand asset groups', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'brand-asset-groups.update', 'name' => 'Update brand asset groups', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'brand-asset-groups.reorder', 'name' => 'Reorder brand asset groups', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'brand-asset-groups.destroy', 'name' => 'Delete brand asset groups', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'brand-assets.index', 'name' => 'View brand assets', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'brand-assets.store', 'name' => 'Create brand assets', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'brand-assets.update', 'name' => 'Update brand assets', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'brand-assets.reorder', 'name' => 'Reorder brand assets', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'brand-assets.destroy', 'name' => 'Delete brand assets', 'supports_web' => true, 'supports_api' => false],
+
             ['code' => 'events.index', 'name' => 'View events', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'events.store', 'name' => 'Create events', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'events.update', 'name' => 'Update events', 'supports_web' => true, 'supports_api' => false],

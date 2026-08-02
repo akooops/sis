@@ -45,6 +45,16 @@ export const adminMenu = [
         ],
     },
     {
+        label: 'Brand',
+        icon: 'ki-filled ki-color-swatch',
+        children: [
+            // Brands first: groups hang off one, and the drill-downs land on the two below.
+            { label: 'Brands', route: 'web.admin.brands.index', permission: 'brands.index' },
+            { label: 'Asset Groups', route: 'web.admin.brand-asset-groups.index', permission: 'brand-asset-groups.index' },
+            { label: 'Assets', route: 'web.admin.brand-assets.index', permission: 'brand-assets.index' },
+        ],
+    },
+    {
         label: 'Academic',
         icon: 'ki-filled ki-teacher',
         children: [

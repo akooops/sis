@@ -2,16 +2,19 @@
 
 namespace App\Data\Page;
 
+use App\Data\Menu\MenuData;
 use App\Models\Page;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Lazy;
 
-/** Translatable fields are full locale => value maps. */
+/** Translatable fields are full locale => value maps. `menu` is Lazy — included only when eager-loaded. */
 class PageData extends Data
 {
     public function __construct(
         public string $id,
         public string $name,
         public string $slug,
+        public ?string $menu_id,
         /** @var array<string, string|null> */
         public array $title,
         /** @var array<string, string|null> */
@@ -26,6 +29,7 @@ class PageData extends Data
         public ?string $thumbnail_url,
         public ?string $created_at,
         public ?string $updated_at,
+        public Lazy|MenuData|null $menu,
     ) {}
 
     public static function fromModel(Page $page): self
@@ -34,6 +38,7 @@ class PageData extends Data
             id: $page->id,
             name: $page->name,
             slug: $page->slug,
+            menu_id: $page->menu_id,
             title: $page->enabledTranslations('title'),
             description: $page->enabledTranslations('description'),
             content: $page->enabledTranslations('content'),
@@ -45,6 +50,7 @@ class PageData extends Data
             thumbnail_url: $page->thumbnail_url,
             created_at: $page->created_at?->toIso8601String(),
             updated_at: $page->updated_at?->toIso8601String(),
+            menu: Lazy::whenLoaded('menu', $page, fn () => $page->menu ? MenuData::from($page->menu) : null),
         );
     }
 }

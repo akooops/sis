@@ -25,11 +25,12 @@ class PagesController extends ApiController
     public function index(): JsonResponse
     {
         $pages = QueryBuilder::for(Page::class)
-            ->with('media')
+            ->with(['media', 'menu'])
             ->allowedFilters([
                 AllowedFilter::exact('id'),
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('is_system'),
+                AllowedFilter::exact('menu_id'),
                 $this->searchTranslations(
                     ['id', 'name', 'slug'],
                     ['title', 'description'],
@@ -46,7 +47,7 @@ class PagesController extends ApiController
 
     public function show(Page $page): JsonResponse
     {
-        return $this->respond(PageData::from($page), 'Page retrieved successfully');
+        return $this->respond(PageData::from($page->load('menu')), 'Page retrieved successfully');
     }
 
     public function store(StorePageData $data): JsonResponse
@@ -56,6 +57,7 @@ class PagesController extends ApiController
         $page = Page::create([
             'name' => $data->name,
             'slug' => $data->slug,
+            'menu_id' => $data->menu_id,
             'title' => [$default => $data->title],
             'description' => [$default => $data->description],
             'content' => [$default => $data->content],
@@ -67,7 +69,7 @@ class PagesController extends ApiController
 
         UploadService::attach($data->thumbnail, $page, Page::THUMBNAIL_COLLECTION);
 
-        return $this->respond(PageData::from($page->fresh()), 'Page created successfully', 201);
+        return $this->respond(PageData::from($page->fresh()->load('menu')), 'Page created successfully', 201);
     }
 
     public function update(UpdatePageData $data, Page $page): JsonResponse
@@ -97,7 +99,7 @@ class PagesController extends ApiController
             UploadService::attach($data->thumbnail, $page, Page::THUMBNAIL_COLLECTION);
         }
 
-        return $this->respond(PageData::from($page->fresh()), 'Page updated successfully');
+        return $this->respond(PageData::from($page->fresh()->load('menu')), 'Page updated successfully');
     }
 
     public function destroy(Page $page): JsonResponse

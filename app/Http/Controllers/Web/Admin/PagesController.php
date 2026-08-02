@@ -83,6 +83,21 @@ class PagesController extends Controller
         return inertia('Admin/Albums/Index');
     }
 
+    public function brands(): Response
+    {
+        return inertia('Admin/Brands/Index');
+    }
+
+    public function brandAssetGroups(): Response
+    {
+        return inertia('Admin/BrandAssetGroups/Index');
+    }
+
+    public function brandAssets(): Response
+    {
+        return inertia('Admin/BrandAssets/Index');
+    }
+
     public function events(): Response
     {
         return inertia('Admin/Events/Index');

@@ -8,6 +8,9 @@ use App\Http\Controllers\Api\Admin\ApiKeysController;
 use App\Http\Controllers\Api\Admin\ArticlesController;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\BannersController;
+use App\Http\Controllers\Api\Admin\BrandAssetGroupsController;
+use App\Http\Controllers\Api\Admin\BrandAssetsController;
+use App\Http\Controllers\Api\Admin\BrandsController;
 use App\Http\Controllers\Api\Admin\CalendarsController;
 use App\Http\Controllers\Api\Admin\CategoriesController;
 use App\Http\Controllers\Api\Admin\CountriesController;
@@ -196,6 +199,35 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('albums', [AlbumsController::class, 'store'])->middleware('verify.permissions:albums.store')->name('api.v1.admin.albums.store');
         Route::put('albums/{album}', [AlbumsController::class, 'update'])->middleware('verify.permissions:albums.update')->name('api.v1.admin.albums.update');
         Route::delete('albums/{album}', [AlbumsController::class, 'destroy'])->middleware('verify.permissions:albums.destroy')->name('api.v1.admin.albums.destroy');
+
+        // Brands
+        Route::get('brands', [BrandsController::class, 'index'])->middleware('verify.permissions:brands.index')->name('api.v1.admin.brands.index');
+        Route::get('brands/{brand}', [BrandsController::class, 'show'])->middleware('verify.permissions:brands.index')->name('api.v1.admin.brands.show');
+        Route::post('brands', [BrandsController::class, 'store'])->middleware('verify.permissions:brands.store')->name('api.v1.admin.brands.store');
+        Route::put('brands/{brand}', [BrandsController::class, 'update'])->middleware('verify.permissions:brands.update')->name('api.v1.admin.brands.update');
+        Route::delete('brands/{brand}', [BrandsController::class, 'destroy'])->middleware('verify.permissions:brands.destroy')->name('api.v1.admin.brands.destroy');
+        // Nested read: the same index, with the brand pinned server-side.
+        Route::get('brands/{brand}/asset-groups', [BrandAssetGroupsController::class, 'forBrand'])->middleware('verify.permissions:brand-asset-groups.index')->name('api.v1.admin.brands.asset-groups.index');
+
+        // Brand asset groups
+        Route::get('brand-asset-groups', [BrandAssetGroupsController::class, 'index'])->middleware('verify.permissions:brand-asset-groups.index')->name('api.v1.admin.brand-asset-groups.index');
+        Route::get('brand-asset-groups/{brandAssetGroup}', [BrandAssetGroupsController::class, 'show'])->middleware('verify.permissions:brand-asset-groups.index')->name('api.v1.admin.brand-asset-groups.show');
+        Route::post('brand-asset-groups', [BrandAssetGroupsController::class, 'store'])->middleware('verify.permissions:brand-asset-groups.store')->name('api.v1.admin.brand-asset-groups.store');
+        // Declared before brand-asset-groups/{brandAssetGroup} so 'reorder' is not bound as an id.
+        Route::post('brand-asset-groups/reorder', [BrandAssetGroupsController::class, 'reorder'])->middleware('verify.permissions:brand-asset-groups.reorder')->name('api.v1.admin.brand-asset-groups.reorder');
+        Route::put('brand-asset-groups/{brandAssetGroup}', [BrandAssetGroupsController::class, 'update'])->middleware('verify.permissions:brand-asset-groups.update')->name('api.v1.admin.brand-asset-groups.update');
+        Route::delete('brand-asset-groups/{brandAssetGroup}', [BrandAssetGroupsController::class, 'destroy'])->middleware('verify.permissions:brand-asset-groups.destroy')->name('api.v1.admin.brand-asset-groups.destroy');
+        // Nested read: the same index, with the group pinned server-side.
+        Route::get('brand-asset-groups/{brandAssetGroup}/assets', [BrandAssetsController::class, 'forGroup'])->middleware('verify.permissions:brand-assets.index')->name('api.v1.admin.brand-asset-groups.assets.index');
+
+        // Brand assets
+        Route::get('brand-assets', [BrandAssetsController::class, 'index'])->middleware('verify.permissions:brand-assets.index')->name('api.v1.admin.brand-assets.index');
+        Route::get('brand-assets/{brandAsset}', [BrandAssetsController::class, 'show'])->middleware('verify.permissions:brand-assets.index')->name('api.v1.admin.brand-assets.show');
+        Route::post('brand-assets', [BrandAssetsController::class, 'store'])->middleware('verify.permissions:brand-assets.store')->name('api.v1.admin.brand-assets.store');
+        // Declared before brand-assets/{brandAsset} so 'reorder' is not bound as an id.
+        Route::post('brand-assets/reorder', [BrandAssetsController::class, 'reorder'])->middleware('verify.permissions:brand-assets.reorder')->name('api.v1.admin.brand-assets.reorder');
+        Route::put('brand-assets/{brandAsset}', [BrandAssetsController::class, 'update'])->middleware('verify.permissions:brand-assets.update')->name('api.v1.admin.brand-assets.update');
+        Route::delete('brand-assets/{brandAsset}', [BrandAssetsController::class, 'destroy'])->middleware('verify.permissions:brand-assets.destroy')->name('api.v1.admin.brand-assets.destroy');
 
         // Events
         Route::get('events', [EventsController::class, 'index'])->middleware('verify.permissions:events.index')->name('api.v1.admin.events.index');

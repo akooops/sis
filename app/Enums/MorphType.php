@@ -7,6 +7,9 @@ use App\Models\Album;
 use App\Models\ApiKey;
 use App\Models\Article;
 use App\Models\Banner;
+use App\Models\Brand;
+use App\Models\BrandAsset;
+use App\Models\BrandAssetGroup;
 use App\Models\Calendar;
 use App\Models\Category;
 use App\Models\Country;
@@ -64,6 +67,9 @@ enum MorphType: string
     case Page = 'page';
     case Article = 'article';
     case Album = 'album';
+    case Brand = 'brand';
+    case BrandAssetGroup = 'brand_asset_group';
+    case BrandAsset = 'brand_asset';
     case Event = 'event';
     case Category = 'category';
     case Achievement = 'achievement';
@@ -106,6 +112,9 @@ enum MorphType: string
             self::Page => Page::class,
             self::Article => Article::class,
             self::Album => Album::class,
+            self::Brand => Brand::class,
+            self::BrandAssetGroup => BrandAssetGroup::class,
+            self::BrandAsset => BrandAsset::class,
             self::Event => Event::class,
             self::Category => Category::class,
             self::Achievement => Achievement::class,

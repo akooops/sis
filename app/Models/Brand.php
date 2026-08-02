@@ -2,31 +2,27 @@
 
 namespace App\Models;
 
-use App\States\Page\PageStatus;
-use App\States\Page\Published;
+use App\States\Brand\BrandStatus;
+use App\States\Brand\Published;
 use App\Traits\Translations\HasEnabledTranslations;
 use App\Traits\Uploads\HasMedia;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\ModelStates\HasStates;
 use Spatie\Translatable\HasTranslations;
 
 /**
- * An editorial record with a public slug and a publish workflow.
+ * A brand whose downloadable identity assets are filed into ordered groups —
+ * "Visual identity" -> fonts, logos, and so on. The page body (title/description/
+ * content) is the article-style write-up; the groups are what visitors come for.
  *
  * `name` is the internal label; title/description/content are translated into
- * JSON columns. That is content — the UI catalogue is still lang/*.php.
- *
- * `menu_id` is an optional menu the page renders alongside its content — a section
- * nav; null means none.
- *
- * One collection, `thumbnail`. Images inserted into the content stay FREE media:
- * nothing prunes them, so nothing needs to own them.
+ * JSON columns. Deleting a brand cascades to its groups and their assets.
  */
-class Page extends Model
+class Brand extends Model
 {
     use HasEnabledTranslations, HasFactory, HasMedia, HasStates, HasTranslations, HasUlids;
 
@@ -49,25 +45,23 @@ class Page extends Model
     protected $appends = ['thumbnail_url'];
 
     protected $casts = [
-        'status' => PageStatus::class,
+        'status' => BrandStatus::class,
         'published_at' => 'datetime',
-        'is_system' => 'bool',
     ];
 
     /* -----------------------------------------
      2. Relationships
     ------------------------------------------*/
 
-    public function menu(): BelongsTo
+    public function assetGroups(): HasMany
     {
-        return $this->belongsTo(Menu::class);
+        return $this->hasMany(BrandAssetGroup::class)->orderBy('order');
     }
 
     /* -----------------------------------------
      3. Accessors
     ------------------------------------------*/
 
-    /** Null when unset — no bundled fallback, and it is required at creation. */
     public function getThumbnailUrlAttribute(): ?string
     {
         return $this->getFirstMediaUrl(self::THUMBNAIL_COLLECTION);
@@ -77,15 +71,13 @@ class Page extends Model
      4. Methods
     ------------------------------------------*/
 
-    /** Pages the public site may serve. */
+    /** Brands the public site may serve. */
     public function scopeLive(Builder $query): Builder
     {
         return $query->whereState('status', Published::class);
     }
 
     /**
-     * One thumbnail: a new one frees the old back to the pool.
-     *
      * @return array<int, string>
      */
     public function singleFileCollections(): array

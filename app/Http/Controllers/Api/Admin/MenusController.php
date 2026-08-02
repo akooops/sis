@@ -43,6 +43,7 @@ class MenusController extends ApiController
         $menu = Menu::create([
             'name' => $data->name,
             'code' => $data->code,
+            'is_system' => false,
         ]);
 
         return $this->respond(MenuData::from($menu->loadCount('items')), 'Menu created successfully', 201);

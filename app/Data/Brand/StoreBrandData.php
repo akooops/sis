@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Data\Page;
+namespace App\Data\Brand;
 
 use App\Rules\CleanUpload;
 use Illuminate\Validation\Rule;
@@ -8,15 +8,14 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 /** Create takes the default locale only; the rest come from the edit form. */
-class StorePageData extends Data
+class StoreBrandData extends Data
 {
     public function __construct(
         public string $name,
         public string $slug,
-        public ?string $menu_id,
         public string $title,
-        public ?string $description,
-        public ?string $content,
+        public string $description,
+        public string $content,
         public string $status,
         public ?string $published_at,
         public ?string $css_url,
@@ -30,16 +29,16 @@ class StorePageData extends Data
 
         return [
             'name' => ['required', 'string', 'max:255'],
-            'slug' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('pages', 'slug')],
-
-            // Optional — a page without a section nav is the normal case.
-            'menu_id' => ['nullable', 'string', Rule::exists('menus', 'id')],
+            'slug' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', Rule::unique('brands', 'slug')],
 
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:1000'],
+            // Uncapped: JSON column, real limit is max_allowed_packet.
             'content' => ['required', 'string'],
 
+            // No 'hidden' at birth: nothing public to withdraw yet.
             'status' => ['required', Rule::in(['draft', 'scheduled', 'published'])],
+            // Only a schedule needs a date; publishing is stamped by the controller.
             'published_at' => $status === 'scheduled'
                 ? ['required', 'date', 'after:now']
                 : ['nullable', 'date'],

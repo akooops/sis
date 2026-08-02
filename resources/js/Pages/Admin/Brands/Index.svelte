@@ -1,5 +1,5 @@
 <script>
-    /** Pages index — content pages with a publish workflow and per-locale copy. */
+    /** Brands index — identity pages whose asset groups hold the downloadable kit. */
     import AdminLayout from '@/layouts/AdminLayout.svelte';
     import IndexCard from '@/components/data/IndexCard.svelte';
     import DataTable from '@/components/data/DataTable.svelte';
@@ -13,15 +13,16 @@
     import RowActions from '@/components/data/RowActions.svelte';
     import DetailDrawer from '@/components/data/DetailDrawer.svelte';
     import ActivityDrawer from '@/components/activity/ActivityDrawer.svelte';
-    import PageForm from './PageForm.svelte';
+    import BrandForm from './BrandForm.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
-    import { PAGE_STATUS_LABELS, PAGE_STATUS_VARIANTS } from '@/lib/page';
+    import { BRAND_STATUS_LABELS, BRAND_STATUS_VARIANTS } from '@/lib/brand';
     import { hasPermission } from '@/lib/permissions';
+    import { router } from '@inertiajs/svelte';
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
     import { confirm } from '@/lib/confirm';
 
-    const list = useIndex('api.v1.admin.pages.index', { perPage: 15, sort: '-created_at' });
+    const list = useIndex('api.v1.admin.brands.index', { perPage: 15, sort: '-created_at' });
 
     let showForm = $state(false);
     let editing = $state(null);
@@ -35,7 +36,8 @@
         { key: 'id', label: 'ID', sortable: true, width: '90px', truncate: false },
         { key: 'name', label: 'Name', sortable: true, truncate: false },
         { key: 'slug', label: 'Slug', sortable: true, truncate: false },
-        { key: 'menu', label: 'Menu', truncate: false },
+        // A withCount, not a column — nothing to sort on.
+        { key: 'asset_groups_count', label: 'Groups', width: '100px', truncate: false },
         { key: 'status', label: 'Status', sortable: true, truncate: false },
         { key: 'published_at', label: 'Published', sortable: true, truncate: false },
     ];
@@ -56,25 +58,27 @@
             key: 'status',
             type: 'select',
             label: 'Status',
-            options: Object.entries(PAGE_STATUS_LABELS).map(([value, label]) => ({ value, label })),
+            options: Object.entries(BRAND_STATUS_LABELS).map(([value, label]) => ({ value, label })),
         },
-        { key: 'is_system', type: 'boolean', label: 'System page' },
     ];
 
     const create = () => { editing = null; showForm = true; };
-    const edit = (p) => { editing = p; showForm = true; };
+    const edit = (b) => { editing = b; showForm = true; };
     const closeForm = () => { showForm = false; editing = null; };
     const saved = () => { closeForm(); list.refresh(); };
-    const view = (p) => { viewing = p; viewOpen = true; };
-    const showActivity = (p) => { activityRow = p; activityOpen = true; };
+    const view = (b) => { viewing = b; viewOpen = true; };
+    const showActivity = (b) => { activityRow = b; activityOpen = true; };
 
-    async function remove(p) {
+    /** Hand the child module its own page, pre-filtered to this brand. */
+    const drillDown = (name, b) => router.visit(`${route(name)}?filter[brand_id]=${b.id}`);
+
+    async function remove(b) {
         if (!(await confirm({
-            body: `Delete ${p.name}? Its uploaded images are returned to the media library, not destroyed. This cannot be undone.`,
+            body: `Delete ${b.name}? Its asset groups and every asset in them go with it. The uploaded files themselves are returned to the media library, not destroyed. This cannot be undone.`,
             variant: 'destructive',
         }))) return;
         try {
-            await api.delete(route('api.v1.admin.pages.destroy', p.id));
+            await api.delete(route('api.v1.admin.brands.destroy', b.id));
             toast.success('Deleted successfully.');
             list.refresh();
         } catch (e) {
@@ -83,9 +87,9 @@
     }
 </script>
 
-<svelte:head><title>Saud International Schools — Pages</title></svelte:head>
+<svelte:head><title>Saud International Schools — Brands</title></svelte:head>
 
-<AdminLayout title="Pages">
+<AdminLayout title="Brands">
     <IndexCard {showForm} {toolbar} {form} {table} />
 
     <Filters
@@ -98,33 +102,32 @@
     />
     <DetailDrawer
         bind:open={viewOpen}
-        title="Page"
+        title="Brand"
         id={viewing?.id}
         avatar={{ src: viewing?.thumbnail_url, name: viewing?.name }}
         heading={viewing?.name}
-        badge={viewing ? { label: PAGE_STATUS_LABELS[viewing.status] ?? viewing.status, variant: PAGE_STATUS_VARIANTS[viewing.status] ?? 'secondary' } : null}
+        badge={viewing ? { label: BRAND_STATUS_LABELS[viewing.status] ?? viewing.status, variant: BRAND_STATUS_VARIANTS[viewing.status] ?? 'secondary' } : null}
         fields={[
             { label: 'Slug', value: viewing?.slug },
-            { label: 'Menu', value: viewing?.menu?.name || '' },
+            { label: 'Asset groups', value: String(viewing?.asset_groups_count ?? 0) },
             { label: 'Published at', value: viewing?.published_at ?? '' },
             { label: 'Stylesheet', value: viewing?.css_url || '' },
-            { label: 'System page', value: viewing?.is_system ? 'Yes' : 'No' },
         ]}
         createdAt={viewing?.created_at}
         updatedAt={viewing?.updated_at}
     />
-    <ActivityDrawer bind:open={activityOpen} subjectType="page" subjectId={activityRow?.id} title={activityRow?.name} />
+    <ActivityDrawer bind:open={activityOpen} subjectType="brand" subjectId={activityRow?.id} title={activityRow?.name} />
 </AdminLayout>
 
 {#snippet toolbar(inForm)}
     {#if !inForm}
         <div class="flex items-center gap-2">
-            <SearchBar placeholder="Search pages…" value={list.search} onsearch={(v) => list.setSearch(v)} />
+            <SearchBar placeholder="Search brands…" value={list.search} onsearch={(v) => list.setSearch(v)} />
             <FilterButton count={list.activeFilters} onclick={() => (filtersOpen = true)} />
         </div>
-        {#if hasPermission('pages.store')}
+        {#if hasPermission('brands.store')}
             <button class="kt-btn kt-btn-sm kt-btn-primary" onclick={create}>
-                <i class="ki-filled ki-plus"></i>Add page
+                <i class="ki-filled ki-plus"></i>Add brand
             </button>
         {/if}
     {:else}
@@ -137,7 +140,7 @@
 <!-- `ready` comes from IndexCard: false while the fly transition runs, so the
      editor doesn't measure itself inside a transformed box. -->
 {#snippet form(ready)}
-    <PageForm page={editing} {ready} onsaved={saved} oncancel={closeForm} />
+    <BrandForm brand={editing} {ready} onsaved={saved} oncancel={closeForm} />
 {/snippet}
 
 {#snippet table()}
@@ -151,8 +154,8 @@
         onPageChange={list.goToPage}
         onPerPageChange={list.setPerPage}
         onRowClick={view}
-        emptyTitle="No pages yet"
-        emptyBody="Create a page to get started."
+        emptyTitle="No brands yet"
+        emptyBody="Create a brand to publish its identity assets."
         {cells}
         {rowActions}
     />
@@ -166,28 +169,19 @@
             {#if row.thumbnail_url}
                 <img src={row.thumbnail_url} alt="" class="size-8 shrink-0 rounded object-cover" />
             {/if}
-            <div class="flex min-w-0 flex-col">
-                <span class="text-sm font-medium text-mono">
-                    <ClampText value={row.name} maxWidth="200px" title={row.name} />
-                </span>
-                {#if row.is_system}<span class="text-xs text-muted-foreground">System page</span>{/if}
-            </div>
+            <span class="text-sm font-medium text-mono">
+                <ClampText value={row.name} maxWidth="200px" title={row.name} />
+            </span>
         </div>
     {:else if column.key === 'slug'}
         <Badge variant="secondary">
             <ClampText value={row.slug} maxWidth="160px" title={row.slug} />
         </Badge>
-    {:else if column.key === 'menu'}
-        {#if row.menu}
-            <Badge variant="primary">
-                <ClampText value={row.menu.name} maxWidth="140px" title={row.menu.name} />
-            </Badge>
-        {:else}
-            
-        {/if}
+    {:else if column.key === 'asset_groups_count'}
+        <Badge variant="secondary">{row.asset_groups_count ?? 0}</Badge>
     {:else if column.key === 'status'}
-        <Badge variant={PAGE_STATUS_VARIANTS[row.status] ?? 'secondary'}>
-            {PAGE_STATUS_LABELS[row.status] ?? row.status}
+        <Badge variant={BRAND_STATUS_VARIANTS[row.status] ?? 'secondary'}>
+            {BRAND_STATUS_LABELS[row.status] ?? row.status}
         </Badge>
     {:else if column.key === 'published_at'}
         {#if row.published_at}<DateTime value={row.published_at} />{:else}{/if}
@@ -199,8 +193,9 @@
 {#snippet rowActions(row)}
     <RowActions actions={[
         { icon: 'ki-eye', label: 'View', onclick: () => view(row) },
-        hasPermission('pages.update') && { icon: 'ki-pencil', label: 'Edit', onclick: () => edit(row) },
+        hasPermission('brands.update') && { icon: 'ki-pencil', label: 'Edit', onclick: () => edit(row) },
+        hasPermission('brand-asset-groups.index') && { icon: 'ki-folder', label: 'Asset groups', onclick: () => drillDown('web.admin.brand-asset-groups.index', row) },
         hasPermission('activities.index') && { icon: 'ki-time', label: 'Activity', onclick: () => showActivity(row) },
-        hasPermission('pages.destroy') && !row.is_system && { icon: 'ki-trash', label: 'Delete', onclick: () => remove(row), variant: 'destructive' },
+        hasPermission('brands.destroy') && { icon: 'ki-trash', label: 'Delete', onclick: () => remove(row), variant: 'destructive' },
     ].filter(Boolean)} />
 {/snippet}

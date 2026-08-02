@@ -44,6 +44,9 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('pages', [AdminPagesController::class, 'pages'])->middleware('verify.permissions:pages.index')->name('web.admin.pages.index');
     Route::get('articles', [AdminPagesController::class, 'articles'])->middleware('verify.permissions:articles.index')->name('web.admin.articles.index');
     Route::get('albums', [AdminPagesController::class, 'albums'])->middleware('verify.permissions:albums.index')->name('web.admin.albums.index');
+    Route::get('brands', [AdminPagesController::class, 'brands'])->middleware('verify.permissions:brands.index')->name('web.admin.brands.index');
+    Route::get('brand-asset-groups', [AdminPagesController::class, 'brandAssetGroups'])->middleware('verify.permissions:brand-asset-groups.index')->name('web.admin.brand-asset-groups.index');
+    Route::get('brand-assets', [AdminPagesController::class, 'brandAssets'])->middleware('verify.permissions:brand-assets.index')->name('web.admin.brand-assets.index');
     Route::get('events', [AdminPagesController::class, 'events'])->middleware('verify.permissions:events.index')->name('web.admin.events.index');
     Route::get('categories', [AdminPagesController::class, 'categories'])->middleware('verify.permissions:categories.index')->name('web.admin.categories.index');
     Route::get('achievements', [AdminPagesController::class, 'achievements'])->middleware('verify.permissions:achievements.index')->name('web.admin.achievements.index');

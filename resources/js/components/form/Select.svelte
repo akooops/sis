@@ -111,6 +111,24 @@
         })();
     });
 
+    // `resourceParams` can change while this stays mounted — a Filters field that
+    // follows another one (the group picker narrowing to the chosen brand) keeps
+    // the same route, so the {#key resource} remount never fires. The page already
+    // loaded belongs to the OLD params, and open() only refetches when the list is
+    // empty, so drop it here or the picker keeps offering the previous brand's rows.
+    // Plain last-key compare: the prop is an object literal rebuilt on every render,
+    // so comparing identity would clear the list forever.
+    let lastParamsKey = JSON.stringify(resourceParams ?? {});
+    $effect(() => {
+        const key = JSON.stringify(resourceParams ?? {});
+        if (key === lastParamsKey) return;
+        lastParamsKey = key;
+        untrack(() => {
+            remoteItems = [];
+            if (openState) fetchOptions();
+        });
+    });
+
     // Normalized options currently shown in the list.
     const listItems = $derived.by(() => {
         if (isRemote) {
