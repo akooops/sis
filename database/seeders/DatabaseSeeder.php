@@ -25,6 +25,10 @@ class DatabaseSeeder extends Seeder
             NewsletterGroupsSeeder::class,
             PagesSeeder::class,
             FormsSeeder::class,
+            // Last: a setting's default may name another record (a menu, a page,
+            // an integration), and a default only lands on the run that creates
+            // the row — so anything it could point at must already exist.
+            SettingsSeeder::class,
         ]);
 
         if (app()->environment('local')) {

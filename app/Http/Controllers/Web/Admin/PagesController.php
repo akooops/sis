@@ -68,6 +68,11 @@ class PagesController extends Controller
         return inertia('Admin/Translations/Index');
     }
 
+    public function settings(): Response
+    {
+        return inertia('Admin/Settings/Index');
+    }
+
     public function pages(): Response
     {
         return inertia('Admin/Pages/Index');

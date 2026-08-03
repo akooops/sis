@@ -40,6 +40,7 @@ use App\Models\Partner;
 use App\Models\Permission;
 use App\Models\Program;
 use App\Models\Role;
+use App\Models\Setting;
 use App\Models\Stream;
 use App\Models\TranslationKey;
 use App\Models\User;
@@ -65,6 +66,7 @@ enum MorphType: string
     case NotificationType = 'notification_type';
     case Language = 'language';
     case TranslationKey = 'translation_key';
+    case Setting = 'setting';
     case Page = 'page';
     case Article = 'article';
     case Album = 'album';
@@ -111,6 +113,7 @@ enum MorphType: string
             self::NotificationType => NotificationType::class,
             self::Language => Language::class,
             self::TranslationKey => TranslationKey::class,
+            self::Setting => Setting::class,
             self::Page => Page::class,
             self::Article => Article::class,
             self::Album => Album::class,

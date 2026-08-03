@@ -49,6 +49,11 @@ class PermissionsSeeder extends Seeder
             ['code' => 'translations.index', 'name' => 'View translations', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'translations.update', 'name' => 'Update translations', 'supports_web' => true, 'supports_api' => false],
 
+            // Settings are seeded from config, so a value is the only thing an
+            // admin writes — there is no store or destroy code to grant.
+            ['code' => 'settings.index', 'name' => 'View settings', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'settings.update', 'name' => 'Update settings', 'supports_web' => true, 'supports_api' => false],
+
             // Content pages.
             ['code' => 'pages.index', 'name' => 'View pages', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'pages.store', 'name' => 'Create pages', 'supports_web' => true, 'supports_api' => false],

@@ -115,6 +115,7 @@ export const adminMenu = [
         label: 'System',
         icon: 'ki-filled ki-setting-2',
         children: [
+            { label: 'Settings', route: 'web.admin.settings.index', permission: 'settings.index' },
             { label: 'Notification Groups', route: 'web.admin.notification-groups.index', permission: 'notification-groups.index' },
             { label: 'Integrations', route: 'web.admin.integrations.index', permission: 'integrations.index' },
             { label: 'Activity Log', route: 'web.admin.activities.index', permission: 'activities.index' },

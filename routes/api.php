@@ -49,6 +49,7 @@ use App\Http\Controllers\Api\Admin\ProgramsController;
 use App\Http\Controllers\Api\Admin\RolePermissionsController;
 use App\Http\Controllers\Api\Admin\RolesController;
 use App\Http\Controllers\Api\Admin\SessionsController;
+use App\Http\Controllers\Api\Admin\SettingsController;
 use App\Http\Controllers\Api\Admin\StreamsController;
 use App\Http\Controllers\Api\Admin\TranslationKeysController;
 use App\Http\Controllers\Api\Admin\TranslationsController;
@@ -180,6 +181,14 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         // Translations
         Route::get('translations/{language}', [TranslationsController::class, 'index'])->middleware('verify.permissions:translations.index')->name('api.v1.admin.translations.index');
         Route::put('translations/{language}/{translationKey}', [TranslationsController::class, 'update'])->middleware('verify.permissions:translations.update')->name('api.v1.admin.translations.update');
+
+        // Settings. Seeded from config/settings.php, so there is no store and no
+        // destroy — an admin edits a value and nothing else.
+        Route::get('settings', [SettingsController::class, 'index'])->middleware('verify.permissions:settings.index')->name('api.v1.admin.settings.index');
+        // Declared before settings/{setting} so 'groups' is not bound as an id.
+        Route::get('settings/groups', [SettingsController::class, 'groups'])->middleware('verify.permissions:settings.index')->name('api.v1.admin.settings.groups');
+        Route::get('settings/{setting}', [SettingsController::class, 'show'])->middleware('verify.permissions:settings.index')->name('api.v1.admin.settings.show');
+        Route::put('settings/{setting}', [SettingsController::class, 'update'])->middleware('verify.permissions:settings.update')->name('api.v1.admin.settings.update');
 
         // Pages
         Route::get('pages', [PagesController::class, 'index'])->middleware('verify.permissions:pages.index')->name('api.v1.admin.pages.index');
