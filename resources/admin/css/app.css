@@ -1,0 +1,88 @@
+/**
+ * Admin stylesheet — Metronic 9 (Tailwind 4) built from source via Vite.
+ *
+ * Unlike the old setup (a prebuilt public/assets/css/theme.css that never
+ * scanned our components), Tailwind here scans resources/admin/js/**, so ANY
+ * utility class used in a .svelte file is compiled. Brand tokens live in
+ * brand.css so a rebrand is a one-file change.
+ *
+ * The whole Metronic theme is in here. It must never reach a public page — see
+ * resources/site/css/site.css, which is the other, deliberately theme-free half.
+ */
+
+/* Tailwind core.
+   `source(none)` turns OFF automatic source detection, which scans the WHOLE
+   project and ignores the @source lines below — it was pulling resources/site
+   into this bundle (and site.css was pulling this one into a public page).
+   Explicit sources only, and they are this half of the tree. */
+@import 'tailwindcss' source(none);
+
+/* Scan our own source for utility classes (Svelte components + JS), plus the
+   Inertia shell — its <body> class list is Tailwind utilities too, and dropping
+   it would strip the demo1 layout off the page. */
+@source '../js/**/*.{svelte,js}';
+@source '../views/**/*.blade.php';
+
+/* Class-based dark mode (<html class="dark">), matching Metronic's toggle. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Metronic theme tokens + Tailwind @theme mapping (light/dark). */
+@import '../metronic/src/css/config.ktui.css';
+
+/* KTUI component classes (kt-btn, kt-card, kt-table, kt-drawer, …).
+   Three levels up: this file is resources/admin/css/, node_modules is at the
+   project root. The metronic imports around it are only one, because the theme
+   source is a sibling — resources/admin/metronic. */
+@import '../../../node_modules/@keenthemes/ktui/styles.css';
+
+/* Keenicons is imported from app.js (outside Tailwind's @layer system) so the
+   icon-glyph `content` isn't overridden by the unlayered ::before reset. */
+
+/* Metronic extra components + the demo1 layout. */
+@import '../metronic/src/css/components/index.css';
+@import '../metronic/src/css/demos/demo1.css';
+
+/* Brand overrides (colors, radius). Keep last so it wins. */
+@import './brand.css';
+
+/* The Inertia root must fill the flex body so the demo1 layout takes full width. */
+#app {
+    display: flex;
+    flex-grow: 1;
+    width: 100%;
+    min-width: 0;
+}
+
+/* Sidebar scrollbar thumb. Metronic's .kt-scrollable-* paints the thumb with
+   `var(--color-input)`, but that theme var is DECLARED on :root (@theme inline),
+   so it computes there once — light zinc-200 — and merely inherits into the
+   sidebar. Our sidebar is a nested `.dark` scope (dark rail on a light page),
+   which remaps `--input` but can't retroactively change `--color-input`, so the
+   thumb came out light. Re-point it at the raw token: declared HERE, it resolves
+   in whatever scope the sidebar is actually in. */
+#sidebar_scrollable {
+    --scrollbar-thumb-color: var(--input);
+}
+
+/* Collapsed sidebar (narrow rail): show ONLY the icons; hovering the sidebar
+   (Metronic expands it back to full width) or toggling it open reveals the rest.
+   Reinforces demo1's collapse rules with `!important` because our Svelte-driven
+   menu items carry Tailwind's `flex` utility, which otherwise wins the cascade
+   and keeps the accordion/labels visible. Desktop only (lg+). */
+@media (min-width: 1024px) {
+    body.kt-sidebar-collapse #sidebar:not(:hover) .kt-menu-title,
+    body.kt-sidebar-collapse #sidebar:not(:hover) .kt-menu-arrow,
+    body.kt-sidebar-collapse #sidebar:not(:hover) .kt-menu-bullet,
+    body.kt-sidebar-collapse #sidebar:not(:hover) .kt-menu-accordion {
+        display: none !important;
+    }
+
+    /* Center the remaining icon in the rail. */
+    body.kt-sidebar-collapse #sidebar:not(:hover) .kt-menu-link {
+        justify-content: center;
+        padding-inline: 0;
+    }
+    body.kt-sidebar-collapse #sidebar:not(:hover) .kt-menu-icon {
+        width: auto;
+    }
+}

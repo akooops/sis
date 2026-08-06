@@ -111,6 +111,7 @@ use App\Services\Translations\TranslationService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session as SessionFacade;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Activitylog\Facades\CauserResolver;
 use Spatie\Translatable\Facades\Translatable;
@@ -138,6 +139,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->registerViewNamespaces();
         $this->resolveActivityCauser();
         $this->useOurSessionTable();
         $this->useIntegrationMailer();
@@ -193,6 +195,21 @@ class AppServiceProvider extends ServiceProvider
         FormBlockedIp::observe(FormBlockedIpObserver::class);
         FormNotificationGroup::observe(FormNotificationGroupObserver::class);
         FormSubmission::observe(FormSubmissionObserver::class);
+    }
+
+    /**
+     * The two view roots, each behind its own namespace.
+     *
+     * resources/ is split into admin/ and site/ — two apps, two Vite bundles,
+     * two audiences. Blade is namespaced to match, so `site::layout` can never
+     * silently resolve to an admin file (or the reverse) once both halves grow
+     * a `layout` or a `pages/show`. config/view.php still lists both paths, so
+     * an unprefixed name resolves too; prefer the prefix in our own code.
+     */
+    protected function registerViewNamespaces(): void
+    {
+        View::addNamespace('admin', resource_path('admin/views'));
+        View::addNamespace('site', resource_path('site/views'));
     }
 
     /**

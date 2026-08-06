@@ -81,7 +81,7 @@ class User extends Authenticatable
 
     public function getAvatarUrlAttribute(): string
     {
-        return $this->getFirstMediaUrl('avatar') ?: URL::to('assets/media/avatars/blank.png');
+        return $this->getFirstMediaUrl('avatar') ?: URL::to('assets/admin/media/avatars/blank.png');
     }
 
     /* -----------------------------------------

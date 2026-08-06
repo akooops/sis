@@ -62,7 +62,7 @@ class Country extends Model
     public function getFlagUrlAttribute(): string
     {
         return $this->getFirstMediaUrl(self::FLAG_COLLECTION)
-            ?: URL::to('assets/media/flags/'.($this->flag ?: self::FLAG_FALLBACK).'.svg');
+            ?: URL::to('assets/admin/media/flags/'.($this->flag ?: self::FLAG_FALLBACK).'.svg');
     }
 
     /* -----------------------------------------

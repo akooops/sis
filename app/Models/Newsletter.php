@@ -43,13 +43,13 @@ class Newsletter extends Model
 
     /**
      * Swapped for the recipient's own link by ShipNewsletter at send time.
-     * MIRRORS UNSUBSCRIBE_PLACEHOLDER in resources/js/lib/newsletter.js.
+     * MIRRORS UNSUBSCRIBE_PLACEHOLDER in resources/admin/js/lib/newsletter.js.
      */
     public const UNSUBSCRIBE_PLACEHOLDER = '{{unsubscribe_url}}';
 
     /**
      * Swapped for the recipient's own address by ShipNewsletter at send time.
-     * MIRRORS EMAIL_PLACEHOLDER in resources/js/lib/newsletter.js.
+     * MIRRORS EMAIL_PLACEHOLDER in resources/admin/js/lib/newsletter.js.
      */
     public const EMAIL_PLACEHOLDER = '{{email}}';
 

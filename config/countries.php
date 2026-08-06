@@ -7,7 +7,7 @@ return [
      * is the source of truth; CountriesSeeder mirrors it into the countries table.
      * Grown by code, never CRUD: add a row here, reseed.
      *
-     * `flag` is a filename under public/assets/media/flags and CANNOT be derived
+     * `flag` is a filename under public/assets/admin/media/flags and CANNOT be derived
      * from the code: the artwork is named by slug, the set is not 1:1 with ISO, and
      * a few names are stale (swaziland, east-timor, republic-of-macedonia). null
      * means nothing is bundled — Country::getFlagUrlAttribute() falls back.

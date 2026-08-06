@@ -41,7 +41,7 @@ class Partner extends Model
 
     public function getLogoUrlAttribute(): string
     {
-        return $this->getFirstMediaUrl(self::LOGO_COLLECTION) ?: URL::to('assets/media/app/mini-logo.png');
+        return $this->getFirstMediaUrl(self::LOGO_COLLECTION) ?: URL::to('assets/admin/media/app/mini-logo.png');
     }
 
     /* -----------------------------------------

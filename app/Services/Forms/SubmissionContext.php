@@ -29,7 +29,7 @@ class SubmissionContext
     /**
      * The full column set, ready to merge into a FormSubmission.
      *
-     * @param  array<string, mixed>  $client  the browser's own report (see resources/js/lib/forms/telemetry.js)
+     * @param  array<string, mixed>  $client  the browser's own report (see resources/site/js/lib/forms/telemetry.js)
      * @return array<string, mixed>
      */
     public function all(Request $request, array $client = []): array

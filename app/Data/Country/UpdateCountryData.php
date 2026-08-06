@@ -41,7 +41,7 @@ class UpdateCountryData extends Data
                 Rule::unique('countries', 'alpha3')->ignore(request()->route('country')),
             ],
 
-            // A filename under public/assets/media/flags; blank falls back to the UN flag.
+            // A filename under public/assets/admin/media/flags; blank falls back to the UN flag.
             'flag' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
 
             // array:en,ar also rejects unknown keys.

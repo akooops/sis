@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
- * The other end of resources/js/lib/forms/telemetry.js.
+ * The other end of resources/site/js/lib/forms/telemetry.js.
  *
  * A beacon is a FULL SNAPSHOT, so this is a straight overwrite of the draft's
  * measured columns — no accumulation, no sequence number, no merge. That is what
@@ -287,7 +287,7 @@ class TelemetryRecorder
      * The per-field records, in focus order.
      *
      * Short wire keys, mirrored from the client — see the legend at the top of
-     * resources/js/lib/forms/telemetry.js. They are short because a snapshot
+     * resources/site/js/lib/forms/telemetry.js. They are short because a snapshot
      * repeats all of them every few seconds.
      *
      * ONE RECORD PER KEY, FIRST OCCURRENCE WINS. The client builds these from a

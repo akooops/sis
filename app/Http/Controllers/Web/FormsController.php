@@ -31,7 +31,7 @@ use Illuminate\View\View;
  * The public form.
  *
  * TEMPORARY PRESENTATION, PERMANENT CONTRACT. The Blade views under
- * resources/views/public are a placeholder for whatever the real end-user design
+ * resources/site/views are a placeholder for whatever the real end-user design
  * turns out to be. The JSON schema, the token, the guard order and the stored
  * shape are not placeholders — a redesign should replace the views and keep all
  * of this untouched.
@@ -63,16 +63,16 @@ class FormsController extends Controller
         // not submit is just a slower rejection.
         if ($this->guard->blocksCountry($form, $this->geo->countryCode($request))
             || $this->guard->blocksIp($form->load('blockedIps'), $request->ip())) {
-            return response()->view('public.forms.blocked', ['form' => $form, 'locale' => $locale], 403);
+            return response()->view('site::forms.blocked', ['form' => $form, 'locale' => $locale], 403);
         }
 
         if ($form->hasReachedLimit()) {
-            return response()->view('public.forms.closed', ['form' => $form, 'locale' => $locale], 410);
+            return response()->view('site::forms.closed', ['form' => $form, 'locale' => $locale], 410);
         }
 
         $minted = SubmissionToken::mint($form);
 
-        return view('public.forms.show', [
+        return view('site::forms.show', [
             'form' => $form,
             'locale' => $locale,
             'schema' => $this->schema($form, $locale),
@@ -469,7 +469,7 @@ class FormsController extends Controller
 
         $form = Form::query()->live()->where('slug', $slug)->firstOrFail();
 
-        return view('public.forms.thanks', [
+        return view('site::forms.thanks', [
             'form' => $form,
             'locale' => $locale,
             'reference' => session('sisf_reference'),

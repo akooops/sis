@@ -3,7 +3,9 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "npm run build:admin && npm run build:site",
+        "build:admin": "vite build --mode admin",
+        "build:site": "vite build --mode site"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.1.10",

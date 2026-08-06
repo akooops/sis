@@ -24,7 +24,7 @@ class Language extends Model
     ------------------------------------------*/
 
     /**
-     * Fallback artwork per seeded code — public/assets/media/flags ships the full
+     * Fallback artwork per seeded code — public/assets/admin/media/flags ships the full
      * ISO set, so a language renders a flag with nothing uploaded. An uploaded
      * `flag` media always wins.
      *
@@ -63,7 +63,7 @@ class Language extends Model
     public function getFlagUrlAttribute(): string
     {
         return $this->getFirstMediaUrl('flag')
-            ?: URL::to('assets/media/flags/'.(static::FLAG_ASSETS[$this->code] ?? 'united-nations').'.svg');
+            ?: URL::to('assets/admin/media/flags/'.(static::FLAG_ASSETS[$this->code] ?? 'united-nations').'.svg');
     }
 
     /* -----------------------------------------

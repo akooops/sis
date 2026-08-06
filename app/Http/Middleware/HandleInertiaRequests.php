@@ -10,11 +10,14 @@ class HandleInertiaRequests extends Middleware
     /**
      * The root template that's loaded on the first page visit.
      *
+     * Namespaced: resources/ is split into admin/ and site/, and only the admin
+     * is an Inertia app. See AppServiceProvider::registerViewNamespaces().
+     *
      * @see https://inertiajs.com/server-side-setup#root-template
      *
      * @var string
      */
-    protected $rootView = 'app';
+    protected $rootView = 'admin::app';
 
     /**
      * Determines the current asset version.

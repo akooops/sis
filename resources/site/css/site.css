@@ -1,0 +1,27 @@
+/**
+ * Site stylesheet — the end-user side, everything under resources/site/.
+ *
+ * Separate from the admin's app.css on purpose. That one pulls in the whole
+ * Metronic 9 theme, KTUI and the demo1 layout, which the admin needs and a
+ * public page must never ship. Nothing here may import from resources/admin/.
+ *
+ * The @source lines scan THIS half of the tree only — the admin's app.css
+ * scans its own, and neither sees the other. Anything added under
+ * resources/site/js should be covered by a glob here or its utility classes
+ * will not be compiled.
+ */
+
+/*
+ * `source(none)` turns OFF Tailwind 4's automatic source detection, which
+ * scans the WHOLE project and ignores the @source lines below — so without it
+ * this stylesheet compiled every utility class it found in resources/admin
+ * too, and a public page shipped the admin's `[--kt-drawer-enable:true]`.
+ * Explicit sources only, and they are this half of the tree.
+ */
+@import 'tailwindcss' source(none);
+
+@source '../views/**/*.blade.php';
+@source '../js/**/*.{svelte,js}';
+
+/* The form's own stylesheet. Tailwind-free by design — see the file header. */
+@import './forms.css';

@@ -13,8 +13,16 @@ return [
     |
     */
 
+    /*
+     * Two roots, because resources/ is split into admin/ and site/ — the admin
+     * SPA shell and the public site are separate apps with separate bundles.
+     * Both are also registered as the `admin::` and `site::` namespaces in
+     * AppServiceProvider; prefer those prefixes in our own code, so a name that
+     * exists on both sides can never resolve to the wrong half.
+     */
     'paths' => [
-        resource_path('views'),
+        resource_path('admin/views'),
+        resource_path('site/views'),
     ],
 
     /*

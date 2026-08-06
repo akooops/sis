@@ -9,7 +9,7 @@ use App\Models\FormField;
  * One kind of element a form can hold.
  *
  * Deliberately shaped like App\Contracts\Integrations\Driver, and it returns the
- * SAME FieldData DTO, because that is what resources/js/components/form/
+ * SAME FieldData DTO, because that is what resources/admin/js/components/form/
  * SchemaField.svelte already renders. A forked settings DTO would fork the
  * renderer too, and adding an element would stop being a backend-only change.
  *

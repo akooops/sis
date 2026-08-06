@@ -17,7 +17,7 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-/metronic
+/resources/admin/metronic
 /lang/*/common.php
 /content
 content.zip

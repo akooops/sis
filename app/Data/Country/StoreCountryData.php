@@ -29,7 +29,7 @@ class StoreCountryData extends Data
             'code' => ['required', 'string', 'size:2', 'alpha', 'uppercase', Rule::unique('countries', 'code')],
             'alpha3' => ['nullable', 'string', 'size:3', 'alpha', 'uppercase', Rule::unique('countries', 'alpha3')],
 
-            // A filename under public/assets/media/flags; blank falls back to the UN flag.
+            // A filename under public/assets/admin/media/flags; blank falls back to the UN flag.
             'flag' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
 
             'title' => ['required', 'string', 'max:255'],
