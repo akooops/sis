@@ -154,8 +154,25 @@ function initAlerts(root) {
     });
 }
 
+/**
+ * A filter form that submits itself when a control changes.
+ *
+ * PROGRESSIVE ENHANCEMENT, not a replacement for the button: the form is a plain
+ * GET form and works with this script blocked, which is why the submit button is
+ * in the markup at all. It is hidden HERE rather than in the template, so a page
+ * whose script failed to load still shows the way to apply the filter.
+ */
+function initAutoSubmit(root) {
+    root.querySelectorAll('form[data-auto-submit]').forEach((form) => {
+        form.querySelectorAll('[data-auto-submit-fallback]').forEach((el) => el.remove());
+
+        form.addEventListener('change', () => form.requestSubmit());
+    });
+}
+
 export default function initDisclosure(root = document) {
     initAlerts(root);
+    initAutoSubmit(root);
 
     root.addEventListener('click', (event) => {
         const dismiss = event.target.closest('[data-dismiss]');

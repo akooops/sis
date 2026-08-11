@@ -1,19 +1,4 @@
-{{--
-    The off-canvas navigation, opened by both header buttons.
-
-    Menu items nest exactly one level (MenuItem's own contract), so this is a
-    flat list plus one collapse per parent — no recursion, and no chance of a
-    cycle rendering forever. Each item carries its own resolved `url`.
-
-    The language switcher is the last thing in it, pinned to the bottom. It reads
-    $seo['alternates'] — the SAME map the hreflang tags are built from, so the
-    switcher and the SEO markup cannot disagree about where a language lives.
-    That map is built by the page's controller from the CURRENT route, so
-    switching keeps you on the page you were reading.
---}}
 @php
-    $items = $site->menuItems('header_primary');
-
     $alternates = collect($seo['alternates'] ?? []);
 
     $current = rtrim(url()->current(), '/');
@@ -37,7 +22,7 @@
 
     <div class="flex h-full flex-col overflow-y-auto px-6 pb-6">
         <ul>
-            @foreach ($items as $item)
+            @foreach ($site->menuItems('header_primary') as $item)
                 @if ($item->children->isEmpty())
                     <li class="mt-2">
                         @if ($item->url)

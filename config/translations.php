@@ -419,25 +419,25 @@ return [
                 'pt' => 'Níveis académicos', 'ru' => 'Ступени обучения', 'hi' => 'शैक्षणिक स्तर',
             ],
             'home.programs.cta' => [
-                'en' => 'Explore programmes', 'ar' => 'استكشف البرامج', 'fr' => 'Découvrir les programmes',
+                'en' => 'Learn more', 'ar' => 'إعرف المزيد', 'fr' => 'Découvrir les programmes',
                 'es' => 'Explorar programas', 'de' => 'Programme entdecken', 'it' => 'Scopri i programmi',
                 'pt' => 'Explorar programas', 'ru' => 'Смотреть программы', 'hi' => 'कार्यक्रम देखें',
             ],
             'home.pathway.title' => [
-                'en' => 'Choose your pathway', 'ar' => 'اختر مسارك', 'fr' => 'Choisissez votre parcours',
+                'en' => 'Academic Pathways', 'ar' => 'المسارات الدراسية', 'fr' => 'Choisissez votre parcours',
                 'es' => 'Elija su itinerario', 'de' => 'Wählen Sie Ihren Bildungsweg',
                 'it' => 'Scegli il tuo percorso', 'pt' => 'Escolha o seu percurso',
                 'ru' => 'Выберите свой путь', 'hi' => 'अपना मार्ग चुनें',
             ],
             'home.pathway.subtitle' => [
-                'en' => 'Two curricula, one community.', 'ar' => 'منهجان، ومجتمع واحد.',
+                'en' => 'Globally Recognized. Structured for Your Child\'s Future.', 'ar' => 'معترف به عالمياً، ومصمم لمستقبل طفلك.',
                 'fr' => 'Deux programmes, une communauté.', 'es' => 'Dos currículos, una comunidad.',
                 'de' => 'Zwei Lehrpläne, eine Gemeinschaft.', 'it' => 'Due programmi, una comunità.',
                 'pt' => 'Dois currículos, uma comunidade.', 'ru' => 'Две программы, одно сообщество.',
                 'hi' => 'दो पाठ्यक्रम, एक समुदाय।',
             ],
             'home.pathway.stream_label' => [
-                'en' => 'Pathway', 'ar' => 'المسار', 'fr' => 'Parcours', 'es' => 'Itinerario',
+                'en' => 'Stream', 'ar' => 'المسار', 'fr' => 'Parcours', 'es' => 'Itinerario',
                 'de' => 'Bildungsweg', 'it' => 'Percorso', 'pt' => 'Percurso', 'ru' => 'Направление',
                 'hi' => 'मार्ग',
             ],
@@ -610,6 +610,11 @@ return [
             'guidelines.table.grade' => [
                 'en' => 'Grade', 'ar' => 'الصف', 'fr' => 'Niveau', 'es' => 'Curso', 'de' => 'Klassenstufe',
                 'it' => 'Classe', 'pt' => 'Ano', 'ru' => 'Класс', 'hi' => 'कक्षा',
+            ],
+            'guidelines.all_grades' => [
+                'en' => 'All grades', 'ar' => 'كل الصفوف', 'fr' => 'Tous les niveaux',
+                'es' => 'Todos los cursos', 'de' => 'Alle Klassenstufen', 'it' => 'Tutte le classi',
+                'pt' => 'Todos os anos', 'ru' => 'Все классы', 'hi' => 'सभी कक्षाएँ',
             ],
             'guidelines.empty' => [
                 'en' => 'No files available.', 'ar' => 'لا توجد ملفات متاحة.', 'fr' => 'Aucun fichier disponible.',

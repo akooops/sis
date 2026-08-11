@@ -226,6 +226,23 @@
         object-fit: cover;
     }
 
+    /* The play badge on a gallery tile whose file is a video. The tile paints the
+       clip's first frame through <video preload="metadata">, which on its own is
+       indistinguishable from a still — this is the affordance that says the
+       lightbox will play it. */
+    .media-play {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        color: var(--color-paper);
+        text-shadow: 0 2px 12px rgb(0 0 0 / 45%);
+        pointer-events: none;
+    }
+
     .media-card .card-body {
         min-height: 0;
     }

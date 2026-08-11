@@ -10,47 +10,32 @@
 
     <section>
         <div class="container pb-14 pt-6">
+            {{-- data-calendar loads FullCalendar on demand — 258 kB, so it must
+                 never reach a page without one. site/calendar.js reads the events
+                 off data-events and the direction off <html dir>. --}}
+            {{-- Prev/next are FullCalendar's OWN buttons; calendar.js turns a
+                 view change into a reload with ?month=, because only this
+                 month's rows were loaded. Hence no month URLs on this element —
+                 the <noscript> block below is the only place they are written. --}}
+            <div class="mb-10" data-calendar data-events="{{ $calendarEvents->toJson() }}"
+                data-initial-date="{{ $month->toDateString() }}"></div>
+
+            {{-- A no-JS fallback and the accessible name for the view: without it
+                 a visitor with the 258 kB blocked sees an empty div. --}}
+            <noscript>
+                <nav class="pager mb-6" aria-label="@lang('site.events.starts')">
+                    <a class="pager-link" href="{{ $previousMonth }}" rel="prev">
+                        <i class="uil uil-angle-left-b" aria-hidden="true"></i>
+                    </a>
+                    <span class="pager-link is-active">{{ $monthLabel }}</span>
+                    <a class="pager-link" href="{{ $nextMonth }}" rel="next">
+                        <i class="uil uil-angle-right-b" aria-hidden="true"></i>
+                    </a>
+                </nav>
+            </noscript>
+
             @if ($events->isEmpty())
                 <p class="text-muted">@lang('site.events.empty')</p>
-            @else
-                <div class="mb-10" data-calendar data-events="{{ $calendarEvents->toJson() }}"></div>
-
-                <div class="grid auto-rows-fr gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    @foreach ($events as $event)
-                        @php($url = route('web.site.events.show', ['slug' => $event->slug]))
-
-                        <article class="card media-card">
-                            @if ($event->thumbnail_url)
-                                <figure class="overlay media-figure">
-                                    <a href="{{ $url }}">
-                                        <img src="{{ $event->thumbnail_url }}"
-                                            alt="{{ $event->getTranslation('title', $site->locale(), true) }}"
-                                            loading="lazy">
-                                    </a>
-                                </figure>
-                            @endif
-
-                            <div class="card-body">
-                                <h2 class="mb-2 text-3xl font-black uppercase leading-[35px] text-brand">
-                                    <a class="hover:text-brand-soft" href="{{ $url }}">
-                                        {{ $event->getTranslation('title', $site->locale(), true) ?: $event->name }}
-                                    </a>
-                                </h2>
-
-                                <p class="mb-0">{{ $event->getTranslation('description', $site->locale(), true) }}</p>
-                            </div>
-
-                            <div class="card-footer">
-                                <ul class="post-meta">
-                                    <li>
-                                        <i class="uil uil-calendar-alt" aria-hidden="true"></i>
-                                        <span>{{ $event->start_at?->translatedFormat('j M Y') }}</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </article>
-                    @endforeach
-                </div>
             @endif
         </div>
     </section>
