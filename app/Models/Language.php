@@ -66,6 +66,18 @@ class Language extends Model
             ?: URL::to('assets/admin/media/flags/'.(static::FLAG_ASSETS[$this->code] ?? 'united-nations').'.svg');
     }
 
+    /**
+     * The writing direction, as <html dir> wants it.
+     *
+     * Here rather than in the site's context object because it is a fact about
+     * the language and nothing else: `is_rtl` is the stored truth and this is the
+     * one place that turns it into the string every reader needs.
+     */
+    public function getDirectionAttribute(): string
+    {
+        return $this->is_rtl ? 'rtl' : 'ltr';
+    }
+
     /* -----------------------------------------
      4. Methods
     ------------------------------------------*/

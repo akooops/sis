@@ -3,12 +3,16 @@
 namespace App\Services\Integrations;
 
 use App\Contracts\Integrations\ProvidesAnalytics;
-use App\Models\Form;
 use App\Models\Integration;
 
 /**
  * Analytics channel. Consistent with Email, Sms, Ai and Captcha:
- *   Analytics::forForm($form)->client();
+ *   Analytics::default()->client();
+ *
+ * ONE PROPERTY FOR THE WHOLE SITE, resolved from the `integrations.analytics`
+ * setting. There is no forForm() any more: a form could pin its own account,
+ * which meant one visitor's pageviews and form events landed in two properties
+ * that no report could ever join into a funnel. The site's tag now covers both.
  *
  * Read-only by design: this hands the VIEW the parameters for a browser tag and
  * does nothing else. Server-side reporting (GA4's Measurement Protocol) is not
@@ -32,28 +36,6 @@ class Analytics
         return new self(Integration::activeFor('analytics'));
     }
 
-    /**
-     * The integration a form pinned, or none.
-     *
-     * find(), deliberately not firstOrFail(): this runs on a public page, and an
-     * admin deleting the integration must turn TRACKING off, not 500 every
-     * visitor. No fallback to the default account either — a form reports to the
-     * property it was pinned to or to nothing at all, because silently sending a
-     * different property's data is worse than sending none.
-     */
-    public static function forForm(Form $form): self
-    {
-        if (! $form->analytics_integration_id) {
-            return new self(null);
-        }
-
-        $integration = Integration::query()
-            ->ofType('analytics')
-            ->where('is_enabled', true)
-            ->find($form->analytics_integration_id);
-
-        return new self($integration);
-    }
 
     /**
      * Whether the page should load a tag at all.

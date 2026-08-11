@@ -1,8 +1,4 @@
-{{-- TEMPORARY — see resources/site/views/layout.blade.php --}}
 @extends('site::layout')
-
-@section('robots', 'noindex,nofollow')
-@section('title', __('forms.closed').' — '.config('app.name'))
 
 @section('content')
     <div class="sisf">

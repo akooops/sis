@@ -59,8 +59,6 @@ return new class extends Migration
             $table->ulid('captcha_integration_id')->nullable();
             $table->foreign('captcha_integration_id')->references('id')->on('integrations')->nullOnDelete();
 
-            $table->ulid('analytics_integration_id')->nullable();
-            $table->foreign('analytics_integration_id')->references('id')->on('integrations')->nullOnDelete();
 
             $table->index(['status', 'published_at']);
 

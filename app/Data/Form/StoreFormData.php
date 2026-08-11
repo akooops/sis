@@ -53,7 +53,6 @@ class StoreFormData extends Data
         public ?string $redirect_url = null,
 
         public ?string $captcha_integration_id = null,
-        public ?string $analytics_integration_id = null,
     ) {}
 
     public static function rules(ValidationContext $context): array
@@ -118,13 +117,6 @@ class StoreFormData extends Data
                 'string',
                 Rule::exists('integrations', 'id')->where(
                     fn ($q) => $q->whereIn('integration_type_id', self::typeIds('captcha')),
-                ),
-            ],
-            'analytics_integration_id' => [
-                'nullable',
-                'string',
-                Rule::exists('integrations', 'id')->where(
-                    fn ($q) => $q->whereIn('integration_type_id', self::typeIds('analytics')),
                 ),
             ],
 

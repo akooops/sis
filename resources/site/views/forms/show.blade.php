@@ -1,109 +1,34 @@
-{{-- TEMPORARY — see resources/site/views/layout.blade.php --}}
-@extends('site::layout', ['direction' => $schema['is_rtl'] ? 'rtl' : 'ltr'])
+{{--
+    The standalone public form page.
 
-@section('title', ($schema['title'][$locale] ?? $form->name).' — '.config('app.name'))
+    `$seo` comes from FormsController like every other page's does — these views
+    used to call a mutable builder on the site context from inside a php block,
+    which meant the page's <head> was decided in the view and read back by the
+    layout that had already started rendering.
+
+    The direction is the layout's job and comes from the Language row, so this
+    page and the thanks/closed/blocked pages are all correct in Arabic from one
+    source. They were not before — only this view passed it and the other three
+    rendered LTR.
+
+    The mount point and the whole payload live in the shared renderer partial,
+    which the site's contact and admissions pages include too.
+--}}
+@extends('site::layout')
 
 @section('content')
-    @if ($errors->any())
-        <div class="sisf-alert" role="alert">
-            <ul>
-                @foreach ($errors->all() as $message)
-                    <li>{{ $message }}</li>
-                @endforeach
-            </ul>
+    <section>
+        <div class="container py-10">
+            {{-- data-sisf ONLY — no `sisf` class. FormRenderer emits its own
+                 `.sisf` root inside [data-sisf-root], and nesting one inside
+                 another applies the token block and its padding twice.
+
+                 The marker is on this wrapper rather than on [data-sisf-root]
+                 because the thanks page has no root but still has to load the
+                 module to report the completion. --}}
+            <div data-sisf>
+                @include('site::forms.partials.renderer')
+            </div>
         </div>
-    @endif
-
-    {{--
-        NO <form> HERE. FormRenderer renders the real one, because only it knows
-        which answers exist across pages the visitor is not currently looking at
-        — it mirrors the whole set into hidden inputs. Wrapping it in a second
-        form would nest them, and the browser drops the inner one along with
-        every one of those hidden answers.
-    --}}
-    <div data-sisf-root>
-        <noscript>
-            <p>{{ __('forms.javascript_required') }}</p>
-        </noscript>
-    </div>
-
-    {{-- JSON blocks, not JS variables: the schema carries admin-authored HTML,
-         and a stray </script> inside a string literal would break out of it. --}}
-    <script type="application/json" id="sisf-schema">
-        {!! json_encode($schema, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-
-    <script type="application/json" id="sisf-config">
-        {!! json_encode([
-            'action' => route('web.user.forms.submit', ['locale' => $locale, 'slug' => $form->slug]),
-            'csrf' => csrf_token(),
-            'token' => $token,
-            'uploadAction' => route('web.user.forms.upload', ['locale' => $locale, 'slug' => $form->slug]),
-            'telemetryAction' => route('web.user.forms.telemetry', ['locale' => $locale, 'slug' => $form->slug]),
-            // What the page is allowed to measure. Sent rather than compiled in,
-            // so switching a capture off in .env switches off the LISTENER, not
-            // just the column — nothing is collected that is not sent.
-            'capture' => config('forms.capture'),
-            'honeypot' => $honeypot,
-            'old' => (object) old('fields', []),
-            // Null on a form with no challenge — the renderer draws nothing and
-            // posts no token, which is the case the server skips entirely.
-            'captcha' => $captcha->enabled() ? [
-                'provider' => $captcha->provider(),
-                'siteKey' => $captcha->siteKey(),
-                // Defaulted here rather than in the renderer, to match the
-                // driver's own fallback when an old row has no version set.
-                'version' => $captcha->version() ?: 'v2',
-            ] : null,
-        ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-
-    {{-- The provider script, and ONLY when this form actually challenges: a form
-         with no captcha must not reach out to Google at all.
-
-         v3 wants the site key baked into the URL; v2 is rendered explicitly by
-         the island, because the widget belongs inside the <form> the renderer
-         owns and auto-render would have to find a div that does not exist yet.
-
-         urlencode(), not {{ }} alone: Blade escapes for HTML, which leaves & and
-         # intact — and either one inside a site key would end the `render`
-         parameter early and load the script against a truncated key. --}}
-    @if ($captcha->provider() === 'recaptcha' && $captcha->siteKey())
-        <script
-            src="https://www.google.com/recaptcha/api.js?render={{ $captcha->version() === 'v3' ? urlencode($captcha->siteKey()) : 'explicit' }}"
-            async
-            defer
-        ></script>
-    @endif
-
-    {{-- The analytics tag, and only when this form pins one. Renders nothing
-         otherwise — same rule as the captcha script above. --}}
-    @include('site::forms.partials.analytics', ['stage' => 'form'])
-
-    {{-- The form's two styling hooks, both set on the form itself. Every page and
-         every element carries a css id and class of the admin's choosing, and
-         these target them from outside. --}}
-    @if ($form->css_url)
-        <link rel="stylesheet" href="{{ $form->css_url }}">
-    @endif
-
-    {{-- Last, so a rule here beats the hosted sheet — that is the point of
-         having both.
-
-         {!! !!} is deliberate: escaping would turn `>` into &gt; and every
-         descendant selector with it, which breaks the one thing this field is
-         for. It is safe HERE because App\Traits\Css\SanitisesCustomCss strips
-         `</style` and `<script` on the way into the column, on both the create
-         and the update payload, so a value that could close this block never
-         reaches the database — and <style> is RAWTEXT, so with those gone
-         nothing left in the value can start a tag.
-
-         That is a guarantee about THIS context and no other. The value still
-         carries whatever else the admin typed (`<img onerror=…>` survives the
-         strip untouched), so it is inert in a <style> block and live XSS in a
-         text node or a style="" attribute. Copy this block as-is; do not
-         interpolate the column anywhere else. --}}
-    @if ($form->custom_css)
-        <style>{!! $form->custom_css !!}</style>
-    @endif
+    </section>
 @endsection

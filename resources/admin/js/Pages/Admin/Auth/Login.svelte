@@ -16,7 +16,7 @@
         generalError = null;
         try {
             const data = await form.post(route('api.v1.admin.auth.login'));
-            if (data) window.location.assign('/');
+            if (data) window.location.assign('/admin');
         } catch (err) {
             generalError = err instanceof ApiError ? err.message : 'Network error. Please try again.';
         }

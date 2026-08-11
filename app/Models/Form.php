@@ -84,11 +84,6 @@ class Form extends Model
         return $this->belongsTo(Integration::class, 'captcha_integration_id');
     }
 
-    public function analyticsIntegration(): BelongsTo
-    {
-        return $this->belongsTo(Integration::class, 'analytics_integration_id');
-    }
-
     public function pages(): HasMany
     {
         return $this->hasMany(FormPage::class)->orderBy('order');

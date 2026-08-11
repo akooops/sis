@@ -58,7 +58,7 @@ class FormsController extends ApiController
         $form->loadCount(['pages', 'fields']);
 
         return $this->respond(
-            FormData::from($form->load(['category', 'captchaIntegration', 'analyticsIntegration'])),
+            FormData::from($form->load(['category', 'captchaIntegration'])),
             'Form retrieved successfully',
         );
     }
@@ -103,7 +103,6 @@ class FormsController extends ApiController
                 'redirect_url' => $data->confirmation_type === 'redirect' ? $data->redirect_url : null,
 
                 'captcha_integration_id' => $data->is_captcha_enabled ? $data->captcha_integration_id : null,
-                'analytics_integration_id' => $data->analytics_integration_id,
             ]);
 
             FormPage::create([
@@ -122,7 +121,7 @@ class FormsController extends ApiController
         $form = $form->fresh()->loadCount(['pages', 'fields']);
 
         return $this->respond(
-            FormData::from($form->load(['category', 'captchaIntegration', 'analyticsIntegration'])),
+            FormData::from($form->load(['category', 'captchaIntegration'])),
             'Form created successfully',
             201,
         );
@@ -159,7 +158,7 @@ class FormsController extends ApiController
         $form = $form->fresh()->loadCount(['pages', 'fields']);
 
         return $this->respond(
-            FormData::from($form->load(['category', 'captchaIntegration', 'analyticsIntegration'])),
+            FormData::from($form->load(['category', 'captchaIntegration'])),
             'Form updated successfully',
         );
     }

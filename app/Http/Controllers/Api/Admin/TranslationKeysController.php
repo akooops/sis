@@ -12,7 +12,8 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 /**
- * Read-only registry mirroring config('translations.keys'), grown by reseeding.
+ * Read-only registry mirroring the catalogue under config/translations/, grown
+ * by reseeding.
  * Values live elsewhere — a key plus a locale is TranslationsController.
  */
 class TranslationKeysController extends ApiController

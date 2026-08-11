@@ -6,6 +6,8 @@ use App\Models\Form;
 use App\Models\FormField;
 use App\Models\FormFieldOption;
 use App\Models\FormPage;
+use App\Models\Language;
+use App\Services\Translations\TranslationService;
 use App\States\Form\Published;
 use Illuminate\Database\Seeder;
 
@@ -14,8 +16,11 @@ use Illuminate\Database\Seeder;
  * the delete, and UpdateBuilderData::withValidator() (via Form::isLocked()) blocks
  * changes to the pages and fields — the settings stay editable.
  *
- * config('forms.system') is intentionally empty: the capability ships, the
- * content doesn't. Add an entry when you know a slug the code depends on.
+ * TRANSLATED ACROSS EVERY SEEDED LOCALE. The definitions in config('forms.system')
+ * carry catalogue KEYS (`label_key`, `title_key`, `confirmation_key`) rather than
+ * strings, and each is resolved here against the `forms` group of
+ * config/translations.php. So a fresh install has a contact form that reads
+ * correctly in Arabic, not an English one with eight empty locales.
  *
  * firstOrCreate for the form, matching PagesSeeder: a form row is authored
  * content and a reseed must never clobber copy an admin has since written.
@@ -23,11 +28,16 @@ use Illuminate\Database\Seeder;
  * re-running this must not resurrect a page someone deliberately removed, nor
  * duplicate one.
  *
- * Runs AFTER LanguagesSeeder, because Language::defaultCode() memoises statically
- * for the process and would cache a miss if no language row existed yet.
+ * Runs AFTER LanguagesSeeder, whose rows decide which locales are written.
  */
 class FormsSeeder extends Seeder
 {
+    /** @var array<string, array<string, string>> */
+    protected array $catalogue = [];
+
+    /** @var array<int, string> */
+    protected array $codes = [];
+
     public function run(): void
     {
         $forms = config('forms.system', []);
@@ -36,15 +46,19 @@ class FormsSeeder extends Seeder
             return;
         }
 
-        $default = \App\Models\Language::defaultCode();
+        $this->catalogue = app(TranslationService::class)->catalogue('forms');
+        $this->codes = Language::query()->pluck('code')->all();
 
         foreach ($forms as $definition) {
             $form = Form::firstOrCreate(
                 ['slug' => $definition['slug']],
                 [
                     'name' => $definition['name'],
-                    'title' => [$default => $definition['title'] ?? $definition['name']],
-                    'confirmation_message' => [$default => $definition['confirmation_message'] ?? 'Thank you. Your response has been recorded.'],
+                    'title' => $this->translate($definition['title_key'] ?? null, $definition['name']),
+                    'confirmation_message' => $this->translate(
+                        $definition['confirmation_key'] ?? null,
+                        'Thank you. Your response has been recorded.',
+                    ),
                     'status' => Published::class,
                     'published_at' => now(),
                     'is_system' => true,
@@ -60,15 +74,49 @@ class FormsSeeder extends Seeder
                 continue;
             }
 
-            $this->buildStructure($form, $definition, $default);
+            $this->buildStructure($form, $definition);
         }
+    }
+
+    /**
+     * One catalogue key as a locale => string map, for a translatable column.
+     *
+     * The key is given WITH its group (`forms.contact.name`); the group prefix is
+     * stripped because catalogue() is already scoped to it. A key the catalogue
+     * does not know falls back to the supplied English string in the default
+     * locale, so a typo degrades to one untranslated label rather than a blank
+     * form.
+     *
+     * @return array<string, string>
+     */
+    protected function translate(?string $key, string $fallback): array
+    {
+        $lines = $key === null
+            ? null
+            : ($this->catalogue[preg_replace('/^forms\./', '', $key)] ?? null);
+
+        if ($lines === null) {
+            return [Language::defaultCode() => $fallback];
+        }
+
+        $out = [];
+
+        foreach ($this->codes as $code) {
+            if (! empty($lines[$code])) {
+                $out[$code] = $lines[$code];
+            }
+        }
+
+        return $out ?: [Language::defaultCode() => $fallback];
     }
 
     /**
      * @param  array<string, mixed>  $definition
      */
-    protected function buildStructure(Form $form, array $definition, string $default): void
+    protected function buildStructure(Form $form, array $definition): void
     {
+        $default = Language::defaultCode();
+
         foreach ($definition['pages'] ?? [['name' => 'Page 1', 'fields' => $definition['fields'] ?? []]] as $pageIndex => $pageDefinition) {
             $page = FormPage::create([
                 'form_id' => $form->id,
@@ -88,7 +136,10 @@ class FormsSeeder extends Seeder
                     'is_required' => (bool) ($fieldDefinition['is_required'] ?? false),
                     'settings' => $fieldDefinition['settings'] ?? null,
                     'validation' => $fieldDefinition['validation'] ?? null,
-                    'label' => [$default => $fieldDefinition['label'] ?? ''],
+                    'label' => $this->translate(
+                        $fieldDefinition['label_key'] ?? null,
+                        $fieldDefinition['label'] ?? '',
+                    ),
                     'content' => [$default => $fieldDefinition['content'] ?? ''],
                 ]);
 
@@ -97,6 +148,10 @@ class FormsSeeder extends Seeder
                         'form_field_id' => $field->id,
                         'value' => $option['value'],
                         'order' => $optionIndex,
+                        // Option VALUES are never translated — the same answer has
+                        // to read identically whatever language it was given in.
+                        // These labels are codes (2026/2027, Grade 4), so they are
+                        // seeded once and left for an admin to localise if wanted.
                         'label' => [$default => $option['label'] ?? $option['value']],
                     ]);
                 }

@@ -40,17 +40,24 @@ return [
      *
      * `ki-social-media` is the stand-in for a network keenicons ships no glyph
      * for; add a row here to grow the list.
+     *
+     * TWO icon fields, because the two halves of the app use different icon
+     * fonts: `icon` is keenicons, which only the admin bundle loads, and
+     * `site_icon` is Unicons, which only the public bundle loads. One field
+     * would mean whichever side lost renders an empty box. Both are derived from
+     * the platform code, so neither is ever admin-supplied text in a class
+     * attribute.
      */
     'platforms' => [
-        'facebook' => ['name' => 'Facebook', 'icon' => 'ki-facebook'],
-        'instagram' => ['name' => 'Instagram', 'icon' => 'ki-instagram'],
-        'twitter' => ['name' => 'X', 'icon' => 'ki-twitter'],
-        'youtube' => ['name' => 'YouTube', 'icon' => 'ki-youtube'],
-        'linkedin' => ['name' => 'LinkedIn', 'icon' => 'ki-social-media'],
-        'tiktok' => ['name' => 'TikTok', 'icon' => 'ki-tiktok'],
-        'snapchat' => ['name' => 'Snapchat', 'icon' => 'ki-snapchat'],
-        'whatsapp' => ['name' => 'WhatsApp', 'icon' => 'ki-whatsapp'],
-        'behance' => ['name' => 'Behance', 'icon' => 'ki-behance'],
-        'dribbble' => ['name' => 'Dribbble', 'icon' => 'ki-dribbble'],
+        'facebook' => ['name' => 'Facebook', 'icon' => 'ki-facebook', 'site_icon' => 'uil-facebook-f'],
+        'instagram' => ['name' => 'Instagram', 'icon' => 'ki-instagram', 'site_icon' => 'uil-instagram'],
+        'twitter' => ['name' => 'X', 'icon' => 'ki-twitter', 'site_icon' => 'uil-twitter'],
+        'youtube' => ['name' => 'YouTube', 'icon' => 'ki-youtube', 'site_icon' => 'uil-youtube'],
+        'linkedin' => ['name' => 'LinkedIn', 'icon' => 'ki-social-media', 'site_icon' => 'uil-linkedin'],
+        'tiktok' => ['name' => 'TikTok', 'icon' => 'ki-tiktok', 'site_icon' => 'uil-music'],
+        'snapchat' => ['name' => 'Snapchat', 'icon' => 'ki-snapchat', 'site_icon' => 'uil-snapchat-ghost'],
+        'whatsapp' => ['name' => 'WhatsApp', 'icon' => 'ki-whatsapp', 'site_icon' => 'uil-whatsapp'],
+        'behance' => ['name' => 'Behance', 'icon' => 'ki-behance', 'site_icon' => 'uil-behance'],
+        'dribbble' => ['name' => 'Dribbble', 'icon' => 'ki-dribbble', 'site_icon' => 'uil-dribbble'],
     ],
 ];

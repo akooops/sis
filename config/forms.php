@@ -39,10 +39,119 @@ return [
      * Forms that ship with the app. FormsSeeder creates these as is_system, so
      * their settings stay editable but their structure does not.
      *
-     * Empty on purpose, the same way PagesSeeder ships empty: the capability
-     * ships, the content does not.
+     * These two exist because the public site RESOLVES THEM BY SLUG:
+     * /{locale}/contact and /{locale}/inquiries each look up one of these and
+     * render it with the ordinary form renderer, so renaming a slug would
+     * 404 a page. is_system is what makes that safe — UpdateFormData freezes the
+     * slug with Rule::in([$form->slug]), Form::isLocked() blocks structural
+     * edits in the builder, and FormsController::destroy refuses the delete.
+     * Copy, wording, notification routing and webhooks all stay editable.
+     *
+     * LABELS ARE CATALOGUE KEYS, NOT STRINGS. `label_key`, `title_key` and
+     * `confirmation_key` name entries in the `forms` group of
+     * config/translations.php, and FormsSeeder resolves each one across every
+     * seeded locale — so both forms ship translated into all nine rather than
+     * English-only with eight blanks for an admin to fill.
+     *
+     * Keys rather than nine inline strings per field because the wording already
+     * exists there and is edited on the Translations page; two copies would
+     * disagree the first time someone corrected one of them. An admin can still
+     * override any label afterwards in the builder — the seed is a starting
+     * point, not a binding.
+     *
+     * Settings and validation keys below are the ones the FieldType classes
+     * actually declare — `email` and `phone` declare NONE, so nothing is passed
+     * to them. Check app/Services/Forms/FieldTypes/*.php before adding a key;
+     * an unknown one is silently ignored rather than rejected.
      */
-    'system' => [],
+    'system' => [
+        [
+            'slug' => 'contact',
+            'name' => 'Contact',
+            'title_key' => 'forms.contact.title',
+            'confirmation_key' => 'forms.contact.success',
+            'pages' => [
+                [
+                    'name' => 'Contact',
+                    'fields' => [
+                        ['type' => 'text', 'key' => 'name', 'label_key' => 'forms.contact.name', 'is_required' => true, 'validation' => ['max_length' => 120]],
+                        ['type' => 'email', 'key' => 'email', 'label_key' => 'forms.contact.email', 'is_required' => true],
+                        ['type' => 'phone', 'key' => 'phone', 'label_key' => 'forms.contact.phone'],
+                        ['type' => 'text', 'key' => 'subject', 'label_key' => 'forms.contact.subject', 'is_required' => true, 'validation' => ['max_length' => 160]],
+                        ['type' => 'textarea', 'key' => 'message', 'label_key' => 'forms.contact.message', 'is_required' => true, 'settings' => ['rows' => 8], 'validation' => ['max_length' => 4000]],
+                        ['type' => 'button', 'key' => 'submit', 'label_key' => 'forms.contact.submit', 'settings' => ['action' => 'submit', 'variant' => 'primary']],
+                    ],
+                ],
+            ],
+        ],
+
+        [
+            'slug' => 'inquiries',
+            'name' => 'Admissions inquiry',
+            'title_key' => 'forms.inquiry.title',
+            'confirmation_key' => 'forms.inquiry.success',
+            'pages' => [
+                [
+                    'name' => 'Inquiry',
+                    'fields' => [
+                        ['type' => 'text', 'key' => 'guardian_name', 'label_key' => 'forms.inquiry.guardian_name', 'is_required' => true, 'validation' => ['max_length' => 120]],
+                        ['type' => 'email', 'key' => 'email', 'label_key' => 'forms.contact.email', 'is_required' => true],
+                        ['type' => 'phone', 'key' => 'phone', 'label_key' => 'forms.contact.phone', 'is_required' => true],
+                        ['type' => 'text', 'key' => 'student_name', 'label_key' => 'forms.inquiry.student_name', 'is_required' => true, 'validation' => ['max_length' => 120]],
+                        // 'today' is resolved to a concrete date by DateType::resolve()
+                        // at render time — a relative string cannot be compared
+                        // against a date_format rule, which is why it resolves there.
+                        ['type' => 'date', 'key' => 'student_birthdate', 'label_key' => 'forms.inquiry.student_birthdate', 'is_required' => true, 'validation' => ['max_date' => 'today']],
+                        ['type' => 'text', 'key' => 'student_school', 'label_key' => 'forms.inquiry.student_school', 'validation' => ['max_length' => 160]],
+                        [
+                            'type' => 'select',
+                            'key' => 'academic_year',
+                            'label_key' => 'forms.inquiry.academic_year',
+                            'is_required' => true,
+                            // A fixed list rather than a generated one: a seeder
+                            // runs once, and a range computed from the seed date
+                            // would silently go stale. Extend it here.
+                            'options' => [
+                                ['value' => '2026/2027', 'label' => '2026/2027'],
+                                ['value' => '2027/2028', 'label' => '2027/2028'],
+                                ['value' => '2028/2029', 'label' => '2028/2029'],
+                                ['value' => '2029/2030', 'label' => '2029/2030'],
+                                ['value' => '2030/2031', 'label' => '2030/2031'],
+                            ],
+                        ],
+                        [
+                            'type' => 'select',
+                            'key' => 'grade',
+                            'label_key' => 'forms.inquiry.grade',
+                            'is_required' => true,
+                            // Option VALUES are never translated — the same answer
+                            // has to read identically whatever language it was
+                            // given in, which is what makes an export comparable.
+                            'options' => [
+                                ['value' => 'prek', 'label' => 'PreK'],
+                                ['value' => 'kg1', 'label' => 'KG1'],
+                                ['value' => 'kg2', 'label' => 'KG2'],
+                                ['value' => 'g1', 'label' => 'Grade 1'],
+                                ['value' => 'g2', 'label' => 'Grade 2'],
+                                ['value' => 'g3', 'label' => 'Grade 3'],
+                                ['value' => 'g4', 'label' => 'Grade 4'],
+                                ['value' => 'g5', 'label' => 'Grade 5'],
+                                ['value' => 'g6', 'label' => 'Grade 6'],
+                                ['value' => 'g7', 'label' => 'Grade 7'],
+                                ['value' => 'g8', 'label' => 'Grade 8'],
+                                ['value' => 'g9', 'label' => 'Grade 9'],
+                                ['value' => 'g10', 'label' => 'Grade 10'],
+                                ['value' => 'g11', 'label' => 'Grade 11'],
+                                ['value' => 'g12', 'label' => 'Grade 12'],
+                            ],
+                        ],
+                        ['type' => 'textarea', 'key' => 'questions', 'label_key' => 'forms.inquiry.questions', 'settings' => ['rows' => 5], 'validation' => ['max_length' => 4000]],
+                        ['type' => 'button', 'key' => 'submit', 'label_key' => 'forms.inquiry.submit', 'settings' => ['action' => 'submit', 'variant' => 'primary']],
+                    ],
+                ],
+            ],
+        ],
+    ],
 
     /*
      * How long a rendered form's submission token stays valid, in minutes. The

@@ -56,6 +56,20 @@
          */
         captcha = null,
         /*
+         * The renderer's OWN chrome, translated server-side by
+         * App\Services\Forms\FormPresenter::labels().
+         *
+         * These were English string literals inline, which meant an Arabic form
+         * had "Next" and "Step 2 of 3" in Latin script under an RTL heading.
+         * Field labels are NOT here — those are translatable columns an admin
+         * edits in the builder and they arrive inside `schema`.
+         *
+         * Null is fine: the builder preview passes nothing and falls back to the
+         * English defaults below, which is the right behaviour for an
+         * English-only admin.
+         */
+        labels = null,
+        /*
          * The browser's passive report on itself — screen, timezone, language.
          * Mirrored into hidden `client[…]` inputs so the SERVER sees the same
          * values on submit that the beacon sent, which is what keeps the device
@@ -147,6 +161,34 @@
     const linearIndex = $derived(linearPages.findIndex((p) => p.id === current?.id));
     const isLastLinear = $derived(linearIndex >= 0 && linearIndex === linearPages.length - 1);
     const canGoBack = $derived(stack.length > 1);
+
+    /*
+     * The renderer's chrome, with the English defaults as the floor.
+     *
+     * The defaults stay because two callers legitimately pass nothing: the
+     * builder preview, whose admin is English-only by design, and any future
+     * embed that has no server to translate for it. A missing key falls through
+     * per-key rather than all-or-nothing.
+     */
+    const DEFAULT_LABELS = {
+        submit: 'Submit',
+        next: 'Next',
+        back: 'Back',
+        sending: 'Sending…',
+        step: 'Step :current of :total',
+        uploading: 'Uploading…',
+        removeFile: 'Remove file',
+        captchaFailed: 'The verification could not be completed. Please try again in a moment.',
+    };
+
+    const t = $derived({ ...DEFAULT_LABELS, ...(labels ?? {}) });
+
+    /** :current / :total, matching Laravel's own replacement syntax. */
+    const stepLabel = $derived(
+        t.step
+            .replace(':current', String(linearIndex + 1))
+            .replace(':total', String(linearPages.length)),
+    );
 
     /**
      * Whether the page the visitor is looking at is the one that can submit.
@@ -389,7 +431,7 @@
                 });
             })
             .catch(() => {
-                captchaNotice = 'The verification could not be loaded. Please reload the page and try again.';
+                captchaNotice = t.captchaFailed;
             });
     });
 
@@ -410,7 +452,7 @@
             await providerReady();
             captchaToken = await window.grecaptcha.execute(captcha.siteKey, { action: 'submit' });
         } catch {
-            captchaNotice = 'The verification could not be completed. Please try again in a moment.';
+            captchaNotice = t.captchaFailed;
             captchaPending = false;
 
             return;
@@ -528,7 +570,7 @@
 
         {#if linearPages.length > 1 && linearIndex >= 0}
             <p class="sisf-progress" aria-live="polite">
-                Step {linearIndex + 1} of {linearPages.length}
+                {stepLabel}
             </p>
         {/if}
 
@@ -578,14 +620,14 @@
         {#if !(current?.fields ?? []).some((f) => f.type === 'button')}
             <div class="sisf-actions">
                 {#if canGoBack}
-                    <button type="button" class="sisf-btn sisf-btn--secondary" onclick={back}>Back</button>
+                    <button type="button" class="sisf-btn sisf-btn--secondary" onclick={back}>{t.back}</button>
                 {/if}
                 {#if isLastLinear}
                     <button type="submit" class="sisf-btn sisf-btn--primary" disabled={submitting || captchaPending}>
-                        {submitting || captchaPending ? 'Sending…' : 'Submit'}
+                        {submitting || captchaPending ? t.sending : t.submit}
                     </button>
                 {:else}
-                    <button type="button" class="sisf-btn sisf-btn--primary" onclick={next}>Next</button>
+                    <button type="button" class="sisf-btn sisf-btn--primary" onclick={next}>{t.next}</button>
                 {/if}
             </div>
         {/if}

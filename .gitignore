@@ -18,6 +18,7 @@ yarn-error.log
 /.idea
 /.vscode
 /resources/admin/metronic
-/lang/*/common.php
+/lang/*/*.php
+!/lang/*/validation.php
 /content
 content.zip

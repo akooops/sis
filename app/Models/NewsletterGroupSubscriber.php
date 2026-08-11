@@ -69,7 +69,7 @@ class NewsletterGroupSubscriber extends Model
      */
     public function unsubscribeUrl(): string
     {
-        return route('web.user.newsletter-groups.unsubscribe', [
+        return route('web.site.newsletter-groups.unsubscribe', [
             'signature' => $this->signature,
             'email' => $this->email,
         ]);

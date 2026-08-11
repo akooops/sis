@@ -1,0 +1,44 @@
+{{--
+    Admissions inquiry.
+
+    Same shape as the contact page — heading, rule, copy, then the form at full
+    width. The seeded `inquiries` system form posts to the unchanged forms
+    endpoint; see site::pages.contact for why embedding is safe.
+--}}
+@extends('site::layout')
+
+@section('content')
+    @include('site::partials.page-hero', [
+        'image' => $page->thumbnail_url,
+        'title' => $page->getTranslation('title', $site->locale(), true) ?: $page->name,
+    ])
+
+    @include('site::partials.page-menu', ['menu' => $page->menu])
+
+    @include('site::partials.breadcrumb')
+
+    <section>
+        <div class="container pb-14 pt-6">
+            <h2 class="mb-4 text-6xl font-semibold uppercase leading-[42px] text-brand" data-aos="fade-up"
+                data-aos-duration="1000">
+                {{ $page->getTranslation('title', $site->locale(), true) ?: $page->name }}
+            </h2>
+
+            <hr class="mb-4 mt-2 border-line" data-aos="fade-up" data-aos-duration="1000">
+
+            @include('site::partials.flash')
+
+            @if ($page->getTranslation('content', $site->locale(), true))
+                <div class="prose mb-8" data-aos="fade-up" data-aos-duration="1000">
+                    {!! $page->getTranslation('content', $site->locale(), true) !!}
+                </div>
+            @endif
+
+            @if ($presentation)
+                <div data-sisf data-aos="fade-up" data-aos-duration="1000">
+                    @include('site::forms.partials.renderer')
+                </div>
+            @endif
+        </div>
+    </section>
+@endsection

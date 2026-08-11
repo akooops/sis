@@ -81,7 +81,6 @@
         redirect_url: r?.redirect_url ?? '',
 
         captcha_integration_id: r?.captcha_integration_id ?? null,
-        analytics_integration_id: r?.analytics_integration_id ?? null,
     });
 
     const form = useForm(
@@ -453,23 +452,6 @@
                         />
                     </Field>
                 {/if}
-
-                <Field
-                    label="Analytics integration"
-                    error={form.errors.analytics_integration_id}
-                    hint="Optional. Reports views, steps and completions to the connected analytics account."
-                >
-                    <Select
-                        resource="api.v1.admin.integrations.index"
-                        resourceParams={{ filter: { type: 'analytics', is_enabled: 1 } }}
-                        bind:value={form.data.analytics_integration_id}
-                        labelKey="name"
-                        placeholder="Search analytics integrations…"
-                        initialOptions={record?.analytics_integration
-                            ? [{ value: record.analytics_integration.id, label: record.analytics_integration.name }]
-                            : []}
-                    />
-                </Field>
 
                 {#if editing}
                     {@render connections('Where submissions go', [

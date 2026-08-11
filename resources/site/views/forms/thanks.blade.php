@@ -1,11 +1,10 @@
-{{-- TEMPORARY — see resources/site/views/layout.blade.php --}}
 @extends('site::layout')
 
-@section('robots', 'noindex,nofollow')
-@section('title', __('forms.thanks_title').' — '.config('app.name'))
-
 @section('content')
-    <div class="sisf">
+    {{-- data-sisf, not data-sisf-root: this page has no renderer to mount, but it
+         IS the page that reports a completed submission, so the form module has
+         to load here. See the ON_DEMAND table in site.js. --}}
+    <div class="sisf" data-sisf>
         <h1 class="sisf-title">{{ __('forms.thanks_title') }}</h1>
 
         {{-- Admin-authored, same trust level as any other page content. --}}
@@ -29,5 +28,8 @@
         `$reference` comes from a flash the controller sets only when a
         submission was persisted, so it is the honest signal.
     --}}
-    @include('site::forms.partials.analytics', ['stage' => $reference ? 'complete' : 'form'])
+    @include('site::forms.partials.tracking', [
+        'form' => $form,
+        'stage' => $reference ? 'complete' : 'form',
+    ])
 @endsection

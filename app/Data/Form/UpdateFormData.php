@@ -49,7 +49,6 @@ class UpdateFormData extends Data
         public ?string $redirect_url,
 
         public ?string $captcha_integration_id,
-        public ?string $analytics_integration_id,
 
         public string|Optional|null $thumbnail = null,
     ) {}
@@ -131,13 +130,6 @@ class UpdateFormData extends Data
                 'string',
                 Rule::exists('integrations', 'id')->where(
                     fn ($q) => $q->whereIn('integration_type_id', self::typeIds('captcha')),
-                ),
-            ],
-            'analytics_integration_id' => [
-                'nullable',
-                'string',
-                Rule::exists('integrations', 'id')->where(
-                    fn ($q) => $q->whereIn('integration_type_id', self::typeIds('analytics')),
                 ),
             ],
 

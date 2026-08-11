@@ -46,6 +46,8 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute((int) config('forms.limits.telemetry_per_minute', 60))->by($request->ip());
         });
 
+        Route::pattern('locale', '[a-z]{2}');
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')

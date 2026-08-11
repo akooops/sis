@@ -47,7 +47,6 @@ class FormData extends Data
 
         public ?string $category_id,
         public ?string $captcha_integration_id,
-        public ?string $analytics_integration_id,
 
         public ?string $thumbnail_url,
         public ?string $public_url,
@@ -57,7 +56,6 @@ class FormData extends Data
 
         public Lazy|CategoryData|null $category,
         public Lazy|IntegrationData|null $captcha_integration,
-        public Lazy|IntegrationData|null $analytics_integration,
 
         public ?string $created_at,
         public ?string $updated_at,
@@ -97,7 +95,6 @@ class FormData extends Data
 
             category_id: $form->category_id,
             captcha_integration_id: $form->captcha_integration_id,
-            analytics_integration_id: $form->analytics_integration_id,
 
             thumbnail_url: $form->thumbnail_url,
             // Only meaningful once it is live, and the admin's "copy link" action
@@ -109,7 +106,6 @@ class FormData extends Data
 
             category: Lazy::whenLoaded('category', $form, fn () => $form->category ? CategoryData::from($form->category) : null),
             captcha_integration: Lazy::whenLoaded('captchaIntegration', $form, fn () => $form->captchaIntegration ? IntegrationData::from($form->captchaIntegration) : null),
-            analytics_integration: Lazy::whenLoaded('analyticsIntegration', $form, fn () => $form->analyticsIntegration ? IntegrationData::from($form->analyticsIntegration) : null),
 
             created_at: $form->created_at?->toIso8601String(),
             updated_at: $form->updated_at?->toIso8601String(),

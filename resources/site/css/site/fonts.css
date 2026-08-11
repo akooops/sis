@@ -1,0 +1,90 @@
+/* =============================================================================
+   WEBFONTS
+   Mulish carries Latin, DINNext Arabic carries Arabic. WOFF2 only — it has been supported
+   everywhere since 2016. Files stay where they already live under public/, so
+   these are absolute URLs Vite leaves alone.
+
+   600 and 800 are deliberately NOT declared. The original build only shipped
+   300/400/500/700/900, so `font-semibold` resolved to Bold and `font-extrabold`
+   to Black. Adding the real faces renders those lighter than the design.
+   ========================================================================== */
+
+@font-face {
+    font-family: "Mulish";
+    src: url("/assets/site/fonts/Mulish/Mulish-Light.woff2") format("woff2");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Mulish";
+    src: url("/assets/site/fonts/Mulish/Mulish-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Mulish";
+    src: url("/assets/site/fonts/Mulish/Mulish-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Mulish";
+    src: url("/assets/site/fonts/Mulish/Mulish-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Mulish";
+    src: url("/assets/site/fonts/Mulish/Mulish-Black.woff2") format("woff2");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "DINNext";
+    src: url("/assets/site/fonts/DINNext/DINNextLTArabic-Light.woff2") format("woff2");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "DINNext";
+    src: url("/assets/site/fonts/DINNext/DINNextLTArabic-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "DINNext";
+    src: url("/assets/site/fonts/DINNext/DINNextLTArabic-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "DINNext";
+    src: url("/assets/site/fonts/DINNext/DINNextLTArabic-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "DINNext";
+    src: url("/assets/site/fonts/DINNext/DINNextLTArabic-Black.woff2") format("woff2");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}

@@ -9,13 +9,13 @@ use App\Models\FormSubmission;
 use App\Data\Media\StoreMediaData;
 use App\Models\Language;
 use App\Models\Media;
+use App\Services\Forms\FormPresenter;
 use App\Services\Forms\GeoResolver;
 use App\Services\Forms\SubmissionContext;
 use App\Services\Forms\SubmissionGuard;
 use App\Services\Forms\SubmissionToken;
 use App\Services\Forms\SubmissionValidator;
 use App\Services\Forms\TelemetryRecorder;
-use App\Services\Integrations\Analytics;
 use App\Services\Integrations\Captcha;
 use App\Services\Uploads\UploadService;
 use Illuminate\Http\JsonResponse;
@@ -30,11 +30,11 @@ use Illuminate\View\View;
 /**
  * The public form.
  *
- * TEMPORARY PRESENTATION, PERMANENT CONTRACT. The Blade views under
- * resources/site/views are a placeholder for whatever the real end-user design
- * turns out to be. The JSON schema, the token, the guard order and the stored
- * shape are not placeholders — a redesign should replace the views and keep all
- * of this untouched.
+ * PERMANENT CONTRACT. The JSON schema, the token, the guard order and the stored
+ * shape are the contract; the presentation never was. The views have since been
+ * re-parented onto the real site layout and the payload assembly extracted to
+ * App\Services\Forms\FormPresenter — which the site's own contact and admissions
+ * pages also call, so one renderer serves both. None of the contract moved.
  *
  * Lives in the `web` middleware group on purpose. A session-less group has no
  * ShareErrorsFromSession, so every ValidationException on a non-JSON POST would
@@ -48,9 +48,16 @@ class FormsController extends Controller
         protected GeoResolver $geo,
         protected SubmissionContext $context,
         protected TelemetryRecorder $recorder,
+        protected FormPresenter $presenter,
     ) {}
 
-    /** The form itself. Locale is an explicit URL segment, never a negotiation. */
+    /**
+     * The form itself. Locale is an explicit URL segment, never a negotiation.
+     *
+     * The assembly moved to FormPresenter when the site's contact and admissions
+     * pages started embedding the same renderer. The GUARDS and their status
+     * codes stayed here, because those are this controller's contract.
+     */
     public function show(Request $request, string $locale, string $slug): View|RedirectResponse
     {
         abort_unless(in_array($locale, Language::enabledCodes(), true), 404);
@@ -59,28 +66,63 @@ class FormsController extends Controller
 
         App::setLocale($locale);
 
-        // Blocked on the GET as well as the POST: rendering a form somebody may
-        // not submit is just a slower rejection.
-        if ($this->guard->blocksCountry($form, $this->geo->countryCode($request))
-            || $this->guard->blocksIp($form->load('blockedIps'), $request->ip())) {
-            return response()->view('site::forms.blocked', ['form' => $form, 'locale' => $locale], 403);
+        $state = $this->presenter->state($request, $form);
+
+        $title = $form->getTranslation('title', $locale, true) ?: $form->name;
+
+        if ($state === 'blocked') {
+            return response()->view('site::forms.blocked', [
+                'form' => $form,
+                'locale' => $locale,
+                'seo' => $this->seo($form, $locale, $title, 'noindex,nofollow'),
+            ], 403);
         }
 
-        if ($form->hasReachedLimit()) {
-            return response()->view('site::forms.closed', ['form' => $form, 'locale' => $locale], 410);
+        if ($state === 'closed') {
+            return response()->view('site::forms.closed', [
+                'form' => $form,
+                'locale' => $locale,
+                'seo' => $this->seo($form, $locale, $title, 'noindex,nofollow'),
+            ], 410);
         }
 
-        $minted = SubmissionToken::mint($form);
+        $presentation = $this->presenter->present($form, $locale);
 
         return view('site::forms.show', [
             'form' => $form,
             'locale' => $locale,
-            'schema' => $this->schema($form, $locale),
-            'token' => $minted['token'],
-            'honeypot' => $form->is_spam_filtered ? $minted['honeypot'] : null,
-            'captcha' => Captcha::forForm($form),
-            'analytics' => Analytics::forForm($form),
+            'presentation' => $presentation,
+            'seo' => $this->seo($form, $locale, $presentation->schema['title'][$locale] ?? $title),
         ]);
+    }
+
+    /**
+     * The <head> contract site::layout reads, for the four standalone form pages.
+     *
+     * A helper and not four inline copies, unlike the site's own controllers:
+     * these are four views of ONE resource at one URL — the form — rather than
+     * four pages, and `show()` alone picks between three of them on the way out.
+     *
+     * @return array<string, mixed>
+     */
+    protected function seo(Form $form, string $locale, string $title, string $robots = 'index,follow'): array
+    {
+        $routeName = 'web.user.forms.show';
+        $routeParameters = ['slug' => $form->slug];
+
+        return [
+            'title' => $title,
+            'description' => $form->getTranslation('description', $locale, true),
+            'image' => null,
+            'canonical' => route($routeName, ['locale' => $locale] + $routeParameters),
+            'robots' => $robots,
+            'type' => 'website',
+            // These URIs keep their own /forms/{locale}/{slug} shape, so the
+            // locale is an explicit parameter here and never stripped.
+            'alternates' => collect(Language::enabledCodes())->mapWithKeys(fn (string $code) => [
+                $code => route($routeName, ['locale' => $code] + $routeParameters),
+            ]),
+        ];
     }
 
     /** Bare slug: send the visitor to a locale they can read. */
@@ -473,89 +515,11 @@ class FormsController extends Controller
             'form' => $form,
             'locale' => $locale,
             'reference' => session('sisf_reference'),
-            // Same pinned integration as the form page: sisf_form_complete has
-            // to be reported to the property that saw sisf_form_view, or the
-            // funnel breaks.
-            'analytics' => Analytics::forForm($form),
+            'seo' => $this->seo($form, $locale, __('forms.thanks_title'), 'noindex,nofollow'),
         ]);
     }
 
     /* ------------------------------------------------------------------ */
-
-    /** The renderer's schema — the same shape the builder preview feeds it. */
-    protected function schema(Form $form, string $locale): array
-    {
-        $form->load(['pages.fields.options']);
-
-        return [
-            'id' => $form->id,
-            'slug' => $form->slug,
-            'locale' => $locale,
-            'default_locale' => Language::defaultCode(),
-            'is_rtl' => (bool) Language::where('code', $locale)->value('is_rtl'),
-            'title' => $form->enabledTranslations('title'),
-            'description' => $form->enabledTranslations('description'),
-            'content' => $form->enabledTranslations('content'),
-            'pages' => $form->pages->map(fn ($page) => [
-                'id' => $page->id,
-                'title' => $page->enabledTranslations('title'),
-                'css_id' => $page->css_id,
-                'css_class' => $page->css_class,
-                'is_interstitial' => (bool) $page->is_interstitial,
-                'fields' => $page->fields->map(fn ($field) => [
-                    'id' => $field->id,
-                    'type' => $field->type,
-                    'key' => $field->key,
-                    'is_required' => (bool) $field->is_required,
-                    'settings' => $field->settings ?? [],
-                    'validation' => $field->validation ?? [],
-                    'target_form_page_id' => $field->target_form_page_id,
-                    'css_id' => $field->css_id,
-                    'css_class' => $field->css_class,
-                    'label' => $field->enabledTranslations('label'),
-                    'placeholder' => $field->enabledTranslations('placeholder'),
-                    'value' => $field->enabledTranslations('value'),
-                    // The map above is what the builder round-trips; this is the
-                    // one value the renderer seeds an unanswered field with, and
-                    // it has to be resolved HERE because the renderer seeds before
-                    // it knows anything about locales.
-                    'value_resolved' => $this->resolved($field->enabledTranslations('value'), $locale),
-                    'content' => $field->enabledTranslations('content'),
-                    'options' => $field->options->map(fn ($o) => [
-                        'value' => $o->value,
-                        'is_default' => (bool) $o->is_default,
-                        'label' => $o->enabledTranslations('label'),
-                    ])->all(),
-                ])->all(),
-            ])->all(),
-        ];
-    }
-
-    /**
-     * One translatable map, resolved for the page's locale.
-     *
-     * The visitor's locale first, then the default — the same order lib/forms/i18n
-     * `translate()` uses, so a half-translated form falls back the same way whether
-     * the value was resolved here or in the browser.
-     *
-     * NULL, never '', when there is nothing: the renderer seeds with
-     * `?? emptyValue(type, field)`, and '' would be adopted as the answer for a
-     * checkbox group or a multi-select that needs an array.
-     *
-     * @param  array<string, string|null>  $map
-     */
-    protected function resolved(array $map, string $locale): ?string
-    {
-        foreach ([$locale, Language::defaultCode()] as $code) {
-            $value = $map[$code] ?? null;
-
-            if (is_string($value) && $value !== '') {
-                return $value;
-            }
-        }
-
-        return null;
-    }
 
     /**
      * The row for this outcome — UPGRADING the session's draft when there is one.

@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * One translatable line, identified by file (`group`) and dotted path (`key`).
- * Mirrors config('translations.keys'); grown by code, never CRUD.
+ * Mirrors the catalogue under config/translations/, one file per group, whose
+ * values are locale => string maps. Grown by code, never CRUD.
  *
  * Keys ONLY — values live in lang/{code}/{group}.php. This table is what makes
  * "every key survives a write" checkable, and what the Translations page pages.

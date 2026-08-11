@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Throwable;
 
 /**
  * A configured instance of a driver (this SMTP account, that OpenAI key).
@@ -74,8 +75,17 @@ class Integration extends Model
     }
 
     /**
-     * What the app sends through for a type: the oldest enabled one. Interim rule
-     * until a settings table governs it; Email/Sms/Ai::for($id) pins one instead.
+     * What the app sends through for a type.
+     *
+     * The `integrations.{type}` SETTING when an admin has pinned one, and the
+     * oldest enabled integration otherwise. The fallback is what makes a single
+     * configured integration work with nothing chosen; the setting is what
+     * decides between two, which the fallback picks arbitrarily.
+     *
+     * Only the types with a setting declared in config/settings.php can be
+     * pinned — today `analytics` and `ai`. Everything else keeps the fallback.
+     *
+     * Email/Sms/Ai::for($id) still pins one explicitly and bypasses both.
      */
     public static function activeFor(string $typeCode): ?self
     {
@@ -83,11 +93,39 @@ class Integration extends Model
             return static::$activeMemo[$typeCode];
         }
 
-        return static::$activeMemo[$typeCode] = static::query()
-            ->ofType($typeCode)
-            ->enabled()
-            ->oldest()
-            ->first();
+        return static::$activeMemo[$typeCode] = static::pinnedFor($typeCode)
+            ?? static::query()->ofType($typeCode)->enabled()->oldest()->first();
+    }
+
+    /**
+     * The integration an admin pinned for this type, if any.
+     *
+     * Re-checks the type and the enabled flag rather than trusting the stored
+     * id: a setting written before an integration was disabled, retyped or
+     * deleted must stop resolving, not keep sending through a dead account.
+     *
+     * Guarded, because this runs from AppServiceProvider::boot() — before
+     * `settings` necessarily exists on a fresh install or mid-migration.
+     */
+    protected static function pinnedFor(string $typeCode): ?self
+    {
+        try {
+            $id = Setting::query()
+                ->where('group', 'integrations')
+                ->where('key', $typeCode)
+                ->value('value');
+        } catch (Throwable) {
+            return null;
+        }
+
+        // The column is json-cast, so a bare id round-trips as a quoted string.
+        $id = is_string($id) ? trim($id, '"') : null;
+
+        if ($id === null || $id === '') {
+            return null;
+        }
+
+        return static::query()->ofType($typeCode)->enabled()->whereKey($id)->first();
     }
 
     /** Drop the per-request active memo (called by the observer on any write). */

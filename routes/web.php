@@ -4,7 +4,18 @@ use App\Http\Controllers\Web\Admin\AuthController;
 use App\Http\Controllers\Web\Admin\PagesController as AdminPagesController;
 use App\Http\Controllers\Web\FormsController as PublicFormsController;
 use App\Http\Controllers\Web\NewsletterController;
-use App\Http\Controllers\Web\PagesController;
+use App\Http\Controllers\Web\Site\AchievementsController;
+use App\Http\Controllers\Web\Site\AlbumsController;
+use App\Http\Controllers\Web\Site\ArticlesController;
+use App\Http\Controllers\Web\Site\BrandsController;
+use App\Http\Controllers\Web\Site\ContactController;
+use App\Http\Controllers\Web\Site\EventsController;
+use App\Http\Controllers\Web\Site\HomeController;
+use App\Http\Controllers\Web\Site\JobsController;
+use App\Http\Controllers\Web\Site\PagesController;
+use App\Http\Controllers\Web\Site\ProgramsController;
+use App\Http\Controllers\Web\Site\ResourcesController;
+use App\Http\Controllers\Web\Site\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -12,9 +23,15 @@ use Illuminate\Support\Facades\Route;
 | Web Routes
 |--------------------------------------------------------------------------
 |
-| These routes only render Inertia page shells; all data is fetched by the
+| Two audiences in one file.
+|
+| The ADMIN routes only render Inertia page shells; all data is fetched by the
 | Svelte pages from the JSON API (/api/v1/admin/...). The rendering lives in
-| App\Http\Controllers\Web, never inline here.
+| App\Http\Controllers\Web\Admin, never inline here.
+|
+| The SITE routes are server-rendered Blade under App\Http\Controllers\Web\Site,
+| every one of them behind a `{locale}` segment. See the site group at the
+| bottom for why the ordering inside it is load-bearing.
 |
 */
 
@@ -72,11 +89,6 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('forms/{form}/analytics', [AdminPagesController::class, 'formAnalytics'])->middleware('verify.permissions:forms.show')->name('web.admin.forms.analytics');
 });
 
-/*------------------------
-| Public (no auth — reached from an email)
-|------------------------*/
-Route::get('newsletter/unsubscribe/{signature}', [NewsletterController::class, 'unsubscribe'])->name('web.user.newsletter-groups.unsubscribe');
-
 /*
  * Public forms.
  *
@@ -89,39 +101,110 @@ Route::get('newsletter/unsubscribe/{signature}', [NewsletterController::class, '
  * `[a-z]{2}` constraint is compilable, so route:cache still works.
  */
 Route::prefix('forms')->group(function () {
-    Route::get('{locale}/{slug}', [PublicFormsController::class, 'show'])
-        ->where('locale', '[a-z]{2}')->name('web.user.forms.show');
+    /*
+     * `set.locale` was added when the public site landed. The URIs are
+     * deliberately unchanged — a form link already in the wild must keep
+     * working — but these views now extend the real site layout, whose header
+     * calls route('web.site.home'), and that throws "Missing required
+     * parameter" without the URL::defaults the middleware sets.
+     *
+     * The controller keeps its own abort_unless guards. They are the contract;
+     * this is presentation plumbing.
+     */
+    Route::middleware('set.locale')->group(function () {
+        Route::get('{locale}/{slug}', [PublicFormsController::class, 'show'])
+            ->where('locale', '[a-z]{2}')->name('web.user.forms.show');
 
-    Route::get('{locale}/{slug}/thanks', [PublicFormsController::class, 'thanks'])
-        ->where('locale', '[a-z]{2}')->name('web.user.forms.thanks');
+        Route::get('{locale}/{slug}/thanks', [PublicFormsController::class, 'thanks'])
+            ->where('locale', '[a-z]{2}')->name('web.user.forms.thanks');
 
-    Route::post('{locale}/{slug}', [PublicFormsController::class, 'submit'])
-        ->where('locale', '[a-z]{2}')
-        ->middleware('throttle:form-submits')
-        ->name('web.user.forms.submit');
+        Route::post('{locale}/{slug}', [PublicFormsController::class, 'submit'])
+            ->where('locale', '[a-z]{2}')
+            ->middleware('throttle:form-submits')
+            ->name('web.user.forms.submit');
 
-    // Files go up before the form is submitted: they have to survive a page
-    // change and a virus scan, and the answer only carries the media id.
-    Route::post('{locale}/{slug}/uploads', [PublicFormsController::class, 'upload'])
-        ->where('locale', '[a-z]{2}')
-        ->middleware('throttle:form-uploads')
-        ->name('web.user.forms.upload');
+        // Files go up before the form is submitted: they have to survive a page
+        // change and a virus scan, and the answer only carries the media id.
+        Route::post('{locale}/{slug}/uploads', [PublicFormsController::class, 'upload'])
+            ->where('locale', '[a-z]{2}')
+            ->middleware('throttle:form-uploads')
+            ->name('web.user.forms.upload');
 
-    // The analytics beacon. EXCEPTED FROM CSRF in App\Http\Middleware\
-    // VerifyCsrfToken, because navigator.sendBeacon cannot set a header — the
-    // encrypted submission token authenticates it instead, and the throttle
-    // keeps the cost of an unauthenticated POST bounded.
-    Route::post('{locale}/{slug}/telemetry', [PublicFormsController::class, 'telemetry'])
-        ->where('locale', '[a-z]{2}')
-        ->middleware('throttle:form-telemetry')
-        ->name('web.user.forms.telemetry');
+        // The analytics beacon. EXCEPTED FROM CSRF in App\Http\Middleware\
+        // VerifyCsrfToken, because navigator.sendBeacon cannot set a header — the
+        // encrypted submission token authenticates it instead, and the throttle
+        // keeps the cost of an unauthenticated POST bounded.
+        Route::post('{locale}/{slug}/telemetry', [PublicFormsController::class, 'telemetry'])
+            ->where('locale', '[a-z]{2}')
+            ->middleware('throttle:form-telemetry')
+            ->name('web.user.forms.telemetry');
+    });
 
     // Bare slug: pick a locale the visitor can read and redirect. Declared last
-    // so it never swallows the two-letter locale segment above.
+    // so it never swallows the two-letter locale segment above, and OUTSIDE the
+    // set.locale group because it has no {locale} to resolve.
     Route::get('{slug}', [PublicFormsController::class, 'redirectToLocale'])->name('web.user.forms.entry');
 });
 
 /*------------------------
-| Root
+| SEO endpoints
 |------------------------*/
-Route::get('/', [PagesController::class, 'index'])->name('web.index');
+
+/*
+ * BEFORE the site group. Its `{slug}` route matches any single segment, so
+ * registered after these it would swallow `sitemap.xml` and `robots.txt` and
+ * answer them with a Page lookup that 404s.
+ *
+ * Outside the locale prefix too: one sitemap for the whole site, with every
+ * locale expressed as an <xhtml:link> alternate INSIDE it. robots.txt is a route
+ * rather than the static public/robots.txt it replaces, because the Sitemap:
+ * directive needs an absolute URL and only a route can interpolate
+ * config('app.url') per environment — which is also why that static file had to
+ * be deleted, the web server serving public/ first would have made this dead.
+ */
+Route::get('sitemap.xml', [SitemapController::class, 'index'])->name('web.site.sitemap');
+Route::get('robots.txt', [SitemapController::class, 'robots'])->name('web.site.robots');
+
+Route::get('newsletter/unsubscribe/{signature}', [NewsletterController::class, 'unsubscribe'])
+    ->name('web.site.newsletter-groups.unsubscribe');
+
+/*------------------------
+| Public site
+|------------------------*/
+$site = function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+
+    Route::get('articles', [ArticlesController::class, 'index'])->name('articles.index');
+    Route::get('articles/{slug}', [ArticlesController::class, 'show'])->name('articles.show');
+
+    Route::get('albums', [AlbumsController::class, 'index'])->name('albums.index');
+    Route::get('albums/{slug}', [AlbumsController::class, 'show'])->name('albums.show');
+
+    Route::get('events', [EventsController::class, 'index'])->name('events.index');
+    Route::get('events/{slug}', [EventsController::class, 'show'])->name('events.show');
+
+    Route::get('achievements', [AchievementsController::class, 'index'])->name('achievements.index');
+    Route::get('achievements/{slug}', [AchievementsController::class, 'show'])->name('achievements.show');
+
+    Route::get('programs/{slug}', [ProgramsController::class, 'show'])->name('programs.show');
+
+    Route::get('brands', [BrandsController::class, 'index'])->name('brands.index');
+    Route::get('brands/{slug}', [BrandsController::class, 'show'])->name('brands.show');
+
+    Route::get('jobs', [JobsController::class, 'index'])->name('jobs.index');
+    Route::get('jobs/apply', [JobsController::class, 'apply'])->name('jobs.apply');
+    Route::get('jobs/{slug}', [JobsController::class, 'show'])->name('jobs.show');
+
+    Route::get('calendars', [ResourcesController::class, 'calendars'])->name('calendars');
+    Route::get('newsletters', [ResourcesController::class, 'newsletters'])->name('newsletters');
+    Route::get('guidelines', [ResourcesController::class, 'guidelines'])->name('guidelines');
+    Route::get('documents', [ResourcesController::class, 'documents'])->name('documents');
+
+    Route::get('contact', [ContactController::class, 'contact'])->name('contact');
+    Route::get('inquiries', [ContactController::class, 'inquiries'])->name('inquiries');
+
+    Route::get('{slug}', [PagesController::class, 'show'])->name('pages.show');
+};
+
+Route::middleware('set.locale')->prefix('{locale}')->name('web.site.')->group($site);
+Route::middleware('set.locale')->name('web.site.root.')->group($site);

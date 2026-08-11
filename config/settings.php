@@ -114,156 +114,103 @@ return [
      * see SettingsSeeder, whose whole reason for existing is that reseeding must
      * not reset what an admin configured. `sort` orders the settings inside
      * their group; `description` is the hint shown under the field.
+     */    /*
+     * The setting catalogue. SettingsSeeder mirrors it into the settings table;
+     * an admin then edits `value` and nothing else, which is why the module has
+     * no create and no delete. Config rather than a CRUD table because a setting
+     * exists only for the code that reads it by key — a row an admin invented
+     * would be one nothing consults. Grown by code: add an entry here, reseed.
+     *
+     * DELIBERATELY SHORT. A setting is for something with ONE value across every
+     * language and every page. Anything a visitor READS is a lang key instead —
+     * a settings row would serve the English string on the Arabic site — and
+     * anything with exactly one right answer is a constant. What survived that
+     * test is below; everything else was removed rather than left inert.
+     *
+     * The menus are the clearest case: they used to be four `model` settings
+     * pointing at a Menu, and they are now resolved by `code` in
+     * SiteContext::MENU_SLOTS. A system menu's code cannot be changed
+     * (MenusController blocks it) — so the code IS the stable reference the
+     * setting was trying to provide, and the setting was a second way to say the
+     * same thing that could disagree with the first.
+     *
+     * `type` is one of Setting::TYPES and names the SHAPE of `value`:
+     *   text   -> a string            number -> numeric          date -> a date
+     *   select -> one of `options`    model  -> the id of a `model` record
+     *
+     * `filter` narrows a model setting to a subset of its model. Its keys are
+     * filters the target's index endpoint already exposes, because the picker
+     * sends them there as filter[key]; the `filters` map beside that model above
+     * says how the server applies the same narrowing when it validates.
+     *
+     * `default` seeds `value` on the run that CREATES the row and never again —
+     * see SettingsSeeder, whose whole reason for existing is that reseeding must
+     * not reset what an admin configured.
      */
     'settings' => [
 
-        'general' => [
-            'site_name' => [
-                'name' => 'Site name',
+        /*
+         * Raw markup injected into every public page.
+         *
+         * STORED XSS BY DESIGN. The values render through {!! !!} and are not
+         * sanitised, because the whole point is to paste a verification meta tag
+         * or a third-party widget snippet in verbatim — anything that escaped it
+         * would also break it. The only gate is admin access, so keep this group
+         * off any role that is not fully trusted.
+         */
+        'code' => [
+            'head' => [
+                'name' => 'Head code',
                 'type' => 'text',
-                'default' => 'Saud International Schools',
-                'description' => 'The school name, used in page titles, outgoing email and the public site header.',
+                'description' => 'Markup injected into the <head> of every public page. Verification tags, third-party snippets.',
                 'sort' => 1,
             ],
-            'tagline' => [
-                'name' => 'Tagline',
+            'foot' => [
+                'name' => 'Footer code',
                 'type' => 'text',
-                'default' => 'Learning without limits',
-                'description' => 'The single line shown under the school name.',
+                'description' => 'Markup injected just before </body> on every public page.',
                 'sort' => 2,
-            ],
-            'logo' => [
-                'name' => 'Logo',
-                'type' => 'model',
-                'model' => 'media',
-                'description' => 'The mark the public site header renders.',
-                'sort' => 3,
-            ],
-            'favicon' => [
-                'name' => 'Favicon',
-                'type' => 'model',
-                'model' => 'media',
-                'description' => 'The small square icon browsers show in the tab.',
-                'sort' => 4,
-            ],
-            'main_menu' => [
-                'name' => 'Main menu',
-                'type' => 'model',
-                'model' => 'menu',
-                'description' => 'Which menu the public site renders as its primary navigation.',
-                'sort' => 5,
-            ],
-            'timezone' => [
-                'name' => 'Timezone',
-                'type' => 'select',
-                /*
-                 * A short list rather than the several hundred PHP zone ids: this
-                 * is a select, not a search, and every zone offered is one the
-                 * school actually operates in. Add a row when that changes.
-                 */
-                'options' => [
-                    ['value' => 'Asia/Riyadh', 'label' => 'Riyadh (GMT+3)'],
-                    ['value' => 'Asia/Dubai', 'label' => 'Dubai (GMT+4)'],
-                    ['value' => 'Africa/Cairo', 'label' => 'Cairo (GMT+2)'],
-                    ['value' => 'Europe/London', 'label' => 'London (GMT+0/+1)'],
-                    ['value' => 'UTC', 'label' => 'UTC'],
-                ],
-                'default' => 'Asia/Riyadh',
-                'description' => 'The zone dates and times are displayed in.',
-                'sort' => 6,
-            ],
-            'items_per_page' => [
-                'name' => 'Items per page',
-                'type' => 'number',
-                'default' => 12,
-                'description' => 'How many records a public listing shows before paginating.',
-                'sort' => 7,
-            ],
-        ],
-
-        'seo' => [
-            'meta_title' => [
-                'name' => 'Meta title',
-                'type' => 'text',
-                'default' => 'Saud International Schools',
-                'description' => 'The title search engines and social cards fall back to.',
-                'sort' => 1,
-            ],
-            'meta_description' => [
-                'name' => 'Meta description',
-                'type' => 'text',
-                'default' => 'An international school community built on curiosity, care and high expectations.',
-                'description' => 'The summary shown under the title in search results.',
-                'sort' => 2,
-            ],
-            'keywords' => [
-                'name' => 'Keywords',
-                'type' => 'text',
-                'is_multiple' => true,
-                'default' => ['saud international schools', 'international school', 'admissions'],
-                'description' => 'Search keywords, one per entry.',
-                'sort' => 3,
             ],
         ],
 
         'homepage' => [
-            'hero_banner' => [
-                'name' => 'Hero banner',
-                'type' => 'model',
-                'model' => 'banner',
-                'description' => 'The banner shown at the top of the homepage.',
+            'banner_mode' => [
+                'name' => 'Banner mode',
+                'type' => 'select',
+                'options' => [
+                    ['value' => 'ordered', 'label' => 'All banners, in order'],
+                    ['value' => 'random', 'label' => 'One at random'],
+                ],
+                'default' => 'ordered',
+                'description' => 'Whether the hero runs every live banner as a slider, or shows a single one picked at random on each visit.',
                 'sort' => 1,
             ],
-            'featured_articles' => [
-                'name' => 'Featured articles',
+            'pathway_program' => [
+                'name' => 'Pathway programme',
                 'type' => 'model',
-                'model' => 'article',
-                'is_multiple' => true,
-                'default' => [],
-                'description' => 'The articles pinned to the homepage, in the order chosen here.',
-                'sort' => 2,
-            ],
-            'articles_per_page' => [
-                'name' => 'Articles per page',
-                'type' => 'number',
-                'default' => 6,
-                'description' => 'How many articles the homepage news section lists.',
-                'sort' => 3,
-            ],
-        ],
-
-        'academic' => [
-            /*
-             * No defaults: these are set at the start of each academic year, and a
-             * seeded date would read as fact on a fresh install rather than as an
-             * unanswered question.
-             */
-            'year_start' => [
-                'name' => 'Academic year start',
-                'type' => 'date',
-                'description' => 'The first day of the current academic year.',
-                'sort' => 1,
-            ],
-            'year_end' => [
-                'name' => 'Academic year end',
-                'type' => 'date',
-                'description' => 'The last day of the current academic year.',
+                'model' => 'program',
+                'description' => 'The programme whose streams are shown as the pathway cards on the homepage.',
                 'sort' => 2,
             ],
         ],
 
-        'notifications' => [
-            'default_email_integration' => [
-                'name' => 'Default email integration',
+        /*
+         * Which integration answers when nothing more specific is pinned.
+         *
+         * Every channel already falls back to Integration::activeFor($type),
+         * which returns the first ENABLED integration of a type — fine with one,
+         * arbitrary with two. These settings are how an admin says which.
+         */
+        'integrations' => [
+            'analytics' => [
+                'name' => 'Site analytics',
                 'type' => 'model',
                 'model' => 'integration',
-                // Without this the picker would offer SMS and AI integrations for
-                // a slot that can only ever send mail.
-                'filter' => ['type' => 'email'],
-                'description' => 'Which email integration sends mail when nothing more specific is configured.',
+                'filter' => ['type' => 'analytics'],
+                'description' => 'The analytics property every public page reports to. A form can still pin its own.',
                 'sort' => 1,
             ],
-            'default_ai_integration' => [
+            'ai' => [
                 'name' => 'Default AI provider',
                 'type' => 'model',
                 'model' => 'integration',
