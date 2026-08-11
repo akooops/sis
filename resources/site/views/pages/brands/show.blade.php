@@ -17,7 +17,7 @@
     <section>
         <div class="container pb-14">
             @foreach ($brand->assetGroups as $group)
-                <div class="card">
+                <div class="card mb-4">
                     <div class="card-header">
                         <button type="button" class="panel-toggle" data-toggle="collapse"
                             data-target="#brand-group-{{ $group->id }}" aria-expanded="true"

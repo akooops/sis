@@ -440,6 +440,12 @@
     /* -------------------------------------------------------------------------
        Badge
        ---------------------------------------------------------------------- */
+    /* --badge-color is how a CATEGORY paints its own chip: the row carries a
+       colour an admin picked, and the badge wears it. Set as a custom property
+       rather than an inline background-color so the brand default survives an
+       unset or empty value through the var() fallback — the same shape .stream
+       uses for --stream-color. A badge with no category (the job chips) never
+       sets it and stays brand. */
     .badge {
         display: inline-flex;
         align-items: center;
@@ -448,8 +454,25 @@
         font-weight: 700;
         line-height: 1;
         color: var(--color-paper);
-        background-color: var(--color-brand);
+        background-color: var(--badge-color, var(--color-brand));
         border-radius: var(--radius-md);
+    }
+
+    /* A badge that is also a link — the category filters in the news sidebar. */
+    a.badge {
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    a.badge:hover {
+        opacity: 0.85;
+    }
+
+    /* The selected filter, ringed in its OWN colour with a gap so the ring reads
+       as separate from the chip. Outline rather than a border: it draws outside
+       the box, so the chip does not resize when it becomes active. */
+    .badge.is-active {
+        outline: 2px solid var(--badge-color, var(--color-brand));
+        outline-offset: 2px;
     }
 
     /* -------------------------------------------------------------------------
@@ -527,6 +550,14 @@
 
     .pager-link i {
         font-size: 18px;
+    }
+
+    /* The prev/next chevrons point along the reading direction, so in RTL they
+       point the other way. Mirrored rather than swapped for two icon classes:
+       "previous" stays previous in the markup, and the arrow follows the page —
+       which is also what the home page's ⟶ does. */
+    [dir="rtl"] .pager-link i {
+        transform: scaleX(-1);
     }
 
     .pager-link:hover,

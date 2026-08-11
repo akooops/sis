@@ -15,7 +15,7 @@
                 <article class="card lg:col-span-2">
                     <div class="card-body">
                         @if ($achievement->category)
-                            <span class="badge mb-2">
+                            <span class="badge mb-2" style="--badge-color: {{ $achievement->category->color }}">
                                 {{ $achievement->category->getTranslation('title', $site->locale(), true) ?: $achievement->category->name }}
                             </span>
                         @endif

@@ -172,6 +172,7 @@ Route::get('newsletter/unsubscribe/{signature}', [NewsletterController::class, '
 | Public site
 |------------------------*/
 $site = function () {
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/', [HomeController::class, 'index'])->name('home');
 
     Route::get('articles', [ArticlesController::class, 'index'])->name('articles.index');

@@ -44,8 +44,8 @@
 
                                     <div class="card-body">
                                         @if ($achievement->category)
-                                            <span class="badge mb-2">
-                                                {{ $achievement->category->getTranslation('title', $site->locale(), true) }}
+                                            <span class="badge mb-2" style="--badge-color: {{ $achievement->category->color }}">
+                                                {{ $achievement->category->getTranslation('title', $site->locale(), true) ?: $achievement->category->name }}
                                             </span>
                                         @endif
 

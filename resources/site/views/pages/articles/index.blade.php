@@ -31,7 +31,10 @@
 
                                     <div class="card-body">
                                         @if ($article->category)
-                                            <span class="badge mb-2">
+                                            {{-- The chip wears the category's own
+                                                 colour; .badge falls back to brand
+                                                 when the row has none. --}}
+                                            <span class="badge mb-2" style="--badge-color: {{ $article->category->color }}">
                                                 {{ $article->category->getTranslation('title', $site->locale(), true) ?: $article->category->name }}
                                             </span>
                                         @endif
@@ -72,11 +75,25 @@
                             @lang('site.achievements.filters.categories')
                         </h4>
 
-                        <ul class="mb-8">
+                        {{-- Coloured chips rather than a stacked list of links, so
+                             the filter reads the same as the chip printed on each
+                             article card. The selected one is ringed in its OWN
+                             colour instead of recoloured, which would have
+                             detached it from the category it names.
+
+                             A row, not a column: the chips are short and their
+                             colour is the thing being scanned. --}}
+                        <ul class="mb-8 flex flex-wrap gap-2">
                             @foreach ($categories as $item)
-                                <li class="mb-1">
-                                    <a class="{{ $category === $item->code ? 'text-danger' : 'text-heading hover:text-brand' }}"
-                                        href="{{ route('web.site.articles.index', ['category' => $item->code]) }}">
+                                @php($isActive = $category === $item->code)
+
+                                <li>
+                                    {{-- The active chip links back to the unfiltered
+                                         listing, so clicking it clears the filter. --}}
+                                    <a class="badge {{ $isActive ? 'is-active' : '' }}"
+                                        style="--badge-color: {{ $item->color }}"
+                                        href="{{ $isActive ? route('web.site.articles.index') : route('web.site.articles.index', ['category' => $item->code]) }}"
+                                        @if ($isActive) aria-current="true" @endif>
                                         {{ $item->getTranslation('title', $site->locale(), true) ?: $item->name }}
                                     </a>
                                 </li>

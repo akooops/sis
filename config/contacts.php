@@ -51,7 +51,7 @@ return [
     'platforms' => [
         'facebook' => ['name' => 'Facebook', 'icon' => 'ki-facebook', 'site_icon' => 'uil-facebook-f'],
         'instagram' => ['name' => 'Instagram', 'icon' => 'ki-instagram', 'site_icon' => 'uil-instagram'],
-        'twitter' => ['name' => 'X', 'icon' => 'ki-twitter', 'site_icon' => 'uil-twitter'],
+        'twitter' => ['name' => 'X', 'icon' => 'ki-twitter', 'site_icon' => 'uil-x-twitter'],
         'youtube' => ['name' => 'YouTube', 'icon' => 'ki-youtube', 'site_icon' => 'uil-youtube'],
         'linkedin' => ['name' => 'LinkedIn', 'icon' => 'ki-social-media', 'site_icon' => 'uil-linkedin'],
         'tiktok' => ['name' => 'TikTok', 'icon' => 'ki-tiktok', 'site_icon' => 'uil-music'],
