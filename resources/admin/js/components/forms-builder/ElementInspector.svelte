@@ -151,6 +151,10 @@
             <code class="text-2sm text-muted-foreground">{field.key}</code>
         </div>
 
+        <!-- No page picker here, and none on the canvas card either. Moving an
+             element to another page is a DRAG: Up/Down reorder within a page and
+             deliberately stop at its boundary (see stepField). -->
+
         <!-- Translatable copy, for the locale the canvas is showing. -->
         {#if showsContent}
             <Field label="Content" hint="Shown to the visitor." error={errors?.content}>

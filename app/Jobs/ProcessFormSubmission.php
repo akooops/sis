@@ -11,6 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Throwable;
 
 /**
@@ -35,6 +36,12 @@ class ProcessFormSubmission implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 1;
+
+    /** How many answers the notification lists before it says "and N more". */
+    protected const SUMMARY_FIELDS = 6;
+
+    /** Per-answer cap, so one long textarea cannot become the whole email. */
+    protected const SUMMARY_VALUE_CHARS = 80;
 
     public function __construct(public string $submissionId) {}
 
@@ -67,9 +74,11 @@ class ProcessFormSubmission implements ShouldQueue
 
             NotificationService::send('form.submission_received', [
                 'title' => "New response to {$form->name}",
-                'body' => "Reference {$submission->id}.",
+                'body' => $this->body($form, $submission),
                 'route_name' => 'web.admin.forms.index',
-                'route_params' => ['form' => $form->id],
+                'route_params' => [
+                    'filter[id]' => $form->id,
+                ],
             ], $groupIds);
         } catch (Throwable $e) {
             Log::channel('integrations')->error('form.notify-failed', [
@@ -77,6 +86,110 @@ class ProcessFormSubmission implements ShouldQueue
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * What the notification actually says.
+     *
+     * It used to be "Reference 01KZ….", which told the reader nothing they could
+     * act on: not what was submitted, not when, not by whom — so every
+     * notification was a trip to the admin to find out whether it mattered. This
+     * carries the reference, the timestamp and the first few answers, which is
+     * usually enough to triage without opening anything.
+     *
+     * DELIBERATELY A SUMMARY, NOT THE SUBMISSION. It is capped at
+     * self::SUMMARY_FIELDS answers with each value trimmed, because this string
+     * is also what an email integration sends: the whole of a long form, or an
+     * essay-length textarea, does not belong in an inbox, and the drawer is one
+     * click away. Blank answers are skipped — a list of empty labels is noise.
+     */
+    protected function body(Form $form, FormSubmission $submission): string
+    {
+        $when = ($submission->submitted_at ?? $submission->created_at)?->format('j M Y, H:i');
+
+        $lines = ["Reference {$submission->id}".($when ? " — submitted {$when}." : '.')];
+
+        $answers = $this->answers($form, $submission);
+
+        if ($answers !== []) {
+            $shown = array_slice($answers, 0, self::SUMMARY_FIELDS);
+            $rest = count($answers) - count($shown);
+
+            $lines[] = '';
+            $lines = array_merge($lines, $shown);
+
+            if ($rest > 0) {
+                $lines[] = '…and '.$rest.' more '.($rest === 1 ? 'answer' : 'answers').'.';
+            }
+        }
+
+        return implode("\n", $lines);
+    }
+
+    /**
+     * The answered fields as "Label: value", in the form's reading order.
+     *
+     * Rendered through the field type's own display(), the same call the CSV
+     * export makes, so a consent reads Yes/No and a checkbox group reads as a
+     * list rather than as JSON. File answers resolve to their filenames first —
+     * a line of ULIDs tells the reader nothing.
+     *
+     * @return array<int, string>
+     */
+    protected function answers(Form $form, FormSubmission $submission): array
+    {
+        $data = $submission->data ?? [];
+
+        if ($data === []) {
+            return [];
+        }
+
+        $locale = config('app.fallback_locale', 'en');
+        $names = $submission->relationLoaded('media')
+            ? $submission->media->pluck('name', 'id')
+            : $submission->media()->pluck('name', 'id');
+
+        $lines = [];
+
+        // The form's CURRENT fields, ordered by the query rather than by the
+        // stored snapshot: MySQL's JSON type does not keep object key order.
+        $fields = $form->fields()
+            ->with('page')
+            ->get()
+            ->sortBy([['page.order', 'asc'], ['order', 'asc'], ['key', 'asc']]);
+
+        foreach ($fields as $field) {
+            $element = $field->element();
+
+            if (! $element?->isInput() || ! array_key_exists($field->key, $data)) {
+                continue;
+            }
+
+            $value = $data[$field->key];
+
+            if ($value === null || $value === '' || $value === []) {
+                continue;
+            }
+
+            if ($field->type === 'file') {
+                $resolve = fn ($id) => is_string($id) ? ($names[$id] ?? $id) : $id;
+                $value = is_array($value) ? array_map($resolve, $value) : $resolve($value);
+            }
+
+            $text = trim((string) $element->display($field, $value, $locale));
+
+            if ($text === '') {
+                continue;
+            }
+
+            // The KEY, not the label. This notification is an admin surface, and
+            // the admin names a field the same way everywhere — the builder card,
+            // the CSV column, the submission drawer. The label is the visitor's
+            // translated title and would put Arabic headings in an English inbox.
+            $lines[] = $field->key.': '.Str::limit($text, self::SUMMARY_VALUE_CHARS);
+        }
+
+        return $lines;
     }
 
     protected function deliver(Form $form, FormSubmission $submission): void

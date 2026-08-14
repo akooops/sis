@@ -28,7 +28,13 @@ use Illuminate\View\View;
  *
  * THE FORM IS OPTIONAL on both pages. If the seeded row has been unpublished, or
  * the visitor is blocked, or the install never seeded it, the page still renders
- * its copy — a missing form must not 404 the school's contact page.
+ * its copy — a missing form must not 404 the school's contact page. When there
+ * is a REASON the form is absent, the page says so: `notice` carries it and
+ * site::partials.form-embed draws the alert.
+ *
+ * AND THERE IS NO CONFIRMATION URL. A successful submit comes back here, and the
+ * same partial swaps the form for the confirmation message — which is what makes
+ * these two pages and a standalone form behave identically.
  */
 class ContactController extends SiteController
 {
@@ -62,9 +68,13 @@ class ContactController extends SiteController
 
         $address = $this->site()->contacts()->firstWhere('type', ContactDetail::ADDRESS_TYPE);
 
+        $embed = $this->embed($request, $form, $locale);
+
         return view('site::pages.contact', [
             'page' => $page,
-            'presentation' => $this->presentation($request, $form, $locale),
+            'form' => $embed['form'],
+            'presentation' => $embed['presentation'],
+            'notice' => $embed['notice'],
             // The three channels the page prints beside the map. Phones and
             // WhatsApp numbers share one column, which is why they arrive joined.
             'address' => $address,
@@ -110,24 +120,52 @@ class ContactController extends SiteController
 
         $breadcrumbs = [['label' => $title, 'url' => null]];
 
+        $embed = $this->embed($request, $form, $locale);
+
         return view('site::pages.inquiries', [
             'page' => $page,
-            'presentation' => $this->presentation($request, $form, $locale),
+            'form' => $embed['form'],
+            'presentation' => $embed['presentation'],
+            'notice' => $embed['notice'],
             'seo' => $seo,
             'breadcrumbs' => $breadcrumbs,
         ]);
     }
 
     /**
-     * The renderer payload, or null when the form must not be shown.
+     * The renderer payload, and any reason there is none.
      *
-     * Same guards as the standalone form page: a visitor who may not submit is
-     * shown the page WITHOUT the form rather than a rendered dead end.
+     * Exactly what Web\Site\FormsController computes for a standalone form, in
+     * the same order and for the same reasons — both feed the one
+     * site::partials.form-embed, so a form behaves identically wherever it is
+     * read. A visitor who may not submit gets the page plus an alert saying so,
+     * rather than a page the form has silently vanished from.
+     *
+     * @return array{form: ?Form, presentation: ?FormPresentation, notice: ?string}
      */
-    protected function presentation(Request $request, ?Form $form, string $locale): ?FormPresentation
+    protected function embed(Request $request, ?Form $form, string $locale): array
     {
-        return ($form && $this->presenter->state($request, $form) === 'ok')
-            ? $this->presenter->present($form, $locale)
-            : null;
+        if ($form === null) {
+            return ['form' => null, 'presentation' => null, 'notice' => null];
+        }
+
+        // Before the state check: the submission that just succeeded may be the
+        // one that hit the form's cap, and the person who sent it must read
+        // their confirmation rather than "no longer accepting responses".
+        $submitted = session('sisf_submitted') === $form->id;
+
+        $state = $submitted ? 'ok' : $this->presenter->state($request, $form);
+
+        // submit() already returned the same sentence in the error bag; the
+        // renderer prints that above the form, so a notice would say it twice.
+        $hasFormError = session('errors')?->getBag('default')->has('form') ?? false;
+
+        return [
+            'form' => $form,
+            'presentation' => ($state === 'ok' && ! $submitted)
+                ? $this->presenter->present($form, $locale)
+                : null,
+            'notice' => ($state === 'ok' || $hasFormError) ? null : $state,
+        ];
     }
 }

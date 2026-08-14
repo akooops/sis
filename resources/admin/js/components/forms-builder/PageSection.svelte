@@ -25,7 +25,6 @@
 
     let {
         page,
-        pages = [],
         index = 0,
         locale = 'en',
         fallbackLocale = 'en',
@@ -38,7 +37,6 @@
         onselect = null,
         onselectpage = null,
         onstep = null,
-        onmove = null,
         onduplicate = null,
         onremove = null,
         onremovepage = null,
@@ -51,7 +49,6 @@
      */
     const items = $derived(page.fields);
 
-    const otherPages = $derived(pages.filter((p) => p.id !== page.id));
 
     // Whatever the server said about the page itself, rather than its fields.
     const pageError = $derived(errors[page.id] ? Object.values(errors[page.id])[0] : null);
@@ -114,7 +111,6 @@
             <div animate:flip={FLIP}>
                 <CanvasElement
                     {field}
-                    pages={otherPages}
                     {locale}
                     {fallbackLocale}
                     {locked}
@@ -124,7 +120,6 @@
                     canMoveDown={items.indexOf(field) < items.length - 1}
                     {onselect}
                     {onstep}
-                    {onmove}
                     {onduplicate}
                     {onremove}
                 />

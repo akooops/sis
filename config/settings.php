@@ -207,7 +207,7 @@ return [
                 'type' => 'model',
                 'model' => 'integration',
                 'filter' => ['type' => 'analytics'],
-                'description' => 'The analytics property every public page reports to. A form can still pin its own.',
+                'description' => 'The analytics property every public page reports to, forms included. There is one property for the whole site — a form cannot pin its own.',
                 'sort' => 1,
             ],
             'ai' => [

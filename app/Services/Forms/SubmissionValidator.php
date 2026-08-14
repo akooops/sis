@@ -162,6 +162,7 @@ class SubmissionValidator
     public function snapshot($fields, string $locale): array
     {
         $out = [];
+        $order = 0;
 
         foreach ($this->ordered($fields) as $field) {
             if (! $field->element()?->isInput()) {
@@ -171,6 +172,24 @@ class SubmissionValidator
             $out[$field->key] = [
                 'label' => $field->getTranslation('label', $locale, true) ?: $field->key,
                 'type' => $field->type,
+                /*
+                 * THE READING ORDER, AS A NUMBER, BECAUSE KEY ORDER DOES NOT
+                 * SURVIVE THE COLUMN.
+                 *
+                 * This array is built in the form's own order and json_encodes
+                 * in that order — and MySQL throws it away. The native JSON type
+                 * stores an object in a normalised form with its keys sorted by
+                 * length and then lexicographically, so the row reads back as
+                 * email, phone, guests, stream, visit_at, full_name… whatever
+                 * order it went in as. The admin's submission drawer renders in
+                 * snapshot order, so answers came out shuffled with nothing in
+                 * the PHP to explain it.
+                 *
+                 * An integer survives what key order cannot. Kept as a map
+                 * rather than switched to a list because every reader looks a
+                 * field up by key.
+                 */
+                'order' => $order++,
             ];
         }
 

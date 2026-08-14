@@ -1,4 +1,3 @@
-{{-- Session flash messages. Auto-dismissed by site/disclosure.js. --}}
 @foreach (['success' => 'uil-check-circle', 'error' => 'uil-exclamation-triangle'] as $key => $icon)
     @if (session($key))
         <div class="alert alert-{{ $key === 'error' ? 'danger' : 'success' }} mb-4 flex items-center gap-2"

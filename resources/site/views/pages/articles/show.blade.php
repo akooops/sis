@@ -30,7 +30,11 @@
                         {{-- Admin-authored rich text, same trust level as any other
                              page content — it is written in the admin editor and a
                              visitor can never reach it. --}}
-                        <div class="prose">
+                        @include('site::partials.content-styles', ['model' => $article])
+
+                        {{-- id="page-content" is the scope hook the admin's own
+                             CSS targets. See site::partials.content-styles. --}}
+                        <div id="page-content" class="prose">
                             {!! $article->getTranslation('content', $site->locale(), true) !!}
                         </div>
                     </div>

@@ -37,7 +37,11 @@
             <hr class="mb-4 mt-2 border-line" data-aos="fade-up" data-aos-duration="1500">
 
             @if ($page->getTranslation('content', $site->locale(), true))
-                <div class="prose w-full" data-aos="fade-up" data-aos-duration="2000">
+                @include('site::partials.content-styles', ['model' => $page])
+
+                {{-- id="page-content" is the scope hook the admin's own CSS
+                     targets. See site::partials.content-styles. --}}
+                <div id="page-content" class="prose w-full" data-aos="fade-up" data-aos-duration="2000">
                     {!! $page->getTranslation('content', $site->locale(), true) !!}
                 </div>
             @endif

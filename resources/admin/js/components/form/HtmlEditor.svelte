@@ -54,6 +54,17 @@
         ready = true,
         contentCssUrl = null,
         contentStyle = '',
+        /*
+         * The id put on the editor document's <body>, so the admin's own CSS
+         * matches in here exactly as it will on the site.
+         *
+         * The public content div carries id="page-content" and every CSS hint in
+         * the admin tells the author to scope their rules to it — so without this
+         * the editor would load their stylesheet and then match none of it, and
+         * the preview would say their CSS does nothing. TinyMCE's default body id
+         * is `tinymce`, which no rule of theirs will ever name.
+         */
+        bodyId = 'page-content',
         height = 480,
         disabled = false,
         // Opt-in extras, both off so no existing caller changes behaviour.
@@ -187,6 +198,9 @@
                 // going through the live path means a class you type in the source
                 // view is styled the moment you save the CSS field, not on reload.
                 content_css: 'default',
+                // Init-only, unlike the CSS itself: an id is not something a
+                // caller flips mid-edit, and TinyMCE offers no setter for it.
+                body_id: untrack(() => bodyId),
                 height: untrack(() => height),
                 directionality: untrack(() => (rtl ? 'rtl' : 'ltr')),
 

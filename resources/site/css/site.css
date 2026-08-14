@@ -49,15 +49,11 @@
 @import './site/components.css';
 @import './site/sections.css';
 
-/* The public form renderer's own sheet. Tailwind-free by contract — see its
-   header; it is mounted in contexts where preflight is not guaranteed. */
+/* The public form renderer's own sheet — ONE file, and unlayered by contract.
+   It was split into a neutral half and a site-theme half for an admin preview
+   that no longer exists; see its header. Tailwind-free, because the renderer
+   mounts into markup where preflight is not guaranteed. */
 @import './forms.css';
-
-/* ...and the site's repaint of it, so an embedded form on /contact reads as
-   part of the page rather than as a widget dropped onto it. AFTER forms.css so
-   these win on equal specificity. The admin never loads this file, which is
-   exactly why forms.css keeps neutral, token-free defaults. */
-@import './site/forms-theme.css';
 
 /*
  * What Tailwind scans. These already subsume the ported js/site/ subtree and

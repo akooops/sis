@@ -1,5 +1,13 @@
 import intlTelInput from 'intl-tel-input';
 
+/* Defined in lib/phone.js, not here, and re-exported for the callers that
+   already import it from this module: PhoneControl needs the same normalisation
+   and must NOT import this file, because that would drag ~90 KB of country
+   metadata into every bundle the control appears in. */
+import { toE164 } from '@site/lib/phone';
+
+export { toE164 };
+
 /* The stylesheet is imported from site.css inside the components layer —
    importing it here would leave it unlayered and outranking our overrides. */
 
@@ -18,44 +26,6 @@ const OPTIONS = {
     formatOnDisplay: true,
     loadUtils: () => import('intl-tel-input/utils'),
 };
-
-/**
- * Normalises whatever was typed to E.164 (`+<dial><number>`).
- *
- * libphonenumber only returns a value once the number parses, so a half-typed
- * number would otherwise submit an empty hidden field. The fallback builds the
- * same shape by hand from the selected country's dial code.
- */
-export function toE164(iti, raw) {
-    const typed = raw.trim();
-
-    if (typed === '') {
-        return '';
-    }
-
-    // getNumber() echoes the raw input back when it cannot parse it yet, so
-    // only trust a value that is already in international form.
-    const parsed = iti.getNumber();
-
-    if (parsed && parsed.startsWith('+')) {
-        return parsed;
-    }
-
-    // v29 names this getSelectedCountry(); it returns the full country object.
-    const country = typeof iti.getSelectedCountry === 'function' ? iti.getSelectedCountry() : null;
-    const dial = country?.dialCode ?? '';
-
-    let digits = typed.replace(/\D/g, '');
-
-    // Drop a leading trunk zero, and the dial code if the user typed it too.
-    digits = digits.replace(/^0+/, '');
-
-    if (dial && digits.startsWith(dial)) {
-        digits = digits.slice(dial.length);
-    }
-
-    return `+${dial}${digits}`;
-}
 
 /**
  * Keeps a hidden field in sync with the E.164 value while the visible field
@@ -96,18 +66,48 @@ export function bindPhoneInput(input, onChange) {
  * Attach the country selector to an input that manages its own value.
  *
  * For the form renderer, whose phone control is bound to Svelte state rather
- * than to a hidden sibling. There is no E.164 mirroring to do here: the plugin
- * runs with `separateDialCode: false`, so the dial code stays IN the input and
- * the value Svelte already holds carries it — and PhoneType::store() normalises
- * to E.164 server-side anyway, with App\Rules\PhoneNumber rejecting what it
- * cannot parse.
+ * than to a hidden sibling. Two jobs, and the second one used to be missing:
  *
- * The one thing that does need forwarding is a country change: picking a
- * country rewrites the input without firing `input`, so Svelte would keep the
- * old dial code. Re-dispatching it is the whole job.
+ * 1. Forward a country change. Picking a country rewrites the input WITHOUT
+ *    firing `input`, so the control would keep the old number.
+ * 2. Expose the plugin as `input.iti`, which is how PhoneControl reaches
+ *    toE164() and answers with the international number.
+ *
+ * THE VALUE ON SCREEN IS NOT THE ANSWER, and assuming it was is what broke this
+ * field. `separateDialCode` is off, so the reasoning went, the dial code stays
+ * in the box and the box is already E.164. It is not: with `formatOnDisplay` the
+ * plugin renders the NATIONAL format for the selected country, so a visitor who
+ * picks the flag and types 0555 123 456 leaves "0555 123 456" in the input.
+ * PhoneFormatter::e164() parses with region = null by design, so it cannot read
+ * that, and App\Rules\PhoneNumber rejects anything without a leading "+" — the
+ * visitor is told their own correctly-entered number is invalid.
  */
 export function attachPhoneWidget(input) {
+    /*
+     * Initialising can empty the box.
+     *
+     * The utils chunk loads separately, so at init the plugin often cannot parse
+     * what is already there and drops it. That is invisible on a blank form and
+     * very visible on a repopulated one: a submission rejected for a bad phone
+     * number came back with every field refilled EXCEPT the phone, so the visitor
+     * was shown "that number is not valid" pointing at an empty box.
+     *
+     * Captured before, restored after, through the plugin's own setter first so
+     * the flag follows the number rather than staying on the default country.
+     */
+    const initial = input.value;
+
     const iti = intlTelInput(input, OPTIONS);
+
+    if (initial) {
+        if (typeof iti.setNumber === 'function') {
+            iti.setNumber(initial);
+        }
+
+        if (!input.value) {
+            input.value = initial;
+        }
+    }
 
     input.iti = iti;
 

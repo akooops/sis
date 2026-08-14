@@ -266,23 +266,12 @@ export function createBuilder() {
             mapPages((p) => (p.id === pageId ? { ...p, fields } : p));
         },
 
-        moveFieldToPage(fieldId, pageId) {
-            let moving = null;
-
-            const stripped = doc.pages.map((p) => {
-                const found = p.fields.find((f) => f.id === fieldId);
-                if (found) moving = found;
-
-                return found ? { ...p, fields: p.fields.filter((f) => f.id !== fieldId) } : p;
-            });
-
-            if (!moving) return;
-
-            commit({
-                ...doc,
-                pages: stripped.map((p) => (p.id === pageId ? { ...p, fields: [...p.fields, moving] } : p)),
-            });
-        },
+        /*
+         * No moveFieldToPage(). Its only callers were the canvas card's
+         * "Move to…" select and the inspector's Page field, both removed —
+         * a cross-page move is a DRAG, and svelte-dnd-action does it through
+         * setFields() on each zone rather than through a move method.
+         */
 
         /** Step a field within its page. The keyboard path — drag is not the only way in. */
         stepField(fieldId, delta) {

@@ -13,7 +13,6 @@
  */
 import { mount } from 'svelte';
 import FormRenderer from '@site/components/forms/FormRenderer.svelte';
-import { createFormAnalytics } from '@site/lib/forms/ga';
 import { collectEnvironment, createTelemetry } from '@site/lib/forms/telemetry';
 import { attachPhoneWidget } from './phone';
 
@@ -33,30 +32,12 @@ export function readPayload(id) {
 }
 
 export default function initForms() {
-    /*
-     * Set by the analytics partial, and only when the form pins an enabled
-     * analytics integration. Undefined is the ordinary case: the shim then
-     * no-ops on every call, so nothing below has to branch on it.
-     */
-    const tracking = window.sisfAnalytics ?? null;
-    const analytics = createFormAnalytics(tracking);
-
     const root = document.querySelector('[data-sisf-root]');
 
+    // Nothing to mount. Nothing else to do either, now that the form emits no
+    // analytics of its own — the page's own tag records the visit like any
+    // other page.
     if (!root) {
-        /*
-         * No form on this page. The confirmation page is the exception worth
-         * reporting: it is the only place that knows a submission landed.
-         *
-         * THIS is why the on-demand selector in site.js is [data-sisf] and not
-         * [data-sisf-root]: the thanks page has no root to mount into, so
-         * keying on the root would never load this module there and the
-         * conversion event would silently stop firing.
-         */
-        if (tracking?.stage === 'complete') {
-            analytics.complete();
-        }
-
         return;
     }
 
@@ -68,14 +49,16 @@ export default function initForms() {
     }
 
     /*
-     * The measurement layer. Two different things, deliberately kept apart:
-     * `analytics` is the admin's own third-party tag and reports MILESTONES to
-     * whoever they pinned; `telemetry` is ours and reports COUNTS AND TIMINGS to
-     * our own endpoint, which is what fills the analytics columns on the
-     * submission row. Neither knows about the other.
+     * OUR OWN measurement, and the only measurement here. It reports counts and
+     * timings to our endpoint, which is what fills the analytics columns on the
+     * submission row and drives the form's own analytics screen.
      *
-     * It is inert without an endpoint and a token, so the builder preview and a
-     * page rendered without them cost nothing.
+     * There is no third-party tag in this file any more: the site loads one
+     * analytics property from the `integrations.analytics` setting, in the
+     * layout, and a form is measured by that as an ordinary page.
+     *
+     * Inert without an endpoint and a token, so a page rendered without them
+     * costs nothing.
      */
     const environment = collectEnvironment();
     const telemetry = createTelemetry({
@@ -103,6 +86,14 @@ export default function initForms() {
             // Repopulate after a validation failure, so a rejected submission
             // does not make the visitor retype everything.
             values: { ...(config.old ?? {}) },
+            // ...and show each rejection in red under the input that caused it,
+            // keyed by field key. The server is the only validator — a failed
+            // submit returns as a fresh page load, so these arrive in the
+            // payload rather than from anything that happened in the browser.
+            errors: { ...(config.errors ?? {}) },
+            // False on a form's own page, where the page heading and body ARE
+            // the form's title, description and content.
+            chrome: config.chrome ?? true,
             // Posted as hidden client[…] inputs, so the submit reads the same
             // screen, timezone and language the beacon reported.
             client: Object.fromEntries(
@@ -111,17 +102,8 @@ export default function initForms() {
             // No onsubmit: the form posts natively, which is what keeps
             // Laravel's withErrors round-trip working.
             onsubmit: null,
-            // Two consumers of one callback. analytics.start() is once-guarded,
-            // so the third-party tag still costs one event no matter how much
-            // the visitor types; telemetry keeps counting.
-            oninteract: (event) => {
-                analytics.start();
-                telemetry.interact(event);
-            },
-            onstep: (event) => {
-                analytics.step(event);
-                telemetry.step(event);
-            },
+            oninteract: (event) => telemetry.interact(event),
+            onstep: (event) => telemetry.step(event),
         },
     });
 
@@ -130,40 +112,12 @@ export default function initForms() {
     telemetry.attach(root);
 
     enhancePhoneFields(root);
+    watchPhoneFields(root);
 
-    analytics.view();
-
-    // The count the server rejected on the previous attempt: a failed submit
-    // returns as a fresh page load, so there is no client event to hang this on.
-    analytics.error(tracking?.errors ?? 0);
-
-    /*
-     * The renderer owns the <form> and posts it natively, so the submit is
-     * observed here rather than through a prop — a capture-phase listener on
-     * the mount point sees it whichever button triggered it, and cannot
-     * interfere with the post.
-     */
-    root.addEventListener('submit', () => analytics.submit(), true);
-
-    /*
-     * pagehide is the ONLY leave signal, and it is the only one that means the
-     * page is actually going away: a close, a navigation, or entry into the
-     * back/forward cache.
-     *
-     * visibilitychange USED to fire this too, and it was wrong. On mobile every
-     * app switch, screen lock, notification pull-down and tab change hides the
-     * page while the visitor fully intends to come back — and a sent event
-     * cannot be taken back, so every one of those was a permanent false
-     * abandonment in the property.
-     *
-     * The trade is deliberate and one-directional: a backgrounded mobile tab the
-     * OS later kills fires nothing at all, so that abandonment goes unreported.
-     * An undercount is a number you can reason about; an overcount that scales
-     * with how distracted the visitor's phone is, is not.
-     *
-     * abandon() is once-guarded and ignores a submitted form.
-     */
-    window.addEventListener('pagehide', () => analytics.abandon());
+    // No leave handler here. There used to be a `pagehide` listener reporting
+    // abandonment to the third-party tag; our own telemetry binds `pagehide` and
+    // `visibilitychange` itself inside attach(), and it is the only measurement
+    // left.
 }
 
 /**
@@ -180,17 +134,45 @@ export default function initForms() {
  * a working tel input and the server still normalises what it receives.
  */
 function enhancePhoneFields(root) {
-    const inputs = root.querySelectorAll('.sisf-el--phone input[type="tel"]');
+    root.querySelectorAll('.sisf-el--phone input[type="tel"]').forEach((input) => {
+        // Idempotent: attachPhoneWidget hangs the plugin on the element, so an
+        // input that already has one is skipped rather than wrapped twice.
+        if (input.iti) {
+            return;
+        }
 
-    if (inputs.length === 0) {
-        return;
-    }
-
-    inputs.forEach((input) => {
         try {
             attachPhoneWidget(input);
         } catch (error) {
             console.warn('[site] could not attach the phone widget', error);
         }
     });
+}
+
+/**
+ * Keep every phone field enhanced, not just the ones present at mount.
+ *
+ * A MULTI-PAGE FORM DESTROYS AND REBUILDS ITS FIELDS ON EVERY STEP. Attaching
+ * once after mount therefore covered page one and nothing else: step forward and
+ * back, and the phone input is a NEW element with no plugin on it — no country
+ * selector, and the answer goes up as the national number the visitor typed,
+ * which PhoneFormatter::e164() cannot parse and App\Rules\PhoneNumber rejects.
+ * The visitor is told their own correctly-entered number is invalid, and only on
+ * a form long enough to have steps.
+ *
+ * An observer rather than a hook on `onstep`: this fires when the node actually
+ * appears, so it needs no guess about when Svelte has flushed, and it covers any
+ * other path that swaps fields in — a conditional field, a re-render, a page the
+ * renderer restores from the stack.
+ */
+function watchPhoneFields(root) {
+    if (typeof MutationObserver !== 'function') {
+        return;
+    }
+
+    const observer = new MutationObserver(() => enhancePhoneFields(root));
+
+    observer.observe(root, { childList: true, subtree: true });
+
+    return observer;
 }

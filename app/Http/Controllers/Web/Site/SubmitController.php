@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Web;
+namespace App\Http\Controllers\Web\Site;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\ProcessFormSubmission;
 use App\Models\Form;
 use App\Models\FormSubmission;
 use App\Data\Media\StoreMediaData;
-use App\Models\Language;
 use App\Models\Media;
-use App\Services\Forms\FormPresenter;
 use App\Services\Forms\GeoResolver;
 use App\Services\Forms\SubmissionContext;
 use App\Services\Forms\SubmissionGuard;
@@ -17,7 +15,9 @@ use App\Services\Forms\SubmissionToken;
 use App\Services\Forms\SubmissionValidator;
 use App\Services\Forms\TelemetryRecorder;
 use App\Services\Integrations\Captcha;
+use App\Services\Site\SiteContext;
 use App\Services\Uploads\UploadService;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,22 +25,23 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\View\View;
 
 /**
- * The public form.
+ * The public form's SUBMISSION pipeline.
  *
  * PERMANENT CONTRACT. The JSON schema, the token, the guard order and the stored
- * shape are the contract; the presentation never was. The views have since been
- * re-parented onto the real site layout and the payload assembly extracted to
- * App\Services\Forms\FormPresenter — which the site's own contact and admissions
- * pages also call, so one renderer serves both. None of the contract moved.
+ * shape are the contract; the presentation never was. The presentation has since
+ * left entirely: the payload assembly went to App\Services\Forms\FormPresenter,
+ * and the page a visitor reads is now an ordinary site page owned by
+ * Web\Site\FormsController. What is left here is the three POST endpoints and
+ * the twelve gates in front of them, at the URIs they have always had — a form
+ * already rendered in somebody's browser posts to the action it was served with.
  *
  * Lives in the `web` middleware group on purpose. A session-less group has no
  * ShareErrorsFromSession, so every ValidationException on a non-JSON POST would
  * 500 with "Session store not set" instead of redirecting back with errors.
  */
-class FormsController extends Controller
+class SubmitController extends Controller
 {
     public function __construct(
         protected SubmissionValidator $validator,
@@ -48,90 +49,24 @@ class FormsController extends Controller
         protected GeoResolver $geo,
         protected SubmissionContext $context,
         protected TelemetryRecorder $recorder,
-        protected FormPresenter $presenter,
     ) {}
 
     /**
-     * The form itself. Locale is an explicit URL segment, never a negotiation.
+     * Where this form is read: its own page, or the site page that embeds it.
      *
-     * The assembly moved to FormPresenter when the site's contact and admissions
-     * pages started embedding the same renderer. The GUARDS and their status
-     * codes stayed here, because those are this controller's contract.
+     * A system form has no /forms/{slug} — that route 404s for one — so pointing
+     * anything at it would be pointing into a 404. SiteContext owns the slug =>
+     * route map, because the menu builder needs the same answer.
      */
-    public function show(Request $request, string $locale, string $slug): View|RedirectResponse
+    protected function formPageUrl(Form $form, string $locale): string
     {
-        abort_unless(in_array($locale, Language::enabledCodes(), true), 404);
+        if ($form->is_system) {
+            $name = SiteContext::SYSTEM_FORM_ROUTES[$form->slug] ?? null;
 
-        $form = Form::query()->live()->where('slug', $slug)->firstOrFail();
-
-        App::setLocale($locale);
-
-        $state = $this->presenter->state($request, $form);
-
-        $title = $form->getTranslation('title', $locale, true) ?: $form->name;
-
-        if ($state === 'blocked') {
-            return response()->view('site::forms.blocked', [
-                'form' => $form,
-                'locale' => $locale,
-                'seo' => $this->seo($form, $locale, $title, 'noindex,nofollow'),
-            ], 403);
+            return $name === null ? url('/') : route($name, ['locale' => $locale]);
         }
 
-        if ($state === 'closed') {
-            return response()->view('site::forms.closed', [
-                'form' => $form,
-                'locale' => $locale,
-                'seo' => $this->seo($form, $locale, $title, 'noindex,nofollow'),
-            ], 410);
-        }
-
-        $presentation = $this->presenter->present($form, $locale);
-
-        return view('site::forms.show', [
-            'form' => $form,
-            'locale' => $locale,
-            'presentation' => $presentation,
-            'seo' => $this->seo($form, $locale, $presentation->schema['title'][$locale] ?? $title),
-        ]);
-    }
-
-    /**
-     * The <head> contract site::layout reads, for the four standalone form pages.
-     *
-     * A helper and not four inline copies, unlike the site's own controllers:
-     * these are four views of ONE resource at one URL — the form — rather than
-     * four pages, and `show()` alone picks between three of them on the way out.
-     *
-     * @return array<string, mixed>
-     */
-    protected function seo(Form $form, string $locale, string $title, string $robots = 'index,follow'): array
-    {
-        $routeName = 'web.user.forms.show';
-        $routeParameters = ['slug' => $form->slug];
-
-        return [
-            'title' => $title,
-            'description' => $form->getTranslation('description', $locale, true),
-            'image' => null,
-            'canonical' => route($routeName, ['locale' => $locale] + $routeParameters),
-            'robots' => $robots,
-            'type' => 'website',
-            // These URIs keep their own /forms/{locale}/{slug} shape, so the
-            // locale is an explicit parameter here and never stripped.
-            'alternates' => collect(Language::enabledCodes())->mapWithKeys(fn (string $code) => [
-                $code => route($routeName, ['locale' => $code] + $routeParameters),
-            ]),
-        ];
-    }
-
-    /** Bare slug: send the visitor to a locale they can read. */
-    public function redirectToLocale(Request $request, string $slug): RedirectResponse
-    {
-        $enabled = Language::enabledCodes();
-        $preferred = $request->getPreferredLanguage($enabled) ?: Language::defaultCode();
-
-        return redirect()->route('web.user.forms.show', ['locale' => $preferred, 'slug' => $slug]);
+        return route('web.site.forms.show', ['locale' => $locale, 'slug' => $form->slug]);
     }
 
     /**
@@ -153,10 +88,8 @@ class FormsController extends Controller
      * Returns the id and NO URL. Handing a public uploader a link to its own
      * file would turn the form into an anonymous file host.
      */
-    public function upload(Request $request, string $locale, string $slug): JsonResponse
+    public function upload(Request $request, string $slug): JsonResponse
     {
-        abort_unless(in_array($locale, Language::enabledCodes(), true), 404);
-
         $form = Form::query()->live()->where('slug', $slug)->with('fields')->firstOrFail();
 
         $payload = SubmissionToken::read($request->input('submission_token'));
@@ -276,9 +209,29 @@ class FormsController extends Controller
      * arrives, and nothing is listening. The 422s exist for the developer
      * watching the network tab, not for the client.
      */
-    public function telemetry(Request $request, string $locale, string $slug): Response
+    public function telemetry(Request $request, string $slug): Response
     {
-        abort_unless(in_array($locale, Language::enabledCodes(), true), 404);
+        /*
+         * A BEACON MUST BE TRANSPARENT TO THE FLASH, and this line is the whole
+         * of what makes it so.
+         *
+         * Flash data survives exactly one request: Store::ageFlashData() runs on
+         * every save, moving `new` to `old` and FORGETTING whatever was already
+         * in `old`. This endpoint is in the `web` group, so it has a session and
+         * it ages one.
+         *
+         * That is a race with every redirect the form does. pagehide fires as a
+         * submit navigates, so a beacon can land AFTER the POST that flashed and
+         * BEFORE the GET that reads it — and the confirmation, the validation
+         * errors and the old input all vanish, intermittently, on the visitors
+         * whose browser happened to win. It is invisible to a scripted test,
+         * which sends no beacons at all.
+         *
+         * reflash() keeps whatever is in flight for one more request, so a
+         * beacon costs the page nothing. First statement in the method because
+         * the guards below abort.
+         */
+        $request->session()->reflash();
 
         $form = Form::query()->live()->where('slug', $slug)
             ->with(['blockedIps', 'pages', 'fields'])
@@ -310,11 +263,25 @@ class FormsController extends Controller
     /**
      * The submit pipeline. The order is the design — see SubmissionGuard.
      */
-    public function submit(Request $request, string $locale, string $slug): RedirectResponse
+    public function submit(Request $request): RedirectResponse
     {
-        abort_unless(in_array($locale, Language::enabledCodes(), true), 404);
-
-        App::setLocale($locale);
+        /*
+         * BOTH READ BY NAME, NEVER AS METHOD ARGUMENTS.
+         *
+         * This one action serves two routes — `{locale}/forms/{slug}` and the
+         * stripped `forms/{slug}` — and Laravel binds non-class controller
+         * parameters POSITIONALLY, not by name. A `submit(string $locale, string
+         * $slug)` signature is handed the SLUG as its first argument on the
+         * unprefixed route, and 404s hunting a form called "en" on the other.
+         * Same trap the site controllers carry a note about.
+         *
+         * The locale comes from the app rather than the URI because SetLocale
+         * has already resolved it: it reads the segment when there is one, falls
+         * back to the default when there is not, and 404s anything that is not
+         * an enabled code — so there is nothing left here to re-check.
+         */
+        $slug = $request->route('slug');
+        $locale = App::getLocale();
 
         // 1. Live?
         $form = Form::query()->live()->where('slug', $slug)->with(['blockedIps', 'fields.options'])->firstOrFail();
@@ -323,7 +290,7 @@ class FormsController extends Controller
         $payload = SubmissionToken::read($request->input('submission_token'));
 
         if (! $payload || $payload['form'] !== $form->id) {
-            $this->recordSpam($request, $form, $locale, ['forged_token'], 60);
+            $this->recordSpam($request, $form, ['forged_token'], 60);
 
             return back()->withErrors(['form' => __('forms.invalid_session')])->withInput();
         }
@@ -340,7 +307,7 @@ class FormsController extends Controller
 
         // 4. Country and IP.
         if ($this->guard->blocksCountry($form, $countryCode) || $this->guard->blocksIp($form, $ip)) {
-            $this->recordSpam($request, $form, $locale, ['blocked_origin'], 100);
+            $this->recordSpam($request, $form, ['blocked_origin'], 100);
 
             abort(403);
         }
@@ -360,7 +327,7 @@ class FormsController extends Controller
         // learns nothing — which is precisely why the row must be written.
         if ($form->is_spam_filtered) {
             if ($this->guard->honeypotTripped($request, $payload['hp'])) {
-                $this->recordSpam($request, $form, $locale, ['honeypot'], 100, [], true);
+                $this->recordSpam($request, $form, ['honeypot'], 100, [], true);
 
                 return $this->confirmation($form, $locale);
             }
@@ -368,7 +335,7 @@ class FormsController extends Controller
             if (SubmissionToken::elapsed($payload) < (int) $payload['min']) {
                 // Values kept: a fast human on a one-field form is real, and
                 // this is the row someone will want to review.
-                $this->recordSpam($request, $form, $locale, ['too_fast'], 70, $answers);
+                $this->recordSpam($request, $form, ['too_fast'], 70, $answers);
 
                 return $this->confirmation($form, $locale);
             }
@@ -424,7 +391,7 @@ class FormsController extends Controller
         if ($validator->fails()) {
             // Error KEYS only — the values are the visitor's data and this row
             // exists to count failures, not to keep a copy of what they typed.
-            $this->recordFailure($request, $form, $locale, array_keys($validator->errors()->toArray()));
+            $this->recordFailure($request, $form, array_keys($validator->errors()->toArray()));
 
             return back()->withErrors($validator)->withInput();
         }
@@ -439,7 +406,9 @@ class FormsController extends Controller
                 return null;
             }
 
-            $submission = $this->newSubmission($request, $form, $locale, [
+            $previousStatus = null;
+
+            $submission = $this->newSubmission($request, $form, [
                 'status' => 'completed',
                 'session_id' => $payload['sid'],
                 'submitted_at' => now(),
@@ -455,13 +424,24 @@ class FormsController extends Controller
                 // finished; nothing here was abandoned.
                 'abandoned_form_field_id' => null,
                 'abandoned_field_key' => null,
-            ]);
+            ], $previousStatus);
 
             $this->recorder->clearAbandonment($submission);
 
             $this->attachFiles($form, $fields, $submission);
 
-            $locked->increment('submissions_count');
+            /*
+             * COUNT THE COMPLETION, NOT THE REQUEST.
+             *
+             * One session owns one row, so a second submit from a page still
+             * holding its first token re-claims the row it already completed
+             * rather than inserting. Incrementing unconditionally would then
+             * charge that one submission twice against `submissions_limit` and
+             * close the form early — a double-click costing a place.
+             */
+            if ($previousStatus !== 'completed') {
+                $locked->increment('submissions_count');
+            }
 
             return $submission;
         });
@@ -490,33 +470,36 @@ class FormsController extends Controller
         ProcessFormSubmission::dispatchAfterResponse($submission->id);
     }
 
-    /** The thank-you page, or a redirect when the form asks for one. */
+    /**
+     * Back to the page they submitted from, or away when the form asks for it.
+     *
+     * THERE IS NO CONFIRMATION URL any more. The visitor returns to the page
+     * they were already on — the form's own page, or /contact and /inquiries,
+     * which embed the same renderer — and site::partials.form-embed reads these
+     * two flashes and draws the confirmation in place of the form. One page, one
+     * address, whichever way the form was reached.
+     *
+     * The fallback is load-bearing: back() with no previous URL lands on '/',
+     * which has no embed partial on it, so the flash would be set and then
+     * silently dropped. "No previous URL" is also the shape of a post with no
+     * session, which is to say a bot.
+     *
+     * Keyed by form id rather than a bare boolean, because a page may embed more
+     * than one form and only the submitted one may confirm.
+     *
+     * The submission's ULID IS the reference — there is no second code to quote.
+     * It is null on the honeypot and too-fast paths, which is exactly what keeps
+     * those out of the conversion count while showing an identical page.
+     */
     protected function confirmation(Form $form, string $locale, ?FormSubmission $submission = null): RedirectResponse
     {
         if ($form->confirmation_type === 'redirect' && $form->redirect_url) {
             return redirect()->away($form->redirect_url);
         }
 
-        // The ULID id IS the reference — there is no second code to quote.
-        return redirect()
-            ->route('web.user.forms.thanks', ['locale' => $locale, 'slug' => $form->slug])
+        return back(303, [], $this->formPageUrl($form, $locale))
+            ->with('sisf_submitted', $form->id)
             ->with('sisf_reference', $submission?->id);
-    }
-
-    public function thanks(Request $request, string $locale, string $slug): View
-    {
-        abort_unless(in_array($locale, Language::enabledCodes(), true), 404);
-
-        App::setLocale($locale);
-
-        $form = Form::query()->live()->where('slug', $slug)->firstOrFail();
-
-        return view('site::forms.thanks', [
-            'form' => $form,
-            'locale' => $locale,
-            'reference' => session('sisf_reference'),
-            'seo' => $this->seo($form, $locale, __('forms.thanks_title'), 'noindex,nofollow'),
-        ]);
     }
 
     /* ------------------------------------------------------------------ */
@@ -538,8 +521,10 @@ class FormsController extends Controller
      *
      * @param  array<string, mixed>  $attributes
      */
-    protected function newSubmission(Request $request, Form $form, string $locale, array $attributes): FormSubmission
+    protected function newSubmission(Request $request, Form $form, array $attributes, ?string &$previousStatus = null): FormSubmission
     {
+        $previousStatus = null;
+
         $token = SubmissionToken::read($request->input('submission_token'));
         $session = $token && $token['form'] === $form->id ? $token['sid'] : null;
 
@@ -551,47 +536,104 @@ class FormsController extends Controller
         ]);
 
         if ($session) {
-            $draft = FormSubmission::query()
-                ->where('form_id', $form->id)
-                ->where('session_id', $session)
-                ->where('status', 'started')
-                ->first();
+            $existing = $this->sessionRow($form, $session);
 
-            if ($draft) {
-                /*
-                 * The draft was very probably still pointing at whatever field
-                 * the visitor had open when the last beacon left. Reaching ANY
-                 * terminal state ends that — a submission that was rejected as
-                 * spam or failed validation was not abandoned at that field, and
-                 * leaving the marker set inflates the drop-off chart with the
-                 * field people actually finished on.
-                 *
-                 * Here rather than on the completed branch alone, because this
-                 * method is the one funnel every terminal outcome goes through.
-                 */
-                $terminal = ($attributes['status'] ?? null) !== 'started';
-
-                if ($terminal) {
-                    $attributes += ['abandoned_form_field_id' => null, 'abandoned_field_key' => null];
-                }
-
-                $draft->forceFill(array_merge($defaults, $attributes))->save();
-
-                if ($terminal) {
-                    $this->recorder->clearAbandonment($draft);
-                }
-
-                return $draft;
+            if ($existing) {
+                return $this->claim($existing, $defaults, $attributes, $previousStatus);
             }
         }
 
-        return FormSubmission::create(array_merge($defaults, $attributes));
+        /*
+         * The INSERT can still lose a race the SELECT above could not see. The
+         * beacon fires on pagehide, which is precisely when a submit navigates
+         * away, so it lands between the two often enough to matter.
+         *
+         * The unique index makes the loser fail rather than duplicate, and this
+         * adopts the row the winner created rather than 500ing on it. Same shape
+         * as TelemetryRecorder::record(), deliberately: both writers race for the
+         * same single row, so both have to survive losing.
+         */
+        try {
+            return FormSubmission::create(array_merge($defaults, $attributes));
+        } catch (UniqueConstraintViolationException $e) {
+            $existing = $session ? $this->sessionRow($form, $session) : null;
+
+            /*
+             * A null session cannot collide on (form_id, session_id) — MySQL
+             * allows any number of NULLs in a unique index — so a violation with
+             * no session is some other constraint entirely and must not be
+             * swallowed into a misleading "adopted the other row".
+             */
+            if (! $existing) {
+                throw $e;
+            }
+
+            return $this->claim($existing, $defaults, $attributes, $previousStatus);
+        }
+    }
+
+    /**
+     * The one row this session is allowed, WHATEVER state it reached.
+     *
+     * DELIBERATELY NOT FILTERED TO `started`, which is what it used to do and
+     * what made this throw. The unique index is on (form_id, session_id) and
+     * says nothing about status, so a lookup narrower than the constraint finds
+     * nothing, inserts, and hits the index anyway —
+     * SQLSTATE[23000] 1062 straight out of a public page.
+     *
+     * Every path that reuses a session hit it: a second submit from a page still
+     * holding its first token (a double-click, or a browser Back and re-post),
+     * and a beacon whose draft had already been aged to `abandoned` before the
+     * visitor got round to finishing.
+     */
+    protected function sessionRow(Form $form, string $session): ?FormSubmission
+    {
+        return FormSubmission::query()
+            ->where('form_id', $form->id)
+            ->where('session_id', $session)
+            ->first();
+    }
+
+    /**
+     * Take this session's row over and record the outcome on it.
+     *
+     * @param  array<string, mixed>  $defaults
+     * @param  array<string, mixed>  $attributes
+     * @param  string|null  $previousStatus  set to the status this row held before the claim
+     */
+    protected function claim(FormSubmission $row, array $defaults, array $attributes, ?string &$previousStatus = null): FormSubmission
+    {
+        $previousStatus = $row->status;
+
+        /*
+         * The row was very probably still pointing at whatever field the visitor
+         * had open when the last beacon left. Reaching ANY terminal state ends
+         * that — a submission that was rejected as spam or failed validation was
+         * not abandoned at that field, and leaving the marker set inflates the
+         * drop-off chart with the field people actually finished on.
+         *
+         * Here rather than on the completed branch alone, because this method is
+         * the one funnel every terminal outcome goes through.
+         */
+        $terminal = ($attributes['status'] ?? null) !== 'started';
+
+        if ($terminal) {
+            $attributes += ['abandoned_form_field_id' => null, 'abandoned_field_key' => null];
+        }
+
+        $row->forceFill(array_merge($defaults, $attributes))->save();
+
+        if ($terminal) {
+            $this->recorder->clearAbandonment($row);
+        }
+
+        return $row;
     }
 
     /** @param array<int, string> $reasons */
-    protected function recordSpam(Request $request, Form $form, string $locale, array $reasons, int $score, array $answers = [], bool $honeypot = false): void
+    protected function recordSpam(Request $request, Form $form, array $reasons, int $score, array $answers = [], bool $honeypot = false): void
     {
-        $this->newSubmission($request, $form, $locale, [
+        $this->newSubmission($request, $form, [
             'status' => 'spam',
             // Clamped: the reason table sums past a tinyint, and an overflow
             // would throw under strict mode and 500 the public path.
@@ -606,9 +648,9 @@ class FormsController extends Controller
     }
 
     /** @param array<int, string> $keys */
-    protected function recordFailure(Request $request, Form $form, string $locale, array $keys): void
+    protected function recordFailure(Request $request, Form $form, array $keys): void
     {
-        $this->newSubmission($request, $form, $locale, [
+        $this->newSubmission($request, $form, [
             'status' => 'validation_failed',
             'validation_errors' => $keys,
             'validation_error_count' => count($keys),

@@ -1,25 +1,3 @@
-{{--
-    Contact.
-
-    Laid out as the old page was: heading, rule, the map card with its three
-    contact channels across the full width, then the form beneath it — NOT a
-    form-plus-sidebar grid. The channels come from ContactDetail rows rather than
-    the old loose settings keys.
-
-    The form is the seeded `contact` system form, rendered by the ordinary
-    renderer through the shared partial, so it posts to the unchanged
-    /forms/{locale}/{slug} endpoint. A validation failure calls back(), whose
-    previous URL is THIS page, so errors and old input land right here.
-
-    $presentation is null when the form has been unpublished or the visitor is
-    blocked; the page still renders its copy and the channels, because a missing
-    form must not take the school's contact page down with it.
-
-    $address, $emails, $phones and $mapEmbed all arrive from
-    ContactController::contact() — including the keyless map URL, which is built
-    from the address row's own coordinates rather than from a pasted embed
-    setting.
---}}
 @extends('site::layout')
 
 @section('content')
@@ -44,7 +22,11 @@
             @include('site::partials.flash')
 
             @if ($page->getTranslation('content', $site->locale(), true))
-                <div class="prose mb-8" data-aos="fade-up" data-aos-duration="1000">
+                @include('site::partials.content-styles', ['model' => $page])
+
+                {{-- id="page-content" is the scope hook the admin's own CSS
+                     targets. See site::partials.content-styles. --}}
+                <div id="page-content" class="prose mb-8" data-aos="fade-up" data-aos-duration="1000">
                     {!! $page->getTranslation('content', $site->locale(), true) !!}
                 </div>
             @endif
@@ -114,13 +96,7 @@
                 </div>
             @endif
 
-            {{-- data-sisf ONLY: FormRenderer emits its own `.sisf` root, and
-                 nesting one inside another doubles the padding. --}}
-            @if ($presentation)
-                <div data-sisf data-aos="fade-up" data-aos-duration="1000">
-                    @include('site::forms.partials.renderer')
-                </div>
-            @endif
+            @include('site::partials.form-embed')
         </div>
     </section>
 @endsection

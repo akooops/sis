@@ -29,5 +29,6 @@
         'title' => $event->getTranslation('title', $site->locale(), true) ?: $event->name,
         'subtitle' => $event->getTranslation('description', $site->locale(), true),
         'content' => $event->getTranslation('content', $site->locale(), true),
+        'styles' => $event,
     ])
 @endsection

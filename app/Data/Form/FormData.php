@@ -98,8 +98,15 @@ class FormData extends Data
 
             thumbnail_url: $form->thumbnail_url,
             // Only meaningful once it is live, and the admin's "copy link" action
-            // should not hand out a URL that 404s.
-            public_url: $form->isLive() ? url("/forms/{$form->slug}") : null,
+            // should not hand out a URL that 404s — which is also why a SYSTEM
+            // form has none: it exists only embedded in the site page that owns
+            // it, and /forms/{slug} deliberately 404s for one.
+            //
+            // A literal path rather than route('web.site.forms.show'): that name
+            // is the {locale}-prefixed twin and relies on the URL::defaults that
+            // SetLocale sets, and SetLocale does not run on the admin API — it
+            // would throw "Missing required parameter" on every form listed.
+            public_url: $form->isLive() && ! $form->is_system ? url("/forms/{$form->slug}") : null,
 
             pages_count: (int) ($form->pages_count ?? $form->pages()->count()),
             fields_count: (int) ($form->fields_count ?? $form->fields()->count()),

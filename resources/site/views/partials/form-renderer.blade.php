@@ -1,25 +1,65 @@
 {{--
     The public form renderer's mount point and its payload.
 
-    ONE COPY OF THE PAYLOAD CONTRACT. Both the standalone form page
-    (/forms/{locale}/{slug}) and the site's own contact and admissions pages
-    include this, so the schema shape, the token, the honeypot and the captcha
-    wiring cannot drift between them.
+    ONE COPY OF THE PAYLOAD CONTRACT. The form's own page and the site's contact
+    and inquiries pages all reach this through site::partials.form-embed, so the
+    schema shape, the token, the honeypot and the captcha wiring cannot drift
+    between them.
 
-    Expects: $presentation (App\Services\Forms\FormPresentation).
+    Expects: $presentation (App\Services\Forms\FormPresentation), and optionally
+    $chrome (see below).
 --}}
 @php
     $form = $presentation->form;
     $captcha = $presentation->captcha;
+
+    /*
+     * Whether the renderer prints the form's own title, description and content.
+     *
+     * FALSE on the form's own page, where those three ARE the page — its hero
+     * and its body — and printing them again inside the form would say
+     * everything twice. TRUE everywhere else, which is what /contact and
+     * /inquiries have always rendered.
+     */
+    $chrome = $chrome ?? true;
+
+    /*
+     * Per-field errors, keyed the way the renderer looks them up: by field key.
+     *
+     * The validator namespaces answers under `fields.` so a field called
+     * `captcha_token` cannot collide with the real one, and an array answer
+     * reports per element (`fields.docs.0`). Both are folded back onto the field
+     * itself, because the field is the only thing the renderer can highlight.
+     */
+    $fieldErrors = [];
+
+    foreach ($errors->getBag('default')->messages() as $errorKey => $errorMessages) {
+        if (! str_starts_with($errorKey, 'fields.')) {
+            continue;
+        }
+
+        $fieldKey = explode('.', substr($errorKey, strlen('fields.')))[0];
+
+        // First wins: a rule on the field is reported before the rules on its
+        // individual values, and it is the more useful of the two.
+        $fieldErrors[$fieldKey] ??= $errorMessages[0] ?? '';
+    }
+
+    // Not a field: an expired or forged token, a form that filled up, a rejected
+    // captcha. '' when there is none — first() never returns null.
+    $formError = $errors->first('form');
 @endphp
 
-@if ($errors->any())
-    <div class="sisf-alert" role="alert">
-        <ul>
-            @foreach ($errors->all() as $message)
-                <li>{{ $message }}</li>
-            @endforeach
-        </ul>
+{{--
+    The FORM-LEVEL error only — an expired or forged token, a form that filled up
+    or was already submitted, a failed captcha. Every other message belongs to a
+    field and is rendered in red underneath it by the island; printing the whole
+    bag here as well, which is what this used to do, said each one twice.
+--}}
+@if ($formError)
+    <div class="alert alert-danger mb-4 flex items-center gap-2" role="alert">
+        <i class="uil uil-exclamation-triangle" aria-hidden="true"></i>
+        <span class="flex-1">{{ $formError }}</span>
     </div>
 @endif
 
@@ -55,6 +95,10 @@
         'capture' => config('forms.capture'),
         'honeypot' => $presentation->honeypot,
         'old' => (object) old('fields', []),
+        // (object), like `old` above: an empty [] serialises as a JSON array,
+        // which is truthy in JS and would sail past the renderer's `?? {}`.
+        'errors' => (object) $fieldErrors,
+        'chrome' => $chrome,
         // The renderer's own chrome, translated server-side. It used to hardcode
         // "Next"/"Back"/"Submit" as English literals, which showed through on
         // every Arabic form.
@@ -88,9 +132,6 @@
         defer
     ></script>
 @endif
-
-{{-- The funnel marker only — the layout already loaded the site's tag. --}}
-@include('site::forms.partials.tracking', ['form' => $form, 'stage' => 'form'])
 
 {{-- The form's two styling hooks, both set on the form itself. Every page and
      every element carries a css id and class of the admin's choosing, and

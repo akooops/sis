@@ -1,52 +1,74 @@
 /**
- * Public form stylesheet.
+ * The public form renderer's stylesheet. ONE FILE.
  *
- * DELIBERATELY TAILWIND-FREE. This file is loaded in three places that do not
- * share a cascade: the public page, the builder's preview <iframe>, and the
- * builder canvas. Only the admin ships Tailwind's preflight, so anything that
- * leaned on it would work in the preview and silently break in production.
- * Everything here is plain CSS with its own scoped reset.
+ * It used to be two — forms.css for a neutral, token-free structure and
+ * site/forms-theme.css to repaint it — on the grounds that the same component
+ * also rendered in the admin builder's preview and canvas, which have no site
+ * tokens to read. That is no longer true: the builder has no preview, and
+ * nothing under resources/admin imports this file. So the split bought one
+ * consumer's worth of indirection for zero consumers, and every control was
+ * declared twice: a neutral box here, a site box overriding it 200 lines later,
+ * with `.sisf .sisf-input` existing purely to out-specify `.sisf-input`.
  *
- * THE CONTAINER CONTRACT — the whole point of this file. Every element renders
- * the same wrapper, and the admin's `css_id` / `css_class` land on the WRAPPER,
- * never on the control:
+ * DELIBERATELY UNLAYERED, and that is load-bearing. An unlayered rule beats a
+ * layered one whatever its specificity, so wrapping this in `@layer components`
+ * — which an early attempt did — meant it could only win where nothing else
+ * declared anything: the controls kept their browser look. Same trap as the
+ * vendor sheets in site.css, from the other direction.
+ *
+ * TAILWIND-FREE. No `@apply`, no utility classes, its own scoped reset. The
+ * renderer mounts into markup this sheet does not control, and preflight is not
+ * guaranteed to have run around it.
+ *
+ * THE CONTAINER CONTRACT — the reason the class names look like this. Every
+ * element renders the same wrapper, and the admin's `css_id` / `css_class` land
+ * on the WRAPPER, never on the control:
  *
  *   <div class="sisf-el sisf-el--text is-required my-class" id="my-id"
  *        data-sisf-type="text" data-sisf-key="first_name">
  *     <label class="sisf-label">…<span class="sisf-required">*</span></label>
  *     <div class="sisf-control"><input class="sisf-input"></div>
- *     <p class="sisf-error" role="alert" hidden>…</p>
+ *     <p class="sisf-error" role="alert">…</p>
  *   </div>
  *
  * so an admin styles the container AND its control with `.my-class input`,
- * `.my-class .sisf-label`, `.my-class.is-invalid input`, and so on. The
- * data-attributes give a second, class-free handle.
+ * `.my-class .sisf-label`, `.my-class.is-invalid input`. The data-attributes
+ * give a second, class-free handle.
  *
  * Logical properties throughout (margin-inline-start, not margin-left) so one
- * stylesheet serves both LTR and RTL; only the handful of things that cannot be
- * expressed logically get a [dir=rtl] rule.
+ * sheet serves LTR and RTL; only the few things that cannot be expressed
+ * logically get a [dir="rtl"] rule.
  */
 
 /* -----------------------------------------
  1. Tokens
 ------------------------------------------*/
 
+/*
+ * The form's own palette, pointing at the site's. Kept as an indirection rather
+ * than inlining `var(--color-brand)` at every use, because it is also the
+ * retheming surface: an admin's Custom CSS can set `--sisf-primary` on `.sisf`
+ * and move the whole form without knowing a single class name.
+ */
 .sisf {
-    --sisf-fg: #1f2937;
-    --sisf-muted: #6b7280;
-    --sisf-bg: #ffffff;
-    --sisf-border: #d1d5db;
-    --sisf-border-strong: #9ca3af;
-    --sisf-primary: #1b84ff;
-    --sisf-primary-fg: #ffffff;
-    --sisf-danger: #dc2626;
-    --sisf-danger-bg: #fef2f2;
-    --sisf-success: #16a34a;
-    --sisf-radius: 6px;
-    --sisf-gap: 20px;
-    --sisf-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --sisf-fg: var(--color-body);
+    --sisf-muted: var(--color-faint);
+    --sisf-bg: var(--color-mist);
+    --sisf-border: var(--color-line-soft);
+    --sisf-border-strong: var(--color-line-strong);
+    --sisf-primary: var(--color-brand);
+    --sisf-primary-sweep: var(--color-brand-soft);
+    --sisf-primary-fg: var(--color-paper);
+    --sisf-danger: var(--color-danger);
+    --sisf-danger-ink: var(--color-danger-ink);
+    --sisf-danger-bg: var(--color-danger-surface);
+    --sisf-radius: var(--radius-md);
+    --sisf-gap: 16px;
+    /* inherit, so RTL picks up DINNext through the [dir] rule in base.css
+       instead of being pinned to a Latin system stack. */
+    --sisf-font: inherit;
     --sisf-font-size: 15px;
-    --sisf-control-height: 42px;
+    --sisf-focus-ring: 0 0 0 3px rgb(42 93 145 / 0.12);
 }
 
 /* -----------------------------------------
@@ -67,20 +89,26 @@
     line-height: 1.5;
 }
 
-.sisf p,
-.sisf h1,
-.sisf h2,
-.sisf h3,
-.sisf h4,
-.sisf h5,
-.sisf h6,
-.sisf fieldset,
-.sisf legend {
+/*
+ * :where() SO THE RESET HAS ZERO SPECIFICITY, and that is not a style choice.
+ *
+ * `.sisf h2` is (0,1,1) and beats a flat `.sisf-page-title` at (0,1,0), so a
+ * plain descendant reset silently wins against the very rules meant to dress the
+ * element: the page title lost its margin-bottom, and `.sisf-error` and
+ * `.sisf-file-status` — both <p> — lost their top margin, with nothing in the
+ * cascade to point at.
+ *
+ * The two-file version never hit this because every theme rule was written
+ * `.sisf .sisf-page-title` at (0,2,0) purely to out-specify this block. Merging
+ * dropped that prefix as redundant; :where() is what makes it genuinely
+ * redundant rather than quietly load-bearing.
+ */
+:where(.sisf) :where(p, h1, h2, h3, h4, h5, h6, fieldset, legend) {
     margin: 0;
     padding: 0;
 }
 
-.sisf fieldset {
+:where(.sisf) :where(fieldset) {
     border: 0;
     min-inline-size: 0;
 }
@@ -93,23 +121,69 @@
  3. Layout
 ------------------------------------------*/
 
-.sisf-form {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sisf-gap);
-}
-
+.sisf-form,
 .sisf-page {
     display: flex;
     flex-direction: column;
     gap: var(--sisf-gap);
 }
 
-.sisf-actions {
+/*
+ * The submit row, right-aligned as the old contact form's was.
+ *
+ * TWO selectors, because a form gets its buttons one of two ways: the renderer's
+ * FALLBACK controls (.sisf-actions, drawn only when the page declares none of
+ * its own), or a real button ELEMENT the admin placed — which is what both
+ * seeded system forms use.
+ *
+ * Note WHICH element carries the flex on the second one. A button element is
+ * `.sisf-el--button > .sisf-control > button`, and the control is a full-width
+ * block — so justify-content on the OUTER row computes correctly and does
+ * nothing at all, because its single child already fills it. The control is the
+ * box that has to distribute.
+ *
+ * flex-end, not `text-align: right`: in an RTL container flex-end is the LEFT
+ * edge, so the button lands on the reading end in both directions.
+ */
+.sisf-actions,
+.sisf-el--button .sisf-control {
     display: flex;
+    justify-content: flex-end;
+}
+
+.sisf-actions {
     flex-wrap: wrap;
     gap: 12px;
     align-items: center;
+}
+
+/*
+ * A run of adjacent buttons — Back and Next — on one line.
+ *
+ * FormPage.svelte wraps consecutive button elements in this; every element is
+ * otherwise a block in the page's column flex, so the two stacked vertically,
+ * each on its own full-width line.
+ *
+ * The children stay .sisf-el, which is `display:flex; flex-direction:column`, so
+ * they need flex:0 0 auto or they stretch to equal widths and the buttons come
+ * out oddly proportioned. And their .sisf-control must stop distributing: the
+ * row is what aligns now, and a full-width control inside it would push its
+ * neighbour away.
+ */
+.sisf-button-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.sisf-button-row .sisf-el {
+    flex: 0 0 auto;
+}
+
+.sisf-button-row .sisf-el--button .sisf-control {
+    display: block;
 }
 
 /* -----------------------------------------
@@ -123,22 +197,22 @@
 }
 
 .sisf-label {
-    font-weight: 500;
-    color: var(--sisf-fg);
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-heading);
 }
 
 .sisf-required {
-    color: var(--sisf-danger);
     margin-inline-start: 3px;
-}
-
-.sisf-help {
-    font-size: 0.875em;
-    color: var(--sisf-muted);
+    color: var(--sisf-danger);
 }
 
 .sisf-error {
-    font-size: 0.875em;
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
     color: var(--sisf-danger);
 }
 
@@ -146,30 +220,57 @@
  5. Controls
 ------------------------------------------*/
 
+/* Matched to .input / .select / .textarea in components.css. Declared here
+   rather than @apply-ing those: the two must be able to diverge if the renderer
+   ever needs a control the site markup has no class for. */
 .sisf-input,
-.sisf-textarea,
-.sisf-select {
-    inline-size: 100%;
-    min-block-size: var(--sisf-control-height);
-    padding: 8px 12px;
-    font: inherit;
-    color: inherit;
+.sisf-select,
+.sisf-textarea {
+    display: block;
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 15px;
+    line-height: 1.7;
+    font-weight: 500;
+    color: var(--sisf-fg);
     background-color: var(--sisf-bg);
     border: 1px solid var(--sisf-border);
     border-radius: var(--sisf-radius);
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-.sisf-textarea {
-    min-block-size: 110px;
-    resize: vertical;
+.sisf-input::placeholder,
+.sisf-textarea::placeholder {
+    color: var(--sisf-muted);
 }
 
 .sisf-input:focus,
-.sisf-textarea:focus,
-.sisf-select:focus {
-    outline: 2px solid var(--sisf-primary);
-    outline-offset: 1px;
+.sisf-select:focus,
+.sisf-textarea:focus {
+    outline: 0;
     border-color: var(--sisf-primary);
+    box-shadow: var(--sisf-focus-ring);
+}
+
+.sisf-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* The site's chevron. A native select's arrow is painted by the UA on the
+   inline-end edge in LTR only, so the position is the one thing here that
+   cannot be expressed logically. */
+.sisf-select {
+    padding-inline-end: 40px;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2360697b' stroke-width='2'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+}
+
+:where([dir="rtl"]) .sisf-select {
+    background-position: left 16px center;
 }
 
 /* Numbers and phone numbers are read left-to-right even in an RTL form. */
@@ -179,11 +280,20 @@
     text-align: start;
 }
 
-.sisf-choice {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
+/* Two ways in, because Element.svelte sets both: the class on the container and
+   the attribute on the control. */
+.sisf-el.is-invalid .sisf-input,
+.sisf-el.is-invalid .sisf-select,
+.sisf-el.is-invalid .sisf-textarea,
+.sisf-input[aria-invalid="true"],
+.sisf-select[aria-invalid="true"],
+.sisf-textarea[aria-invalid="true"] {
+    border-color: var(--sisf-danger);
 }
+
+/* -----------------------------------------
+ 6. Choices
+------------------------------------------*/
 
 .sisf-choices {
     display: flex;
@@ -191,143 +301,125 @@
     gap: 8px;
 }
 
-/* -----------------------------------------
- 6. State
-------------------------------------------*/
-
-.sisf-el.is-invalid .sisf-input,
-.sisf-el.is-invalid .sisf-textarea,
-.sisf-el.is-invalid .sisf-select {
-    border-color: var(--sisf-danger);
-    background-color: var(--sisf-danger-bg);
-}
-
-/* -----------------------------------------
- 7. Buttons
-------------------------------------------*/
-
-.sisf-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-block-size: var(--sisf-control-height);
-    padding: 8px 18px;
-    font: inherit;
-    font-weight: 500;
-    border: 1px solid transparent;
-    border-radius: var(--sisf-radius);
-    cursor: pointer;
-}
-
-.sisf-btn[disabled] {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.sisf-btn--primary {
-    background-color: var(--sisf-primary);
-    color: var(--sisf-primary-fg);
-}
-
-.sisf-btn--secondary {
-    background-color: transparent;
-    color: var(--sisf-fg);
-    border-color: var(--sisf-border-strong);
-}
-
-/* -----------------------------------------
- 8. Form and page typography
-------------------------------------------*/
-
-.sisf-title {
-    font-size: 1.5em;
-    font-weight: 600;
-    line-height: 1.3;
-}
-
-.sisf-description {
-    color: var(--sisf-muted);
-}
-
-.sisf-content :is(p, ul, ol) {
-    margin-block: 0.5em;
-}
-
-.sisf-content :is(ul, ol) {
-    padding-inline-start: 1.5em;
-}
-
-.sisf-progress {
-    font-size: 0.875em;
-    color: var(--sisf-muted);
-}
-
-.sisf-page-title {
-    font-size: 1.2em;
-    font-weight: 600;
-}
-
-.sisf-heading {
-    font-weight: 600;
-    line-height: 1.3;
-}
-
-.sisf-heading:is(h1) { font-size: 1.6em; }
-.sisf-heading:is(h2) { font-size: 1.4em; }
-.sisf-heading:is(h3) { font-size: 1.2em; }
-.sisf-heading:is(h4) { font-size: 1.05em; }
-.sisf-heading:is(h5, h6) { font-size: 1em; }
-
-.sisf-html :is(p, ul, ol) {
-    margin-block: 0.5em;
-}
-
-.sisf-html :is(ul, ol) {
-    padding-inline-start: 1.5em;
-}
-
-.sisf-html img {
-    max-inline-size: 100%;
-    block-size: auto;
-}
-
-/* -----------------------------------------
- 9. Choices
-------------------------------------------*/
-
 .sisf-choices--inline {
     flex-direction: row;
     flex-wrap: wrap;
     gap: 16px;
 }
 
-.sisf-radio,
-.sisf-checkbox {
-    inline-size: 1em;
-    block-size: 1em;
-    margin-block-start: 0.25em;
-    flex-shrink: 0;
-    accent-color: var(--sisf-primary);
+.sisf-choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
 }
 
 .sisf-choice-label {
     cursor: pointer;
 }
 
+.sisf-checkbox,
+.sisf-radio {
+    flex: 0 0 auto;
+    width: 21px;
+    height: 21px;
+    margin-top: 2px;
+    appearance: none;
+    background-color: var(--sisf-bg);
+    border: 1px solid rgb(8 60 130 / 0.1);
+    border-radius: var(--radius-xs);
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.sisf-radio {
+    border-radius: 50%;
+}
+
+.sisf-checkbox:checked,
+.sisf-radio:checked {
+    background-color: var(--sisf-primary);
+    border-color: var(--sisf-primary);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.sisf-checkbox:checked {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23fff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8.5l3.5 3.5L13 5'/%3E%3C/svg%3E");
+    background-size: 14px;
+}
+
+.sisf-radio:checked {
+    background-image: radial-gradient(circle, var(--sisf-primary-fg) 34%, transparent 36%);
+}
+
 /* -----------------------------------------
- 10. File uploads
+ 7. File upload
 ------------------------------------------*/
 
+/* The same box as .sisf-input, with the browser's own file button turned into
+   the site's .btn. ::file-selector-button is the standard selector and nothing
+   else can reach that button, so a browser without support simply keeps its
+   default one inside a themed box. */
 .sisf-file {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 15px;
+    line-height: 1.7;
+    font-weight: 500;
+    color: var(--sisf-fg);
+    background-color: var(--sisf-bg);
+    border: 1px solid var(--sisf-border);
+    border-radius: var(--sisf-radius);
+    cursor: pointer;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.sisf-file::file-selector-button {
+    margin-inline-end: 12px;
+    padding: 6px 16px;
     font: inherit;
-    color: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.7;
+    text-transform: uppercase;
+    letter-spacing: -0.2px;
+    color: var(--sisf-primary-fg);
+    background-color: var(--sisf-primary);
+    border: 0;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.sisf-file::file-selector-button:hover {
+    background-color: var(--sisf-primary-sweep);
+}
+
+.sisf-file:focus,
+.sisf-file:focus-visible {
+    outline: 0;
+    border-color: var(--sisf-primary);
+    box-shadow: var(--sisf-focus-ring);
+}
+
+.sisf-file[aria-invalid="true"] {
+    border-color: var(--sisf-danger);
+}
+
+.sisf-file:disabled,
+.sisf-file:disabled::file-selector-button {
+    cursor: not-allowed;
+}
+
+.sisf-file:disabled {
+    opacity: 0.6;
 }
 
 .sisf-file-status {
-    font-size: 0.875em;
-    color: var(--sisf-muted);
     margin-block-start: 6px;
+    font-size: 14px;
+    color: var(--sisf-muted);
 }
 
 .sisf-file-list {
@@ -339,12 +431,14 @@
     gap: 6px;
 }
 
+/* One uploaded file: a row that reads as "this is attached, and it can go". */
 .sisf-file-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 10px;
-    border: 1px solid var(--sisf-border);
+    gap: 12px;
+    padding: 10px 14px;
+    background-color: var(--sisf-bg);
+    border: 1px solid var(--sisf-border-strong);
     border-radius: var(--sisf-radius);
 }
 
@@ -354,37 +448,168 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 0.9375em;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--sisf-fg);
 }
 
+/* Matched to .btn-close in components.css, which is the site's own dismiss
+   affordance — the same circle in the same place means one thing to learn. */
 .sisf-file-remove {
     flex-shrink: 0;
-    border: 0;
-    background: transparent;
-    color: var(--sisf-danger);
-    font-size: 1.1em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    font-size: 18px;
     line-height: 1;
+    color: var(--sisf-muted);
+    background-color: transparent;
+    border: 0;
+    border-radius: 50%;
     cursor: pointer;
-    padding: 2px 6px;
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.sisf-file-remove:hover {
+    color: var(--sisf-danger-ink);
+    background-color: var(--sisf-danger-bg);
+}
+
+.sisf-file-remove:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
 }
 
 /* -----------------------------------------
- 11. RTL exceptions
+ 8. Buttons
 ------------------------------------------*/
 
-/* A native select's chevron is painted by the UA on the inline-end edge in LTR
-   only; these three cannot be expressed with logical properties alone. */
-:where([dir='rtl']) .sisf-select {
-    background-position: left 12px center;
+/* The site's gradient sweep, including the RTL mirroring — see the .btn comment
+   in components.css for why BOTH the gradient direction and the resting
+   position have to flip. */
+.sisf-btn {
+    --btn-fill: var(--sisf-primary);
+    --btn-sweep: var(--sisf-primary-sweep);
+    --btn-ink: var(--sisf-primary-fg);
+    --btn-border: transparent;
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border: 2px solid var(--btn-border);
+    border-radius: var(--sisf-radius);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.7;
+    letter-spacing: -0.2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    overflow: hidden;
+    color: var(--btn-ink);
+    background-color: var(--btn-fill);
+    background-image: linear-gradient(to right, var(--btn-sweep) 50%, transparent 50%);
+    background-size: 200% 100%;
+    background-position: right bottom;
+    transition: all 0.4s ease;
+}
+
+.sisf-btn:hover {
+    background-position: left bottom;
+    color: var(--btn-ink);
+}
+
+:where([dir="rtl"]) .sisf-btn {
+    background-image: linear-gradient(to left, var(--btn-sweep) 50%, transparent 50%);
+    background-position: left bottom;
+}
+
+:where([dir="rtl"]) .sisf-btn:hover {
+    background-position: right bottom;
+}
+
+.sisf-btn--secondary {
+    --btn-fill: transparent;
+    --btn-sweep: var(--sisf-primary);
+    --btn-ink: var(--sisf-primary);
+    --btn-border: var(--sisf-primary);
+}
+
+.sisf-btn--secondary:hover {
+    color: var(--sisf-primary-fg);
+}
+
+.sisf-btn:disabled,
+.sisf-btn[disabled] {
+    opacity: 0.65;
+    pointer-events: none;
 }
 
 /* -----------------------------------------
- 12. Captcha
+ 9. Typography
 ------------------------------------------*/
 
-/* The provider paints the widget itself in a fixed-size iframe; all this owns
-   is the space around it, and the room for a load failure message. Empty on a
-   v3 form, which renders no widget at all. */
+.sisf-page-title {
+    margin-bottom: 16px;
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.3;
+    text-transform: uppercase;
+    color: var(--sisf-primary);
+}
+
+.sisf-heading {
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--color-heading);
+}
+
+.sisf-heading:is(h1) { font-size: 1.6em; }
+.sisf-heading:is(h2) { font-size: 1.4em; }
+.sisf-heading:is(h3) { font-size: 1.2em; }
+.sisf-heading:is(h4) { font-size: 1.05em; }
+.sisf-heading:is(h5, h6) { font-size: 1em; }
+
+.sisf-progress {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--sisf-primary);
+}
+
+.sisf-content,
+.sisf-html {
+    color: var(--sisf-fg);
+}
+
+.sisf-content :is(p, ul, ol),
+.sisf-html :is(p, ul, ol) {
+    margin-block: 0.5em;
+}
+
+.sisf-content :is(ul, ol),
+.sisf-html :is(ul, ol) {
+    padding-inline-start: 1.5em;
+}
+
+.sisf-html img {
+    max-inline-size: 100%;
+    block-size: auto;
+}
+
+/* -----------------------------------------
+ 10. Captcha
+------------------------------------------*/
+
+/* The provider paints the widget itself in a fixed-size iframe; all this owns is
+   the space around it, and the room for a load failure message. Empty on a v3
+   form, which renders no widget at all. */
 .sisf-captcha {
     display: flex;
     flex-direction: column;
@@ -397,21 +622,12 @@
 }
 
 /* -----------------------------------------
- 13. Server-rendered messages
+ 11. intl-tel-input
 ------------------------------------------*/
 
-.sisf-alert {
-    margin-block-end: 20px;
-    padding: 12px 16px;
-    border: 1px solid var(--sisf-danger);
-    border-radius: var(--sisf-radius);
-    background-color: var(--sisf-danger-bg);
-    color: var(--sisf-danger);
-    font-family: var(--sisf-font);
-    font-size: 0.9375em;
-}
-
-.sisf-alert ul {
-    margin: 0;
-    padding-inline-start: 1.2em;
-}
+/* NOTHING HERE ON PURPOSE. components.css already lays the country selector out
+   as a bordered flex box matching `.input-addon`, and it targets
+   `.iti input.iti__tel-input` — a class the plugin puts on the input itself,
+   whatever else that input is called. So the rendered `.sisf-input` picks up the
+   site's existing phone treatment for free, and a rule here would only fight it.
+   See site/forms.js for where the widget is attached. */

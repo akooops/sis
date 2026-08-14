@@ -4,6 +4,7 @@ namespace App\Services\Site;
 
 use App\Enums\MorphType;
 use App\Models\ContactDetail;
+use App\Models\Form;
 use App\Models\Language;
 use App\Models\Menu;
 use App\Models\MenuItem;
@@ -46,7 +47,6 @@ final class SiteContext
      * Code, not config: it maps a closed enum onto route names declared in
      * routes/web.php, and both halves want to be grep-able together. A model
      * missing from here has no public page, which is a fact about the site.
-     * `form` deliberately points at the UNCHANGED /forms/{locale}/{slug}.
      *
      * @var array<string, string>
      */
@@ -59,7 +59,25 @@ final class SiteContext
         'job_offer' => 'web.site.jobs.show',
         'program' => 'web.site.programs.show',
         'brand' => 'web.site.brands.show',
-        'form' => 'web.user.forms.show',
+        'form' => 'web.site.forms.show',
+    ];
+
+    /**
+     * A seeded form's real page.
+     *
+     * A system form has NO standalone page — /forms/{slug} 404s for one, because
+     * it exists only embedded in the site page that owns it. Without this a menu
+     * item pointing at the seeded contact form would resolve to a link straight
+     * into that 404, which is worse than the unlinked label a null produces.
+     *
+     * Keyed by slug because a system form's slug is frozen (UpdateFormData pins
+     * it with Rule::in), so it already IS the stable reference.
+     *
+     * @var array<string, string>
+     */
+    public const SYSTEM_FORM_ROUTES = [
+        'contact' => 'web.site.contact',
+        'inquiries' => 'web.site.inquiries',
     ];
 
     /** @var Collection<string, Setting>|null keyed "group.key" */
@@ -336,6 +354,16 @@ final class SiteContext
                 ['slug' => $program->slug, 'stream' => $model->slug],
                 $locale,
             );
+        }
+
+        /*
+         * A system form is embedded in a page of its own, and has no
+         * /forms/{slug} to link to — see SYSTEM_FORM_ROUTES.
+         */
+        if ($model instanceof Form && $model->is_system) {
+            $name = self::SYSTEM_FORM_ROUTES[$model->slug] ?? null;
+
+            return $name === null ? null : $this->route($name, [], $locale);
         }
 
         $name = self::LINK_ROUTES[MorphType::aliasFor($model::class)] ?? null;

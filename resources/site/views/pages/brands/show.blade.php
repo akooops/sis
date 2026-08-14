@@ -12,6 +12,7 @@
         'title' => $brand->getTranslation('title', $site->locale(), true) ?: $brand->name,
         'subtitle' => $brand->getTranslation('description', $site->locale(), true),
         'content' => $brand->getTranslation('content', $site->locale(), true),
+        'styles' => $brand,
     ])
 
     <section>

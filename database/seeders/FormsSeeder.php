@@ -7,7 +7,6 @@ use App\Models\FormField;
 use App\Models\FormFieldOption;
 use App\Models\FormPage;
 use App\Models\Language;
-use App\Services\Translations\TranslationService;
 use App\States\Form\Published;
 use Illuminate\Database\Seeder;
 
@@ -16,11 +15,15 @@ use Illuminate\Database\Seeder;
  * the delete, and UpdateBuilderData::withValidator() (via Form::isLocked()) blocks
  * changes to the pages and fields — the settings stay editable.
  *
- * TRANSLATED ACROSS EVERY SEEDED LOCALE. The definitions in config('forms.system')
- * carry catalogue KEYS (`label_key`, `title_key`, `confirmation_key`) rather than
- * strings, and each is resolved here against the `forms` group of
- * config/translations.php. So a fresh install has a contact form that reads
+ * TRANSLATED ACROSS EVERY SEEDED LOCALE, AND THE WORDING IS IN ONE FILE. The
+ * definitions in config('forms.system') carry `title`, `confirmation_message` and
+ * `label` as locale => string maps, and this narrows each to the locales that
+ * actually have a Language row. So a fresh install has a contact form that reads
  * correctly in Arabic, not an English one with eight empty locales.
+ *
+ * This used to resolve catalogue KEYS against the `forms` group of
+ * config/translations.php, which put a seeded form's wording in a second file and
+ * made the catalogue carry eighteen keys nothing resolved at runtime.
  *
  * firstOrCreate for the form, matching PagesSeeder: a form row is authored
  * content and a reseed must never clobber copy an admin has since written.
@@ -32,9 +35,6 @@ use Illuminate\Database\Seeder;
  */
 class FormsSeeder extends Seeder
 {
-    /** @var array<string, array<string, string>> */
-    protected array $catalogue = [];
-
     /** @var array<int, string> */
     protected array $codes = [];
 
@@ -46,7 +46,6 @@ class FormsSeeder extends Seeder
             return;
         }
 
-        $this->catalogue = app(TranslationService::class)->catalogue('forms');
         $this->codes = Language::query()->pluck('code')->all();
 
         foreach ($forms as $definition) {
@@ -54,9 +53,9 @@ class FormsSeeder extends Seeder
                 ['slug' => $definition['slug']],
                 [
                     'name' => $definition['name'],
-                    'title' => $this->translate($definition['title_key'] ?? null, $definition['name']),
+                    'title' => $this->translate($definition['title'] ?? null, $definition['name']),
                     'confirmation_message' => $this->translate(
-                        $definition['confirmation_key'] ?? null,
+                        $definition['confirmation_message'] ?? null,
                         'Thank you. Your response has been recorded.',
                     ),
                     'status' => Published::class,
@@ -79,26 +78,21 @@ class FormsSeeder extends Seeder
     }
 
     /**
-     * One catalogue key as a locale => string map, for a translatable column.
+     * A config locale => string map, narrowed to the locales this install has.
      *
-     * The key is given WITH its group (`forms.contact.name`); the group prefix is
-     * stripped because catalogue() is already scoped to it. A key the catalogue
-     * does not know falls back to the supplied English string in the default
-     * locale, so a typo degrades to one untranslated label rather than a blank
-     * form.
+     * config/forms.php carries all nine; a Language row is what decides which of
+     * them are written, so an install running three languages seeds three and not
+     * nine columns of copy nobody can read.
      *
+     * A missing or empty map falls back to the supplied English string in the
+     * default locale, so a typo degrades to one untranslated label rather than a
+     * blank form.
+     *
+     * @param  array<string, string>|null  $lines
      * @return array<string, string>
      */
-    protected function translate(?string $key, string $fallback): array
+    protected function translate(?array $lines, string $fallback): array
     {
-        $lines = $key === null
-            ? null
-            : ($this->catalogue[preg_replace('/^forms\./', '', $key)] ?? null);
-
-        if ($lines === null) {
-            return [Language::defaultCode() => $fallback];
-        }
-
         $out = [];
 
         foreach ($this->codes as $code) {
@@ -137,8 +131,8 @@ class FormsSeeder extends Seeder
                     'settings' => $fieldDefinition['settings'] ?? null,
                     'validation' => $fieldDefinition['validation'] ?? null,
                     'label' => $this->translate(
-                        $fieldDefinition['label_key'] ?? null,
-                        $fieldDefinition['label'] ?? '',
+                        $fieldDefinition['label'] ?? null,
+                        $fieldDefinition['key'],
                     ),
                     'content' => [$default => $fieldDefinition['content'] ?? ''],
                 ]);

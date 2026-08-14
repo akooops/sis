@@ -58,8 +58,10 @@ class FormPresenter
             honeypot: $form->is_spam_filtered ? $minted['honeypot'] : null,
             captcha: Captcha::forForm($form),
             action: route('web.user.forms.submit', ['locale' => $locale, 'slug' => $form->slug]),
-            uploadAction: route('web.user.forms.upload', ['locale' => $locale, 'slug' => $form->slug]),
-            telemetryAction: route('web.user.forms.telemetry', ['locale' => $locale, 'slug' => $form->slug]),
+            // No locale on these two: the uploader answers with ids and sizes and
+            // the beacon answers 204, so neither has anything a language changes.
+            uploadAction: route('web.user.forms.upload', ['slug' => $form->slug]),
+            telemetryAction: route('web.user.forms.telemetry', ['slug' => $form->slug]),
             labels: $this->labels(),
         );
     }

@@ -31,7 +31,7 @@ class ArticlesController extends SiteController
                 fn (Builder $inner) => $inner->where('categories.code', $category),
             ))
             ->latest('published_at')
-            ->paginate(2)
+            ->paginate(12)
             ->withQueryString();
 
 

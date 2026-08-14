@@ -56,18 +56,18 @@
          * DENIED (the default, and what an EU-facing site must keep) puts GA4
          * in cookieless-ping mode: events still reach the property, but no
          * client_id is persisted, so THERE IS NO IDENTITY ACROSS PAGE LOADS.
-         * The form page and the confirmation page are two separate loads —
-         * sisf_form_view / sisf_form_start / sisf_form_submit land under one
-         * throwaway identity and sisf_form_complete under another. That means
-         * the view -> complete conversion funnel CANNOT BE JOINED at all: the
-         * numbers still add up per property, but no report can tell you which
-         * views became completions. GA4 can only recover it through behavioural
-         * modelling, which needs consent-update signals and traffic volume this
-         * site will not have.
+         * Pageviews still count; nothing that needs the SAME visitor recognised
+         * across two loads survives — a landing page and the page someone
+         * reaches from it cannot be joined into a journey.
          *
-         * GRANTED restores the funnel and is what an admin whose audience is
-         * outside the EU should pick — it is the `consent_default` switch on
-         * the analytics integration.
+         * GRANTED restores that and is what an admin whose audience is outside
+         * the EU should pick — it is the `consent_default` switch on the
+         * analytics integration.
+         *
+         * (This used to spell the trade out in terms of the form funnel, back
+         * when a form emitted its own sisf_form_* events. It does not any more:
+         * a form is measured as an ordinary page, and the submission's own
+         * telemetry — our endpoint, not GA — is what reports its funnel.)
          *
          * KNOWN GAP: THIS APP HAS NO CONSENT BANNER. Consent Mode expects a
          * banner to call gtag('consent', 'update', {...}) once the visitor

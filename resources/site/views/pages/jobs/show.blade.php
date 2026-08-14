@@ -18,7 +18,11 @@
                         @lang('jobs.detail.description')
                     </h2>
 
-                    <div class="prose">
+                    @include('site::partials.content-styles', ['model' => $job])
+
+                    {{-- id="page-content" is the scope hook the admin's own CSS
+                         targets. See site::partials.content-styles. --}}
+                    <div id="page-content" class="prose">
                         {!! $job->getTranslation('content', $site->locale(), true) !!}
                     </div>
 

@@ -47,17 +47,22 @@ return [
      * edits in the builder, and FormsController::destroy refuses the delete.
      * Copy, wording, notification routing and webhooks all stay editable.
      *
-     * LABELS ARE CATALOGUE KEYS, NOT STRINGS. `label_key`, `title_key` and
-     * `confirmation_key` name entries in the `forms` group of
-     * config/translations.php, and FormsSeeder resolves each one across every
-     * seeded locale — so both forms ship translated into all nine rather than
-     * English-only with eight blanks for an admin to fill.
+     * WORDING IS INLINE HERE, NOT A CATALOGUE KEY. Every title, confirmation
+     * and label below is a locale => string map, so this file alone says what
+     * the two seeded forms read like in all nine languages, and FormsSeeder
+     * needs nothing but what it can see.
      *
-     * Keys rather than nine inline strings per field because the wording already
-     * exists there and is edited on the Translations page; two copies would
-     * disagree the first time someone corrected one of them. An admin can still
-     * override any label afterwards in the builder — the seed is a starting
-     * point, not a binding.
+     * It used to hold `title_key` / `confirmation_key` / `label_key` pointing
+     * into the `forms` group of config/translations.php, which meant reading a
+     * seeded form took two files and a lookup, and the catalogue carried
+     * eighteen keys nothing ever resolved at runtime — they existed purely to
+     * be copied into the database once. The lang files keep the strings the
+     * app itself resolves (forms.submit, forms.closed, …); a seed value is not
+     * one of those.
+     *
+     * THE SEED IS A STARTING POINT, NOT A BINDING. These land in translatable
+     * columns on the row, and an admin edits them afterwards in the builder —
+     * changing a string here never rewrites a form that already exists.
      *
      * Settings and validation keys below are the ones the FieldType classes
      * actually declare — `email` and `phone` declare NONE, so nothing is passed
@@ -68,18 +73,131 @@ return [
         [
             'slug' => 'contact',
             'name' => 'Contact',
-            'title_key' => 'forms.contact.title',
-            'confirmation_key' => 'forms.contact.success',
+            'title' => [
+                'en' => 'Contact us',
+                'ar' => 'اتصل بنا',
+                'fr' => 'Nous contacter',
+                'es' => 'Contacto',
+                'de' => 'Kontakt',
+                'it' => 'Contattaci',
+                'pt' => 'Contacte-nos',
+                'ru' => 'Свяжитесь с нами',
+                'hi' => 'हमसे संपर्क करें',
+            ],
+            'confirmation_message' => [
+                'en' => 'Thank you for contacting us. We will reply shortly.',
+                'ar' => 'شكرًا لتواصلك معنا. سنرد عليك قريبًا.',
+                'fr' => 'Merci de nous avoir contactés. Nous vous répondrons sous peu.',
+                'es' => 'Gracias por ponerse en contacto. Le responderemos en breve.',
+                'de' => 'Danke für Ihre Nachricht. Wir melden uns in Kürze.',
+                'it' => 'Grazie per averci contattato. Ti risponderemo a breve.',
+                'pt' => 'Obrigado por nos contactar. Responderemos em breve.',
+                'ru' => 'Спасибо за обращение. Мы скоро ответим.',
+                'hi' => 'हमसे संपर्क करने के लिए धन्यवाद। हम शीघ्र ही उत्तर देंगे।',
+            ],
             'pages' => [
                 [
                     'name' => 'Contact',
                     'fields' => [
-                        ['type' => 'text', 'key' => 'name', 'label_key' => 'forms.contact.name', 'is_required' => true, 'validation' => ['max_length' => 120]],
-                        ['type' => 'email', 'key' => 'email', 'label_key' => 'forms.contact.email', 'is_required' => true],
-                        ['type' => 'phone', 'key' => 'phone', 'label_key' => 'forms.contact.phone'],
-                        ['type' => 'text', 'key' => 'subject', 'label_key' => 'forms.contact.subject', 'is_required' => true, 'validation' => ['max_length' => 160]],
-                        ['type' => 'textarea', 'key' => 'message', 'label_key' => 'forms.contact.message', 'is_required' => true, 'settings' => ['rows' => 8], 'validation' => ['max_length' => 4000]],
-                        ['type' => 'button', 'key' => 'submit', 'label_key' => 'forms.contact.submit', 'settings' => ['action' => 'submit', 'variant' => 'primary']],
+                        [
+                            'type' => 'text',
+                            'key' => 'name',
+                            'is_required' => true,
+                            'validation' => ['max_length' => 120],
+                            'label' => [
+                                'en' => 'Full name',
+                                'ar' => 'الاسم الكامل',
+                                'fr' => 'Nom complet',
+                                'es' => 'Nombre completo',
+                                'de' => 'Vollständiger Name',
+                                'it' => 'Nome completo',
+                                'pt' => 'Nome completo',
+                                'ru' => 'Полное имя',
+                                'hi' => 'पूरा नाम',
+                            ],
+                        ],
+                        [
+                            'type' => 'email',
+                            'key' => 'email',
+                            'is_required' => true,
+                            'label' => [
+                                'en' => 'Email address',
+                                'ar' => 'البريد الإلكتروني',
+                                'fr' => 'Adresse e-mail',
+                                'es' => 'Correo electrónico',
+                                'de' => 'E-Mail-Adresse',
+                                'it' => 'Indirizzo e-mail',
+                                'pt' => 'Endereço de e-mail',
+                                'ru' => 'Электронная почта',
+                                'hi' => 'ईमेल पता',
+                            ],
+                        ],
+                        [
+                            'type' => 'phone',
+                            'key' => 'phone',
+                            'label' => [
+                                'en' => 'Phone number',
+                                'ar' => 'رقم الهاتف',
+                                'fr' => 'Numéro de téléphone',
+                                'es' => 'Número de teléfono',
+                                'de' => 'Telefonnummer',
+                                'it' => 'Numero di telefono',
+                                'pt' => 'Número de telefone',
+                                'ru' => 'Номер телефона',
+                                'hi' => 'फ़ोन नंबर',
+                            ],
+                        ],
+                        [
+                            'type' => 'text',
+                            'key' => 'subject',
+                            'is_required' => true,
+                            'validation' => ['max_length' => 160],
+                            'label' => [
+                                'en' => 'Subject',
+                                'ar' => 'الموضوع',
+                                'fr' => 'Objet',
+                                'es' => 'Asunto',
+                                'de' => 'Betreff',
+                                'it' => 'Oggetto',
+                                'pt' => 'Assunto',
+                                'ru' => 'Тема',
+                                'hi' => 'विषय',
+                            ],
+                        ],
+                        [
+                            'type' => 'textarea',
+                            'key' => 'message',
+                            'is_required' => true,
+                            'settings' => ['rows' => 8],
+                            'validation' => ['max_length' => 4000],
+                            'label' => [
+                                'en' => 'Message',
+                                'ar' => 'الرسالة',
+                                'fr' => 'Message',
+                                'es' => 'Mensaje',
+                                'de' => 'Nachricht',
+                                'it' => 'Messaggio',
+                                'pt' => 'Mensagem',
+                                'ru' => 'Сообщение',
+                                'hi' => 'संदेश',
+                            ],
+                        ],
+                        [
+                            'type' => 'button',
+                            'key' => 'submit',
+                            'settings' => ['action' => 'submit', 'variant' => 'primary'],
+                            'label' => [
+                                'en' => 'Send message',
+                                'ar' => 'إرسال الرسالة',
+                                'fr' => 'Envoyer le message',
+                                'es' => 'Enviar mensaje',
+                                'de' => 'Nachricht senden',
+                                'it' => 'Invia il messaggio',
+                                'pt' => 'Enviar mensagem',
+                                'ru' => 'Отправить сообщение',
+                                'hi' => 'संदेश भेजें',
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -88,29 +206,141 @@ return [
         [
             'slug' => 'inquiries',
             'name' => 'Admissions inquiry',
-            'title_key' => 'forms.inquiry.title',
-            'confirmation_key' => 'forms.inquiry.success',
+            'title' => [
+                'en' => 'Admissions inquiry',
+                'ar' => 'طلب القبول والتسجيل',
+                'fr' => 'Demande d\'admission',
+                'es' => 'Solicitud de admisión',
+                'de' => 'Aufnahmeanfrage',
+                'it' => 'Richiesta di ammissione',
+                'pt' => 'Pedido de admissão',
+                'ru' => 'Заявка на приём',
+                'hi' => 'प्रवेश पूछताछ',
+            ],
+            'confirmation_message' => [
+                'en' => 'Thank you. Our admissions team will be in touch.',
+                'ar' => 'شكرًا لك. سيتواصل معك فريق القبول والتسجيل.',
+                'fr' => 'Merci. Notre équipe des admissions vous contactera.',
+                'es' => 'Gracias. Nuestro equipo de admisiones se pondrá en contacto.',
+                'de' => 'Vielen Dank. Unser Aufnahmeteam wird sich melden.',
+                'it' => 'Grazie. Il nostro ufficio ammissioni ti contatterà.',
+                'pt' => 'Obrigado. A nossa equipa de admissões entrará em contacto.',
+                'ru' => 'Спасибо. Приёмная комиссия свяжется с вами.',
+                'hi' => 'धन्यवाद। हमारी प्रवेश टीम आपसे संपर्क करेगी।',
+            ],
             'pages' => [
                 [
                     'name' => 'Inquiry',
                     'fields' => [
-                        ['type' => 'text', 'key' => 'guardian_name', 'label_key' => 'forms.inquiry.guardian_name', 'is_required' => true, 'validation' => ['max_length' => 120]],
-                        ['type' => 'email', 'key' => 'email', 'label_key' => 'forms.contact.email', 'is_required' => true],
-                        ['type' => 'phone', 'key' => 'phone', 'label_key' => 'forms.contact.phone', 'is_required' => true],
-                        ['type' => 'text', 'key' => 'student_name', 'label_key' => 'forms.inquiry.student_name', 'is_required' => true, 'validation' => ['max_length' => 120]],
-                        // 'today' is resolved to a concrete date by DateType::resolve()
-                        // at render time — a relative string cannot be compared
-                        // against a date_format rule, which is why it resolves there.
-                        ['type' => 'date', 'key' => 'student_birthdate', 'label_key' => 'forms.inquiry.student_birthdate', 'is_required' => true, 'validation' => ['max_date' => 'today']],
-                        ['type' => 'text', 'key' => 'student_school', 'label_key' => 'forms.inquiry.student_school', 'validation' => ['max_length' => 160]],
+                        [
+                            'type' => 'text',
+                            'key' => 'guardian_name',
+                            'is_required' => true,
+                            'validation' => ['max_length' => 120],
+                            'label' => [
+                                'en' => 'Guardian name',
+                                'ar' => 'اسم ولي الأمر',
+                                'fr' => 'Nom du responsable légal',
+                                'es' => 'Nombre del tutor',
+                                'de' => 'Name des Erziehungsberechtigten',
+                                'it' => 'Nome del tutore',
+                                'pt' => 'Nome do encarregado de educação',
+                                'ru' => 'Имя родителя или опекуна',
+                                'hi' => 'अभिभावक का नाम',
+                            ],
+                        ],
+                        [
+                            'type' => 'email',
+                            'key' => 'email',
+                            'is_required' => true,
+                            'label' => [
+                                'en' => 'Email address',
+                                'ar' => 'البريد الإلكتروني',
+                                'fr' => 'Adresse e-mail',
+                                'es' => 'Correo electrónico',
+                                'de' => 'E-Mail-Adresse',
+                                'it' => 'Indirizzo e-mail',
+                                'pt' => 'Endereço de e-mail',
+                                'ru' => 'Электронная почта',
+                                'hi' => 'ईमेल पता',
+                            ],
+                        ],
+                        [
+                            'type' => 'phone',
+                            'key' => 'phone',
+                            'is_required' => true,
+                            'label' => [
+                                'en' => 'Phone number',
+                                'ar' => 'رقم الهاتف',
+                                'fr' => 'Numéro de téléphone',
+                                'es' => 'Número de teléfono',
+                                'de' => 'Telefonnummer',
+                                'it' => 'Numero di telefono',
+                                'pt' => 'Número de telefone',
+                                'ru' => 'Номер телефона',
+                                'hi' => 'फ़ोन नंबर',
+                            ],
+                        ],
+                        [
+                            'type' => 'text',
+                            'key' => 'student_name',
+                            'is_required' => true,
+                            'validation' => ['max_length' => 120],
+                            'label' => [
+                                'en' => 'Student name',
+                                'ar' => 'اسم الطالب',
+                                'fr' => 'Nom de l\'élève',
+                                'es' => 'Nombre del alumno',
+                                'de' => 'Name des Schülers',
+                                'it' => 'Nome dello studente',
+                                'pt' => 'Nome do aluno',
+                                'ru' => 'Имя учащегося',
+                                'hi' => 'छात्र का नाम',
+                            ],
+                        ],
+                        // 'today' is resolved to a concrete date by DateType::resolve() at
+                        // render time — a relative string cannot be compared against a
+                        // date_format rule, which is why it resolves there.
+                        [
+                            'type' => 'date',
+                            'key' => 'student_birthdate',
+                            'is_required' => true,
+                            'validation' => ['max_date' => 'today'],
+                            'label' => [
+                                'en' => 'Student date of birth',
+                                'ar' => 'تاريخ ميلاد الطالب',
+                                'fr' => 'Date de naissance de l\'élève',
+                                'es' => 'Fecha de nacimiento del alumno',
+                                'de' => 'Geburtsdatum des Schülers',
+                                'it' => 'Data di nascita dello studente',
+                                'pt' => 'Data de nascimento do aluno',
+                                'ru' => 'Дата рождения учащегося',
+                                'hi' => 'छात्र की जन्म तिथि',
+                            ],
+                        ],
+                        [
+                            'type' => 'text',
+                            'key' => 'student_school',
+                            'validation' => ['max_length' => 160],
+                            'label' => [
+                                'en' => 'Current school',
+                                'ar' => 'المدرسة الحالية',
+                                'fr' => 'École actuelle',
+                                'es' => 'Centro actual',
+                                'de' => 'Derzeitige Schule',
+                                'it' => 'Scuola attuale',
+                                'pt' => 'Escola atual',
+                                'ru' => 'Текущая школа',
+                                'hi' => 'वर्तमान विद्यालय',
+                            ],
+                        ],
                         [
                             'type' => 'select',
                             'key' => 'academic_year',
-                            'label_key' => 'forms.inquiry.academic_year',
                             'is_required' => true,
-                            // A fixed list rather than a generated one: a seeder
-                            // runs once, and a range computed from the seed date
-                            // would silently go stale. Extend it here.
+                            // A fixed list rather than a generated one: a seeder runs once, and
+                            // a range computed from the seed date would silently go stale.
+                            // Extend it here.
                             'options' => [
                                 ['value' => '2026/2027', 'label' => '2026/2027'],
                                 ['value' => '2027/2028', 'label' => '2027/2028'],
@@ -118,15 +348,25 @@ return [
                                 ['value' => '2029/2030', 'label' => '2029/2030'],
                                 ['value' => '2030/2031', 'label' => '2030/2031'],
                             ],
+                            'label' => [
+                                'en' => 'Academic year',
+                                'ar' => 'العام الدراسي',
+                                'fr' => 'Année scolaire',
+                                'es' => 'Curso académico',
+                                'de' => 'Schuljahr',
+                                'it' => 'Anno scolastico',
+                                'pt' => 'Ano letivo',
+                                'ru' => 'Учебный год',
+                                'hi' => 'शैक्षणिक वर्ष',
+                            ],
                         ],
                         [
                             'type' => 'select',
                             'key' => 'grade',
-                            'label_key' => 'forms.inquiry.grade',
                             'is_required' => true,
-                            // Option VALUES are never translated — the same answer
-                            // has to read identically whatever language it was
-                            // given in, which is what makes an export comparable.
+                            // Option VALUES are never translated — the same answer has to read
+                            // identically whatever language it was given in, which is what makes
+                            // an export comparable.
                             'options' => [
                                 ['value' => 'prek', 'label' => 'PreK'],
                                 ['value' => 'kg1', 'label' => 'KG1'],
@@ -144,9 +384,51 @@ return [
                                 ['value' => 'g11', 'label' => 'Grade 11'],
                                 ['value' => 'g12', 'label' => 'Grade 12'],
                             ],
+                            'label' => [
+                                'en' => 'Grade applied for',
+                                'ar' => 'الصف المتقدَّم إليه',
+                                'fr' => 'Niveau demandé',
+                                'es' => 'Curso solicitado',
+                                'de' => 'Gewünschte Klassenstufe',
+                                'it' => 'Classe richiesta',
+                                'pt' => 'Ano pretendido',
+                                'ru' => 'Желаемый класс',
+                                'hi' => 'आवेदित कक्षा',
+                            ],
                         ],
-                        ['type' => 'textarea', 'key' => 'questions', 'label_key' => 'forms.inquiry.questions', 'settings' => ['rows' => 5], 'validation' => ['max_length' => 4000]],
-                        ['type' => 'button', 'key' => 'submit', 'label_key' => 'forms.inquiry.submit', 'settings' => ['action' => 'submit', 'variant' => 'primary']],
+                        [
+                            'type' => 'textarea',
+                            'key' => 'questions',
+                            'settings' => ['rows' => 5],
+                            'validation' => ['max_length' => 4000],
+                            'label' => [
+                                'en' => 'Questions',
+                                'ar' => 'أسئلتك',
+                                'fr' => 'Questions',
+                                'es' => 'Preguntas',
+                                'de' => 'Fragen',
+                                'it' => 'Domande',
+                                'pt' => 'Questões',
+                                'ru' => 'Вопросы',
+                                'hi' => 'प्रश्न',
+                            ],
+                        ],
+                        [
+                            'type' => 'button',
+                            'key' => 'submit',
+                            'settings' => ['action' => 'submit', 'variant' => 'primary'],
+                            'label' => [
+                                'en' => 'Send inquiry',
+                                'ar' => 'إرسال الطلب',
+                                'fr' => 'Envoyer la demande',
+                                'es' => 'Enviar solicitud',
+                                'de' => 'Anfrage senden',
+                                'it' => 'Invia la richiesta',
+                                'pt' => 'Enviar pedido',
+                                'ru' => 'Отправить заявку',
+                                'hi' => 'पूछताछ भेजें',
+                            ],
+                        ],
                     ],
                 ],
             ],

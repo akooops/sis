@@ -30,6 +30,10 @@
         locale = 'en',
         fallbackLocale = 'en',
         disabled = false,
+        // Forwarded, not read: this file owns the label and the error, and a
+        // control only needs these when it has copy of its OWN — which is
+        // FileControl and nothing else.
+        labels = {},
         onchange = null,
         onfocus = null,
         onblur = null,
@@ -104,6 +108,7 @@
                     {locale}
                     {fallbackLocale}
                     {disabled}
+                    {labels}
                     id={controlId}
                     invalid={!!error}
                     {describedBy}
@@ -137,6 +142,7 @@
                     {locale}
                     {fallbackLocale}
                     {disabled}
+                    {labels}
                     id={controlId}
                     invalid={!!error}
                     {describedBy}

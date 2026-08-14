@@ -18,6 +18,16 @@
         id = undefined,
         invalid = false,
         describedBy = undefined,
+        /*
+         * The only control with copy of its own, and so the only one that gets
+         * these. They are server-translated by FormPresenter::labels(); the
+         * English defaults cover the builder preview, which passes none.
+         *
+         * Three strings below are still hardcoded because no catalogue key
+         * exists for them yet: the preview notice (admin-only, English is
+         * correct), the per-field cap and the upload failure.
+         */
+        labels = {},
         onchange = null,
         onfocus = null,
         onblur = null,
@@ -101,7 +111,7 @@
     onblur={() => onblur?.(field)}
 />
 
-{#if busy}<p class="sisf-file-status">Uploading…</p>{/if}
+{#if busy}<p class="sisf-file-status">{labels.uploading ?? 'Uploading…'}</p>{/if}
 {#if notice}<p class="sisf-file-status">{notice}</p>{/if}
 
 {#if items.length}
@@ -113,7 +123,7 @@
                     type="button"
                     class="sisf-file-remove"
                     {disabled}
-                    aria-label="Remove file"
+                    aria-label={labels.removeFile ?? 'Remove file'}
                     onclick={() => drop(index)}
                 >×</button>
             </li>

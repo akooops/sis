@@ -23,11 +23,11 @@ import initSwipers from './site/swiper';
 /**
  * [selector, loader] — the module is fetched only if the selector matches.
  *
- * NOTE the form marker. It is `[data-sisf]`, wrapped around the content of ALL
- * FOUR site::forms.* views, and NOT `[data-sisf-root]`. The thanks page has no
- * mount root but is the only page that knows a submission completed, so keying
- * on the root would never load the module there and the conversion event would
- * stop firing with no error to notice.
+ * The form marker is `[data-sisf]`, the wrapper site::partials.form-embed puts
+ * around a rendered form. It used to wrap the CONFIRMATION too, so that the
+ * module would load on that render and report a conversion; the form emits no
+ * third-party analytics any more, so a confirmation is plain HTML and this
+ * loads only where there is actually a form to mount.
  */
 const ON_DEMAND = [
     ['[data-sisf]', () => import('./site/forms')],

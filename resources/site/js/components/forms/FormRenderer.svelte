@@ -35,7 +35,17 @@
          * oninteract. One owner, and reactivity that actually fires.
          */
         values = {},
-        errors = {},
+        /*
+         * Server-side validation errors, keyed by FIELD KEY — the same key
+         * FormPage looks them up by. INITIAL only, for the same reason `values`
+         * is: they are cleared per field as the visitor fixes them, so they need
+         * an owner, and that owner is `errors` below.
+         *
+         * The server is the only validator. A rejected submit comes back as a
+         * fresh page load, so there is nothing to merge into — the payload IS
+         * the state.
+         */
+        errors: initialErrors = {},
         locale = null,
         mode = 'live',
         submitting = false,
@@ -78,10 +88,32 @@
          * Empty in the builder preview, where there is nothing to post to.
          */
         client = {},
+        /*
+         * Whether to print the form's own content.
+         *
+         * FALSE on a form's own page, where that content IS the page body above
+         * the form, so printing it again here would say everything twice. TRUE
+         * everywhere else: the builder preview, and the site pages that embed a
+         * form under their own copy.
+         *
+         * It used to gate the title and description as well. Those are no longer
+         * rendered at all — see the markup below.
+         */
+        chrome = true,
         onsubmit = null,
         oninteract = null,
         onstep = null,
     } = $props();
+
+    /**
+     * The live error set — seeded from the prop, then owned here.
+     *
+     * A message describes the value the server rejected, so it stops being true
+     * the moment the visitor changes that value. Clearing it in handleChange is
+     * what makes the red text under an input disappear as they fix it, rather
+     * than sitting there until the next round trip.
+     */
+    let errors = $state({ ...initialErrors });
 
     /**
      * The visible controls carry no `name`: they are driven by Svelte state, and
@@ -211,8 +243,9 @@
         return isLastLinear;
     });
 
-    const title = $derived(translate(schema?.title, activeLocale, fallbackLocale));
-    const description = $derived(translate(schema?.description, activeLocale, fallbackLocale));
+    /* schema.title and schema.description are deliberately NOT read. They stay
+       in the payload because the admin builder round-trips the whole schema, but
+       the renderer prints neither: the page around the form already says both. */
     const content = $derived(translate(schema?.content, activeLocale, fallbackLocale));
 
     /** Seed the stack, and re-seed when the form itself changes. */
@@ -222,7 +255,53 @@
         const id = schema?.id ?? null;
         if (id === lastSchemaId) return;
         lastSchemaId = id;
-        stack = pages.length ? [pages[0].id] : [];
+
+        /*
+         * Open on the page carrying the first error, not on page one.
+         *
+         * A rejected submit comes back as a fresh page load, so a multi-page
+         * form would otherwise re-open at the beginning with the offending field
+         * several pages away and invisible — the visitor is shown a form with
+         * nothing apparently wrong with it and no way to find out what.
+         *
+         * Interstitials are skipped: they are entered from a button and have no
+         * position in the linear run, so landing on one strands the visitor.
+         *
+         * Folded into THIS effect rather than added as a second one, because two
+         * effects writing `stack` would race and the seed below would sometimes
+         * win.
+         */
+        const errored = pages.find(
+            (page) => !page.is_interstitial && (page.fields ?? []).some((field) => errors[field.key]),
+        );
+
+        stack = pages.length ? [(errored ?? pages[0]).id] : [];
+    });
+
+    /**
+     * Put the visitor in front of the first rejected field.
+     *
+     * ONCE. Not on every change — fixing a field would otherwise yank the page
+     * back to whatever is now the "first" error. The form sits below a
+     * full-viewport hero and a body, so without this a returning visitor lands
+     * at the top of a page whose error is off-screen.
+     */
+    let focusedError = false;
+    $effect(() => {
+        if (focusedError || !formEl) return;
+
+        const [key] = Object.keys(errors);
+
+        if (!key) return;
+
+        focusedError = true;
+
+        // Field keys are /^[a-z][a-z0-9_]*$/ (enforced by UpdateBuilderData), so
+        // there is nothing here a selector needs escaped.
+        const element = formEl.querySelector(`[data-sisf-key="${key}"]`);
+
+        element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element?.querySelector('input, select, textarea')?.focus({ preventScroll: true });
     });
 
     /**
@@ -241,7 +320,7 @@
                 if (answers[field.key] === undefined) {
                     // Old input first (a rejected submission must not make the
                     // visitor retype everything), then the field's own default —
-                    // resolved for this locale by FormsController::schema(), and
+                    // resolved for this locale by FormPresenter::schema(), and
                     // null rather than '' when there is none, so the type's own
                     // empty value (an array, a false) still wins for the controls
                     // that need one. The builder's preview schema carries no
@@ -292,6 +371,12 @@
 
     function handleChange(field, value) {
         answers[field.key] = value;
+
+        // The message described the value the server rejected. That value is
+        // gone, so the message is too — the red text clears as they type rather
+        // than waiting for the next round trip to disagree with what they see.
+        if (errors[field.key]) delete errors[field.key];
+
         oninteract?.({ type: 'change', field, value });
     }
 
@@ -562,11 +647,23 @@
             {/each}
         {/if}
 
-        {#if title}<h1 class="sisf-title">{title}</h1>{/if}
-        {#if description}<p class="sisf-description">{description}</p>{/if}
-        <!-- Admin-authored, same trust level as Page::content. A visitor can
-             never write into it. -->
-        {#if content}<div class="sisf-content">{@html content}</div>{/if}
+        <!--
+            The form's own CONTENT, and nothing else — see the `chrome` prop.
+
+            The title and description used to print here too. They were noise
+            wherever the form actually renders: on /contact and /inquiries the
+            section already carries a heading and a paragraph saying the same
+            thing, so the form repeated the page back at the visitor directly
+            above the first input. The title was already suppressed in CSS for
+            exactly that reason; this stops rendering both rather than hiding
+            one, so the markup and the page agree.
+
+            Admin-authored, same trust level as Page::content. A visitor can
+            never write into it.
+        -->
+        {#if chrome && content}
+            <div class="sisf-content">{@html content}</div>
+        {/if}
 
         {#if linearPages.length > 1 && linearIndex >= 0}
             <p class="sisf-progress" aria-live="polite">
@@ -582,6 +679,7 @@
                 locale={activeLocale}
                 {fallbackLocale}
                 disabled={submitting}
+                labels={t}
                 onchange={handleChange}
                 onfocus={(field) => oninteract?.({ type: 'focus', field })}
                 onblur={(field) => oninteract?.({ type: 'blur', field })}

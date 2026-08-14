@@ -205,7 +205,15 @@
             {/each}
 
             <div class="grid gap-4 xl:grid-cols-[272px_minmax(0,1fr)_360px]">
-                <aside class="flex flex-col gap-4">
+                <!-- Sticky for the same reason the Settings rail is: adding an
+                     element to a page near the bottom otherwise means scrolling
+                     up to the palette and back down for every single one. Same
+                     self-start caveat — see the Settings aside below. -->
+                <aside
+                    class="flex flex-col gap-4 xl:sticky xl:self-start
+                           xl:top-[calc(var(--header-height)+1rem)]
+                           xl:max-h-[calc(100vh-var(--header-height)-2rem)] xl:overflow-y-auto"
+                >
                     <div class="kt-card">
                         <div class="kt-card-header">
                             <h3 class="kt-card-title">Elements</h3>
@@ -252,7 +260,6 @@
                             <PageSection
                                 {page}
                                 {index}
-                                pages={builder.pages}
                                 locale={builder.locale}
                                 fallbackLocale={builder.defaultLocale}
                                 selectedId={builder.selectedId}
@@ -264,7 +271,6 @@
                                 onselect={select}
                                 onselectpage={selectPage}
                                 onstep={(id, delta) => builder.stepField(id, delta)}
-                                onmove={(id, pageId) => pageId && builder.moveFieldToPage(id, pageId)}
                                 onduplicate={(id) => builder.duplicateField(id)}
                                 onremove={removeField}
                                 onremovepage={removePage}
@@ -280,7 +286,26 @@
                 </div>
 
                 {#if wide}
-                    <aside class="flex flex-col gap-4 rounded-xl border border-border p-4">
+                    <!--
+                        STICKY, so selecting an element does not mean scrolling
+                        back up to its settings and back down again for the next
+                        one. A long form made that the whole editing loop.
+
+                        `self-start` is the part that is easy to miss: a grid item
+                        stretches to the row height by default, so it is already
+                        as tall as the canvas and `sticky` has nothing to travel
+                        within — the rule applies and simply does nothing.
+
+                        Offset by the fixed Metronic header (--header-height, 70px
+                        here) rather than a hardcoded number, and capped to the
+                        remaining viewport with its own scroll, so a long
+                        inspector still reaches its last field.
+                    -->
+                    <aside
+                        class="flex flex-col gap-4 rounded-xl border border-border p-4 xl:sticky xl:self-start
+                               xl:top-[calc(var(--header-height)+1rem)]
+                               xl:max-h-[calc(100vh-var(--header-height)-2rem)] xl:overflow-y-auto"
+                    >
                         <h2 class="text-sm font-medium text-mono">Settings</h2>
                         {@render inspector()}
                     </aside>

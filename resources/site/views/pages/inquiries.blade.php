@@ -1,10 +1,3 @@
-{{--
-    Admissions inquiry.
-
-    Same shape as the contact page — heading, rule, copy, then the form at full
-    width. The seeded `inquiries` system form posts to the unchanged forms
-    endpoint; see site::pages.contact for why embedding is safe.
---}}
 @extends('site::layout')
 
 @section('content')
@@ -29,16 +22,16 @@
             @include('site::partials.flash')
 
             @if ($page->getTranslation('content', $site->locale(), true))
-                <div class="prose mb-8" data-aos="fade-up" data-aos-duration="1000">
+                @include('site::partials.content-styles', ['model' => $page])
+
+                {{-- id="page-content" is the scope hook the admin's own CSS
+                     targets. See site::partials.content-styles. --}}
+                <div id="page-content" class="prose mb-8" data-aos="fade-up" data-aos-duration="1000">
                     {!! $page->getTranslation('content', $site->locale(), true) !!}
                 </div>
             @endif
 
-            @if ($presentation)
-                <div data-sisf data-aos="fade-up" data-aos-duration="1000">
-                    @include('site::forms.partials.renderer')
-                </div>
-            @endif
+            @include('site::partials.form-embed')
         </div>
     </section>
 @endsection

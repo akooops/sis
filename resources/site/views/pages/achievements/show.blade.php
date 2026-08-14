@@ -26,7 +26,11 @@
 
                         <hr class="mb-4 mt-2 border-line">
 
-                        <div class="prose">
+                        @include('site::partials.content-styles', ['model' => $achievement])
+
+                        {{-- id="page-content" is the scope hook the admin's own
+                             CSS targets. See site::partials.content-styles. --}}
+                        <div id="page-content" class="prose">
                             {!! $achievement->getTranslation('content', $site->locale(), true) !!}
                         </div>
                     </div>

@@ -12,6 +12,7 @@
         'title' => $album->getTranslation('title', $site->locale(), true) ?: $album->name,
         'subtitle' => $album->getTranslation('description', $site->locale(), true),
         'content' => $album->getTranslation('content', $site->locale(), true),
+        'styles' => $album,
     ])
 
     @if ($files->isNotEmpty())

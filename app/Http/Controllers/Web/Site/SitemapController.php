@@ -129,10 +129,17 @@ class SitemapController extends SiteController
             },
         );
 
-        // Public forms keep their own URL shape — /forms/{locale}/{slug}.
-        Form::query()->live()->select(['slug', 'updated_at'])->cursor()->each(
+        /*
+         * A public form is an ordinary site page now, so it lists like one.
+         *
+         * SYSTEM forms are excluded: they have no standalone page at all, and
+         * their content is already listed as /contact and /inquiries through
+         * SLUG_ROUTES above — listing both was duplicate content pointing at a
+         * URL that now 404s.
+         */
+        Form::query()->live()->where('is_system', false)->select(['slug', 'updated_at'])->cursor()->each(
             function (Form $form) use (&$urls, $default, $locales) {
-                $urls[] = $this->entry('web.user.forms.show', ['slug' => $form->slug], $default, $locales, $form->updated_at);
+                $urls[] = $this->entry('web.site.forms.show', ['slug' => $form->slug], $default, $locales, $form->updated_at);
             },
         );
 
@@ -154,10 +161,14 @@ class SitemapController extends SiteController
         $lines = [
             'User-agent: *',
             'Disallow: /admin/',
-            // The form pages are reachable and indexable through the site; their
-            // /forms/ URLs are the same content at a second address, and the
-            // thanks/blocked/closed pages under them are noindex anyway.
-            'Disallow: /forms/',
+            /*
+             * NO `Disallow: /forms/`. It used to be here because /forms/ served
+             * a second copy of pages the site already had — but /forms/{slug} is
+             * now the canonical address of a form and the sitemap advertises it,
+             * so disallowing it would block the very URLs this file points at
+             * while leaving /{locale}/forms/{slug} crawlable. The submission
+             * endpoints under it are POST-only and so not crawlable at all.
+             */
             '',
             'Sitemap: '.route('web.site.sitemap'),
             '',

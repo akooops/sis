@@ -260,11 +260,11 @@
                 {/if}
             </div>
 
-            <Field label="Stylesheet URL" error={form.errors.css_url} hint="Optional external CSS applied to this job offer's content.">
+            <Field label="Stylesheet URL" error={form.errors.css_url} hint="Optional. A hosted stylesheet for this job offer's content HTML only. Scope every selector to #page-content — the id on the content container — so nothing leaks into the rest of the page.">
                 <Input bind:value={form.data.css_url} invalid={!!form.errors.css_url} placeholder="https://…" />
             </Field>
 
-            <Field label="Custom CSS" error={form.errors.custom_css} hint="Inline CSS applied to this job offer's content.">
+            <Field label="Custom CSS" error={form.errors.custom_css} hint="Inline CSS for this job offer's content HTML only, loaded after the stylesheet above so rules here win. Scope every selector to #page-content — the id on the content container — so nothing leaks into the rest of the page.">
                 <textarea
                     class="kt-input min-h-[90px] font-mono text-2sm"
                     class:border-destructive={!!form.errors.custom_css}

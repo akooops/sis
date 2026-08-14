@@ -12,7 +12,6 @@
 
     let {
         field,
-        pages = [],
         locale = 'en',
         fallbackLocale = 'en',
         selected = false,
@@ -22,14 +21,36 @@
         canMoveDown = false,
         onselect = null,
         onstep = null,
-        onmove = null,
         onduplicate = null,
         onremove = null,
     } = $props();
 
+    /**
+     * A one-line summary of whatever the element says.
+     *
+     * A heading, paragraph or html element has no `label` — its text lives in
+     * `content`, as MARKUP. Printed raw, the card read
+     * `<p><strong>Note:</strong> this block is…` and ran off the side of the
+     * canvas. This flattens it to its text, which is all a summary row wants.
+     *
+     * DOMParser, not a regex: it decodes entities as well as dropping tags, and
+     * it parses into a detached document that runs nothing.
+     */
+    function plain(value) {
+        const text = String(value ?? '');
+
+        if (!text.includes('<') && !text.includes('&')) {
+            return text;
+        }
+
+        return (new DOMParser().parseFromString(text, 'text/html').body.textContent ?? '')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
     const label = $derived(
-        translate(field.label, locale, fallbackLocale)
-            || translate(field.content, locale, fallbackLocale)
+        plain(translate(field.label, locale, fallbackLocale))
+            || plain(translate(field.content, locale, fallbackLocale))
             || field.key,
     );
 
@@ -51,19 +72,25 @@
     ></i>
 
     <button type="button" class="flex min-w-0 grow flex-col items-start gap-1 text-start" onclick={() => onselect?.(field.id)}>
-        <span class="flex items-center gap-2">
-            <span class="truncate text-sm font-medium text-mono">{label}</span>
-            {#if field.is_required}<span class="text-destructive" title="Required">*</span>{/if}
+        <!-- w-full + min-w-0 on BOTH rows, and shrink on what truncates.
+             `truncate` alone does nothing here: a flex item defaults to
+             min-width:auto, so the row refused to shrink below its content and
+             the text ran past the card instead of ellipsing inside it. The
+             button already carries min-w-0; every nested flex box needs its
+             own. -->
+        <span class="flex w-full min-w-0 items-center gap-2">
+            <span class="min-w-0 shrink truncate text-sm font-medium text-mono">{label}</span>
+            {#if field.is_required}<span class="shrink-0 text-destructive" title="Required">*</span>{/if}
             {#if missingHere}
-                <Badge variant="warning" size="sm">Not translated</Badge>
+                <span class="shrink-0"><Badge variant="warning" size="sm">Not translated</Badge></span>
             {/if}
         </span>
-        <span class="flex items-center gap-2 text-2sm text-muted-foreground">
-            <Badge variant="secondary" size="sm">{field.type}</Badge>
-            <code class="truncate">{field.key}</code>
+        <span class="flex w-full min-w-0 items-center gap-2 text-2sm text-muted-foreground">
+            <span class="shrink-0"><Badge variant="secondary" size="sm">{field.type}</Badge></span>
+            <code class="min-w-0 shrink truncate">{field.key}</code>
         </span>
         {#if error}
-            <span class="text-2sm text-destructive">{Object.values(error)[0]}</span>
+            <span class="w-full min-w-0 break-words text-2sm text-destructive">{Object.values(error)[0]}</span>
         {/if}
     </button>
 
@@ -86,19 +113,11 @@
                 onclick={() => onstep?.(field.id, 1)}
             ><i class="ki-filled ki-down"></i></button>
 
-            {#if pages.length > 1}
-                <select
-                    class="kt-input h-7 w-[110px] text-2sm"
-                    aria-label="Move to page"
-                    onchange={(e) => { onmove?.(field.id, e.currentTarget.value); e.currentTarget.selectedIndex = 0; }}
-                >
-                    <option value="">Move to…</option>
-                    {#each pages as page (page.id)}
-                        <option value={page.id}>{page.name}</option>
-                    {/each}
-                </select>
-            {/if}
-
+            <!-- No "Move to…" select here. It cost 110px of every row, on every
+                 element, permanently — and the row is where the element's own
+                 name has to fit. It moved to the inspector's "Page" field, which
+                 has room for it and can show the CURRENT page rather than an
+                 empty prompt. Dragging a card still does the same job. -->
             <button
                 type="button"
                 class="kt-btn kt-btn-icon kt-btn-xs kt-btn-secondary"

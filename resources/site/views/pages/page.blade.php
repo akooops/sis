@@ -16,5 +16,6 @@
         'title' => $page->getTranslation('title', $site->locale(), true) ?: $page->name,
         'subtitle' => $page->getTranslation('description', $site->locale(), true),
         'content' => $page->getTranslation('content', $site->locale(), true),
+        'styles' => $page,
     ])
 @endsection

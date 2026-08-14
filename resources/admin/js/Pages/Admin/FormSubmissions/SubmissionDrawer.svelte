@@ -3,11 +3,21 @@
      * SubmissionDrawer — one submission, read in full.
      *
      * ANSWERS ARE RENDERED FROM THE SUBMISSION'S OWN `fields` SNAPSHOT, never
-     * from the live form. That snapshot ({key: {label, type}}, taken at submit
-     * time) is the entire reason the column exists: a form relabelled or
+     * from the live form. That snapshot ({key: {label, type, order}}, taken at
+     * submit time) is the entire reason the column exists: a form relabelled or
      * restructured last year must not rewrite what a visitor was actually asked.
-     * Anything answered under a key the snapshot missed is still listed, under
-     * its raw key, so no answer can go invisible.
+     * Anything answered under a key the snapshot missed is still listed so no
+     * answer can go invisible.
+     *
+     * EACH ANSWER IS TITLED BY ITS KEY, NOT BY THE SNAPSHOT'S LABEL. The label is
+     * the visitor-facing title in the language they submitted in, so an Arabic
+     * submission listed its answers under Arabic headings inside an admin that is
+     * English-only by design. The key is what the builder card shows, what the
+     * CSV column is named and what the API speaks — one name for a field, on
+     * every screen. The label stays in the column as part of the record.
+     *
+     * `order` is what the list is sorted by, because MySQL's JSON type does not
+     * keep object key order — see SubmissionValidator::snapshot().
      *
      * Not a DetailDrawer: that renders one flat label/value list, and this is
      * four groups plus a file list plus a per-answer section.
@@ -95,14 +105,31 @@
         const data = record.data ?? {};
         const files = record.files ?? [];
 
+        /*
+         * SORTED BY THE SNAPSHOT'S `order`, NOT BY KEY ORDER.
+         *
+         * The snapshot is written in the form's reading order, but it lands in a
+         * MySQL JSON column, and that type stores an object with its keys sorted
+         * by length then lexicographically — so it reads back shuffled, and the
+         * drawer used to list answers as field 5, then 2, then 4.
+         * SubmissionValidator::snapshot() therefore records an explicit `order`.
+         *
+         * `?? Infinity` keeps rows written before that field existed working:
+         * they simply keep whatever order the column hands back, which is what
+         * they did before.
+         */
         const keys = [
-            ...Object.keys(snapshot),
+            ...Object.keys(snapshot).sort(
+                (a, b) => (snapshot[a]?.order ?? Infinity) - (snapshot[b]?.order ?? Infinity),
+            ),
             ...Object.keys(data).filter((key) => !(key in snapshot)),
         ];
 
+        // No `label` here on purpose: the drawer lists answers by KEY. The
+        // snapshot's label is the visitor's translated title and is kept on the
+        // row for the record, not for this screen.
         return keys.map((key) => ({
             key,
-            label: snapshot[key]?.label || key,
             type: snapshot[key]?.type ?? null,
             orphaned: !(key in snapshot),
             value: data[key] ?? null,
@@ -208,11 +235,20 @@
                         {#each answers as answer (answer.key)}
                             <div class="flex flex-col gap-1 px-3 py-2 text-sm">
                                 <dt class="flex items-center gap-2 text-muted-foreground">
-                                    <span>{answer.label}</span>
+                                    <!-- THE FIELD KEY, NOT ITS LABEL. The label is
+                                         the visitor-facing title in the language
+                                         they submitted in, so an Arabic submission
+                                         listed its answers under Arabic headings in
+                                         an admin that is English-only by design.
+                                         The key is what the builder shows, what the
+                                         export column is named and what the API
+                                         speaks — one name for a field everywhere. -->
+                                    <code class="min-w-0 truncate">{answer.key}</code>
                                     {#if answer.orphaned}
-                                        <!-- Answered under a key the snapshot never
-                                             recorded — shown so it cannot be lost. -->
-                                        <Badge variant="warning" size="sm">Unlabelled</Badge>
+                                        <!-- Answered under a key the form's snapshot
+                                             never recorded — a field removed since,
+                                             shown so the answer cannot be lost. -->
+                                        <Badge variant="warning" size="sm">Not in form</Badge>
                                     {/if}
                                 </dt>
                                 <dd class="min-w-0 text-mono">

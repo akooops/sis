@@ -66,7 +66,7 @@ class CsvSubmissionWriter
 
             fputcsv($handle, array_merge(
                 static::META_HEADERS,
-                $fields->map(fn (FormField $field) => $this->safe($this->header($field, $locale)))->all(),
+                $fields->map(fn (FormField $field) => $this->safe($this->header($field)))->all(),
             ));
 
             $written = 0;
@@ -140,11 +140,20 @@ class CsvSubmissionWriter
     }
 
     /** The column header: the field's label in the export locale, else its key. */
-    protected function header(FormField $field, string $locale): string
+    /**
+     * THE COLUMN IS THE FIELD KEY, NOT ITS LABEL.
+     *
+     * The label is the visitor-facing title in whichever language they were
+     * shown, so an export used to be headed in the admin's locale while the API,
+     * the builder and the submission drawer all name the same field by its key.
+     * A key also survives a relabel, which is what lets two exports taken months
+     * apart line up column for column.
+     *
+     * Translation is a visitor concern; the admin speaks keys.
+     */
+    protected function header(FormField $field): string
     {
-        $label = trim((string) $field->getTranslation('label', $locale));
-
-        return $label !== '' ? $label : $field->key;
+        return $field->key;
     }
 
     /**
