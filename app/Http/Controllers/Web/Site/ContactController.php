@@ -30,7 +30,7 @@ use Illuminate\View\View;
  * the visitor is blocked, or the install never seeded it, the page still renders
  * its copy — a missing form must not 404 the school's contact page. When there
  * is a REASON the form is absent, the page says so: `notice` carries it and
- * site::partials.form-embed draws the alert.
+ * site::partials.forms.embed draws the alert.
  *
  * AND THERE IS NO CONFIRMATION URL. A successful submit comes back here, and the
  * same partial swaps the form for the confirmation message — which is what makes
@@ -137,7 +137,7 @@ class ContactController extends SiteController
      *
      * Exactly what Web\Site\FormsController computes for a standalone form, in
      * the same order and for the same reasons — both feed the one
-     * site::partials.form-embed, so a form behaves identically wherever it is
+     * site::partials.forms.embed, so a form behaves identically wherever it is
      * read. A visitor who may not submit gets the page plus an alert saying so,
      * rather than a page the form has silently vanished from.
      *

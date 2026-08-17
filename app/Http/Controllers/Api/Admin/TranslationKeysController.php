@@ -12,7 +12,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 /**
- * Read-only registry mirroring the catalogue under config/translations/, grown
+ * Read-only registry mirroring TranslationKeysSeeder::catalogue(), grown
  * by reseeding.
  * Values live elsewhere — a key plus a locale is TranslationsController.
  */

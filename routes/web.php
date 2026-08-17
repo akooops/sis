@@ -159,9 +159,6 @@ Route::middleware('set.locale')->name('web.site.root.')->group($site);
 Forms
 |------------------------*/
 Route::post('forms/{slug}/uploads', [SubmitController::class, 'upload'])->middleware('throttle:form-uploads')->name('web.user.forms.upload');
-// Reads an already-uploaded CV and answers with prefill values. Shares the
-// upload throttle because it is the same cost profile — a provider call per
-// request — and the same trust boundary: the visitor's own submission token.
 Route::post('forms/{slug}/parse-cv', [SubmitController::class, 'parseCv'])->middleware('throttle:form-uploads')->name('web.user.forms.parse-cv');
 Route::post('forms/{slug}/telemetry', [SubmitController::class, 'telemetry'])->middleware('throttle:form-telemetry')->name('web.user.forms.telemetry');
 

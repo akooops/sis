@@ -71,4 +71,4 @@
     </div>
 </header>
 
-@include('site::partials.drawer')
+@include('site::partials.layout.drawer')

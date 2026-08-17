@@ -23,7 +23,7 @@ import initSwipers from './site/swiper';
 /**
  * [selector, loader] — the module is fetched only if the selector matches.
  *
- * The form marker is `[data-sisf]`, the wrapper site::partials.form-embed puts
+ * The form marker is `[data-sisf]`, the wrapper site::partials.forms.embed puts
  * around a rendered form. It used to wrap the CONFIRMATION too, so that the
  * module would load on that render and report a conversion; the form emits no
  * third-party analytics any more, so a confirmation is plain HTML and this

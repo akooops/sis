@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Rules\Forms;
+namespace App\Rules;
 
 use App\Contracts\Forms\SubmissionRule;
 use App\Models\Candidate;
@@ -24,7 +24,7 @@ use App\Models\JobOffer;
  * insert. This exists to make the common case a readable message rather than a
  * constraint violation.
  */
-class ApplicationIsAllowed implements SubmissionRule
+class JobApplicationIsAllowed implements SubmissionRule
 {
     /**
      * @param  array<string, mixed>  $answers

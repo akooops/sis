@@ -1,12 +1,12 @@
 @extends('site::layout')
 
 @section('content')
-    @include('site::partials.page-hero', [
+    @include('site::partials.content.hero', [
         'image' => $article->thumbnail_url,
         'title' => $article->getTranslation('title', $site->locale(), true) ?: $article->name,
     ])
 
-    @include('site::partials.breadcrumb')
+    @include('site::partials.content.breadcrumb')
 
     <section>
         <div class="container pb-14 pt-6" data-aos="fade-up" data-aos-duration="1000">
@@ -30,10 +30,10 @@
                         {{-- Admin-authored rich text, same trust level as any other
                              page content — it is written in the admin editor and a
                              visitor can never reach it. --}}
-                        @include('site::partials.content-styles', ['model' => $article])
+                        @include('site::partials.content.content-styles', ['model' => $article])
 
                         {{-- id="page-content" is the scope hook the admin's own
-                             CSS targets. See site::partials.content-styles. --}}
+                             CSS targets. See site::partials.content.content-styles. --}}
                         <div id="page-content" class="prose">
                             {!! $article->getTranslation('content', $site->locale(), true) !!}
                         </div>

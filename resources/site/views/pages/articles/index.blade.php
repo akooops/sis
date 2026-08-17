@@ -1,12 +1,12 @@
 @extends('site::layout')
 
 @section('content')
-    @include('site::partials.page-hero', [
+    @include('site::partials.content.hero', [
         'image' => $page->thumbnail_url,
         'title' => $page->getTranslation('title', $site->locale(), true) ?: $page->name,
     ])
 
-    @include('site::partials.breadcrumb')
+    @include('site::partials.content.breadcrumb')
 
     <section>
         <div class="container pb-14 pt-6" data-aos="fade-up" data-aos-duration="1000">
@@ -60,7 +60,7 @@
                             @endforeach
                         </div>
 
-                        @include('site::partials.pagination', ['paginator' => $articles])
+                        @include('site::partials.ui.pagination', ['paginator' => $articles])
                     @endif
                 </div>
 

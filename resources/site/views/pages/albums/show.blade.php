@@ -1,14 +1,14 @@
 @extends('site::layout')
 
 @section('content')
-    @include('site::partials.page-hero', [
+    @include('site::partials.content.hero', [
         'image' => $album->thumbnail_url,
         'title' => $album->getTranslation('title', $site->locale(), true) ?: $album->name,
     ])
 
-    @include('site::partials.breadcrumb')
+    @include('site::partials.content.breadcrumb')
 
-    @include('site::partials.page-body', [
+    @include('site::partials.content.body', [
         'title' => $album->getTranslation('title', $site->locale(), true) ?: $album->name,
         'subtitle' => $album->getTranslation('description', $site->locale(), true),
         'content' => $album->getTranslation('content', $site->locale(), true),

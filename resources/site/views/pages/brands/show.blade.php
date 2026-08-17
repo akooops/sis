@@ -1,14 +1,14 @@
 @extends('site::layout')
 
 @section('content')
-    @include('site::partials.page-hero', [
+    @include('site::partials.content.hero', [
         'image' => $brand->thumbnail_url,
         'title' => $brand->getTranslation('title', $site->locale(), true) ?: $brand->name,
     ])
 
-    @include('site::partials.breadcrumb')
+    @include('site::partials.content.breadcrumb')
 
-    @include('site::partials.page-body', [
+    @include('site::partials.content.body', [
         'title' => $brand->getTranslation('title', $site->locale(), true) ?: $brand->name,
         'subtitle' => $brand->getTranslation('description', $site->locale(), true),
         'content' => $brand->getTranslation('content', $site->locale(), true),

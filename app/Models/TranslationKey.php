@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * One translatable line, identified by file (`group`) and dotted path (`key`).
- * Mirrors the catalogue under config/translations/, one file per group, whose
+ * Mirrors TranslationKeysSeeder::catalogue(), one entry per group, whose
  * values are locale => string maps. Grown by code, never CRUD.
  *
  * Keys ONLY — values live in lang/{code}/{group}.php. This table is what makes

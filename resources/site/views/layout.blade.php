@@ -65,7 +65,7 @@
 
     {{-- Analytics integration --}}
     @if ($site->analytics()->enabled())
-        @include('site::partials.analytics')
+        @include('site::partials.layout.analytics')
     @endif
 
     {{-- Head code --}}
@@ -79,13 +79,13 @@
 <body class="bg-paper text-body antialiased">
     <a class="sr-only focus:not-sr-only" href="#content">@lang('nav.skip_to_content')</a>
 
-    @include('site::partials.header')
+    @include('site::partials.layout.header')
 
     <main id="content">
         @yield('content')
     </main>
 
-    @include('site::partials.footer')
+    @include('site::partials.layout.footer')
 
     {{-- Scroll to top --}}
     <button type="button" class="scroll-top" aria-label="@lang('common.scroll_top')">

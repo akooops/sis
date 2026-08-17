@@ -1,12 +1,12 @@
 @extends('site::layout')
 
 @section('content')
-    @include('site::partials.page-hero', [
+    @include('site::partials.content.hero', [
         'image' => $page->thumbnail_url,
         'title' => $page->getTranslation('title', $site->locale(), true) ?: $page->name,
     ])
 
-    @include('site::partials.breadcrumb')
+    @include('site::partials.content.breadcrumb')
 
     <section>
         <div class="container pb-14 pt-6">
@@ -16,7 +16,7 @@
                         <h3 class="mb-2 text-brand">@lang('site.achievements.empty.title')</h3>
                         <p class="text-muted">@lang('site.achievements.empty.body')</p>
                     @else
-                        @include('site::partials.achievement-timeline', [
+                        @include('site::partials.ui.achievement-timeline', [
                             'achievementsByYear' => $achievementsByYear,
                             'breakpoints' => '{"992": {"slidesPerView": 2}, "1200": {"slidesPerView": 2}}'
                         ])

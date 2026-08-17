@@ -22,7 +22,7 @@ use Illuminate\View\View;
  * page a visitor reads, and nothing else.
  *
  * Every outcome is an alert on this same page rather than a separate URL — see
- * site::partials.form-embed, which /contact and /inquiries include too, so all
+ * site::partials.forms.embed, which /contact and /inquiries include too, so all
  * three behave identically.
  */
 class FormsController extends SiteController

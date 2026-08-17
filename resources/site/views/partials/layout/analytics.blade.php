@@ -27,7 +27,7 @@
 {{-- ONE php-directive form per file, never both the inline and the block one:
      Blade pairs the first opening directive with the first @endphp across the
      WHOLE file, so an inline one above a block swallows every directive between
-     them. See partials/pagination.blade.php for the full note. --}}
+     them. See partials/ui/pagination.blade.php for the full note. --}}
 @php
     $tag = $site->analytics()->client();
 

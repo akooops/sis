@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\URL;
 use Spatie\Translatable\HasTranslations;
 
 /**
- * An ISO 3166-1 country. Reference data, seeded from config/countries.php.
+ * An ISO 3166-1 country. Reference data, seeded from CountriesSeeder.
  *
  * `name` is the internal English label and is never translated; `title` is the
  * public name and `nationality` the demonym (British / بريطاني).

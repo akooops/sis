@@ -573,7 +573,7 @@ class SubmitController extends Controller
      *
      * THERE IS NO CONFIRMATION URL any more. The visitor returns to the page
      * they were already on — the form's own page, or /contact and /inquiries,
-     * which embed the same renderer — and site::partials.form-embed reads these
+     * which embed the same renderer — and site::partials.forms.embed reads these
      * two flashes and draws the confirmation in place of the form. One page, one
      * address, whichever way the form was reached.
      *

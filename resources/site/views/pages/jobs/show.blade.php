@@ -2,12 +2,12 @@
 @extends('site::layout')
 
 @section('content')
-    @include('site::partials.page-hero', [
+    @include('site::partials.content.hero', [
         'image' => $job->thumbnail_url,
         'title' => $job->getTranslation('title', $site->locale(), true) ?: $job->name,
     ])
 
-    @include('site::partials.breadcrumb')
+    @include('site::partials.content.breadcrumb')
 
     <section>
         <div class="container pb-14 pt-6">
@@ -30,10 +30,10 @@
                                 </div>
                             @endif
 
-                            @include('site::partials.content-styles', ['model' => $job])
+                            @include('site::partials.content.content-styles', ['model' => $job])
 
                             {{-- id="page-content" is the scope hook the admin's own
-                                 CSS targets. See site::partials.content-styles. --}}
+                                 CSS targets. See site::partials.content.content-styles. --}}
                             <div id="page-content" class="prose">
                                 {!! $job->getTranslation('content', $site->locale(), true) !!}
                             </div>
@@ -51,33 +51,71 @@
                                  gets aria-expanded, the panel gets aria-hidden and
                                  `.is-open`, and the height animates. --}}
                             @if ($presentation)
-                                <div class="mt-8" id="apply">
-                                    <button
-                                        type="button"
-                                        class="btn btn-primary"
-                                        data-toggle="collapse"
-                                        data-target="#apply-panel"
-                                        aria-expanded="false"
-                                        aria-controls="apply-panel"
-                                    >
-                                        {{-- BOTH labels ship; CSS shows whichever
-                                             matches aria-expanded, which the
-                                             disclosure handler already maintains.
-                                             Swapping text in JS would mean a second
-                                             listener duplicating what it does. --}}
-                                        <span class="when-closed">
-                                            <i class="uil uil-file-edit-alt" aria-hidden="true"></i>
-                                            @lang('jobs.apply.cta')
-                                        </span>
-                                        <span class="when-open">
-                                            <i class="uil uil-times" aria-hidden="true"></i>
-                                            @lang('jobs.apply.abort')
-                                        </span>
-                                    </button>
+                                {{-- THE SUBMIT IS A NATIVE POST, so whatever it has
+                                     to say arrives as a FRESH PAGE LOAD — and a
+                                     panel that always starts closed hid it.
 
-                                    <div class="collapse-panel" id="apply-panel" aria-hidden="true">
+                                     Confirmed: the success alert renders inside the
+                                     collapse, so an applicant who had just applied
+                                     was returned to an apparently unchanged page.
+                                     Rejected: same, with their answers and the field
+                                     errors sealed behind a button reading "Apply
+                                     now", which reads as "nothing happened".
+
+                                     Both states are decided HERE, server-side, for
+                                     two reasons: it works with JavaScript off, and
+                                     it avoids the flash of hidden content that a
+                                     post-mount JS open would show.
+
+                                     `$rejected` is spelled exactly as the renderer
+                                     spells `returning` (form-renderer.blade.php), so
+                                     the panel cannot open while the chooser is being
+                                     re-offered, or stay shut while it is skipped. --}}
+                                @php($confirmed = session('sisf_submitted') === $form->id)
+                                @php($rejected = ! $confirmed && old('fields', []) !== [])
+
+                                <div class="mt-8" id="apply">
+                                    {{-- NO TOGGLE ONCE THEY HAVE APPLIED. One
+                                         application per posting is enforced at
+                                         submit, so offering to re-open the form
+                                         would hand them a dead end — and an
+                                         "Apply now" button over their own
+                                         confirmation contradicts it. --}}
+                                    @unless ($confirmed)
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                            data-toggle="collapse"
+                                            data-target="#apply-panel"
+                                            aria-expanded="{{ $rejected ? 'true' : 'false' }}"
+                                            aria-controls="apply-panel"
+                                        >
+                                            {{-- BOTH labels ship; CSS shows whichever
+                                                 matches aria-expanded, which the
+                                                 disclosure handler already maintains.
+                                                 Swapping text in JS would mean a second
+                                                 listener duplicating what it does. --}}
+                                            <span class="when-closed">
+                                                <i class="uil uil-file-edit-alt" aria-hidden="true"></i>
+                                                @lang('jobs.apply.cta')
+                                            </span>
+                                            <span class="when-open">
+                                                <i class="uil uil-times" aria-hidden="true"></i>
+                                                @lang('jobs.apply.abort')
+                                            </span>
+                                        </button>
+                                    @endunless
+
+                                    {{-- `.is-open` is `height: auto`, so a panel
+                                         rendered open is full height immediately with
+                                         no JavaScript; setCollapsed() measures
+                                         scrollHeight when it is first closed, so the
+                                         animation still works from this state. --}}
+                                    <div class="collapse-panel {{ $confirmed || $rejected ? 'is-open' : '' }}"
+                                        id="apply-panel"
+                                        aria-hidden="{{ $confirmed || $rejected ? 'false' : 'true' }}">
                                         <div class="pt-6">
-                                            @include('site::partials.form-embed', [
+                                            @include('site::partials.forms.embed', [
                                                 'form' => $form,
                                                 'presentation' => $presentation,
                                                 'notice' => $notice,
@@ -92,7 +130,7 @@
                                 {{-- Closed, blocked or unseeded: form-embed draws
                                      the reason, and there is nothing to open. --}}
                                 <div class="mt-8">
-                                    @include('site::partials.form-embed', [
+                                    @include('site::partials.forms.embed', [
                                         'form' => $form,
                                         'presentation' => null,
                                         'notice' => $notice,

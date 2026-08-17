@@ -8,7 +8,7 @@
 
     It replaces four standalone views. show/thanks/closed/blocked were one bare
     <section> and three dead ends; every outcome is now an alert here, drawn by
-    site::partials.form-embed — the same partial /contact and /inquiries use.
+    site::partials.forms.embed — the same partial /contact and /inquiries use.
 
     `chrome` is false from the controller: the title, description and content
     below ARE the form's, so the renderer must not print its own copy of all
@@ -17,12 +17,12 @@
 @extends('site::layout')
 
 @section('content')
-    @include('site::partials.page-hero', [
+    @include('site::partials.content.hero', [
         'image' => $form->thumbnail_url,
         'title' => $title,
     ])
 
-    @include('site::partials.breadcrumb')
+    @include('site::partials.content.breadcrumb')
 
     <section>
         <div class="container pb-14 pt-6">
@@ -39,7 +39,7 @@
 
             @if ($content = $form->getTranslation('content', $site->locale(), true))
                 {{-- No content-styles include here: a Form's css_url/custom_css
-                     are emitted by site::partials.form-renderer, which this page
+                     are emitted by site::partials.forms.renderer, which this page
                      already reaches through form-embed below. The hook is still
                      named the same, so one instruction covers every type. --}}
                 <div id="page-content" class="prose mb-8" data-aos="fade-up" data-aos-duration="1000">
@@ -47,7 +47,7 @@
                 </div>
             @endif
 
-            @include('site::partials.form-embed')
+            @include('site::partials.forms.embed')
         </div>
     </section>
 @endsection

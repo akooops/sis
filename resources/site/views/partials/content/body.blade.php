@@ -13,10 +13,10 @@
 
         {{-- `styles` is the record itself when it carries css_url/custom_css.
              Omitted by callers whose model has neither (Program). --}}
-        @include('site::partials.content-styles', ['model' => $styles ?? null])
+        @include('site::partials.content.content-styles', ['model' => $styles ?? null])
 
         {{-- id="page-content" is the scope hook the admin's own CSS targets. See
-             site::partials.content-styles. --}}
+             site::partials.content.content-styles. --}}
         <div id="page-content" class="prose w-full" data-aos="fade-up" data-aos-duration="2000">
             {!! $content !!}
         </div>

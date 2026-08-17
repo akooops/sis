@@ -1,12 +1,12 @@
 @extends('site::layout')
 
 @section('content')
-    @include('site::partials.page-hero', [
+    @include('site::partials.content.hero', [
         'image' => $page->thumbnail_url,
         'title' => $page->getTranslation('title', $site->locale(), true) ?: $page->name,
     ])
 
-    @include('site::partials.breadcrumb')
+    @include('site::partials.content.breadcrumb')
 
     <section>
         <div class="container pb-14 pt-6">
@@ -28,7 +28,7 @@
                 </div>
 
                 <div class="mt-8">
-                    @include('site::partials.pagination', ['paginator' => $albums])
+                    @include('site::partials.ui.pagination', ['paginator' => $albums])
                 </div>
             @endif
         </div>

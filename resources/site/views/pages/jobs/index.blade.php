@@ -5,12 +5,12 @@
 @extends('site::layout')
 
 @section('content')
-    @include('site::partials.page-hero', [
+    @include('site::partials.content.hero', [
         'image' => $page->thumbnail_url,
         'title' => $page->getTranslation('title', $site->locale(), true) ?: $page->name,
     ])
 
-    @include('site::partials.breadcrumb')
+    @include('site::partials.content.breadcrumb')
 
     {{-- ONE URL BUILDER for the category chips, which are the only filters that
          are links rather than form controls. Each chip states only what it
@@ -92,7 +92,7 @@
                             @endforeach
                         </div>
 
-                        @include('site::partials.pagination', ['paginator' => $jobs])
+                        @include('site::partials.ui.pagination', ['paginator' => $jobs])
                     @endif
                 </div>
 

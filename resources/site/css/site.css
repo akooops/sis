@@ -53,7 +53,7 @@
    It was split into a neutral half and a site-theme half for an admin preview
    that no longer exists; see its header. Tailwind-free, because the renderer
    mounts into markup where preflight is not guaranteed. */
-@import './forms.css';
+@import './site/forms.css';
 
 /*
  * What Tailwind scans. These already subsume the ported js/site/ subtree and

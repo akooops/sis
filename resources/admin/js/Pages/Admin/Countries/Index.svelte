@@ -1,5 +1,5 @@
 <script>
-    /** Countries index — the ISO 3166-1 reference table, seeded from config/countries.php. */
+    /** Countries index — the ISO 3166-1 reference table, seeded from CountriesSeeder. */
     import AdminLayout from '@/layouts/AdminLayout.svelte';
     import IndexCard from '@/components/data/IndexCard.svelte';
     import DataTable from '@/components/data/DataTable.svelte';

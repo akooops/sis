@@ -108,39 +108,12 @@ class TranslationService
     /**
      * Every group the registry declares.
      *
-     * An explicit whitelist rather than array_keys() of the catalogue, so a
-     * group can be retired without its lines disappearing from the config file.
+     * An explicit whitelist rather than array_keys() of the seeder catalogue, so a
+     * group can be retired without its lines disappearing from TranslationKeysSeeder.
      */
     public function groups(): array
     {
         return array_values((array) config('translations.groups', []));
-    }
-
-    /**
-     * One group's catalogue: flat-dotted key => (locale => string).
-     *
-     * @return array<string, array<string, string>>
-     */
-    public function catalogue(string $group): array
-    {
-        return in_array($group, $this->groups(), true)
-            ? (array) config("translations.keys.{$group}", [])
-            : [];
-    }
-
-    /**
-     * One group's lines for one locale, ready for putMany(). A locale the
-     * catalogue has no entry for yields '' — which, with fill_missing_keys off,
-     * is written once and then falls back to English on every read.
-     *
-     * @return array<string, string>
-     */
-    public function linesFor(string $code, string $group): array
-    {
-        return array_map(
-            fn ($locales) => (string) (is_array($locales) ? ($locales[$code] ?? '') : $locales),
-            $this->catalogue($group),
-        );
     }
 
     /**

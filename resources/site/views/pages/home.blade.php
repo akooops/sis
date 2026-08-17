@@ -108,7 +108,7 @@
         </div>
     </section>
 
-    @include('site::partials.divider')
+    @include('site::partials.ui.divider')
 
     {{-- ---------------------------------------------------------------------
          Academic levels — one slide per programme, scrim over the artwork.
@@ -166,7 +166,7 @@
         @endif
     </section>
 
-    @include('site::partials.divider', ['spacing' => 'pt-8'])
+    @include('site::partials.ui.divider', ['spacing' => 'pt-8'])
 
     {{-- ---------------------------------------------------------------------
          Latest news
@@ -238,7 +238,7 @@
 
             @if ($achievementsByYear->isNotEmpty())
                 <div data-aos="fade-up" data-aos-duration="2000">
-                    @include('site::partials.achievement-timeline', ['achievementsByYear' => $achievementsByYear])
+                    @include('site::partials.ui.achievement-timeline', ['achievementsByYear' => $achievementsByYear])
                 </div>
             @endif
 

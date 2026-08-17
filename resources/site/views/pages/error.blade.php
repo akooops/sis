@@ -25,7 +25,7 @@
 @extends('site::layout')
 
 @section('content')
-    @include('site::partials.page-hero', [
+    @include('site::partials.content.hero', [
         'image' => $errorPage?->thumbnail_url,
         'title' => $title,
     ])

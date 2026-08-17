@@ -1,12 +1,12 @@
 @extends('site::layout')
 
 @section('content')
-    @include('site::partials.page-hero', [
+    @include('site::partials.content.hero', [
         'image' => $event->thumbnail_url,
         'title' => $event->getTranslation('title', $site->locale(), true) ?: $event->name,
     ])
 
-    @include('site::partials.breadcrumb')
+    @include('site::partials.content.breadcrumb')
 
     <section>
         <div class="container pb-14 pt-6">
@@ -25,7 +25,7 @@
         </div>
     </section>
 
-    @include('site::partials.page-body', [
+    @include('site::partials.content.body', [
         'title' => $event->getTranslation('title', $site->locale(), true) ?: $event->name,
         'subtitle' => $event->getTranslation('description', $site->locale(), true),
         'content' => $event->getTranslation('content', $site->locale(), true),

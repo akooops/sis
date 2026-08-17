@@ -2,7 +2,7 @@
     The public form renderer's mount point and its payload.
 
     ONE COPY OF THE PAYLOAD CONTRACT. The form's own page and the site's contact
-    and inquiries pages all reach this through site::partials.form-embed, so the
+    and inquiries pages all reach this through site::partials.forms.embed, so the
     schema shape, the token, the honeypot and the captcha wiring cannot drift
     between them.
 
@@ -162,10 +162,24 @@
 
      urlencode(), not {{ }} alone: Blade escapes for HTML, which leaves & and
      # intact — and either one inside a site key would end the `render`
-     parameter early and load the script against a truncated key. --}}
+     parameter early and load the script against a truncated key.
+
+     hl IS THE PAGE'S LOCALE, and it has to be on this URL. Without it Google
+     picks the language itself from the browser, so an Arabic page could serve
+     an English "I'm not a robot" — the one control on the form we do not write
+     the words for. It belongs on the script URL for BOTH versions: v2's
+     explicit grecaptcha.render() takes no hl option, and v3's badge and its
+     challenge dialog read it from here too. An unsupported code is ignored by
+     Google rather than rejected, so a new locale degrades to English.
+
+     $presentation->locale, NOT app()->getLocale(): that is the locale every
+     label, placeholder and option in THIS form was resolved in, threaded from
+     FormPresenter. The two agree on a site page, but the form is the thing the
+     widget sits inside, so the challenge follows the form's language rather
+     than the request's. --}}
 @if ($captcha->provider() === 'recaptcha' && $captcha->siteKey())
     <script
-        src="https://www.google.com/recaptcha/api.js?render={{ $captcha->version() === 'v3' ? urlencode($captcha->siteKey()) : 'explicit' }}"
+        src="https://www.google.com/recaptcha/api.js?render={{ $captcha->version() === 'v3' ? urlencode($captcha->siteKey()) : 'explicit' }}&amp;hl={{ urlencode($presentation->locale) }}"
         async
         defer
     ></script>
