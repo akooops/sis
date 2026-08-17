@@ -3,6 +3,7 @@
 namespace App\Services\Forms;
 
 use App\Models\Form;
+use App\Models\FormField;
 use App\Models\Language;
 use App\Services\Integrations\Captcha;
 use Illuminate\Http\Request;
@@ -48,7 +49,20 @@ class FormPresenter
     /** Mint a token and assemble the payload the renderer boots from. */
     public function present(Form $form, string $locale): FormPresentation
     {
-        $minted = SubmissionToken::mint($form);
+        /*
+         * Keep the visitor's upload session across a rejected submit — see
+         * SubmissionToken::mint(). Only their OWN token counts, only while it is
+         * still valid, and only for this form; anything else mints fresh.
+         */
+        $previous = SubmissionToken::read(old('submission_token'));
+
+        $carried = $previous !== null
+            && $previous['form'] === $form->id
+            && ! SubmissionToken::isStale($previous)
+                ? $previous['sid']
+                : null;
+
+        $minted = SubmissionToken::mint($form, $carried);
 
         return new FormPresentation(
             form: $form,
@@ -88,6 +102,18 @@ class FormPresenter
             'uploading' => __('forms.uploading'),
             'removeFile' => __('forms.remove_file'),
             'captchaFailed' => __('forms.captcha_failed'),
+            // :label and :number are left UNRESOLVED on purpose — the group's own
+            // translated label and the row number are only known in the browser,
+            // the same way `step` carries :current and :total.
+            'groupAdd' => __('forms.group_add', ['label' => ':label']),
+            'groupRemove' => __('forms.group_remove'),
+            'groupItem' => __('forms.group_item', ['label' => ':label', 'number' => ':number']),
+            'fillManually' => __('forms.fill_manually'),
+            'fillManuallyHint' => __('forms.fill_manually_hint'),
+            'fillWithAi' => __('forms.fill_with_ai'),
+            'fillWithAiHint' => __('forms.fill_with_ai_hint'),
+            'cvReading' => __('forms.cv_reading'),
+            'cvFailed' => __('forms.cv_failed'),
         ];
     }
 
@@ -98,7 +124,10 @@ class FormPresenter
      */
     public function schema(Form $form, string $locale): array
     {
-        $form->load(['pages.fields.options']);
+        $form->load([
+            'pages.topLevelFields.options',
+            'pages.topLevelFields.children.options',
+        ]);
 
         return [
             'id' => $form->id,
@@ -115,33 +144,54 @@ class FormPresenter
                 'css_id' => $page->css_id,
                 'css_class' => $page->css_class,
                 'is_interstitial' => (bool) $page->is_interstitial,
-                'fields' => $page->fields->map(fn ($field) => [
-                    'id' => $field->id,
-                    'type' => $field->type,
-                    'key' => $field->key,
-                    'is_required' => (bool) $field->is_required,
-                    'settings' => $field->settings ?? [],
-                    'validation' => $field->validation ?? [],
-                    'target_form_page_id' => $field->target_form_page_id,
-                    'css_id' => $field->css_id,
-                    'css_class' => $field->css_class,
-                    'label' => $field->enabledTranslations('label'),
-                    'placeholder' => $field->enabledTranslations('placeholder'),
-                    'value' => $field->enabledTranslations('value'),
-                    // The map above is what the builder round-trips; this is the
-                    // one value the renderer seeds an unanswered field with, and
-                    // it has to be resolved HERE because the renderer seeds before
-                    // it knows anything about locales.
-                    'value_resolved' => $this->resolved($field->enabledTranslations('value'), $locale),
-                    'content' => $field->enabledTranslations('content'),
-                    'options' => $field->options->map(fn ($o) => [
-                        'value' => $o->value,
-                        'is_default' => (bool) $o->is_default,
-                        'label' => $o->enabledTranslations('label'),
-                    ])->all(),
-                ])->all(),
+                'fields' => $page->topLevelFields->map(fn ($field) => $this->field($field, $locale))->all(),
             ])->all(),
         ];
+    }
+
+    /**
+     * One element, and — for a repeatable group — the elements inside it.
+     *
+     * A child is emitted in exactly the same shape as a top-level field, so the
+     * renderer's element registry draws it with the same component and no branch:
+     * the only thing that differs is where its answer lives, which the group
+     * itself owns.
+     *
+     * @return array<string, mixed>
+     */
+    protected function field(FormField $field, string $locale): array
+    {
+        $out = [
+            'id' => $field->id,
+            'type' => $field->type,
+            'key' => $field->key,
+            'is_required' => (bool) $field->is_required,
+            'settings' => $field->settings ?? [],
+            'validation' => $field->validation ?? [],
+            'target_form_page_id' => $field->target_form_page_id,
+            'css_id' => $field->css_id,
+            'css_class' => $field->css_class,
+            'label' => $field->enabledTranslations('label'),
+            'placeholder' => $field->enabledTranslations('placeholder'),
+            'value' => $field->enabledTranslations('value'),
+            // The map above is what the builder round-trips; this is the
+            // one value the renderer seeds an unanswered field with, and
+            // it has to be resolved HERE because the renderer seeds before
+            // it knows anything about locales.
+            'value_resolved' => $this->resolved($field->enabledTranslations('value'), $locale),
+            'content' => $field->enabledTranslations('content'),
+            'options' => $field->options->map(fn ($o) => [
+                'value' => $o->value,
+                'is_default' => (bool) $o->is_default,
+                'label' => $o->enabledTranslations('label'),
+            ])->all(),
+        ];
+
+        if ($field->isGroup()) {
+            $out['children'] = $field->children->map(fn ($child) => $this->field($child, $locale))->all();
+        }
+
+        return $out;
     }
 
     /**

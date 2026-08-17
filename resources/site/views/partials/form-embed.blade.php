@@ -20,6 +20,7 @@
                      something the visitor should be told. Null when submit()
                      already put the same sentence in the error bag.
       $chrome        ?bool — forwarded to site::partials.form-renderer
+      $presets       ?array — answers the page supplies, forwarded to the renderer
 --}}
 @php
     $notice = $notice ?? null;
@@ -76,6 +77,6 @@
          root inside [data-sisf-root], and nesting one inside another applies
          the token block and its padding twice. --}}
     <div data-sisf data-aos="fade-up" data-aos-duration="1000">
-        @include('site::partials.form-renderer')
+        @include('site::partials.form-renderer', ['presets' => $presets ?? [], 'chooser' => $chooser ?? false])
     </div>
 @endif

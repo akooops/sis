@@ -24,6 +24,23 @@
     $chrome = $chrome ?? true;
 
     /*
+     * Answers the PAGE knows before the visitor does — today, the hidden
+     * job_offer_id on a posting's apply form.
+     *
+     * old() WINS. A rejected submit must give the visitor back exactly what they
+     * typed, and a preset that overrode it would silently rewrite an answer they
+     * are looking at. Presets only fill what nothing else has filled.
+     */
+    $presets = $presets ?? [];
+
+    /*
+     * Whether this form opens with a choice — fill it in, or upload a CV and have
+     * it prefilled — rather than with its first field. Off unless the page that
+     * embeds the form asks for it, so /contact is untouched.
+     */
+    $chooser = $chooser ?? false;
+
+    /*
      * Per-field errors, keyed the way the renderer looks them up: by field key.
      *
      * The validator namespaces answers under `fields.` so a field called
@@ -38,11 +55,24 @@
             continue;
         }
 
-        $fieldKey = explode('.', substr($errorKey, strlen('fields.')))[0];
+        $segments = explode('.', substr($errorKey, strlen('fields.')));
+
+        /*
+         * A repeatable group's child reports at `group.index.child` (plus a
+         * trailing index of its own when the child answer is itself an array).
+         * THAT PATH IS KEPT WHOLE, because it is the only thing that says WHICH
+         * ROW was wrong — folding it to the group would flag "Education" and
+         * leave the visitor to work out which of five entries to fix.
+         */
+        if (count($segments) >= 3) {
+            $fieldErrors[implode('.', array_slice($segments, 0, 3))] ??= $errorMessages[0] ?? '';
+
+            continue;
+        }
 
         // First wins: a rule on the field is reported before the rules on its
         // individual values, and it is the more useful of the two.
-        $fieldErrors[$fieldKey] ??= $errorMessages[0] ?? '';
+        $fieldErrors[$segments[0]] ??= $errorMessages[0] ?? '';
     }
 
     // Not a field: an expired or forged token, a form that filled up, a rejected
@@ -88,13 +118,21 @@
         'csrf' => csrf_token(),
         'token' => $presentation->token,
         'uploadAction' => $presentation->uploadAction,
+        'chooser' => $chooser,
+        // Whether the visitor is coming BACK from a rejected submit. Not derived
+        // from `old` below, because presets are merged into it — a page that
+        // supplies one would otherwise look like a returning visitor forever and
+        // the chooser would never appear.
+        'returning' => old('fields', []) !== [],
+        'parseAction' => route('web.user.forms.parse-cv', ['slug' => $form->slug]),
+        'cvKey' => config('jobs.cv_field'),
         'telemetryAction' => $presentation->telemetryAction,
         // What the page is allowed to measure. Sent rather than compiled in,
         // so switching a capture off in .env switches off the LISTENER, not
         // just the column — nothing is collected that is not sent.
         'capture' => config('forms.capture'),
         'honeypot' => $presentation->honeypot,
-        'old' => (object) old('fields', []),
+        'old' => (object) array_merge($presets, old('fields', [])),
         // (object), like `old` above: an empty [] serialises as a JSON array,
         // which is truthy in JS and would sail past the renderer's `?? {}`.
         'errors' => (object) $fieldErrors,

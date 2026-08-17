@@ -670,6 +670,34 @@
     }
 
     /* -------------------------------------------------------------------------
+       A vacancy's facts panel: icon, label, value, one per line.
+       ---------------------------------------------------------------------- */
+    .job-facts {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .job-facts > li {
+        margin-bottom: 12px;
+    }
+
+    .job-facts > li:last-child {
+        margin-bottom: 0;
+    }
+
+    /* The icon sits on the reading edge in both directions — margin-inline-end,
+       never margin-right, since this panel is also rendered RTL. */
+    .job-facts i {
+        margin-inline-end: 8px;
+        color: var(--color-brand);
+    }
+
+    .job-facts strong {
+        margin-inline-end: 6px;
+    }
+
+    /* -------------------------------------------------------------------------
        Job application form — repeatable blocks and skill chips.
        ---------------------------------------------------------------------- */
     .repeatable {

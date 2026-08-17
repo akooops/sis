@@ -13,7 +13,9 @@ use App\Models\Brand;
 use App\Models\BrandAsset;
 use App\Models\BrandAssetGroup;
 use App\Models\Calendar;
+use App\Models\Candidate;
 use App\Models\Category;
+use App\Models\Cluster;
 use App\Models\ContactDetail;
 use App\Models\Country;
 use App\Models\Document;
@@ -29,6 +31,7 @@ use App\Models\FormSubmission;
 use App\Models\FormWebhook;
 use App\Models\Grade;
 use App\Models\Integration;
+use App\Models\JobApplication;
 use App\Models\JobOffer;
 use App\Models\Language;
 use App\Models\Media;
@@ -64,13 +67,25 @@ use App\Observers\BrandAssetGroupObserver;
 use App\Observers\BrandAssetObserver;
 use App\Observers\BrandObserver;
 use App\Observers\CalendarObserver;
+use App\Observers\CandidateObserver;
 use App\Observers\CategoryObserver;
+use App\Observers\ClusterObserver;
 use App\Observers\ContactDetailObserver;
 use App\Observers\CountryObserver;
 use App\Observers\DocumentObserver;
 use App\Observers\EventObserver;
+use App\Observers\FormBlockedCountryObserver;
+use App\Observers\FormBlockedIpObserver;
+use App\Observers\FormFieldObserver;
+use App\Observers\FormFieldOptionObserver;
+use App\Observers\FormNotificationGroupObserver;
+use App\Observers\FormObserver;
+use App\Observers\FormPageObserver;
+use App\Observers\FormSubmissionObserver;
+use App\Observers\FormWebhookObserver;
 use App\Observers\GradeObserver;
 use App\Observers\IntegrationObserver;
+use App\Observers\JobApplicationObserver;
 use App\Observers\JobOfferObserver;
 use App\Observers\LanguageObserver;
 use App\Observers\MediaObserver;
@@ -93,15 +108,6 @@ use App\Observers\RoleObserver;
 use App\Observers\RolePermissionObserver;
 use App\Observers\SettingObserver;
 use App\Observers\StreamObserver;
-use App\Observers\FormBlockedCountryObserver;
-use App\Observers\FormBlockedIpObserver;
-use App\Observers\FormFieldObserver;
-use App\Observers\FormFieldOptionObserver;
-use App\Observers\FormNotificationGroupObserver;
-use App\Observers\FormObserver;
-use App\Observers\FormPageObserver;
-use App\Observers\FormSubmissionObserver;
-use App\Observers\FormWebhookObserver;
 use App\Observers\UserObserver;
 use App\Observers\UserRoleObserver;
 use App\Services\Forms\FieldTypeRegistry;
@@ -182,6 +188,20 @@ class AppServiceProvider extends ServiceProvider
         Menu::observe(MenuObserver::class);
         MenuItem::observe(MenuItemObserver::class);
         JobOffer::observe(JobOfferObserver::class);
+        Candidate::observe(CandidateObserver::class);
+        JobApplication::observe(JobApplicationObserver::class);
+        Cluster::observe(ClusterObserver::class);
+        /*
+         * DELIBERATELY UNOBSERVED: CandidateMatch, CandidateCluster,
+         * JobOfferCluster.
+         *
+         * All three are written in bulk by the scoring and clustering queues —
+         * every candidate against every posting in a shared pool, rebuilt on a
+         * schedule — so an observer would add thousands of audit rows a night
+         * recording that a machine did exactly what it is supposed to. Same
+         * reasoning that keeps Session out of the log. What a PERSON does to a
+         * pool is audited on Cluster itself.
+         */
         Country::observe(CountryObserver::class);
         Program::observe(ProgramObserver::class);
         Stream::observe(StreamObserver::class);

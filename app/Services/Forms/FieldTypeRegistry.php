@@ -70,6 +70,27 @@ class FieldTypeRegistry
     }
 
     /**
+     * Codes allowed INSIDE a repeatable group.
+     *
+     * Two exclusions, both structural rather than stylistic. A group cannot hold
+     * a group: nesting would make the answer a list of lists of objects, which
+     * neither the flat `data` map nor the '' / '.*' rule contract can express.
+     * And it cannot hold an action: Next, Back and Submit move through the FORM,
+     * so a copy of one per repeated entry is three buttons that all do the same
+     * thing and one the visitor can press from inside a row they are still
+     * filling in.
+     *
+     * @return array<int, string>
+     */
+    public function childCodes(): array
+    {
+        return array_keys(array_filter(
+            $this->all(),
+            fn (FieldType $type) => ! $type->hasChildren() && $type->group() !== 'action',
+        ));
+    }
+
+    /**
      * The builder palette: everything an admin can drop onto a canvas, with the
      * schema its inspector renders.
      *
@@ -85,9 +106,50 @@ class FieldTypeRegistry
             'is_input' => $type->isInput(),
             'has_options' => $type->hasOptions(),
             'translatable' => $type->translatable(),
-            'settings' => array_map(fn (FieldData $f) => $f->toArray(), $type->settings()),
+            'settings' => array_map(fn (FieldData $f) => $f->toArray(), $this->settingsFor($type)),
             'validations' => array_map(fn (FieldData $f) => $f->toArray(), $type->validations()),
         ], $this->all()));
+    }
+
+    /**
+     * Percentages a field may occupy on a wide screen.
+     *
+     * A LIST, NOT A FREE NUMBER. 37% is meaningless in a wrapping row — it would
+     * leave a ragged gap and read as a bug — so the admin picks from widths that
+     * actually tile.
+     *
+     * @return array<int, array{value: string, label: string}>
+     */
+    public const WIDTHS = [
+        ['value' => '100', 'label' => '100%'],
+        ['value' => '75', 'label' => '75%'],
+        ['value' => '66', 'label' => '66%'],
+        ['value' => '50', 'label' => '50%'],
+        ['value' => '33', 'label' => '33%'],
+        ['value' => '25', 'label' => '25%'],
+    ];
+
+    /**
+     * An element's own settings, plus the ones EVERY element has.
+     *
+     * Width is injected here rather than added to BaseFieldType::settings(),
+     * because almost every type overrides that method and returns its own array —
+     * a base-class default would be silently dropped by most of them, and a new
+     * element could forget it entirely. Here there is one place, and no type can
+     * opt out or forget.
+     *
+     * @return array<int, FieldData>
+     */
+    public function settingsFor(FieldType $type): array
+    {
+        return [...$type->settings(), new FieldData(
+            key: 'width',
+            label: 'Width on large screens',
+            type: 'select',
+            default: '100',
+            options: self::WIDTHS,
+            help: 'Narrower fields sit side by side. They always fill the width on phones, and neighbours pair up only when they are next to each other.',
+        )];
     }
 
     /**
@@ -106,7 +168,9 @@ class FieldTypeRegistry
 
         $rules = [];
 
-        foreach ($type->settings() as $field) {
+        // settingsFor(), not settings(): the injected width must be validated
+        // like any other setting, or a hand-rolled payload could store anything.
+        foreach ($this->settingsFor($type) as $field) {
             foreach ($this->fieldRules($field, "{$prefix}.{$field->key}") as $key => $rule) {
                 $rules[$key] = $rule;
             }

@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             PagesSeeder::class,
             MenusSeeder::class,
             FormsSeeder::class,
+            JobOffersSeeder::class,
             SettingsSeeder::class,
         ]);
 

@@ -72,6 +72,23 @@ class FormField extends Model
         return $this->hasMany(FormFieldOption::class)->orderBy('order');
     }
 
+    /**
+     * The fields inside a repeatable group. Empty for every other element.
+     *
+     * Ordered by `order`, which for a child is its position INSIDE the group —
+     * the same column top-level fields use for their position on the page.
+     */
+    public function children(): HasMany
+    {
+        return $this->hasMany(FormField::class, 'parent_form_field_id')->orderBy('order');
+    }
+
+    /** The group this field sits in, or null when it sits directly on a page. */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(FormField::class, 'parent_form_field_id');
+    }
+
     /* -----------------------------------------
      3. Accessors
     ------------------------------------------*/
@@ -84,6 +101,26 @@ class FormField extends Model
     public function scopeCapturing(Builder $query): Builder
     {
         return $query->whereIn('type', app(FieldTypeRegistry::class)->inputCodes());
+    }
+
+    /**
+     * Fields that sit directly on a page rather than inside a group.
+     *
+     * THIS IS THE SUBMIT-PATH SET. A group answers for its own children, so a
+     * walk that included them would compile a second, wrongly-pathed rule for
+     * every child (`fields.institution` instead of `fields.education.*.
+     * institution`) and write them into form_submissions.data as phantom
+     * top-level keys the form never asked as questions.
+     */
+    public function scopeTopLevel(Builder $query): Builder
+    {
+        return $query->whereNull('parent_form_field_id');
+    }
+
+    /** Whether this element owns child fields — only a group does. */
+    public function isGroup(): bool
+    {
+        return (bool) $this->element()?->hasChildren();
     }
 
     /**
@@ -103,9 +140,21 @@ class FormField extends Model
         return (bool) $this->element()?->isInput();
     }
 
-    /** Zero-based, scoped to the page — position inside a page IS the order. */
-    public static function nextOrder(string $formPageId): int
+    /**
+     * Zero-based, scoped to the page — position inside a page IS the order.
+     *
+     * Pass $parentId for a field inside a group: its order is its position among
+     * its SIBLINGS, not among everything on the page, so the two must be counted
+     * separately or a group's first child would inherit the page's field count.
+     */
+    public static function nextOrder(string $formPageId, ?string $parentId = null): int
     {
-        return (int) static::query()->where('form_page_id', $formPageId)->max('order') + 1;
+        return (int) static::query()
+            ->where('form_page_id', $formPageId)
+            ->when($parentId === null,
+                fn (Builder $q) => $q->whereNull('parent_form_field_id'),
+                fn (Builder $q) => $q->where('parent_form_field_id', $parentId),
+            )
+            ->max('order') + 1;
     }
 }

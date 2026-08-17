@@ -30,8 +30,11 @@ class FormPageData extends Data
             css_id: $page->css_id,
             css_class: $page->css_class,
             title: $page->enabledTranslations('title'),
-            fields: $page->relationLoaded('fields')
-                ? $page->fields->map(fn ($f) => FormFieldData::from($f))->all()
+            // topLevelFields, because a group carries its own children and the
+            // canvas lays out only what sits on the page. Loading `fields` here
+            // would draw every child a second time as a loose card.
+            fields: $page->relationLoaded('topLevelFields')
+                ? $page->topLevelFields->map(fn ($f) => FormFieldData::from($f))->all()
                 : [],
         );
     }

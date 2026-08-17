@@ -89,9 +89,29 @@ class Form extends Model
         return $this->hasMany(FormPage::class)->orderBy('order');
     }
 
+    /**
+     * EVERY field on the form, group children included.
+     *
+     * Kept whole because fieldOptions() hangs off it and because the builder
+     * saves and deletes against the complete set. The submit path wants
+     * topLevelFields() instead — see the note there.
+     */
     public function fields(): HasMany
     {
         return $this->hasMany(FormField::class)->orderBy('order');
+    }
+
+    /**
+     * The fields that sit directly on a page — what the submit path compiles.
+     *
+     * A group answers for its own children, so validation, normalisation and the
+     * stored snapshot all walk THIS relation and let the group recurse. Eager
+     * load it as `topLevelFields.children.options` to build a whole form's rules
+     * without an N+1.
+     */
+    public function topLevelFields(): HasMany
+    {
+        return $this->hasMany(FormField::class)->topLevel()->orderBy('order');
     }
 
     /** Every option on the form, for building validation without an N+1. */

@@ -69,7 +69,12 @@ export const adminMenu = [
         label: 'Jobs',
         icon: 'ki-filled ki-briefcase',
         children: [
+            // Offers first: an application is made against one, and candidates
+            // and pools are what applications turn into.
             { label: 'Job Offers', route: 'web.admin.job-offers.index', permission: 'job-offers.index' },
+            { label: 'Applications', route: 'web.admin.job-applications.index', permission: 'job-applications.index' },
+            { label: 'Candidates', route: 'web.admin.candidates.index', permission: 'candidates.index' },
+            { label: 'Talent Pools', route: 'web.admin.clusters.index', permission: 'clusters.index' },
         ],
     },
     {

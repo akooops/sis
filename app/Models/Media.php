@@ -61,7 +61,20 @@ class Media extends Model
      */
     public function getPathAttribute(): string
     {
-        $folder = trim((string) ($this->folder ?? ''), '/');
+        /*
+         * READ FROM THE ATTRIBUTE BAG, NOT `$this->folder`, because this model
+         * has BOTH a `folder` column and a static folder() helper below.
+         *
+         * When the column is absent from the bag — which is the case on a row
+         * straight out of Media::create() that did not assign it, since create()
+         * keeps only what it was given — Eloquent's __get falls through to
+         * relationship resolution, finds folder(), calls it, gets a string back
+         * and throws "App\Models\Media::folder must return a relationship
+         * instance". A model RE-LOADED from the database carries the column and
+         * works fine, so the failure only appears on a freshly created row and
+         * the message points nowhere near the cause.
+         */
+        $folder = trim((string) ($this->getAttributes()['folder'] ?? ''), '/');
 
         return $folder === ''
             ? static::folder().$this->file_name

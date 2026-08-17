@@ -34,6 +34,11 @@ abstract class BaseFieldType implements FieldType
         return false;
     }
 
+    public function hasChildren(): bool
+    {
+        return false;
+    }
+
     /**
      * @return array<int, string>
      */

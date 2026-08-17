@@ -39,6 +39,21 @@
 
     const options = $derived((field.options ?? []).map((o) => ({ value: o.value, label: o.label })));
     const inputType = $derived({ number: 'number', email: 'email', url: 'url' }[field.type] ?? 'text');
+
+    // Bounds belong to the number control and nowhere else: min on a text box
+    // would be a length the browser never reports and the server never applies.
+    // Built as an object so an undeclared bound is an ABSENT attribute — an
+    // emitted step="null" is invalid and the browser falls back to step 1, which
+    // is the very default this exists to override.
+    const numberAttrs = $derived.by(() => {
+        if (field.type !== 'number') return {};
+
+        const attrs = {};
+        if (field.min != null) attrs.min = field.min;
+        if (field.max != null) attrs.max = field.max;
+        if (field.step != null) attrs.step = field.step;
+        return attrs;
+    });
     // A secret that already has a stored value isn't "required" — leaving it
     // blank keeps the current one.
     const required = $derived(field.required && !(field.secret && secretSet));
@@ -108,7 +123,7 @@
         {:else if field.type === 'color'}
             <ColorInput bind:value invalid={!!error} />
         {:else}
-            <Input type={inputType} bind:value invalid={!!error} {disabled} />
+            <Input type={inputType} bind:value invalid={!!error} {disabled} {...numberAttrs} />
         {/if}
     </Field>
 {/if}

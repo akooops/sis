@@ -12,7 +12,11 @@ use App\Http\Controllers\Api\Admin\BrandAssetGroupsController;
 use App\Http\Controllers\Api\Admin\BrandAssetsController;
 use App\Http\Controllers\Api\Admin\BrandsController;
 use App\Http\Controllers\Api\Admin\CalendarsController;
+use App\Http\Controllers\Api\Admin\CandidateClustersController;
+use App\Http\Controllers\Api\Admin\CandidateMatchesController;
+use App\Http\Controllers\Api\Admin\CandidatesController;
 use App\Http\Controllers\Api\Admin\CategoriesController;
+use App\Http\Controllers\Api\Admin\ClustersController;
 use App\Http\Controllers\Api\Admin\ContactDetailsController;
 use App\Http\Controllers\Api\Admin\ContactTypesController;
 use App\Http\Controllers\Api\Admin\CountriesController;
@@ -30,6 +34,8 @@ use App\Http\Controllers\Api\Admin\FormWebhooksController;
 use App\Http\Controllers\Api\Admin\GradesController;
 use App\Http\Controllers\Api\Admin\IntegrationsController;
 use App\Http\Controllers\Api\Admin\IntegrationTypesController;
+use App\Http\Controllers\Api\Admin\JobApplicationsController;
+use App\Http\Controllers\Api\Admin\JobOfferClustersController;
 use App\Http\Controllers\Api\Admin\JobOffersController;
 use App\Http\Controllers\Api\Admin\LanguagesController;
 use App\Http\Controllers\Api\Admin\MediaController;
@@ -377,6 +383,68 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('job-offers', [JobOffersController::class, 'store'])->middleware('verify.permissions:job-offers.store')->name('api.v1.admin.job-offers.store');
         Route::put('job-offers/{jobOffer}', [JobOffersController::class, 'update'])->middleware('verify.permissions:job-offers.update')->name('api.v1.admin.job-offers.update');
         Route::delete('job-offers/{jobOffer}', [JobOffersController::class, 'destroy'])->middleware('verify.permissions:job-offers.destroy')->name('api.v1.admin.job-offers.destroy');
+
+        /*
+         * Job applications — READ-ONLY plus five explicit transitions. No store
+         * and no update: the submit pipeline is the only writer, and the only
+         * thing an admin changes is where an application has reached.
+         *
+         * `export` MUST stay above `{jobApplication}`, or it binds as a ULID and
+         * every export 404s. Same discipline as form-submissions/{form}/export.
+         */
+        Route::get('job-applications/export', [JobApplicationsController::class, 'export'])->middleware('verify.permissions:job-applications.export')->name('api.v1.admin.job-applications.export');
+        Route::get('job-applications', [JobApplicationsController::class, 'index'])->middleware('verify.permissions:job-applications.index')->name('api.v1.admin.job-applications.index');
+        Route::get('job-applications/{jobApplication}', [JobApplicationsController::class, 'show'])->middleware('verify.permissions:job-applications.show')->name('api.v1.admin.job-applications.show');
+        Route::post('job-applications/{jobApplication}/shortlist', [JobApplicationsController::class, 'shortlist'])->middleware('verify.permissions:job-applications.shortlist')->name('api.v1.admin.job-applications.shortlist');
+        Route::post('job-applications/{jobApplication}/contact', [JobApplicationsController::class, 'contact'])->middleware('verify.permissions:job-applications.contact')->name('api.v1.admin.job-applications.contact');
+        Route::post('job-applications/{jobApplication}/call', [JobApplicationsController::class, 'call'])->middleware('verify.permissions:job-applications.call')->name('api.v1.admin.job-applications.call');
+        Route::post('job-applications/{jobApplication}/hire', [JobApplicationsController::class, 'hire'])->middleware('verify.permissions:job-applications.hire')->name('api.v1.admin.job-applications.hire');
+        Route::post('job-applications/{jobApplication}/reject', [JobApplicationsController::class, 'reject'])->middleware('verify.permissions:job-applications.reject')->name('api.v1.admin.job-applications.reject');
+        Route::delete('job-applications/{jobApplication}', [JobApplicationsController::class, 'destroy'])->middleware('verify.permissions:job-applications.destroy')->name('api.v1.admin.job-applications.destroy');
+
+        /*
+         * Candidates — the PEOPLE. No store: ApplicationProjector is the only
+         * writer, and there is no candidates.store permission.
+         *
+         * The CV route MUST stay above candidates/{candidate}, or `{candidate}`
+         * would swallow nothing here but the ordering habit is what keeps the
+         * export line below correct. It is signed AND permission-gated: an
+         * expired-signature check is not authorisation, and candidates.cv is
+         * separate from candidates.show because the CV is personal data and
+         * triaging a list should not require pulling files.
+         */
+        Route::get('candidates', [CandidatesController::class, 'index'])->middleware('verify.permissions:candidates.index')->name('api.v1.admin.candidates.index');
+        Route::get('candidates/{candidate}/cv/{media}', [CandidatesController::class, 'cv'])->middleware(['signed', 'verify.permissions:candidates.cv'])->name('api.v1.admin.candidates.cv');
+        Route::get('candidates/{candidate}', [CandidatesController::class, 'show'])->middleware('verify.permissions:candidates.show')->name('api.v1.admin.candidates.show');
+        Route::put('candidates/{candidate}', [CandidatesController::class, 'update'])->middleware('verify.permissions:candidates.update')->name('api.v1.admin.candidates.update');
+        Route::delete('candidates/{candidate}', [CandidatesController::class, 'destroy'])->middleware('verify.permissions:candidates.destroy')->name('api.v1.admin.candidates.destroy');
+
+        // Candidate matches — ONE scoring table, read from both ends. Index only:
+        // a match has no page, it fills the candidate and job offer drawers.
+        Route::get('candidate-matches', [CandidateMatchesController::class, 'index'])->middleware('verify.permissions:candidate-matches.index')->name('api.v1.admin.candidate-matches.index');
+
+        /*
+         * Talent pools. No store: they are discovered by the nightly rebuild, and
+         * a hand-made pool would have no centroid to gather anyone with.
+         * `show` is gated on clusters.index, as job-offers.show is on its index.
+         */
+        Route::get('clusters', [ClustersController::class, 'index'])->middleware('verify.permissions:clusters.index')->name('api.v1.admin.clusters.index');
+        Route::get('clusters/{cluster}', [ClustersController::class, 'show'])->middleware('verify.permissions:clusters.index')->name('api.v1.admin.clusters.show');
+        Route::put('clusters/{cluster}', [ClustersController::class, 'update'])->middleware('verify.permissions:clusters.update')->name('api.v1.admin.clusters.update');
+        Route::delete('clusters/{cluster}', [ClustersController::class, 'destroy'])->middleware('verify.permissions:clusters.destroy')->name('api.v1.admin.clusters.destroy');
+
+        /*
+         * Pool membership: READ AND REMOVE, no store.
+         *
+         * RebuildClusters deletes every membership row before reassigning, so an
+         * add endpoint would be a feature that undoes itself at 03:00. The two
+         * `*.store` permissions stay seeded and inert until that job learns to
+         * preserve hand-made rows.
+         */
+        Route::get('candidate-clusters/{cluster}', [CandidateClustersController::class, 'index'])->middleware('verify.permissions:candidate-clusters.index')->name('api.v1.admin.candidate-clusters.index');
+        Route::delete('candidate-clusters/{candidateCluster}', [CandidateClustersController::class, 'destroy'])->middleware('verify.permissions:candidate-clusters.destroy')->name('api.v1.admin.candidate-clusters.destroy');
+        Route::get('job-offer-clusters/{cluster}', [JobOfferClustersController::class, 'index'])->middleware('verify.permissions:job-offer-clusters.index')->name('api.v1.admin.job-offer-clusters.index');
+        Route::delete('job-offer-clusters/{jobOfferCluster}', [JobOfferClustersController::class, 'destroy'])->middleware('verify.permissions:job-offer-clusters.destroy')->name('api.v1.admin.job-offer-clusters.destroy');
 
         // Countries
         Route::get('countries', [CountriesController::class, 'index'])->middleware('verify.permissions:countries.index')->name('api.v1.admin.countries.index');

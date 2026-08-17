@@ -2,6 +2,7 @@
 
 namespace App\Services\Forms;
 
+use App\Contracts\Forms\SubmissionRule;
 use App\Models\Form;
 use App\Models\FormField;
 use App\Rules\PublicFormUpload;
@@ -30,12 +31,89 @@ class SubmissionValidator
      */
     public function make(Form $form, $fields, array $answers, string $locale, ?string $session = null): ValidatorInstance
     {
+        // Compacted FIRST, so a form-level rule reading one answer to decide
+        // about another sees exactly what will be stored — not a repeat row the
+        // visitor abandoned and that storage is about to drop.
+        $answers = $this->withoutBlankInstances($fields, $answers);
+
         return Validator::make(
             ['fields' => $answers],
-            $this->rules($form, $fields, $session),
+            $this->withFormRules($form, $answers, $this->rules($form, $fields, $session)),
             [],
             $this->attributes($fields, $locale),
         );
+    }
+
+    /**
+     * Merge in whatever config('forms.submission_rules') declares for this form.
+     *
+     * MERGED, NEVER REPLACED: a provider adding a rule to `fields.email` must not
+     * wipe the `email:rfc` and `max:255` the element itself declared, which a
+     * plain array union would do.
+     *
+     * A slug is looked up as an array key rather than through config()'s dot
+     * path, because a dot in a slug would otherwise read as one more level of
+     * nesting and silently find nothing.
+     *
+     * @param  array<string, mixed>  $answers
+     * @param  array<string, mixed>  $rules
+     * @return array<string, mixed>
+     */
+    protected function withFormRules(Form $form, array $answers, array $rules): array
+    {
+        $providers = config('forms.submission_rules', [])[$form->slug] ?? [];
+
+        foreach ($providers as $class) {
+            $provider = app($class);
+
+            // A misconfigured entry must not take a public form down — the same
+            // reasoning as FormField::element() returning null for a dropped type.
+            if (! $provider instanceof SubmissionRule) {
+                continue;
+            }
+
+            foreach ($provider->rules($form, $answers) as $path => $set) {
+                $rules[$path] = array_merge($rules[$path] ?? [], (array) $set);
+            }
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Drop the repeat rows the visitor added and never filled in.
+     *
+     * VALIDATION AND STORAGE HAVE TO AGREE ABOUT WHAT AN EMPTY ROW IS. A group
+     * renders its minimum rows up front and the visitor can add more, so pressing
+     * Add and changing their mind leaves a row of empty strings in the post.
+     * GroupType::store() already discards those — without this, a required child
+     * would reject a submission over a row that was about to be thrown away.
+     *
+     * KEYS ARE PRESERVED, NOT REINDEXED. The remaining indices are what the error
+     * messages are keyed by, and the renderer finds the row to flag by that index
+     * — compacting [A, blank, C] to [A, C] would report C's error against index 1
+     * and highlight the wrong entry. Storage reindexes instead, because stored
+     * data has no DOM to line up with.
+     *
+     * @param  \Illuminate\Support\Collection<int, FormField>  $fields
+     * @param  array<string, mixed>  $answers
+     * @return array<string, mixed>
+     */
+    protected function withoutBlankInstances($fields, array $answers): array
+    {
+        foreach ($fields as $field) {
+            if (! $field->isGroup() || ! is_array($answers[$field->key] ?? null)) {
+                continue;
+            }
+
+            $answers[$field->key] = array_filter(
+                $answers[$field->key],
+                fn ($instance) => is_array($instance)
+                    && array_filter($instance, fn ($value) => ! static::blank($value)) !== [],
+            );
+        }
+
+        return $answers;
     }
 
     /**
@@ -45,10 +123,11 @@ class SubmissionValidator
     public function rules(Form $form, $fields, ?string $session = null): array
     {
         // One pass for every option on the form, so a 20-choice form is one
-        // query rather than twenty.
+        // query rather than twenty. Group children are walked too — a select
+        // inside a repeat needs its membership rule as much as one on the page.
         $options = [];
 
-        foreach ($fields as $field) {
+        foreach ($this->withChildren($fields) as $field) {
             if ($field->relationLoaded('options')) {
                 $options[$field->getKey()] = $field->options->pluck('value')->all();
             }
@@ -74,15 +153,30 @@ class SubmissionValidator
              * rule only proves the file is scanned — not that THIS visitor
              * uploaded it. Without the session check anyone could post someone
              * else's media id and attach a stranger's file to their submission.
+             *
+             * Applied here rather than inside FileType because the session is
+             * request state the element has no business knowing, and it must
+             * reach file fields nested in a group too — hence uploads(), which
+             * returns each one already keyed by its full answer path.
              */
-            if ($field->type === 'file' && $session !== null) {
-                $extensions = method_exists($element, 'extensions') ? $element->extensions($field) : [];
-                $rule = new PublicFormUpload($session, $extensions);
+            if ($session !== null) {
+                foreach ($this->uploads($field) as $path => $upload) {
+                    $uploadElement = $upload->element();
 
-                $rules["fields.{$field->key}.*"][] = $rule;
-                $rules["fields.{$field->key}"][] = $rule;
+                    $extensions = $uploadElement && method_exists($uploadElement, 'extensions')
+                        ? $uploadElement->extensions($upload)
+                        : [];
+
+                    $rule = new PublicFormUpload($session, $extensions);
+
+                    $rules["fields.{$path}.*"][] = $rule;
+                    $rules["fields.{$path}"][] = $rule;
+                }
             }
 
+            // Top-level only. A child cannot be unique — "one answer per form"
+            // is meaningless for a value that repeats within a single
+            // submission, and the builder refuses to set the flag on one.
             if ($field->is_unique) {
                 $rules["fields.{$field->key}"][] = new UniqueSubmissionValue($form, $field);
             }
@@ -106,6 +200,22 @@ class SubmissionValidator
             // Members of an array answer, so "The Colour field" beats
             // "The fields.colour.0 field".
             $attributes["fields.{$field->key}.*"] = $label;
+
+            /*
+             * A group's children name themselves, not their group: the visitor
+             * looking at the second education row wants "The Institution field is
+             * required", not "The Education field is required" (which is also
+             * what the group's own rules would say about a different failure) and
+             * certainly not "fields.education.1.institution".
+             */
+            if ($field->isGroup()) {
+                foreach ($field->children as $child) {
+                    $childLabel = $child->getTranslation('label', $locale, true) ?: $child->key;
+
+                    $attributes["fields.{$field->key}.*.{$child->key}"] = $childLabel;
+                    $attributes["fields.{$field->key}.*.{$child->key}.*"] = $childLabel;
+                }
+            }
         }
 
         return $attributes;
@@ -143,7 +253,7 @@ class SubmissionValidator
 
             $value = $answers[$field->key] ?? null;
 
-            $out[$field->key] = $this->blank($value) ? null : $element->store($field, $value);
+            $out[$field->key] = static::blank($value) ? null : $element->store($field, $value);
         }
 
         return $out;
@@ -169,7 +279,7 @@ class SubmissionValidator
                 continue;
             }
 
-            $out[$field->key] = [
+            $entry = [
                 'label' => $field->getTranslation('label', $locale, true) ?: $field->key,
                 'type' => $field->type,
                 /*
@@ -191,6 +301,34 @@ class SubmissionValidator
                  */
                 'order' => $order++,
             ];
+
+            /*
+             * A group carries its children's labels in the same shape, one level
+             * down, so the drawer can render a stored instance without going back
+             * to the live form — which is the whole point of the snapshot. Without
+             * this, relabelling "Institution" to "School" would silently rewrite
+             * every historical submission's heading.
+             */
+            if ($field->isGroup()) {
+                $children = [];
+                $childOrder = 0;
+
+                foreach ($field->children as $child) {
+                    if (! $child->element()?->isInput()) {
+                        continue;
+                    }
+
+                    $children[$child->key] = [
+                        'label' => $child->getTranslation('label', $locale, true) ?: $child->key,
+                        'type' => $child->type,
+                        'order' => $childOrder++,
+                    ];
+                }
+
+                $entry['children'] = $children;
+            }
+
+            $out[$field->key] = $entry;
         }
 
         return $out;
@@ -228,11 +366,70 @@ class SubmissionValidator
     }
 
     /**
+     * Every field in the set, each group followed by its children.
+     *
+     * Only for lookups that must cover the whole form — the option pre-load, and
+     * nothing else. Rule compilation still walks top-level fields ONLY and lets
+     * each group recurse, or a child would be validated twice: once correctly
+     * under its group's path, and once as a phantom top-level `fields.<child>`
+     * that the visitor never posts and a required child would therefore always
+     * fail.
+     *
+     * @param  \Illuminate\Support\Collection<int, FormField>  $fields
+     * @return \Generator<int, FormField>
+     */
+    protected function withChildren($fields): \Generator
+    {
+        foreach ($fields as $field) {
+            yield $field;
+
+            if ($field->isGroup()) {
+                foreach ($field->children as $child) {
+                    yield $child;
+                }
+            }
+        }
+    }
+
+    /**
+     * The file fields reachable from one top-level field, keyed by the ANSWER
+     * PATH they occupy rather than by their own key — `cv` on a page, but
+     * `education.*.certificate` inside a group.
+     *
+     * @return array<string, FormField>
+     */
+    protected function uploads(FormField $field): array
+    {
+        if ($field->type === 'file') {
+            return [$field->key => $field];
+        }
+
+        if (! $field->isGroup()) {
+            return [];
+        }
+
+        $out = [];
+
+        foreach ($field->children as $child) {
+            if ($child->type === 'file') {
+                $out["{$field->key}.*.{$child->key}"] = $child;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
      * Whether the visitor answered at all — null, an empty/whitespace string or
      * an empty array all mean they did not. `0`, `'0'` and `false` are answers
      * and must survive, so this is never `empty()`.
+     *
+     * Public and static because GroupType has to make the same judgement about
+     * each child inside an instance, and "did they answer?" must mean exactly one
+     * thing across the two — a second copy is a second definition waiting to
+     * drift.
      */
-    protected function blank(mixed $value): bool
+    public static function blank(mixed $value): bool
     {
         if ($value === null) {
             return true;

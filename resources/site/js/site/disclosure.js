@@ -11,10 +11,20 @@
  *
  * A toggle gets `aria-expanded`, its target gets `aria-hidden`, and the panel
  * carries `.is-open` for CSS to animate.
+ *
+ * And every open or close announces itself: a bubbling `site:disclosure`
+ * CustomEvent is dispatched ON THE PANEL, `detail.open` saying which way it
+ * went. That is a public contract other scripts bind to — hiding a panel only
+ * hides its subtree, so anything with state inside one has no other way to know
+ * it was put away. This file stays ignorant of who is listening and what they do
+ * with it; a panel is a box, not a feature.
  */
 
 const OPEN = 'is-open';
 const BODY_LOCK = 'has-drawer-open';
+
+/** Exported so a listener cannot drift from the name by a typo. */
+export const DISCLOSURE_EVENT = 'site:disclosure';
 
 function target(trigger) {
     const selector = trigger.dataset.target;
@@ -29,6 +39,12 @@ function setExpanded(panel, expanded) {
     document
         .querySelectorAll(`[data-target="#${CSS.escape(panel.id)}"]`)
         .forEach((trigger) => trigger.setAttribute('aria-expanded', String(expanded)));
+
+    // Announced here, the one place the state is actually written, and AFTER it
+    // is written — so a listener that reads the panel back sees what the event
+    // said, and no route through this file (collapse, drawer, dropdown, dismiss,
+    // Escape) can change a panel without saying so.
+    panel.dispatchEvent(new CustomEvent(DISCLOSURE_EVENT, { bubbles: true, detail: { open: expanded } }));
 }
 
 /**

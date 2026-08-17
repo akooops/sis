@@ -11,7 +11,9 @@ use App\Models\Brand;
 use App\Models\BrandAsset;
 use App\Models\BrandAssetGroup;
 use App\Models\Calendar;
+use App\Models\Candidate;
 use App\Models\Category;
+use App\Models\Cluster;
 use App\Models\ContactDetail;
 use App\Models\Country;
 use App\Models\Document;
@@ -24,6 +26,7 @@ use App\Models\FormSubmission;
 use App\Models\FormWebhook;
 use App\Models\Grade;
 use App\Models\Integration;
+use App\Models\JobApplication;
 use App\Models\JobOffer;
 use App\Models\Language;
 use App\Models\Media;
@@ -87,6 +90,9 @@ enum MorphType: string
     case Menu = 'menu';
     case MenuItem = 'menu_item';
     case JobOffer = 'job_offer';
+    case JobApplication = 'job_application';
+    case Candidate = 'candidate';
+    case Cluster = 'cluster';
     case Country = 'country';
     case Program = 'program';
     case Stream = 'stream';
@@ -134,6 +140,9 @@ enum MorphType: string
             self::Menu => Menu::class,
             self::MenuItem => MenuItem::class,
             self::JobOffer => JobOffer::class,
+            self::JobApplication => JobApplication::class,
+            self::Candidate => Candidate::class,
+            self::Cluster => Cluster::class,
             self::Country => Country::class,
             self::Program => Program::class,
             self::Stream => Stream::class,

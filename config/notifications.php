@@ -25,6 +25,15 @@ return [
     'types' => [
         'user.pending_approval' => ['name' => 'User pending approval', 'icon' => 'ki-time', 'sort' => 1],
         'form.submission_received' => ['name' => 'Form submission received', 'icon' => 'ki-questionnaire-tablet', 'sort' => 2],
+
+        /*
+         * An application form ALSO fires form.submission_received, because it is
+         * a form. These two carry the JOB context — which posting, which
+         * applicant, where it has reached — so HR subscribes to these and whoever
+         * watches forms in general is not drowned in applications.
+         */
+        'job.application_received' => ['name' => 'Job application received', 'icon' => 'ki-briefcase', 'sort' => 3],
+        'job.application_status_changed' => ['name' => 'Job application status changed', 'icon' => 'ki-arrow-right', 'sort' => 4],
     ],
 
     /*

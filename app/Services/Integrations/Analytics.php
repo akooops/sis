@@ -36,7 +36,6 @@ class Analytics
         return new self(Integration::activeFor('analytics'));
     }
 
-
     /**
      * Whether the page should load a tag at all.
      *

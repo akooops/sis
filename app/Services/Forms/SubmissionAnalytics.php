@@ -326,7 +326,14 @@ class SubmissionAnalytics
         foreach ($form->pages as $page) {
             $pageName = $page->name ?: ($page->getTranslation('title', $locale) ?: 'Page');
 
-            foreach ($page->fields as $field) {
+            /*
+             * Top-level only. A group's children emit no field events — the
+             * telemetry beacon reports one entry per field per submission and
+             * form_submission_field_events is unique on exactly that — so listing
+             * them here would add a row of zeroes per child and dilute the one
+             * number this table exists for: which field loses people.
+             */
+            foreach ($page->topLevelFields as $field) {
                 if (! $field->capturesValue()) {
                     continue;
                 }

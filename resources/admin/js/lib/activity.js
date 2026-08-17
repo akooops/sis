@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'settings', 'pages', 'articles', 'albums', 'brands', 'brand-asset-groups', 'brand-assets', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'calendars', 'contact-details', 'newsletters', 'newsletter-groups', 'newsletter-group-subscribers', 'programs', 'streams', 'grades', 'job-offers', 'countries', 'menus', 'menu-items', 'forms', 'form-pages', 'form-fields', 'form-webhooks', 'form-submissions', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'settings', 'pages', 'articles', 'albums', 'brands', 'brand-asset-groups', 'brand-assets', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'calendars', 'contact-details', 'newsletters', 'newsletter-groups', 'newsletter-group-subscribers', 'programs', 'streams', 'grades', 'job-offers', 'job-applications', 'candidates', 'clusters', 'countries', 'menus', 'menu-items', 'forms', 'form-pages', 'form-fields', 'form-webhooks', 'form-submissions', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -64,6 +64,9 @@ export const LOG_NAME_LABELS = {
     streams: 'Streams',
     grades: 'Grades',
     'job-offers': 'Job Offers',
+    'job-applications': 'Job Applications',
+    candidates: 'Candidates',
+    clusters: 'Talent Pools',
     countries: 'Countries',
     menus: 'Menus',
     'menu-items': 'Menu Items',
@@ -110,6 +113,9 @@ export const SUBJECT_TYPE_LABELS = {
     stream: 'Stream',
     grade: 'Grade',
     job_offer: 'Job Offer',
+    job_application: 'Job application',
+    candidate: 'Candidate',
+    cluster: 'Talent pool',
     country: 'Country',
     menu: 'Menu',
     menu_item: 'Menu Item',
@@ -319,6 +325,31 @@ const ACTIVITY_MESSAGES = {
         created: 'Created the job offer :name',
         updated: 'Updated the job offer :name',
         deleted: 'Deleted the job offer :name',
+    },
+    // `updated` reads as the status move it almost always is — :status comes from
+    // JobApplicationObserver::meta(). An application is never edited any other
+    // way, so there is no second wording to fall back to.
+    'job-applications': {
+        created: 'Received an application from :name',
+        updated: ':name is now :status',
+        deleted: 'Deleted the application from :name',
+        // The export writes this row by hand, and it has no subject: an export
+        // spans postings, so there is no single record it was performed on.
+        exported: 'Exported :count application(s)',
+    },
+    candidates: {
+        created: 'Added the candidate :name',
+        updated: 'Updated the candidate :name',
+        deleted: 'Deleted the candidate :name',
+    },
+    // No `attached`: pool membership has no add path, because the nightly rebuild
+    // clears the table before reassigning. `detached` is hand-rolled by the pivot
+    // controllers, since the pivots themselves are unobserved.
+    clusters: {
+        created: 'Created the talent pool :name',
+        updated: 'Renamed the talent pool :name',
+        deleted: 'Deleted the talent pool :name',
+        detached: 'Removed :name from the pool',
     },
     countries: {
         created: 'Created the country :name',

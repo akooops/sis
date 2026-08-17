@@ -127,13 +127,21 @@ class CsvSubmissionWriter
      * `order`, and both form_fields and form_pages have a column of that name,
      * so joining makes the existing ORDER BY ambiguous and MySQL refuses it.
      *
+     * TOP-LEVEL ONLY, so a repeatable group is ONE column that GroupType::display()
+     * flattens. Including children would add a column per child that no submission
+     * has a top-level answer for — every one of them blank in every row — and
+     * exploding a group into education_1_institution… instead would make the
+     * column count depend on the widest row in the export, so two exports of the
+     * same form would stop lining up.
+     *
      * @return Collection<int, FormField>
      */
     protected function fields(Form $form): Collection
     {
         return $form->fields()
+            ->topLevel()
             ->capturing()
-            ->with('page')
+            ->with(['page', 'children'])
             ->get()
             ->sortBy([['page.order', 'asc'], ['order', 'asc']])
             ->values();

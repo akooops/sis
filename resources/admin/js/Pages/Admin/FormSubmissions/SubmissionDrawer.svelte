@@ -38,9 +38,11 @@
     import { formatFileSize } from '@/lib/format';
     import {
         FILE_FIELD_TYPE,
+        GROUP_FIELD_TYPE,
         SUBMISSION_STATUS_LABELS,
         SUBMISSION_STATUS_VARIANTS,
         formatAnswer,
+        groupEntries,
     } from '@/lib/form';
     import { untrack } from 'svelte';
 
@@ -134,6 +136,20 @@
             orphaned: !(key in snapshot),
             value: data[key] ?? null,
             files: files.filter((file) => file.field_key === key),
+            /*
+             * A repeatable group's answer is a list of objects, so it is expanded
+             * into its entries here rather than run through formatAnswer(), which
+             * would render an education history as `[object Object]`.
+             *
+             * Its files are keyed `group.child` (see
+             * FormSubmissionData::fieldKeysByMedia) and are matched per entry in
+             * the markup, in the order the ids appear.
+             */
+            entries:
+                snapshot[key]?.type === GROUP_FIELD_TYPE
+                    ? groupEntries(data[key], snapshot[key]?.children ?? {})
+                    : [],
+            childFiles: files.filter((file) => (file.field_key ?? '').startsWith(`${key}.`)),
         }));
     });
 
@@ -145,7 +161,13 @@
         (record?.files ?? []).filter(
             (file) =>
                 !answers.some(
-                    (answer) => answer.type === FILE_FIELD_TYPE && answer.key === file.field_key,
+                    (answer) =>
+                        (answer.type === FILE_FIELD_TYPE && answer.key === file.field_key) ||
+                        // A file inside a repeatable group is claimed under
+                        // `group.child`, so matching on the answer key alone
+                        // would list every one of them as unclaimed.
+                        (answer.type === GROUP_FIELD_TYPE &&
+                            (file.field_key ?? '').startsWith(`${answer.key}.`)),
                 ),
         ),
     );
@@ -277,6 +299,53 @@
                                             <Skeleton />
                                         {:else}
                                             <span class="text-muted-foreground">No file</span>
+                                        {/if}
+                                    {:else if answer.type === GROUP_FIELD_TYPE}
+                                        {#if answer.entries.length}
+                                            <!-- One card per repeat, so it stays
+                                                 obvious which degree belongs to
+                                                 which institution. Rows keep the
+                                                 field-key convention the rest of
+                                                 the drawer uses. -->
+                                            <div class="flex flex-col gap-2">
+                                                {#each answer.entries as entry, index (index)}
+                                                    <div class="flex flex-col gap-1 rounded-lg border border-border px-3 py-2">
+                                                        <span class="text-xs text-muted-foreground">#{index + 1}</span>
+                                                        {#each entry.rows as row (row.key)}
+                                                            <div class="flex min-w-0 items-start gap-2">
+                                                                <code class="shrink-0 text-xs text-muted-foreground">{row.key}</code>
+                                                                <span class="min-w-0 flex-1 break-words">
+                                                                    {#if row.type === FILE_FIELD_TYPE}
+                                                                        {@const files = answer.childFiles.filter(
+                                                                            (f) => f.field_key === `${answer.key}.${row.key}`,
+                                                                        )}
+                                                                        {#if files.length}
+                                                                            {#each files as file (file.id)}
+                                                                                <a
+                                                                                    class="inline-flex items-center gap-1.5 text-primary hover:underline"
+                                                                                    href={file.url}
+                                                                                    download={file.name}
+                                                                                >
+                                                                                    <i class="ki-filled ki-file-down"></i>
+                                                                                    <span class="truncate">{file.name}</span>
+                                                                                </a>
+                                                                            {/each}
+                                                                        {:else}
+                                                                            <span class="text-muted-foreground">No file</span>
+                                                                        {/if}
+                                                                    {:else if formatAnswer(row.value) === ''}
+                                                                        <span class="text-muted-foreground">—</span>
+                                                                    {:else}
+                                                                        {formatAnswer(row.value)}
+                                                                    {/if}
+                                                                </span>
+                                                            </div>
+                                                        {/each}
+                                                    </div>
+                                                {/each}
+                                            </div>
+                                        {:else}
+                                            <span class="text-muted-foreground">—</span>
                                         {/if}
                                     {:else if formatAnswer(answer.value) === ''}
                                         <span class="text-muted-foreground">—</span>

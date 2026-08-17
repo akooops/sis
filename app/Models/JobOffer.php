@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\ModelStates\HasStates;
 use Spatie\Translatable\HasTranslations;
 
@@ -54,6 +56,13 @@ class JobOffer extends Model
     public const EDUCATION_LEVELS = ['high_school', 'associate', 'bachelor', 'professional_certificate', 'postgraduate'];
 
     /**
+     * The slug of the seeded, always-open posting that catches spontaneous
+     * applications. Resolved BY SLUG on the public side, which is what `is_system`
+     * exists to protect.
+     */
+    public const GENERAL_SLUG = 'general-application';
+
+    /**
      * Stored as locale => value JSON. The trait casts these, so they must NOT
      * also appear in $casts.
      *
@@ -67,10 +76,13 @@ class JobOffer extends Model
 
     protected $casts = [
         'status' => JobOfferStatus::class,
+        'is_system' => 'bool',
         'published_at' => 'datetime',
         'deadline_at' => 'datetime',
         'start_date' => 'date',
         'experience_years' => 'integer',
+        'embedding' => 'array',
+        'embedded_at' => 'datetime',
     ];
 
     /* -----------------------------------------
@@ -80,6 +92,31 @@ class JobOffer extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function applications(): HasMany
+    {
+        return $this->hasMany(JobApplication::class);
+    }
+
+    /**
+     * Every candidate scored against this posting, applied or merely recommended.
+     * `->strong()` narrows it to the ones worth showing a manager.
+     */
+    public function matches(): HasMany
+    {
+        return $this->hasMany(CandidateMatch::class);
+    }
+
+    /* READ-ONLY — see Cluster. Writes go through JobOfferCluster. */
+    public function clusters(): BelongsToMany
+    {
+        return $this->belongsToMany(Cluster::class, 'job_offer_clusters');
+    }
+
+    public function clusterLinks(): HasMany
+    {
+        return $this->hasMany(JobOfferCluster::class);
     }
 
     /* -----------------------------------------
@@ -114,6 +151,24 @@ class JobOffer extends Model
         // Same comparison as scopeOpen(), so a row it returns never reports closed.
         return $this->status instanceof Published
             && (! $this->deadline_at || $this->deadline_at->gte(now()));
+    }
+
+    /**
+     * A seeded posting: undeletable, and its slug is frozen.
+     *
+     * Same contract `is_system` carries on Page and Form. The general-application
+     * flow resolves this row by slug, so a rename would strand every spontaneous
+     * applicant; everything else about it stays editable.
+     */
+    public function isLocked(): bool
+    {
+        return (bool) $this->is_system;
+    }
+
+    /** The always-open posting spontaneous CVs land against. */
+    public static function general(): ?self
+    {
+        return static::query()->where('slug', self::GENERAL_SLUG)->first();
     }
 
     /**

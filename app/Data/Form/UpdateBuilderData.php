@@ -74,38 +74,85 @@ class UpdateBuilderData extends Data
             'pages.*.fields.*.options.*.value' => ['required', 'string', 'max:191'],
             'pages.*.fields.*.options.*.is_default' => ['sometimes', 'boolean'],
             'pages.*.fields.*.options.*.label' => ['sometimes', $localeMap],
+
+            /*
+             * A repeatable group's children — ONE LEVEL, never more, which the
+             * type list enforces rather than the depth of these paths.
+             *
+             * A child is an ordinary element and validates like one, minus the
+             * two things that only make sense on a page: `target_form_page_id`
+             * (children cannot be buttons) and `is_unique` ("one answer per form"
+             * is meaningless for a value that repeats within one submission).
+             */
+            'pages.*.fields.*.children' => ['sometimes', 'array'],
+            'pages.*.fields.*.children.*.id' => ['required', 'string', 'ulid'],
+            'pages.*.fields.*.children.*.type' => ['required', Rule::in($registry->childCodes())],
+            'pages.*.fields.*.children.*.key' => ['required', 'string', 'max:64', 'regex:/^[a-z][a-z0-9_]*$/'],
+            'pages.*.fields.*.children.*.is_required' => ['sometimes', 'boolean'],
+            'pages.*.fields.*.children.*.settings' => ['sometimes', 'nullable', 'array'],
+            'pages.*.fields.*.children.*.validation' => ['sometimes', 'nullable', 'array'],
+            'pages.*.fields.*.children.*.css_id' => ['nullable', 'string', 'max:255', 'regex:/^[A-Za-z][\w-]*$/'],
+            'pages.*.fields.*.children.*.css_class' => ['nullable', 'string', 'max:255'],
+            'pages.*.fields.*.children.*.label' => ['sometimes', $localeMap],
+            'pages.*.fields.*.children.*.placeholder' => ['sometimes', $localeMap],
+            'pages.*.fields.*.children.*.value' => ['sometimes', $localeMap],
+            'pages.*.fields.*.children.*.content' => ['sometimes', $localeMap],
+            'pages.*.fields.*.children.*.options' => ['sometimes', 'array'],
+            'pages.*.fields.*.children.*.options.*.id' => ['required', 'string', 'ulid'],
+            'pages.*.fields.*.children.*.options.*.value' => ['required', 'string', 'max:191'],
+            'pages.*.fields.*.children.*.options.*.is_default' => ['sometimes', 'boolean'],
+            'pages.*.fields.*.children.*.options.*.label' => ['sometimes', $localeMap],
         ];
 
         // Per-field settings/validation, from the type each field declares.
         foreach ($context->payload['pages'] ?? [] as $p => $page) {
             foreach ($page['fields'] ?? [] as $f => $field) {
-                $type = $field['type'] ?? null;
-
-                if (! is_string($type) || ! $registry->has($type)) {
-                    continue;
-                }
-
                 $prefix = "pages.{$p}.fields.{$f}";
 
-                foreach ($registry->settingsRules($type, "{$prefix}.settings") as $key => $rule) {
-                    // settingsRules keys validation.* on its own; re-prefix it.
-                    $rules[str_starts_with($key, 'validation.') ? "{$prefix}.{$key}" : $key] = $rule;
-                }
-
-                // A choice element without options renders an empty control the
-                // visitor cannot answer, so it would fail at submit instead.
-                if ($registry->type($type)->hasOptions()) {
-                    $rules["{$prefix}.options"] = ['required', 'array', 'min:1'];
-                }
+                static::declaredRules($rules, $registry, $field, $prefix);
 
                 // A goto button that points nowhere is a dead end.
-                if ($type === 'button' && ($field['settings']['action'] ?? null) === 'goto') {
+                if (($field['type'] ?? null) === 'button' && ($field['settings']['action'] ?? null) === 'goto') {
                     $rules["{$prefix}.target_form_page_id"] = ['required', 'string', 'ulid'];
+                }
+
+                foreach ($field['children'] ?? [] as $c => $child) {
+                    static::declaredRules($rules, $registry, $child, "{$prefix}.children.{$c}");
                 }
             }
         }
 
         return $rules;
+    }
+
+    /**
+     * The settings/validation/options rules ONE element declares, at its path.
+     *
+     * Shared by page fields and group children because a child is an ordinary
+     * element: forking this would mean a select inside a group silently skipping
+     * the membership rule that a select on the page gets.
+     *
+     * @param  array<string, mixed>  $rules
+     * @param  array<string, mixed>  $field
+     */
+    protected static function declaredRules(array &$rules, FieldTypeRegistry $registry, array $field, string $prefix): void
+    {
+        $type = $field['type'] ?? null;
+
+        if (! is_string($type) || ! $registry->has($type)) {
+            return;
+        }
+
+        foreach ($registry->settingsRules($type, "{$prefix}.settings") as $key => $rule) {
+            // settingsRules keys validation.* on its own; re-prefix it.
+            $rules[str_starts_with($key, 'validation.') ? "{$prefix}.{$key}" : $key] = $rule;
+        }
+
+        // A choice element without options renders an empty control the
+        // visitor cannot answer, so it would fail at submit instead.
+        if ($registry->type($type)->hasOptions()) {
+            $rules["{$prefix}.options"] = ['required', 'array', 'min:1'];
+        }
     }
 
     /**

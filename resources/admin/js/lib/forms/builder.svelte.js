@@ -55,6 +55,17 @@ function makeKey(type, taken) {
     return key;
 }
 
+/**
+ * One page's elements, each repeatable group followed by its own children.
+ *
+ * Children share the form-wide key namespace and the `unique(form_id, key)`
+ * index with everything else, so anything asking "what keys are taken?" or
+ * "where does this id live?" has to see them.
+ */
+function flatFields(page) {
+    return (page?.fields ?? []).flatMap((field) => [field, ...(field.children ?? [])]);
+}
+
 export function createBuilder() {
     let doc = $state.raw(null);
     let palette = $state.raw([]);
@@ -79,7 +90,10 @@ export function createBuilder() {
         commit({ ...doc, pages: doc.pages.map(mapper) });
     }
 
-    const allKeys = () => new Set(doc.pages.flatMap((p) => p.fields.map((f) => f.key)));
+    const allKeys = () => new Set(doc.pages.flatMap(flatFields).map((f) => f.key));
+
+    /** Every field in the document, children included. */
+    const allFields = () => doc.pages.flatMap(flatFields);
 
     return {
         get doc() { return doc; },
@@ -97,12 +111,23 @@ export function createBuilder() {
         get selectedId() { return selectedId; },
         get selectedPageId() { return selectedPageId; },
 
+        /**
+         * The selected element, its page, and — when it sits inside a repeatable
+         * group — that group. `parent` is what tells the inspector to hide the
+         * settings that only mean something on a page (Must be unique, Go to
+         * page), rather than offering a switch the save would silently drop.
+         */
         get selected() {
             if (!doc || !selectedId) return null;
 
             for (const page of doc.pages) {
-                const field = page.fields.find((f) => f.id === selectedId);
-                if (field) return { field, page };
+                for (const field of page.fields) {
+                    if (field.id === selectedId) return { field, page, parent: null };
+
+                    const child = (field.children ?? []).find((c) => c.id === selectedId);
+
+                    if (child) return { field: child, page, parent: field };
+                }
             }
 
             return null;
@@ -194,7 +219,11 @@ export function createBuilder() {
             commit({ ...doc, pages });
         },
 
-        addField(type, pageId) {
+        /**
+         * Add an element to a page, or — with $parentId — inside a repeatable
+         * group.
+         */
+        addField(type, pageId, parentId = null) {
             const spec = palette.find((p) => p.code === type);
             if (!spec) return null;
 
@@ -215,10 +244,21 @@ export function createBuilder() {
                 value: seed(doc.locales, doc.default_locale),
                 content: seed(doc.locales, doc.default_locale, spec.is_input ? '' : spec.label),
                 options: spec.has_options ? [makeOption(doc, 'option_1', 'Option 1'), makeOption(doc, 'option_2', 'Option 2')] : [],
+                children: [],
             };
 
-            const target = pageId ?? doc.pages[0]?.id;
-            mapPages((p) => (p.id === target ? { ...p, fields: [...p.fields, field] } : p));
+            if (parentId) {
+                mapPages((p) => ({
+                    ...p,
+                    fields: p.fields.map((f) =>
+                        f.id === parentId ? { ...f, children: [...(f.children ?? []), field] } : f,
+                    ),
+                }));
+            } else {
+                const target = pageId ?? doc.pages[0]?.id;
+                mapPages((p) => (p.id === target ? { ...p, fields: [...p.fields, field] } : p));
+            }
+
             selectedId = field.id;
             selectedPageId = null;
 
@@ -226,30 +266,64 @@ export function createBuilder() {
         },
 
         removeField(fieldId) {
-            mapPages((p) => ({ ...p, fields: p.fields.filter((f) => f.id !== fieldId) }));
+            mapPages((p) => ({
+                ...p,
+                fields: p.fields
+                    .filter((f) => f.id !== fieldId)
+                    .map((f) =>
+                        (f.children ?? []).some((c) => c.id === fieldId)
+                            ? { ...f, children: f.children.filter((c) => c.id !== fieldId) }
+                            : f,
+                    ),
+            }));
+
             if (selectedId === fieldId) selectedId = null;
         },
 
         duplicateField(fieldId) {
-            const found = this.selected?.field?.id === fieldId ? this.selected : null;
-            const page = doc.pages.find((p) => p.fields.some((f) => f.id === fieldId));
-            const field = page?.fields.find((f) => f.id === fieldId);
+            const page = doc.pages.find((p) => flatFields(p).some((f) => f.id === fieldId));
+            if (!page) return;
+
+            // The group this belongs to, when it is a child — a copy has to land
+            // beside its original, not at the top of the page.
+            const parent = page.fields.find((f) => (f.children ?? []).some((c) => c.id === fieldId)) ?? null;
+            const siblings = parent ? (parent.children ?? []) : page.fields;
+            const field = siblings.find((f) => f.id === fieldId);
             if (!field) return;
 
             const taken = allKeys();
-            const copy = {
-                ...structuredClone(field),
-                id: ulid(),
-                key: makeKey(field.type, taken),
-                options: (field.options ?? []).map((o) => ({ ...structuredClone(o), id: ulid() })),
+
+            // Each clone claims its key BEFORE the next is minted: duplicating a
+            // group mints one per child, and a shared `taken` snapshot would hand
+            // every one of them the same name.
+            const clone = (f) => {
+                const key = makeKey(f.type, taken);
+                taken.add(key);
+
+                return {
+                    ...structuredClone(f),
+                    id: ulid(),
+                    key,
+                    options: (f.options ?? []).map((o) => ({ ...structuredClone(o), id: ulid() })),
+                };
             };
 
-            const at = page.fields.findIndex((f) => f.id === fieldId) + 1;
-            mapPages((p) =>
-                p.id === page.id
-                    ? { ...p, fields: [...p.fields.slice(0, at), copy, ...p.fields.slice(at)] }
-                    : p,
-            );
+            const copy = clone(field);
+
+            // A duplicated group needs duplicated CHILDREN. Sharing their ids
+            // would make one save write the same rows twice, and whichever group
+            // was written second would take the children off the first.
+            copy.children = (field.children ?? []).map(clone);
+
+            const at = siblings.findIndex((f) => f.id === fieldId) + 1;
+            const next = [...siblings.slice(0, at), copy, ...siblings.slice(at)];
+
+            if (parent) {
+                this.setChildren(parent.id, next);
+            } else {
+                this.setFields(page.id, next);
+            }
+
             selectedId = copy.id;
             selectedPageId = null;
         },
@@ -257,13 +331,30 @@ export function createBuilder() {
         patchField(fieldId, patch) {
             mapPages((p) => ({
                 ...p,
-                fields: p.fields.map((f) => (f.id === fieldId ? { ...f, ...patch } : f)),
+                fields: p.fields.map((f) => {
+                    if (f.id === fieldId) return { ...f, ...patch };
+
+                    if (!(f.children ?? []).some((c) => c.id === fieldId)) return f;
+
+                    return {
+                        ...f,
+                        children: f.children.map((c) => (c.id === fieldId ? { ...c, ...patch } : c)),
+                    };
+                }),
             }));
         },
 
         /** Replace one page's field list — what dnd finalize hands back. */
         setFields(pageId, fields) {
             mapPages((p) => (p.id === pageId ? { ...p, fields } : p));
+        },
+
+        /** The same, for the zone inside one repeatable group. */
+        setChildren(fieldId, children) {
+            mapPages((p) => ({
+                ...p,
+                fields: p.fields.map((f) => (f.id === fieldId ? { ...f, children } : f)),
+            }));
         },
 
         /*
@@ -273,26 +364,49 @@ export function createBuilder() {
          * setFields() on each zone rather than through a move method.
          */
 
-        /** Step a field within its page. The keyboard path — drag is not the only way in. */
+        /**
+         * Step a field among its SIBLINGS. The keyboard path — drag is not the
+         * only way in.
+         *
+         * Siblings, not "the page": a child steps within its group and stops at
+         * its boundary, the same way a top-level field stops at the page's. There
+         * is no keyboard route in or out of a group, for the same reason there is
+         * none between pages — that move is a drag.
+         */
         stepField(fieldId, delta) {
-            mapPages((p) => {
-                const from = p.fields.findIndex((f) => f.id === fieldId);
-                if (from < 0) return p;
+            const swap = (list) => {
+                const from = list.findIndex((f) => f.id === fieldId);
+                if (from < 0) return null;
 
                 const to = from + delta;
-                if (to < 0 || to >= p.fields.length) return p;
+                if (to < 0 || to >= list.length) return list;
 
-                const fields = [...p.fields];
-                [fields[from], fields[to]] = [fields[to], fields[from]];
+                const next = [...list];
+                [next[from], next[to]] = [next[to], next[from]];
 
-                return { ...p, fields };
+                return next;
+            };
+
+            mapPages((p) => {
+                const fields = swap(p.fields);
+
+                if (fields) return { ...p, fields };
+
+                return {
+                    ...p,
+                    fields: p.fields.map((f) => {
+                        const children = swap(f.children ?? []);
+
+                        return children ? { ...f, children } : f;
+                    }),
+                };
             });
         },
 
         /* ---------------- options ---------------- */
 
         addOption(fieldId) {
-            const field = doc.pages.flatMap((p) => p.fields).find((f) => f.id === fieldId);
+            const field = allFields().find((f) => f.id === fieldId);
             if (!field) return;
 
             const n = (field.options?.length ?? 0) + 1;
@@ -302,14 +416,14 @@ export function createBuilder() {
         },
 
         removeOption(fieldId, optionId) {
-            const field = doc.pages.flatMap((p) => p.fields).find((f) => f.id === fieldId);
+            const field = allFields().find((f) => f.id === fieldId);
             if (!field) return;
 
             this.patchField(fieldId, { options: (field.options ?? []).filter((o) => o.id !== optionId) });
         },
 
         patchOption(fieldId, optionId, patch) {
-            const field = doc.pages.flatMap((p) => p.fields).find((f) => f.id === fieldId);
+            const field = allFields().find((f) => f.id === fieldId);
             if (!field) return;
 
             this.patchField(fieldId, {
@@ -354,6 +468,21 @@ function normalise(tree) {
         return out;
     };
 
+    // Applied to a page field and to a group child alike — a child is an
+    // ordinary element and every input the inspector binds to it needs the same
+    // locale keys present.
+    const field = (f) => ({
+        ...f,
+        settings: f.settings ?? {},
+        validation: f.validation ?? {},
+        label: fill(f.label),
+        placeholder: fill(f.placeholder),
+        value: fill(f.value),
+        content: fill(f.content),
+        options: (f.options ?? []).map((o) => ({ ...o, label: fill(o.label) })),
+        children: (f.children ?? []).map((c) => field(c)),
+    });
+
     return {
         ...tree,
         title: fill(tree.title),
@@ -363,22 +492,49 @@ function normalise(tree) {
         pages: (tree.pages ?? []).map((page) => ({
             ...page,
             title: fill(page.title),
-            fields: (page.fields ?? []).map((field) => ({
-                ...field,
-                settings: field.settings ?? {},
-                validation: field.validation ?? {},
-                label: fill(field.label),
-                placeholder: fill(field.placeholder),
-                value: fill(field.value),
-                content: fill(field.content),
-                options: (field.options ?? []).map((o) => ({ ...o, label: fill(o.label) })),
-            })),
+            fields: (page.fields ?? []).map(field),
         })),
     };
 }
 
 /** Strip the drag library's shadow items and send position as order. */
 function serialise(doc) {
+    // Shadow items exist in a group's zone too, and one sent to the server would
+    // fail `ulid` on an id the library invented.
+    const real = (list) => (list ?? []).filter((f) => !f['isDndShadowItem']);
+
+    const field = (f) => ({
+        id: f.id,
+        type: f.type,
+        key: f.key,
+        is_required: !!f.is_required,
+        is_unique: !!f.is_unique,
+        settings: f.settings ?? {},
+        validation: f.validation ?? {},
+        target_form_page_id: f.target_form_page_id || null,
+        css_id: f.css_id || null,
+        css_class: f.css_class || null,
+        label: f.label,
+        placeholder: f.placeholder,
+        value: f.value,
+        content: f.content,
+        options: (f.options ?? []).map((o) => ({
+            id: o.id,
+            value: o.value,
+            is_default: !!o.is_default,
+            label: o.label,
+        })),
+        children: real(f.children).map(child),
+    });
+
+    // One level: a group cannot hold a group, so a child sends no children of
+    // its own. FieldTypeRegistry::childCodes() is what enforces that server-side.
+    const child = (c) => {
+        const { children, ...rest } = field(c);
+
+        return rest;
+    };
+
     return doc.pages.map((page) => ({
         id: page.id,
         name: page.name,
@@ -386,30 +542,7 @@ function serialise(doc) {
         css_id: page.css_id || null,
         css_class: page.css_class || null,
         title: page.title,
-        fields: page.fields
-            .filter((f) => !f['isDndShadowItem'])
-            .map((field) => ({
-                id: field.id,
-                type: field.type,
-                key: field.key,
-                is_required: !!field.is_required,
-                is_unique: !!field.is_unique,
-                settings: field.settings ?? {},
-                validation: field.validation ?? {},
-                target_form_page_id: field.target_form_page_id || null,
-                css_id: field.css_id || null,
-                css_class: field.css_class || null,
-                label: field.label,
-                placeholder: field.placeholder,
-                value: field.value,
-                content: field.content,
-                options: (field.options ?? []).map((o) => ({
-                    id: o.id,
-                    value: o.value,
-                    is_default: !!o.is_default,
-                    label: o.label,
-                })),
-            })),
+        fields: real(page.fields).map(field),
     }));
 }
 
@@ -424,14 +557,17 @@ function remapErrors(raw, doc) {
 
     for (const [path, messages] of Object.entries(raw)) {
         const message = Array.isArray(messages) ? messages[0] : messages;
-        const m = path.match(/^pages\.(\d+)(?:\.fields\.(\d+))?(?:\.(.+))?$/);
+        // The optional children segment comes BEFORE the `rest` capture, so a
+        // child's own error lands on the child's card rather than being read as
+        // an attribute called "children.2.key" on its group.
+        const m = path.match(/^pages\.(\d+)(?:\.fields\.(\d+))?(?:\.children\.(\d+))?(?:\.(.+))?$/);
 
         if (!m) {
             out.form.push(message);
             continue;
         }
 
-        const [, p, f, rest] = m;
+        const [, p, f, c, rest] = m;
         const page = doc.pages[Number(p)];
 
         if (f === undefined) {
@@ -440,7 +576,8 @@ function remapErrors(raw, doc) {
             continue;
         }
 
-        const field = page?.fields?.[Number(f)];
+        const parent = page?.fields?.[Number(f)];
+        const field = c === undefined ? parent : parent?.children?.[Number(c)];
         const id = field?.id ?? 'form';
 
         if (id === 'form') {

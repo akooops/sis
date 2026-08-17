@@ -38,6 +38,16 @@ interface FieldType
     public function hasOptions(): bool;
 
     /**
+     * Whether it owns CHILD FIELDS — only a repeatable group does.
+     *
+     * A group is the one element whose answer is a list of objects rather than a
+     * scalar or a list of scalars, so it is also the one element that recurses:
+     * it compiles its children's rules under its own key, and stores their values
+     * inside its own array. Everything downstream reads that as a single answer.
+     */
+    public function hasChildren(): bool;
+
+    /**
      * Translatable attributes this element actually uses, so the builder shows
      * only the boxes that mean something for it.
      *

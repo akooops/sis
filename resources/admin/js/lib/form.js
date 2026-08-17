@@ -95,6 +95,41 @@ export const DEVICE_TYPE_OPTIONS = [
 export const FILE_FIELD_TYPE = 'file';
 
 /**
+ * The element code whose answer is a LIST OF OBJECTS rather than a scalar or a
+ * list of scalars — a repeatable group. Mirrors GroupType::code().
+ *
+ * The only answer shape formatAnswer() deliberately refuses to flatten: an
+ * education history rendered as `[object Object], [object Object]` is worse than
+ * useless, so the drawer renders each entry itself from the snapshot's `children`.
+ */
+export const GROUP_FIELD_TYPE = 'group';
+
+/**
+ * One group answer as a list of {key, label, value} rows per entry.
+ *
+ * Reads the labels off the SNAPSHOT taken at submit time, not the live form, for
+ * the same reason the rest of the drawer does: renaming a child today must not
+ * silently retitle every submission collected before it.
+ */
+export function groupEntries(value, snapshotChildren = {}) {
+    if (!Array.isArray(value)) return [];
+
+    const order = Object.keys(snapshotChildren).sort(
+        (a, b) => (snapshotChildren[a]?.order ?? Infinity) - (snapshotChildren[b]?.order ?? Infinity),
+    );
+
+    return value.filter((entry) => entry && typeof entry === 'object').map((entry) => ({
+        // Snapshot order first, then any key the entry holds that the snapshot
+        // does not name — same rule the answer list itself follows.
+        rows: [...order, ...Object.keys(entry).filter((key) => !(key in snapshotChildren))].map((key) => ({
+            key,
+            type: snapshotChildren[key]?.type ?? null,
+            value: entry[key] ?? null,
+        })),
+    }));
+}
+
+/**
  * One stored answer as a display string.
  *
  * The client-side counterpart of FieldType::display(), and deliberately the

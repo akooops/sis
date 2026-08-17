@@ -461,10 +461,15 @@ return [
                 'es' => 'Artículos populares', 'de' => 'Beliebte Beiträge', 'it' => 'Articoli popolari',
                 'pt' => 'Artigos populares', 'ru' => 'Популярные статьи', 'hi' => 'लोकप्रिय लेख',
             ],
-            'articles.search' => [
+            'articles.filters.search' => [
                 'en' => 'Search news…', 'ar' => 'ابحث في الأخبار…', 'fr' => 'Rechercher une actualité…',
                 'es' => 'Buscar noticias…', 'de' => 'Neuigkeiten durchsuchen…', 'it' => 'Cerca notizie…',
                 'pt' => 'Pesquisar notícias…', 'ru' => 'Поиск новостей…', 'hi' => 'समाचार खोजें…',
+            ],
+            'articles.filters.categories' => [
+                'en' => 'Categories', 'ar' => 'التصنيفات', 'fr' => 'Catégories', 'es' => 'Categorías',
+                'de' => 'Kategorien', 'it' => 'Categorie', 'pt' => 'Categorias', 'ru' => 'Категории',
+                'hi' => 'श्रेणियाँ',
             ],
             'articles.empty' => [
                 'en' => 'No articles published yet.', 'ar' => 'لم تُنشر أي مقالات بعد.',
@@ -539,11 +544,6 @@ return [
                 'en' => 'Categories', 'ar' => 'التصنيفات', 'fr' => 'Catégories', 'es' => 'Categorías',
                 'de' => 'Kategorien', 'it' => 'Categorie', 'pt' => 'Categorias', 'ru' => 'Категории',
                 'hi' => 'श्रेणियाँ',
-            ],
-            'achievements.filters.all_categories' => [
-                'en' => 'All categories', 'ar' => 'كل التصنيفات', 'fr' => 'Toutes les catégories',
-                'es' => 'Todas las categorías', 'de' => 'Alle Kategorien', 'it' => 'Tutte le categorie',
-                'pt' => 'Todas as categorias', 'ru' => 'Все категории', 'hi' => 'सभी श्रेणियाँ',
             ],
             'achievements.filters.years' => [
                 'en' => 'Years', 'ar' => 'السنوات', 'fr' => 'Années', 'es' => 'Años', 'de' => 'Jahre',
@@ -837,6 +837,134 @@ return [
             ],
 
             /* -----------------------------------------
+             The two ways into a long form
+            ------------------------------------------*/
+
+            'fill_manually' => [
+                'en' => 'Fill in manually', 'ar' => 'التعبئة يدويًا', 'fr' => 'Remplir manuellement',
+                'es' => 'Rellenar manualmente', 'de' => 'Manuell ausfüllen', 'it' => 'Compila manualmente',
+                'pt' => 'Preencher manualmente', 'ru' => 'Заполнить вручную', 'hi' => 'स्वयं भरें',
+            ],
+
+            'fill_manually_hint' => [
+                'en' => 'Answer the questions yourself.', 'ar' => 'أجب عن الأسئلة بنفسك.',
+                'fr' => 'Répondez vous-même aux questions.', 'es' => 'Responda usted mismo.',
+                'de' => 'Beantworten Sie die Fragen selbst.', 'it' => 'Rispondi tu alle domande.',
+                'pt' => 'Responda você mesmo às perguntas.', 'ru' => 'Ответьте на вопросы сами.',
+                'hi' => 'प्रश्नों के उत्तर स्वयं दें।',
+            ],
+
+            'fill_with_ai' => [
+                'en' => 'Fill in from my CV', 'ar' => 'التعبئة من سيرتي الذاتية',
+                'fr' => 'Remplir depuis mon CV', 'es' => 'Rellenar desde mi CV',
+                'de' => 'Aus meinem Lebenslauf ausfüllen', 'it' => 'Compila dal mio CV',
+                'pt' => 'Preencher a partir do meu CV', 'ru' => 'Заполнить из резюме',
+                'hi' => 'मेरे बायोडाटा से भरें',
+            ],
+
+            'fill_with_ai_hint' => [
+                'en' => 'Upload your CV and we will fill in what we can. You can correct anything.',
+                'ar' => 'ارفع سيرتك الذاتية وسنملأ ما نستطيع، ويمكنك تصحيح أي شيء.',
+                'fr' => 'Téléversez votre CV : nous remplirons ce que nous pouvons, vous pourrez tout corriger.',
+                'es' => 'Suba su CV y rellenaremos lo que podamos. Podrá corregir lo que quiera.',
+                'de' => 'Laden Sie Ihren Lebenslauf hoch; wir füllen aus, was wir können — Sie können alles korrigieren.',
+                'it' => 'Carica il tuo CV: compileremo quello che possiamo e potrai correggere tutto.',
+                'pt' => 'Carregue o seu CV e preencheremos o que for possível. Pode corrigir tudo.',
+                'ru' => 'Загрузите резюме — мы заполним, что сможем. Вы сможете всё исправить.',
+                'hi' => 'अपना बायोडाटा अपलोड करें; हम जो भर सकते हैं भर देंगे और आप कुछ भी सुधार सकते हैं।',
+            ],
+
+            'cv_reading' => [
+                'en' => 'Reading your CV…', 'ar' => 'جارٍ قراءة سيرتك الذاتية…',
+                'fr' => 'Lecture de votre CV…', 'es' => 'Leyendo su CV…',
+                'de' => 'Lebenslauf wird gelesen…', 'it' => 'Lettura del CV…',
+                'pt' => 'A ler o seu CV…', 'ru' => 'Читаем резюме…', 'hi' => 'बायोडाटा पढ़ा जा रहा है…',
+            ],
+
+            'cv_failed' => [
+                'en' => 'That file could not be read. You can still fill the form in yourself.',
+                'ar' => 'تعذّرت قراءة الملف. لا يزال بإمكانك تعبئة النموذج بنفسك.',
+                'fr' => 'Ce fichier n’a pas pu être lu. Vous pouvez toujours remplir le formulaire vous-même.',
+                'es' => 'No se pudo leer el archivo. Aún puede rellenar el formulario usted mismo.',
+                'de' => 'Die Datei konnte nicht gelesen werden. Sie können das Formular weiterhin selbst ausfüllen.',
+                'it' => 'Non è stato possibile leggere il file. Puoi comunque compilare il modulo a mano.',
+                'pt' => 'Não foi possível ler o ficheiro. Pode preencher o formulário manualmente.',
+                'ru' => 'Не удалось прочитать файл. Вы можете заполнить форму вручную.',
+                'hi' => 'यह फ़ाइल पढ़ी नहीं जा सकी। आप फ़ॉर्म स्वयं भर सकते हैं।',
+            ],
+
+            /* -----------------------------------------
+             Job application guards
+
+             Refusals no single field can decide — the posting closed, this person
+             already applied, this CV was already sent. Worded for the APPLICANT,
+             who has done nothing wrong in any of the three cases.
+            ------------------------------------------*/
+
+            'job_offer_missing' => [
+                'en' => 'That position is no longer listed.',
+                'ar' => 'هذه الوظيفة لم تعد مدرجة.',
+                'fr' => 'Ce poste n’est plus proposé.',
+                'es' => 'Ese puesto ya no está disponible.',
+                'de' => 'Diese Stelle wird nicht mehr angeboten.',
+                'it' => 'Questa posizione non è più disponibile.',
+                'pt' => 'Essa vaga já não está disponível.',
+                'ru' => 'Эта вакансия больше не размещена.',
+                'hi' => 'यह पद अब सूचीबद्ध नहीं है।',
+            ],
+
+            'job_offer_closed' => [
+                'en' => 'This position has closed for applications.',
+                'ar' => 'أُغلق باب التقديم على هذه الوظيفة.',
+                'fr' => 'Les candidatures pour ce poste sont closes.',
+                'es' => 'Este puesto ya no admite candidaturas.',
+                'de' => 'Für diese Stelle werden keine Bewerbungen mehr angenommen.',
+                'it' => 'Le candidature per questa posizione sono chiuse.',
+                'pt' => 'As candidaturas para esta vaga estão encerradas.',
+                'ru' => 'Приём заявок на эту вакансию закрыт.',
+                'hi' => 'इस पद के लिए आवेदन बंद हो चुके हैं।',
+            ],
+
+            'job_already_applied' => [
+                'en' => 'You have already applied for this position.',
+                'ar' => 'لقد سبق أن تقدمت لهذه الوظيفة.',
+                'fr' => 'Vous avez déjà postulé à ce poste.',
+                'es' => 'Ya se ha presentado a este puesto.',
+                'de' => 'Sie haben sich bereits auf diese Stelle beworben.',
+                'it' => 'Ti sei già candidato per questa posizione.',
+                'pt' => 'Já se candidatou a esta vaga.',
+                'ru' => 'Вы уже подавали заявку на эту вакансию.',
+                'hi' => 'आप इस पद के लिए पहले ही आवेदन कर चुके हैं।',
+            ],
+
+            /* -----------------------------------------
+             Repeatable groups
+
+             ONE SET OF STRINGS FOR EVERY GROUP, interpolated with the group's own
+             translated label — :label is "Education", ":number" the row. A group
+             carries no per-group button copy of its own, so adding one to a form
+             needs no translation work at all.
+            ------------------------------------------*/
+
+            'group_add' => [
+                'en' => 'Add :label', 'ar' => 'إضافة :label', 'fr' => 'Ajouter :label',
+                'es' => 'Añadir :label', 'de' => ':label hinzufügen', 'it' => 'Aggiungi :label',
+                'pt' => 'Adicionar :label', 'ru' => 'Добавить :label', 'hi' => ':label जोड़ें',
+            ],
+
+            'group_remove' => [
+                'en' => 'Remove', 'ar' => 'إزالة', 'fr' => 'Retirer', 'es' => 'Quitar',
+                'de' => 'Entfernen', 'it' => 'Rimuovi', 'pt' => 'Remover', 'ru' => 'Удалить',
+                'hi' => 'हटाएँ',
+            ],
+
+            'group_item' => [
+                'en' => ':label :number', 'ar' => ':label :number', 'fr' => ':label :number',
+                'es' => ':label :number', 'de' => ':label :number', 'it' => ':label :number',
+                'pt' => ':label :number', 'ru' => ':label :number', 'hi' => ':label :number',
+            ],
+
+            /* -----------------------------------------
              Confirmation page
             ------------------------------------------*/
 
@@ -921,6 +1049,88 @@ return [
                 'en' => 'Positions available', 'ar' => 'عدد الشواغر', 'fr' => 'Postes à pourvoir',
                 'es' => 'Puestos disponibles', 'de' => 'Verfügbare Stellen', 'it' => 'Posizioni disponibili',
                 'pt' => 'Vagas disponíveis', 'ru' => 'Количество мест', 'hi' => 'उपलब्ध पद',
+            ],
+
+            /* -----------------------------------------
+             Listing filters — the sidebar block on /jobs
+            ------------------------------------------*/
+
+            'filters.title' => [
+                'en' => 'Filters', 'ar' => 'عوامل التصفية', 'fr' => 'Filtres', 'es' => 'Filtros',
+                'de' => 'Filter', 'it' => 'Filtri', 'pt' => 'Filtros', 'ru' => 'Фильтры',
+                'hi' => 'फ़िल्टर',
+            ],
+            'filters.categories' => [
+                'en' => 'Categories', 'ar' => 'التصنيفات', 'fr' => 'Catégories', 'es' => 'Categorías',
+                'de' => 'Kategorien', 'it' => 'Categorie', 'pt' => 'Categorias', 'ru' => 'Категории',
+                'hi' => 'श्रेणियाँ',
+            ],
+            'filters.employment_type' => [
+                'en' => 'Employment type', 'ar' => 'نوع التوظيف', 'fr' => 'Type de contrat',
+                'es' => 'Tipo de empleo', 'de' => 'Beschäftigungsart', 'it' => 'Tipo di contratto',
+                'pt' => 'Tipo de contrato', 'ru' => 'Тип занятости', 'hi' => 'रोज़गार का प्रकार',
+            ],
+            'filters.work_mode' => [
+                'en' => 'Work type', 'ar' => 'نمط العمل', 'fr' => 'Mode de travail',
+                'es' => 'Modalidad', 'de' => 'Arbeitsform', 'it' => 'Modalità di lavoro',
+                'pt' => 'Regime de trabalho', 'ru' => 'Формат работы', 'hi' => 'कार्य का प्रकार',
+            ],
+            /*
+             * ONE `all` OPTION SERVES THREE LISTS — categories, employment types and
+             * work modes — so the Romance locales take the INVARIABLE form (fr `Tout`,
+             * es `Todo`, it `Tutto`, pt `Tudo`) rather than a gendered plural: `Tous`
+             * would be wrong above the feminine `Catégories` and `Toutes` wrong above
+             * the masculine `Type de contrat`.
+             */
+            'filters.all' => [
+                'en' => 'All', 'ar' => 'الكل', 'fr' => 'Tout', 'es' => 'Todo', 'de' => 'Alle',
+                'it' => 'Tutto', 'pt' => 'Tudo', 'ru' => 'Все', 'hi' => 'सभी',
+            ],
+            /*
+             * The empty option of the two <select> filters in the aside. Keyed
+             * `filters.all_<key>` to match `filters.<key>` above, so the one loop that
+             * renders both selects derives the heading and the empty option from the
+             * same key. They are SEPARATE from `filters.all` because a select's empty
+             * option names the thing it clears — a bare "All" floating in a dropdown
+             * reads as an option rather than as the absence of one — and because that
+             * lets each locale agree with its own noun, which the deliberately
+             * invariable `filters.all` above cannot do.
+             */
+            'filters.all_employment_type' => [
+                'en' => 'All employment types', 'ar' => 'جميع أنواع التوظيف',
+                'fr' => 'Tous les types de contrat', 'es' => 'Todos los tipos de empleo',
+                'de' => 'Alle Beschäftigungsarten', 'it' => 'Tutti i tipi di contratto',
+                'pt' => 'Todos os tipos de contrato', 'ru' => 'Все типы занятости',
+                'hi' => 'सभी रोज़गार प्रकार',
+            ],
+            'filters.all_work_mode' => [
+                'en' => 'All work types', 'ar' => 'جميع أنماط العمل',
+                'fr' => 'Tous les modes de travail', 'es' => 'Todas las modalidades',
+                'de' => 'Alle Arbeitsformen', 'it' => 'Tutte le modalità di lavoro',
+                'pt' => 'Todos os regimes de trabalho', 'ru' => 'Все форматы работы',
+                'hi' => 'सभी कार्य प्रकार',
+            ],
+            'filters.clear' => [
+                'en' => 'Clear all filters', 'ar' => 'مسح جميع عوامل التصفية',
+                'fr' => 'Effacer tous les filtres', 'es' => 'Borrar todos los filtros',
+                'de' => 'Alle Filter zurücksetzen', 'it' => 'Azzera tutti i filtri',
+                'pt' => 'Limpar todos os filtros', 'ru' => 'Сбросить все фильтры',
+                'hi' => 'सभी फ़िल्टर हटाएँ',
+            ],
+            /*
+             * `:count` IS A PLAIN `__()` REPLACEMENT, NOT `trans_choice` — one string has
+             * to be right for 1 and for 300. So every locale is written as a LABEL
+             * (`Vacancies: 1`) instead of a counted phrase (`1 vacancies`): the noun then
+             * never has to agree with the number, which is what would otherwise break
+             * English/French/Hindi (singular after 1), Arabic (dual, plus a different
+             * case for 3–10 and 11+) and Russian (three plural forms). Add a pluralised
+             * variant only via `trans_choice` and a `|` string, never by editing these.
+             */
+            'results' => [
+                'en' => 'Vacancies: :count', 'ar' => 'الوظائف الشاغرة: :count',
+                'fr' => 'Postes à pourvoir : :count', 'es' => 'Vacantes: :count',
+                'de' => 'Stellen: :count', 'it' => 'Posizioni: :count', 'pt' => 'Vagas: :count',
+                'ru' => 'Вакансии: :count', 'hi' => 'रिक्तियाँ: :count',
             ],
 
             /* -----------------------------------------
@@ -1020,6 +1230,30 @@ return [
                 'es' => 'Sobre el puesto', 'de' => 'Über die Stelle', 'it' => 'Informazioni sul ruolo',
                 'pt' => 'Sobre a função', 'ru' => 'О вакансии', 'hi' => 'भूमिका के बारे में',
             ],
+            'detail.experience' => [
+                'en' => 'Years of experience', 'ar' => 'سنوات الخبرة', 'fr' => 'Années d’expérience',
+                'es' => 'Años de experiencia', 'de' => 'Berufsjahre', 'it' => 'Anni di esperienza',
+                'pt' => 'Anos de experiência', 'ru' => 'Опыт работы (лет)', 'hi' => 'अनुभव (वर्ष)',
+            ],
+
+            'detail.employment_type' => [
+                'en' => 'Employment type', 'ar' => 'نوع التوظيف', 'fr' => 'Type de contrat',
+                'es' => 'Tipo de empleo', 'de' => 'Beschäftigungsart', 'it' => 'Tipo di contratto',
+                'pt' => 'Tipo de contrato', 'ru' => 'Тип занятости', 'hi' => 'रोज़गार का प्रकार',
+            ],
+
+            'detail.work_mode' => [
+                'en' => 'Work type', 'ar' => 'نمط العمل', 'fr' => 'Mode de travail',
+                'es' => 'Modalidad', 'de' => 'Arbeitsform', 'it' => 'Modalità di lavoro',
+                'pt' => 'Regime de trabalho', 'ru' => 'Формат работы', 'hi' => 'कार्य का प्रकार',
+            ],
+
+            'detail.education_level' => [
+                'en' => 'Education', 'ar' => 'المؤهل العلمي', 'fr' => 'Niveau d’études',
+                'es' => 'Formación', 'de' => 'Ausbildung', 'it' => 'Titolo di studio',
+                'pt' => 'Habilitações', 'ru' => 'Образование', 'hi' => 'शिक्षा',
+            ],
+
             'detail.skills' => [
                 'en' => 'Required skills', 'ar' => 'المهارات المطلوبة', 'fr' => 'Compétences requises',
                 'es' => 'Competencias requeridas', 'de' => 'Erforderliche Fähigkeiten',
@@ -1067,6 +1301,12 @@ return [
                 'de' => 'Jetzt bewerben', 'it' => 'Candidati ora', 'pt' => 'Candidatar-se',
                 'ru' => 'Откликнуться', 'hi' => 'अभी आवेदन करें',
             ],
+            'apply.abort' => [
+                'en' => 'Cancel', 'ar' => 'إلغاء', 'fr' => 'Annuler', 'es' => 'Cancelar',
+                'de' => 'Abbrechen', 'it' => 'Annulla', 'pt' => 'Cancelar',
+                'ru' => 'Отмена', 'hi' => 'रद्द करें',
+            ],
+
             'apply.title' => [
                 'en' => 'Application', 'ar' => 'طلب التوظيف', 'fr' => 'Candidature', 'es' => 'Solicitud',
                 'de' => 'Bewerbung', 'it' => 'Candidatura', 'pt' => 'Candidatura', 'ru' => 'Заявка',

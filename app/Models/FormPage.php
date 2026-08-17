@@ -47,9 +47,20 @@ class FormPage extends Model
         return $this->belongsTo(Form::class);
     }
 
+    /** EVERY field on the page, group children included. */
     public function fields(): HasMany
     {
         return $this->hasMany(FormField::class)->orderBy('order');
+    }
+
+    /**
+     * The fields laid out on the page itself — what anything that RENDERS or
+     * COLUMNISES the page wants, since a group draws its own children and a child
+     * has no position of its own on the page.
+     */
+    public function topLevelFields(): HasMany
+    {
+        return $this->hasMany(FormField::class)->topLevel()->orderBy('order');
     }
 
     /* -----------------------------------------

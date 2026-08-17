@@ -20,6 +20,7 @@
     import DetailDrawer from '@/components/data/DetailDrawer.svelte';
     import ActivityDrawer from '@/components/activity/ActivityDrawer.svelte';
     import JobOfferForm from './JobOfferForm.svelte';
+    import MatchesDrawer from './MatchesDrawer.svelte';
     import { useIndex } from '@/lib/api/useIndex.svelte';
     import {
         EDUCATION_LEVEL_LABELS,
@@ -34,6 +35,7 @@
     import { api } from '@/lib/api/client';
     import { toast } from '@/lib/toast';
     import { confirm } from '@/lib/confirm';
+    import { router } from '@inertiajs/svelte';
 
     const list = useIndex('api.v1.admin.job-offers.index', { perPage: 15, sort: '-created_at' });
 
@@ -44,6 +46,8 @@
     let viewing = $state(null);
     let activityOpen = $state(false);
     let activityRow = $state(null);
+    let matchesOpen = $state(false);
+    let matchesOffer = $state(null);
 
     const categoryId = $derived(list.params.filter?.category_id ?? null);
 
@@ -108,6 +112,12 @@
     const saved = () => { closeForm(); list.refresh(); };
     const view = (o) => { viewing = o; viewOpen = true; };
     const showActivity = (o) => { activityRow = o; activityOpen = true; };
+    const showMatches = (o) => { matchesOffer = o; matchesOpen = true; };
+
+    // The applications for this posting live on their own page, not in a drawer:
+    // the filtered queue has to stay linkable and exportable.
+    const openApplications = (o) =>
+        router.visit(route('web.admin.job-applications.index', { 'filter[job_offer_id]': o.id }));
 
     async function remove(o) {
         if (!(await confirm({
@@ -161,6 +171,7 @@
         updatedAt={viewing?.updated_at}
     />
     <ActivityDrawer bind:open={activityOpen} subjectType="job_offer" subjectId={activityRow?.id} title={activityRow?.name} />
+    <MatchesDrawer bind:open={matchesOpen} jobOffer={matchesOffer} />
 </AdminLayout>
 
 {#snippet toolbar(inForm)}
@@ -246,6 +257,10 @@
     <RowActions actions={[
         { icon: 'ki-eye', label: 'View', onclick: () => view(row) },
         hasPermission('job-offers.update') && { icon: 'ki-pencil', label: 'Edit', onclick: () => edit(row) },
+        // Two different questions: who the scorer suggests for this posting, and
+        // who actually applied to it. The first is a drawer, the second a page.
+        hasPermission('candidate-matches.index') && { icon: 'ki-people', label: 'Matches', onclick: () => showMatches(row) },
+        hasPermission('job-applications.index') && { icon: 'ki-file-added', label: 'Applications', onclick: () => openApplications(row) },
         hasPermission('activities.index') && { icon: 'ki-time', label: 'Activity', onclick: () => showActivity(row) },
         hasPermission('job-offers.destroy') && { icon: 'ki-trash', label: 'Delete', onclick: () => remove(row), variant: 'destructive' },
     ].filter(Boolean)} />

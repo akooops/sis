@@ -59,6 +59,14 @@
     --sisf-primary: var(--color-brand);
     --sisf-primary-sweep: var(--color-brand-soft);
     --sisf-primary-fg: var(--color-paper);
+    /*
+     * The PALE one. `--sisf-primary-sweep` reads like a tint from its name and
+     * is not — --color-brand-soft is #3c70a3, a mid blue that only ever carries
+     * white text. Anything that wants to stay dark-on-light while highlighting
+     * needs this instead, or the content it is emphasising becomes the least
+     * readable thing on the page.
+     */
+    --sisf-primary-tint: var(--color-brand-tint);
     --sisf-danger: var(--color-danger);
     --sisf-danger-ink: var(--color-danger-ink);
     --sisf-danger-bg: var(--color-danger-surface);
@@ -622,7 +630,479 @@
 }
 
 /* -----------------------------------------
- 11. intl-tel-input
+ 10b. Field widths
+------------------------------------------*/
+
+/*
+ * A field may occupy a fraction of the line on a wide screen — first and last
+ * name at 50% each, a date range at 50/50.
+ *
+ * THE BREAKPOINTS ARE DERIVED, NOT CONFIGURED. The admin picks ONE percentage and
+ * these rules decide the rest, because there is only one right answer on a phone
+ * (fill the width) and asking a non-developer to specify three of them is a
+ * choice with two wrong answers. Anything narrower than half also lands on half
+ * at tablet size: three inputs across 768px is ~250px each, which is too tight
+ * once a label like "Field of study" sits above it.
+ *
+ * 768 / 992 match the breakpoints resources/site/css already uses, so the form
+ * reflows at the same width as the page around it rather than half a step out.
+ *
+ * The page and the group's row become WRAPPING flex containers for this. Default
+ * is 100%, so a form that sets no widths lays out exactly as it did before.
+ */
+/*
+ * ROW + WRAP, not column.
+ *
+ * Both containers were `flex-direction: column`, and wrapping a column produces
+ * new COLUMNS rather than new rows — the opposite of what is wanted. Switched to
+ * a wrapping row whose children default to a full basis, which lays out
+ * identically to the old column while making a narrower field possible.
+ */
+.sisf-page {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+/*
+ * EVERY direct child, not just .sisf-el. A page also holds its own <h2> and the
+ * fallback action row, and a flex child with no basis sizes to its content — so
+ * a heading left out of this would sit beside the first field instead of above
+ * it.
+ *
+ * min-width:0 because a flex item defaults to min-width:auto, and one long
+ * unbroken value (a URL in a text input) would otherwise force the field wider
+ * than the share it was given.
+ */
+.sisf-page > *,
+.sisf-group-item-fields > * {
+    flex: 1 1 100%;
+    min-width: 0;
+}
+
+/* Full width until there is room to be anything else. */
+@media (width >= 768px) {
+    .sisf-page > .sisf-el--w-75,
+    .sisf-group-item-fields > .sisf-el--w-75 {
+        flex-basis: calc(75% - var(--sisf-gap, 16px) / 2);
+    }
+
+    /* 66, 50, 33 and 25 all become a half here — see the note above. */
+    .sisf-page > .sisf-el--w-66,
+    .sisf-page > .sisf-el--w-50,
+    .sisf-page > .sisf-el--w-33,
+    .sisf-page > .sisf-el--w-25,
+    .sisf-group-item-fields > .sisf-el--w-66,
+    .sisf-group-item-fields > .sisf-el--w-50,
+    .sisf-group-item-fields > .sisf-el--w-33,
+    .sisf-group-item-fields > .sisf-el--w-25 {
+        flex-basis: calc(50% - var(--sisf-gap, 16px) / 2);
+    }
+}
+
+@media (width >= 992px) {
+    .sisf-page > .sisf-el--w-66,
+    .sisf-group-item-fields > .sisf-el--w-66 {
+        flex-basis: calc(66.666% - var(--sisf-gap, 16px) * 2 / 3);
+    }
+
+    .sisf-page > .sisf-el--w-33,
+    .sisf-group-item-fields > .sisf-el--w-33 {
+        flex-basis: calc(33.333% - var(--sisf-gap, 16px) * 2 / 3);
+    }
+
+    .sisf-page > .sisf-el--w-25,
+    .sisf-group-item-fields > .sisf-el--w-25 {
+        flex-basis: calc(25% - var(--sisf-gap, 16px) * 3 / 4);
+    }
+}
+
+/* The author-placed button row spans the line whatever its neighbours do —
+   Back and Next belong under the form, not beside a field. */
+.sisf-page > .sisf-button-row,
+.sisf-page > .sisf-actions {
+    flex: 1 1 100%;
+}
+
+/* -----------------------------------------
+ 10c. The two ways in
+------------------------------------------*/
+
+/*
+ * Two cards standing in for the form until one is chosen. Side by side where
+ * there is room, stacked on a phone — the same rule the field widths follow.
+ *
+ * `sisf-apply-*`, NEVER `sisf-choice-*`. `.sisf-choice` is section 6's row
+ * wrapping ONE radio/checkbox option and its label — Radio, Checkbox and
+ * ConsentControl all render it — and this block used the same name. Being the
+ * later of the two at equal specificity, it won: every option row on every
+ * public form was being laid out as a two-column grid. The older name is used
+ * by more components, so this one moved. Don't move it back.
+ */
+.sisf-apply-choice {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr;
+}
+
+@media (width >= 768px) {
+    .sisf-apply-choice {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/*
+ * One is a <button>, the other a <label> owning a file input — so both are
+ * styled here rather than on a shared tag.
+ *
+ * CENTRED BOTH WAYS. Start-aligned, a card read as a paragraph that happened to
+ * have a border round it; these are two marks to choose between, so the icon,
+ * the title and the hint stack up the middle and the stack sits in the middle of
+ * whichever card the grid stretched taller. `text-align: start` is gone: it was
+ * there only to undo the centring a <button> inherits, which is now the wanted
+ * result — and `center` is direction-agnostic, so RTL needs no rule of its own.
+ */
+.sisf-apply-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 24px;
+    border: 2px dashed var(--sisf-border-strong);
+    border-radius: var(--sisf-radius);
+    background: transparent;
+    font: inherit;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+/*
+ * Three selectors for two cards: a <label> cannot take focus itself, so the CV
+ * card's ring is drawn from the :focus-visible of the file input it owns. Drop
+ * that third one and half the chooser goes dark to a keyboard.
+ *
+ * TINT, NOT SWEEP. The card keeps dark text on a light ground in every state, so
+ * the highlight has to stay pale: filling with `--sisf-primary-sweep` put a
+ * #343f52 title and a grey hint on mid blue at about 2:1, which made the card
+ * under the pointer the one you could not read. The group's Add button below
+ * inverts to white text instead — it can, because it has one short label and no
+ * body copy to carry.
+ *
+ * :disabled is excluded because CSS :hover still matches a disabled button, and
+ * the manual card is disabled while a CV parses — lighting up a card that will
+ * not respond reads as a broken click rather than as "wait".
+ */
+.sisf-apply-card:hover:not(:disabled),
+.sisf-apply-card:focus-visible,
+.sisf-apply-card:has(.sisf-apply-file:focus-visible) {
+    border-color: var(--sisf-primary);
+    background: var(--sisf-primary-tint);
+}
+
+/*
+ * The two cards share one busy state from opposite sides: the manual card is a
+ * <button> the component disables, the CV card a <label> that cannot be, so it
+ * is given the class instead. Both must look the same or the pair contradicts
+ * itself while the CV is being read.
+ */
+.sisf-apply-card:disabled,
+.sisf-apply-card.is-busy {
+    cursor: progress;
+    opacity: 0.7;
+}
+
+/*
+ * OFF-SCREEN, NOT `hidden`. `display: none` cannot take focus, so the attribute
+ * left the CV path with no keyboard route in at all and the rule above with
+ * nothing to fire on. Pinned inside the card rather than the page, so focusing
+ * it scrolls to the card and not to the top of the document.
+ */
+.sisf-apply-file {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+/* The card's mark, so it has to carry the card — at the label-ish 32px it read
+   as a bullet the title had been pushed off. */
+.sisf-apply-card i {
+    font-size: 44px;
+    line-height: 1;
+    color: var(--sisf-primary);
+}
+
+.sisf-apply-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--color-heading);
+}
+
+.sisf-apply-hint {
+    font-size: 14px;
+    color: var(--sisf-muted);
+}
+
+/* -----------------------------------------
+ 11. Repeatable groups
+------------------------------------------*/
+
+/*
+ * A group is already a <fieldset class="sisf-el"> with a <legend>, so this owns
+ * only what is INSIDE it: the stack of rows, and the row itself.
+ *
+ * Token-free like the rest of this sheet — the same component renders in
+ * contexts that never load site/forms-theme.css, so nothing here may depend on
+ * a brand variable. The theme sheet repaints it.
+ */
+/*
+ * Matches the design the previous application form used, which reads better than
+ * the header-row version this replaced: the entry is a bordered card with the
+ * remove control tucked into its corner, and adding one is a full-width dashed
+ * button that looks like the empty slot it fills.
+ *
+ * Forms-wide, not job-specific — any repeatable group anywhere gets this.
+ */
+/*
+ * THE GROUP HAS TO READ AS ONE THING. Its entries are cards, so without a
+ * container of its own a repeat looked like loose boxes that happened to be
+ * adjacent — you could not see where "Education" started or stopped. The
+ * fieldset gets a tinted panel and an accent on the reading edge, so the group
+ * is obviously a region and the cards are obviously inside it.
+ */
+.sisf-el--group {
+    padding: 20px;
+    border-inline-start: 3px solid var(--sisf-primary);
+    border-radius: var(--sisf-radius);
+    background: var(--sisf-bg);
+}
+
+.sisf-el--group > .sisf-label {
+    font-size: 16px;
+    color: var(--sisf-primary);
+}
+
+.sisf-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/*
+ * ROW + WRAP, so a child's width setting has something to act on.
+ *
+ * This is easy to delete by accident and impossible to notice: the
+ * `.sisf-group-item-fields > .sisf-el--w-50` rules further down set flex-basis,
+ * and flex-basis on a child of a NON-flex container is simply ignored — every
+ * field silently goes back to its own line with nothing in the cascade to point
+ * at. It lives here, beside the group's other structure, rather than in the
+ * field-widths section, because that section comes EARLIER in the file and a
+ * flex-direction declared there would lose to anything here at equal
+ * specificity.
+ */
+.sisf-group-item-fields {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+/*
+ * padding-top leaves room for the remove control, which is absolutely positioned
+ * into the corner and would otherwise sit on top of the first field's label.
+ */
+.sisf-group-item {
+    position: relative;
+    padding: 34px 20px 20px;
+    border: 1px solid var(--sisf-border);
+    border-radius: var(--sisf-radius);
+    background: var(--color-paper, #fff);
+}
+
+/*
+ * inset-inline-end, not `right`: in an RTL form the remove control belongs in
+ * the opposite corner.
+ */
+.sisf-group-remove {
+    position: absolute;
+    top: 8px;
+    inset-inline-end: 10px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--sisf-danger);
+    cursor: pointer;
+}
+
+.sisf-group-remove:hover {
+    opacity: 0.75;
+}
+
+.sisf-group-add {
+    width: 100%;
+    padding: 16px;
+    border: 2px dashed var(--sisf-primary);
+    border-radius: var(--sisf-radius);
+    background: transparent;
+    color: var(--sisf-primary);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    /* colour and border-color too, or the label snaps to white while the fill
+       behind it is still easing in. */
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/*
+ * A SOLID FILL, not the sweep. The sweep is a brand tint, so primary text on it
+ * was primary-on-primary — the only thing hover changed was a background nobody
+ * could see it against. The dashed border goes to the paper colour with the
+ * text: left at --sisf-primary it would now be the same colour as its own fill
+ * and the button would lose its outline exactly when it gains emphasis.
+ */
+.sisf-group-add:hover {
+    border-color: var(--sisf-primary-fg);
+    background: var(--sisf-primary);
+    color: var(--sisf-primary-fg);
+}
+
+.sisf-group-add i {
+    margin-inline-end: 8px;
+    color: inherit;
+}
+
+/* -----------------------------------------
+ 11b. Separator
+------------------------------------------*/
+
+/*
+ * A rule across the form, with the caption sitting ON it rather than above it —
+ * a caption above a line reads as a heading with an underline, which is the
+ * thing a separator is deliberately not.
+ *
+ * The line is drawn with a border on a pseudo-element either side, so the text
+ * gets a gap without needing a background colour to mask the rule (which would
+ * break the moment the form sits on anything but white).
+ */
+.sisf-separator {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sisf-separator::before,
+.sisf-separator::after {
+    content: "";
+    flex: 1 1 auto;
+    border-top: 1px solid var(--sisf-border);
+}
+
+/* No caption: one continuous rule rather than two halves meeting at a gap. */
+.sisf-separator:not(:has(.sisf-separator-text))::after {
+    display: none;
+}
+
+.sisf-separator-text {
+    flex: 0 0 auto;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--sisf-muted);
+}
+
+.sisf-separator--tight {
+    margin-block: 4px;
+}
+
+.sisf-separator--normal {
+    margin-block: 16px;
+}
+
+.sisf-separator--loose {
+    margin-block: 32px;
+}
+
+/* -----------------------------------------
+ 12. Tag list
+------------------------------------------*/
+
+/* The pills and the typing field share one box that LOOKS like an input, so a
+   tag list reads as one control rather than as a paragraph of badges above a
+   text box. Borrowed shape from `.sisf-input`; token-free like the rest. */
+.sisf-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-height: 42px;
+    padding: 6px 10px;
+    border: 1px solid #e4e6ef;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.sisf-tags:focus-within {
+    border-color: #b5b5c3;
+}
+
+.sisf-tags.is-invalid {
+    border-color: #f1416c;
+}
+
+.sisf-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    padding: 2px 8px;
+    border: 1px solid #e4e6ef;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.sisf-tag-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sisf-tag-remove {
+    flex-shrink: 0;
+    cursor: pointer;
+    border: 0;
+    background: none;
+    font: inherit;
+    line-height: 1;
+    opacity: 0.6;
+}
+
+.sisf-tag-remove:hover {
+    opacity: 1;
+}
+
+/* basis-0 so the field does not claim a full row the moment a pill exists. */
+.sisf-tags-input {
+    flex: 1 1 0;
+    min-width: 6rem;
+    border: 0;
+    background: none;
+    font: inherit;
+    outline: none;
+}
+
+/* -----------------------------------------
+ 13. intl-tel-input
 ------------------------------------------*/
 
 /* NOTHING HERE ON PURPOSE. components.css already lays the country selector out

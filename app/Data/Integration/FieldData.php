@@ -39,5 +39,22 @@ class FieldData extends Data
          * not know, so declaring one costs no frontend work.
          */
         public ?string $pattern = null,
+        /*
+         * Bounds for a `number` field, enforced at BOTH ends: SchemaField puts
+         * them on the input as min/max/step, fieldRules() turns them into
+         * min:/max:/multiple_of:. Declared on any other type they are ignored by
+         * both, because Laravel sizes a non-numeric value by its LENGTH — the
+         * opposite of what these say.
+         *
+         * `step` is a union rather than a float plus a flag because 'any' is the
+         * word the browser itself spells, and no number stands in for it: 0
+         * makes every value invalid, and OMITTING step is what defaults it to 1
+         * — the bug these exist to fix, a control built to hold 0.7 refusing to
+         * accept it. PHP 8.1 has no literal types, so 'any' is the only string
+         * a schema may put here and nothing but review enforces that.
+         */
+        public int|float|null $min = null,
+        public int|float|null $max = null,
+        public int|float|string|null $step = null,
     ) {}
 }

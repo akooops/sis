@@ -39,6 +39,14 @@ class FormFieldData extends Data
         public array $content,
         /** @var array<int, FormFieldOptionData> */
         public array $options,
+        /**
+         * The elements inside a repeatable group, one level deep and empty for
+         * everything else. Same shape as this class, so the builder canvas draws
+         * a child with the same card it draws anything else.
+         *
+         * @var array<int, FormFieldData>
+         */
+        public array $children = [],
     ) {}
 
     public static function fromModel(FormField $field): self
@@ -62,6 +70,9 @@ class FormFieldData extends Data
             content: $field->enabledTranslations('content'),
             options: $field->relationLoaded('options')
                 ? $field->options->map(fn ($o) => FormFieldOptionData::from($o))->all()
+                : [],
+            children: $field->relationLoaded('children')
+                ? $field->children->map(fn ($c) => FormFieldData::from($c))->all()
                 : [],
         );
     }

@@ -67,12 +67,12 @@
                 <aside>
                     <form class="mb-8" action="{{ route('web.site.articles.index') }}">
                         <input name="search" value="{{ $search }}" type="search" class="input"
-                            placeholder="@lang('site.articles.search')" aria-label="@lang('site.articles.search')">
+                            placeholder="@lang('site.articles.filters.search')" aria-label="@lang('site.articles.filters.search')">
                     </form>
 
                     @if ($categories->isNotEmpty())
                         <h4 class="mb-3 text-3xl font-black uppercase leading-[35px] text-brand">
-                            @lang('site.achievements.filters.categories')
+                            @lang('site.articles.filters.categories')
                         </h4>
 
                         {{-- Coloured chips rather than a stacked list of links, so

@@ -34,6 +34,7 @@
         locked = false,
         canRemove = false,
         onfields = null,
+        onchildren = null,
         onselect = null,
         onselectpage = null,
         onstep = null,
@@ -114,6 +115,8 @@
                     {locale}
                     {fallbackLocale}
                     {locked}
+                    {errors}
+                    {selectedId}
                     selected={selectedId === field.id}
                     error={errors[field.id] ?? null}
                     canMoveUp={items.indexOf(field) > 0}
@@ -122,6 +125,7 @@
                     {onstep}
                     {onduplicate}
                     {onremove}
+                    {onchildren}
                 />
             </div>
         {/each}

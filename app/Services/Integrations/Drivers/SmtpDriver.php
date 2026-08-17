@@ -39,7 +39,10 @@ class SmtpDriver implements Driver, SendsMail
     {
         return [
             new FieldData(key: 'host', label: 'Host', type: 'text', required: true),
-            new FieldData(key: 'port', label: 'Port', type: 'number', required: true, default: 587),
+            // The one number here that IS integer-stepped: a TCP port is a whole
+            // 16-bit number, so step 1 is deliberate rather than the browser's
+            // accidental default.
+            new FieldData(key: 'port', label: 'Port', type: 'number', required: true, default: 587, min: 1, max: 65535, step: 1),
             new FieldData(key: 'encryption', label: 'Encryption', type: 'select', default: 'tls', options: [
                 ['value' => 'tls', 'label' => 'TLS'],
                 ['value' => 'ssl', 'label' => 'SSL'],

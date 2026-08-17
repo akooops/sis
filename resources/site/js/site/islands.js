@@ -10,7 +10,6 @@ import { mount } from 'svelte';
  */
 const ISLANDS = {
     'visit-booking': () => import('./islands/VisitBooking.svelte'),
-    'job-application': () => import('./islands/JobApplication.svelte'),
 };
 
 function readProps(el) {

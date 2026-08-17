@@ -15,10 +15,26 @@ return [
     |
     */
 
+    /*
+     * THE FALLBACK HAD A BUG WORTH KNOWING ABOUT, because it fails silently and
+     * only when you change APP_URL.
+     *
+     * It read `sprintf('%s%s', $hardcoded, env('APP_URL'), Sanctum::…())` — two
+     * placeholders, three arguments. So the raw APP_URL was glued onto the end of
+     * the list with no comma (producing the entry `::1http://127.0.0.1:8000`,
+     * which matches no host), and the ONE call that formats it correctly was
+     * dropped as a surplus argument. The app was stateful on 127.0.0.1:8000 only
+     * because that string is hardcoded above; APP_URL contributed nothing.
+     *
+     * That is invisible until the day you serve on another host — a local domain
+     * for a captcha, say — at which point the public site works, the login page
+     * renders, and every admin API call 401s with no cookie and no error to
+     * explain it. Fixed to Laravel's own shape: currentApplicationUrlWithPort()
+     * already returns a LEADING COMMA and strips the scheme.
+     */
     'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
         '%s%s',
-        '127.0.0.1:8000,localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
-        env('APP_URL'),
+        '127.0.0.1:8000,localhost,localhost:3000,127.0.0.1,::1',
         Sanctum::currentApplicationUrlWithPort()
     ))),
 

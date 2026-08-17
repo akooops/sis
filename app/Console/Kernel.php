@@ -14,6 +14,17 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('model:prune')->daily();
 
+        /*
+         * Talent pools are EMERGENT and rebuilt nightly, not seeded — see
+         * App\Jobs\Ai\RebuildClusters. Off-peak because it embeds nothing but
+         * reads every candidate and asks the model to name each pool.
+         *
+         * withoutOverlapping: a slow run must not have a second one clustering
+         * the same rows underneath it, which would leave membership half-written
+         * from two different k-means passes.
+         */
+        $schedule->job(new \App\Jobs\Ai\RebuildClusters)->dailyAt('03:00')->withoutOverlapping();
+
         $schedule->command('pages:publish-scheduled')->everyMinute()->withoutOverlapping();
         $schedule->command('articles:publish-scheduled')->everyMinute()->withoutOverlapping();
         $schedule->command('albums:publish-scheduled')->everyMinute()->withoutOverlapping();

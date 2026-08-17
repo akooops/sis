@@ -1144,3 +1144,20 @@
         }
     }
 }
+
+/* -------------------------------------------------------------------------
+   A disclosure trigger whose label depends on whether its panel is open.
+
+   Both labels ship in the markup and CSS reveals one, keyed off the
+   `aria-expanded` the disclosure handler already sets — so there is no second
+   listener duplicating what site/disclosure.js does, and the label can never
+   disagree with the panel's real state.
+   ---------------------------------------------------------------------- */
+[aria-expanded] .when-open,
+[aria-expanded="true"] .when-closed {
+    display: none;
+}
+
+[aria-expanded="true"] .when-open {
+    display: inline;
+}

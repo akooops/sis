@@ -32,8 +32,31 @@
         disabled = false,
         // Forwarded, not read: this file owns the label and the error, and a
         // control only needs these when it has copy of its OWN — which is
-        // FileControl and nothing else.
+        // FileControl, and GroupControl for its Add/Remove wording.
         labels = {},
+        /**
+         * The WHOLE error map, forwarded for the same reason as `labels`: a
+         * repeatable group has to look up its children's messages itself, keyed
+         * `group.index.child`, and only it knows those paths.
+         */
+        errors = {},
+        /**
+         * The answer path this element occupies, when it is not simply its own
+         * key — `education.0.institution` for a child inside a repeat.
+         *
+         * Drives `data-sisf-key`, which is what the renderer scrolls to when the
+         * server rejects a field: without it every repeat of a child would carry
+         * the same marker and the visitor would be sent to the first row no
+         * matter which one was actually wrong.
+         */
+        keyPath = null,
+        /**
+         * Which repeat this element is in, or null outside a group. Only used to
+         * keep DOM ids unique — the same child rendered three times would
+         * otherwise emit `sisf-<ulid>` three times, and every `<label for>` in
+         * the group would point at the first row's input.
+         */
+        instance = null,
         onchange = null,
         onfocus = null,
         onblur = null,
@@ -46,8 +69,20 @@
     // same reason — an unknown code must not take a public page down.
     const spec = $derived(ELEMENTS[field?.type] ?? null);
 
-    const controlId = $derived(`sisf-${field?.id}`);
+    const controlId = $derived(instance === null ? `sisf-${field?.id}` : `sisf-${field?.id}-${instance}`);
     const errorId = $derived(`${controlId}-error`);
+
+    /** What the renderer's error-scroll looks for. */
+    const answerKey = $derived(keyPath ?? field?.key);
+
+    /*
+     * The admin's css_id, suffixed inside a repeat. A child rendered three times
+     * would otherwise emit the same id three times — invalid HTML, and every
+     * `#my-id` rule in the form's stylesheet would only ever match the first row.
+     */
+    const wrapperId = $derived(
+        !field?.css_id ? undefined : instance === null ? field.css_id : `${field.css_id}-${instance}`,
+    );
 
     const label = $derived(translate(field?.label, locale, fallbackLocale));
 
@@ -57,10 +92,25 @@
 
     const describedBy = $derived(error ? errorId : undefined);
 
+    /**
+     * How much of the line this field takes on a wide screen.
+     *
+     * Emitted as a class rather than an inline style so the form's own stylesheet
+     * and site/forms-theme.css can still override it — an inline width would beat
+     * both. `100` renders no class at all, because full width is the default the
+     * CSS already gives every child.
+     */
+    const widthClass = $derived.by(() => {
+        const width = String(field?.settings?.width ?? '100');
+
+        return width === '100' ? '' : `sisf-el--w-${width}`;
+    });
+
     const classes = $derived(
         [
             'sisf-el',
             `sisf-el--${field?.type}`,
+            widthClass,
             field?.is_required ? 'is-required' : '',
             error ? 'is-invalid' : '',
             filled ? 'is-filled' : '',
@@ -91,9 +141,9 @@
     {:else if spec.group}
         <fieldset
             class={classes}
-            id={field.css_id || undefined}
+            id={wrapperId}
             data-sisf-type={field.type}
-            data-sisf-key={field.key}
+            data-sisf-key={answerKey}
         >
             {#if label}
                 <legend class="sisf-label">
@@ -109,6 +159,7 @@
                     {fallbackLocale}
                     {disabled}
                     {labels}
+                    {errors}
                     id={controlId}
                     invalid={!!error}
                     {describedBy}
@@ -125,9 +176,9 @@
     {:else}
         <div
             class={classes}
-            id={field.css_id || undefined}
+            id={wrapperId}
             data-sisf-type={field.type}
-            data-sisf-key={field.key}
+            data-sisf-key={answerKey}
         >
             {#if spec.labelled && label}
                 <label class="sisf-label" for={controlId}>
@@ -143,6 +194,7 @@
                     {fallbackLocale}
                     {disabled}
                     {labels}
+                    {errors}
                     id={controlId}
                     invalid={!!error}
                     {describedBy}

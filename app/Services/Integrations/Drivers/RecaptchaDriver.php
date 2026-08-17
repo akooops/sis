@@ -67,7 +67,18 @@ class RecaptchaDriver implements Driver, VerifiesCaptcha
                 ['value' => 'v2', 'label' => 'v2 (checkbox)'],
                 ['value' => 'v3', 'label' => 'v3 (score)'],
             ]),
-            new FieldData(key: 'score_threshold', label: 'Score threshold', type: 'number', default: 0.5, help: 'v3 only: submissions scoring below this are rejected. 0 is certainly a bot, 1 certainly a human.'),
+            // Google's score is a decimal between the two ends the help names, so
+            // the control has to accept one — 0.5 is the vendor's own default.
+            new FieldData(
+                key: 'score_threshold',
+                label: 'Score threshold',
+                type: 'number',
+                default: 0.5,
+                help: 'v3 only: submissions scoring below this are rejected. Between 0 and 1, decimals allowed — 0 is certainly a bot, 1 certainly a human.',
+                min: 0,
+                max: 1,
+                step: 'any',
+            ),
         ];
     }
 

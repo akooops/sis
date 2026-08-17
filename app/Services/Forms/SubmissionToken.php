@@ -32,10 +32,23 @@ class SubmissionToken
     /**
      * @return array{token: string, honeypot: string, session: string}
      */
-    public static function mint(Form $form): array
+    public static function mint(Form $form, ?string $session = null): array
     {
         $honeypot = static::honeypotName($form);
-        $session = (string) Str::ulid();
+
+        /*
+         * CARRIED OVER ON A RE-RENDER, minted fresh otherwise.
+         *
+         * The sid is what binds an upload to the visitor who made it —
+         * PublicFormUpload refuses media whose `form_session` is not the one in
+         * the token. A brand new sid on every render therefore ORPHANS every file
+         * the visitor has already uploaded, so a form rejected for a typo came
+         * back demanding the CV again. Reusing the sid of their own still-valid
+         * token keeps the binding intact without widening it: the caller only
+         * ever passes back a token it decrypted from this visitor's own session,
+         * for this same form.
+         */
+        $session ??= (string) Str::ulid();
 
         $token = Crypt::encryptString(json_encode([
             'v' => self::VERSION,

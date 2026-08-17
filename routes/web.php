@@ -80,6 +80,15 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('programs', [AdminPagesController::class, 'programs'])->middleware('verify.permissions:programs.index')->name('web.admin.programs.index');
     Route::get('streams', [AdminPagesController::class, 'streams'])->middleware('verify.permissions:streams.index')->name('web.admin.streams.index');
     Route::get('job-offers', [AdminPagesController::class, 'jobOffers'])->middleware('verify.permissions:job-offers.index')->name('web.admin.job-offers.index');
+    /*
+     * `web.admin.job-applications.index` must keep exactly this name:
+     * JobApplicationObserver::announce() already links every job notification to
+     * it, and it swallows its own failures — so a rename does not error, it makes
+     * every job notification vanish into the integrations log.
+     */
+    Route::get('job-applications', [AdminPagesController::class, 'jobApplications'])->middleware('verify.permissions:job-applications.index')->name('web.admin.job-applications.index');
+    Route::get('candidates', [AdminPagesController::class, 'candidates'])->middleware('verify.permissions:candidates.index')->name('web.admin.candidates.index');
+    Route::get('clusters', [AdminPagesController::class, 'clusters'])->middleware('verify.permissions:clusters.index')->name('web.admin.clusters.index');
     Route::get('menus', [AdminPagesController::class, 'menus'])->middleware('verify.permissions:menus.index')->name('web.admin.menus.index');
     Route::get('menu-items', [AdminPagesController::class, 'menuItems'])->middleware('verify.permissions:menu-items.index')->name('web.admin.menu-items.index');
     Route::get('countries', [AdminPagesController::class, 'countries'])->middleware('verify.permissions:countries.index')->name('web.admin.countries.index');
@@ -128,7 +137,6 @@ $site = function () {
     Route::get('brands/{slug}', [BrandsController::class, 'show'])->name('brands.show');
 
     Route::get('jobs', [JobsController::class, 'index'])->name('jobs.index');
-    Route::get('jobs/apply', [JobsController::class, 'apply'])->name('jobs.apply');
     Route::get('jobs/{slug}', [JobsController::class, 'show'])->name('jobs.show');
 
     Route::get('calendars', [ResourcesController::class, 'calendars'])->name('calendars');
@@ -151,6 +159,10 @@ Route::middleware('set.locale')->name('web.site.root.')->group($site);
 Forms
 |------------------------*/
 Route::post('forms/{slug}/uploads', [SubmitController::class, 'upload'])->middleware('throttle:form-uploads')->name('web.user.forms.upload');
+// Reads an already-uploaded CV and answers with prefill values. Shares the
+// upload throttle because it is the same cost profile — a provider call per
+// request — and the same trust boundary: the visitor's own submission token.
+Route::post('forms/{slug}/parse-cv', [SubmitController::class, 'parseCv'])->middleware('throttle:form-uploads')->name('web.user.forms.parse-cv');
 Route::post('forms/{slug}/telemetry', [SubmitController::class, 'telemetry'])->middleware('throttle:form-telemetry')->name('web.user.forms.telemetry');
 
 Route::middleware('set.locale')->group(function () {

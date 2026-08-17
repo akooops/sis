@@ -163,6 +163,27 @@ class PagesController extends Controller
         return inertia('Admin/JobOffers/Index');
     }
 
+    /**
+     * The HR queue. Its own page rather than a drawer off Job offers, for the
+     * same reason submissions have one: the offers table drills in with
+     * ?filter[job_offer_id]=…, which the client reads out of the URL, so a
+     * filtered queue stays linkable and exportable.
+     */
+    public function jobApplications(): Response
+    {
+        return inertia('Admin/JobApplications/Index');
+    }
+
+    public function candidates(): Response
+    {
+        return inertia('Admin/Candidates/Index');
+    }
+
+    public function clusters(): Response
+    {
+        return inertia('Admin/Clusters/Index');
+    }
+
     public function menus(): Response
     {
         return inertia('Admin/Menus/Index');

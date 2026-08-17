@@ -161,6 +161,11 @@ class FormSubmissionData extends Data
      * (attach() copies an already-owned file and the copy's id is written back),
      * so this map is exact rather than a guess.
      *
+     * A repeatable group's answer is a list of OBJECTS, so a file inside one sits
+     * a level deeper than every other answer. It is keyed `group.child` rather
+     * than by the child alone, because the drawer showing "certificate" three
+     * times over says nothing about which entry each belongs to.
+     *
      * @return array<string, string>
      */
     protected static function fieldKeysByMedia(FormSubmission $submission): array
@@ -171,6 +176,21 @@ class FormSubmissionData extends Data
             foreach (is_array($value) ? $value : [$value] as $item) {
                 if (is_string($item) && $item !== '') {
                     $keys[$item] = (string) $key;
+
+                    continue;
+                }
+
+                // A group instance: {child key => answer}.
+                if (! is_array($item)) {
+                    continue;
+                }
+
+                foreach ($item as $childKey => $childValue) {
+                    foreach (is_array($childValue) ? $childValue : [$childValue] as $id) {
+                        if (is_string($id) && $id !== '') {
+                            $keys[$id] = $key.'.'.$childKey;
+                        }
+                    }
                 }
             }
         }

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Contracts\Forms\SubmissionProjector;
 use App\Models\Form;
 use App\Models\FormSubmission;
 use App\Services\Notifications\NotificationService;
@@ -54,8 +55,57 @@ class ProcessFormSubmission implements ShouldQueue
             return;
         }
 
+        $this->project($form, $submission);
         $this->notify($form, $submission);
         $this->deliver($form, $submission);
+    }
+
+    /**
+     * Hand a completed submission to whatever domain owns this form.
+     *
+     * THE SEAM, and it is a LOOKUP rather than a branch: config('forms.projectors')
+     * maps a form slug to a SubmissionProjector, so a second domain — a visit
+     * reservation, say — is a class and a config line, with nothing in the forms
+     * module changing to accommodate it. A form with no projector is the normal
+     * case and does nothing here.
+     *
+     * HERE RATHER THAN IN AN OBSERVER, for the same reason the webhook delivery is:
+     * FormSubmissionObserver::created() fires inside the submit transaction, and
+     * projecting there would hold a write lock across the whole domain write while
+     * the visitor waits. This job already runs after the response has been sent.
+     *
+     * FIRST, before notify() and deliver(), so a notification about a new
+     * application or booking is sent only once the row exists to link to.
+     *
+     * WRAPPED, because a projection failure must not cost the submission. The
+     * answers are already stored and a projector is required to be idempotent, so
+     * a failed run is repairable by running it again — losing the notification and
+     * the webhook over it would not be.
+     */
+    protected function project(Form $form, FormSubmission $submission): void
+    {
+        $class = config('forms.projectors', [])[$form->slug] ?? null;
+
+        if ($class === null) {
+            return;
+        }
+
+        try {
+            $projector = app($class);
+
+            // A misconfigured entry must not take the rest of the job down with
+            // it — the notification and the webhook still have to go out.
+            if ($projector instanceof SubmissionProjector) {
+                $projector->project($submission);
+            }
+        } catch (Throwable $e) {
+            Log::channel('integrations')->error('form.projection-failed', [
+                'submission' => $submission->id,
+                'form' => $form->slug,
+                'projector' => $class,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
@@ -153,8 +203,13 @@ class ProcessFormSubmission implements ShouldQueue
 
         // The form's CURRENT fields, ordered by the query rather than by the
         // stored snapshot: MySQL's JSON type does not keep object key order.
+        //
+        // Top-level only, matching the answer map — a child has no entry of its
+        // own in `data`, and `children` is loaded so a group can flatten itself
+        // for the summary line without a query per group.
         $fields = $form->fields()
-            ->with('page')
+            ->topLevel()
+            ->with(['page', 'children'])
             ->get()
             ->sortBy([['page.order', 'asc'], ['order', 'asc'], ['key', 'asc']]);
 

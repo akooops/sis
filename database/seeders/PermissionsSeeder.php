@@ -170,6 +170,44 @@ class PermissionsSeeder extends Seeder
             ['code' => 'job-offers.update', 'name' => 'Update job offers', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'job-offers.destroy', 'name' => 'Delete job offers', 'supports_web' => true, 'supports_api' => false],
 
+            ['code' => 'job-applications.index', 'name' => 'View job applications', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'job-applications.show', 'name' => 'View a job application', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'job-applications.destroy', 'name' => 'Delete job applications', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'job-applications.export', 'name' => 'Export job applications', 'supports_web' => true, 'supports_api' => false],
+            /*
+             * One permission PER TRANSITION, not a single "update".
+             *
+             * Moving an application forward and rejecting one are different acts
+             * with different consequences, and a school will want a screener who
+             * can shortlist but not reject, or a manager who can hire but does not
+             * touch the queue. A blanket update permission cannot express either.
+             */
+            ['code' => 'job-applications.shortlist', 'name' => 'Shortlist applicants', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'job-applications.contact', 'name' => 'Mark applicants contacted', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'job-applications.call', 'name' => 'Mark applicants called', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'job-applications.hire', 'name' => 'Mark applicants hired', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'job-applications.reject', 'name' => 'Reject applicants', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'candidates.index', 'name' => 'View candidates', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'candidates.show', 'name' => 'View a candidate', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'candidates.update', 'name' => 'Update candidates', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'candidates.destroy', 'name' => 'Delete candidates', 'supports_web' => true, 'supports_api' => false],
+            // The CV is personal data behind a signed, short-lived link — gated
+            // separately so a screener can triage a list without pulling files.
+            ['code' => 'candidates.cv', 'name' => 'Download candidate CVs', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'candidate-matches.index', 'name' => 'View candidate matches', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'clusters.index', 'name' => 'View talent pools', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'clusters.update', 'name' => 'Rename talent pools', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'clusters.destroy', 'name' => 'Delete talent pools', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'candidate-clusters.index', 'name' => 'View pool members', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'candidate-clusters.store', 'name' => 'Add pool members', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'candidate-clusters.destroy', 'name' => 'Remove pool members', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'job-offer-clusters.index', 'name' => 'View posting pools', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'job-offer-clusters.store', 'name' => 'Add a posting to a pool', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'job-offer-clusters.destroy', 'name' => 'Remove a posting from a pool', 'supports_web' => true, 'supports_api' => false],
+
             ['code' => 'countries.index', 'name' => 'View countries', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'countries.store', 'name' => 'Create countries', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'countries.update', 'name' => 'Update countries', 'supports_web' => true, 'supports_api' => false],

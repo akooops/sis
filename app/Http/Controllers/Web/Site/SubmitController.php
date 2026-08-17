@@ -13,6 +13,7 @@ use App\Services\Forms\SubmissionContext;
 use App\Services\Forms\SubmissionGuard;
 use App\Services\Forms\SubmissionToken;
 use App\Services\Forms\SubmissionValidator;
+use App\Services\Jobs\CvParser;
 use App\Services\Forms\TelemetryRecorder;
 use App\Services\Integrations\Captcha;
 use App\Services\Site\SiteContext;
@@ -25,6 +26,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * The public form's SUBMISSION pipeline.
@@ -97,6 +99,10 @@ class SubmitController extends Controller
         abort_if(! $payload || $payload['form'] !== $form->id, 422);
         abort_if(SubmissionToken::isStale($payload), 422);
 
+        // The COMPLETE field set on purpose — a file field inside a repeatable
+        // group is a child row, and narrowing this to topLevelFields would 422
+        // every upload from inside a group. Keys are unique per form, so a child
+        // is still found by key alone.
         $field = $form->fields->firstWhere('key', $request->input('field'));
 
         abort_if(! $field || $field->type !== 'file', 422);
@@ -138,12 +144,55 @@ class SubmitController extends Controller
     }
 
     /**
-     * Take ownership of the files the visitor uploaded.
+     * Read an uploaded CV and hand back answers to prefill the form with.
      *
-     * attach() COPIES when the media already has an owner, and returns the row
-     * the model ends up with — so the returned id is written back into the
-     * answer. Skipping that would leave a retried submission pointing at the
-     * previous submission's file.
+     * SAME GATES AS THE UPLOADER, because it is the same trust boundary: a valid
+     * token bound to THIS form, and media carrying THIS visitor's upload session.
+     * Without the session check anyone could post a stranger's media id and have
+     * their CV read back to them.
+     *
+     * Costs a provider call, so it sits behind the upload throttle. Any failure
+     * answers with empty values rather than an error — the applicant simply gets
+     * the blank form they would have had anyway, which is a far better outcome
+     * than an error page in front of someone trying to apply.
+     */
+    public function parseCv(Request $request, string $slug): JsonResponse
+    {
+        $form = Form::query()->live()->where('slug', $slug)->firstOrFail();
+
+        $payload = SubmissionToken::read($request->input('submission_token'));
+
+        abort_if(! $payload || $payload['form'] !== $form->id, 422);
+        abort_if(SubmissionToken::isStale($payload), 422);
+
+        $media = Media::query()
+            ->whereKey($request->input('media'))
+            ->where('custom_properties->form_session', $payload['sid'])
+            ->first();
+
+        abort_if(! $media, 422);
+
+        try {
+            $values = app(CvParser::class)->parse($media);
+        } catch (Throwable $e) {
+            Log::channel('integrations')->warning('forms.cv-parse-failed', [
+                'form' => $form->slug,
+                'error' => $e->getMessage(),
+            ]);
+
+            $values = [];
+        }
+
+        return response()->json(['values' => (object) $values]);
+    }
+
+    /**
+     * Take ownership of every file the visitor uploaded, on the page and inside
+     * repeatable groups.
+     *
+     * Takes TOP-LEVEL fields and walks into groups itself, because a group's
+     * files live under its own answer key and the rewritten ids have to go back
+     * into the same nested slots they came from.
      *
      * @param  \Illuminate\Support\Collection<int, \App\Models\FormField>  $fields
      */
@@ -153,30 +202,70 @@ class SubmitController extends Controller
         $changed = false;
 
         foreach ($fields as $field) {
-            if ($field->type !== 'file' || ! array_key_exists($field->key, $data)) {
+            if ($field->type === 'file' && array_key_exists($field->key, $data)) {
+                $data[$field->key] = $this->ownFiles($data[$field->key], $submission);
+                $changed = true;
+
                 continue;
             }
 
-            $ids = is_array($data[$field->key]) ? $data[$field->key] : array_filter([$data[$field->key]]);
-            $owned = [];
-
-            foreach ($ids as $id) {
-                $id = is_array($id) ? ($id['id'] ?? null) : $id;
-
-                if (! is_string($id) || $id === '') {
-                    continue;
-                }
-
-                $owned[] = UploadService::attach($id, $submission, FormSubmission::ANSWERS_COLLECTION)->id;
+            /*
+             * A file inside a repeatable group sits one level down, per instance
+             * — data['education'][2]['certificate']. Missing this leaves those
+             * uploads unattached: they stay owned by nobody, keep the uploader's
+             * form_session, and PublicFormUpload would happily let the NEXT
+             * visitor in that session claim them.
+             */
+            if (! $field->isGroup() || ! is_array($data[$field->key] ?? null)) {
+                continue;
             }
 
-            $data[$field->key] = is_array($data[$field->key]) ? $owned : ($owned[0] ?? null);
-            $changed = true;
+            $uploads = $field->children->where('type', 'file');
+
+            if ($uploads->isEmpty()) {
+                continue;
+            }
+
+            foreach ($data[$field->key] as $index => $instance) {
+                foreach ($uploads as $child) {
+                    if (! is_array($instance) || ! array_key_exists($child->key, $instance)) {
+                        continue;
+                    }
+
+                    $data[$field->key][$index][$child->key] = $this->ownFiles($instance[$child->key], $submission);
+                    $changed = true;
+                }
+            }
         }
 
         if ($changed) {
             $submission->forceFill(['data' => $data])->saveQuietly();
         }
+    }
+
+    /**
+     * Attach one answer's media to the submission, preserving its shape.
+     *
+     * attach() COPIES when the media already has an owner and returns the row the
+     * model ends up with, so the id it gives back is the one that must be stored —
+     * a single-file answer stays a string and a multi-file answer stays a list.
+     */
+    protected function ownFiles(mixed $answer, FormSubmission $submission): mixed
+    {
+        $ids = is_array($answer) ? $answer : array_filter([$answer]);
+        $owned = [];
+
+        foreach ($ids as $id) {
+            $id = is_array($id) ? ($id['id'] ?? null) : $id;
+
+            if (! is_string($id) || $id === '') {
+                continue;
+            }
+
+            $owned[] = UploadService::attach($id, $submission, FormSubmission::ANSWERS_COLLECTION)->id;
+        }
+
+        return is_array($answer) ? $owned : ($owned[0] ?? null);
     }
 
     /** The upload category covering these extensions. */
@@ -284,7 +373,16 @@ class SubmitController extends Controller
         $locale = App::getLocale();
 
         // 1. Live?
-        $form = Form::query()->live()->where('slug', $slug)->with(['blockedIps', 'fields.options'])->firstOrFail();
+        /*
+         * topLevelFields, not fields: a group compiles and stores its own
+         * children, so the submit path must not also walk them as if they sat on
+         * the page. `children.options` is loaded alongside so a whole form's
+         * rules — a select inside a repeat included — cost one query, not one per
+         * child.
+         */
+        $form = Form::query()->live()->where('slug', $slug)
+            ->with(['blockedIps', 'topLevelFields.options', 'topLevelFields.children.options'])
+            ->firstOrFail();
 
         // 2. Authentic, form-bound token?
         $payload = SubmissionToken::read($request->input('submission_token'));
@@ -385,7 +483,7 @@ class SubmitController extends Controller
         }
 
         // 10. The answers themselves.
-        $fields = $form->fields;
+        $fields = $form->topLevelFields;
         $validator = $this->validator->make($form, $fields, $answers, $locale, $payload['sid']);
 
         if ($validator->fails()) {

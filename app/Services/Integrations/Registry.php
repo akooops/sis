@@ -153,6 +153,34 @@ class Registry
             default => 'string',
         };
 
+        /*
+         * Bounds, after the type rule and for the same reason `pattern` is after
+         * it: on a value that is not a number at all, "must be a number" is the
+         * message worth reporting first. They also only MEAN magnitude once
+         * `numeric` is in the set — Laravel sizes a value by the rules it
+         * carries, so min:0 on an unruled string measures its length instead.
+         * Hence the type gate: a bound silently becoming a length rule on some
+         * other field is worse than being ignored there.
+         *
+         * multiple_of is the server half of the input's `step`, so a stepped
+         * field cannot be bypassed by posting past the control; 'any' is the
+         * HTML keyword for no stepping and has no rule to add. It compares with
+         * BigDecimal, so 587 against a step of 1 is exact, not float-fuzzy.
+         */
+        if ($field->type === 'number') {
+            if ($field->min !== null) {
+                $rules[] = 'min:'.$field->min;
+            }
+
+            if ($field->max !== null) {
+                $rules[] = 'max:'.$field->max;
+            }
+
+            if ($field->step !== null && $field->step !== 'any') {
+                $rules[] = 'multiple_of:'.$field->step;
+            }
+        }
+
         // Shape, when the driver declares one. Last, so the type rule still
         // reports first on a value that is not even a string.
         if ($field->pattern !== null) {

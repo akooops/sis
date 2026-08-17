@@ -17,6 +17,16 @@ use App\Models\FormWebhook;
  * `id` is the ULID and it is the submission's only identifier: it is what the
  * visitor was shown on the thank-you page, so a receiver quoting it back is
  * quoting the same string the person has.
+ *
+ * `data` IS NO LONGER FLAT SCALARS ONLY. A repeatable group answers with a list
+ * of objects keyed by child key:
+ *
+ *     "data": { "email": "…", "education": [{"institution": "…", "degree": "…"}] }
+ *
+ * The envelope is unchanged and a form without groups sends exactly what it
+ * always did — but a receiver that assumed every value was a string or a list of
+ * strings needs to know before a group is added to a form it listens to. A file
+ * inside a group is a media id in that nested object, the same as anywhere else.
  */
 class WebhookPayload
 {

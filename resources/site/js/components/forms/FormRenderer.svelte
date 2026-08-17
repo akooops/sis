@@ -126,6 +126,26 @@
     /** The live answer set. */
     let answers = $state({});
 
+    /**
+     * Which answer keys hold a list of OBJECTS rather than a list of scalars.
+     *
+     * Read off the schema rather than sniffed from the value. The obvious shortcut
+     * — "an object member means a group" — is wrong twice over: a file answer is
+     * also an object ({id, name}), and a group child may legitimately be keyed
+     * `id`, since field keys are only required to match /^[a-z][a-z0-9_]*$/.
+     */
+    const groupKeys = $derived.by(() => {
+        const out = new Set();
+
+        for (const page of schema?.pages ?? []) {
+            for (const field of page.fields ?? []) {
+                if (ELEMENTS[field.type]?.repeater) out.add(field.key);
+            }
+        }
+
+        return out;
+    });
+
     const posted = $derived.by(() => {
         const out = [];
 
@@ -135,6 +155,26 @@
                 // and a `required` array reads as absent rather than empty.
                 if (value.length === 0) {
                     out.push({ name: `fields[${key}]`, value: '' });
+                    continue;
+                }
+
+                /*
+                 * A repeatable group's members are OBJECTS, and they post with an
+                 * EXPLICIT INDEX — fields[education][0][institution], never `[]`.
+                 * The index ties an answer to the row it was typed in, and it is
+                 * what the server keys its error messages by, so an empty `[]`
+                 * would renumber the rows on every post and land the messages on
+                 * the wrong ones.
+                 */
+                if (groupKeys.has(key)) {
+                    for (const [index, item] of value.entries()) {
+                        if (item === null || typeof item !== 'object') continue;
+
+                        for (const [childKey, childValue] of Object.entries(item)) {
+                            pushChild(out, `fields[${key}][${index}][${childKey}]`, childValue);
+                        }
+                    }
+
                     continue;
                 }
 
@@ -155,6 +195,32 @@
 
         return out;
     });
+
+    /**
+     * One answer inside a repeat row. Same three shapes as the top level — an
+     * array, a boolean, a scalar — but nested one name deeper.
+     */
+    function pushChild(out, name, value) {
+        if (Array.isArray(value)) {
+            if (value.length === 0) {
+                out.push({ name, value: '' });
+
+                return;
+            }
+
+            for (const item of value) out.push({ name: `${name}[]`, value: scalar(item) });
+
+            return;
+        }
+
+        if (typeof value === 'boolean') {
+            out.push({ name, value: value ? '1' : '0' });
+
+            return;
+        }
+
+        out.push({ name, value: scalar(value) });
+    }
 
     /** A file answer is {id, name}; everything else is already a scalar. */
     function scalar(value) {
@@ -271,8 +337,16 @@
          * effects writing `stack` would race and the seed below would sometimes
          * win.
          */
+        /*
+         * Matched on the ROOT of each error key, because a group's children are
+         * reported at `education.0.institution` — looking the whole path up
+         * against a field key would find nothing, and a form whose only mistake
+         * is inside a repeat would reopen at page one with no error in sight.
+         */
+        const erroredKeys = new Set(Object.keys(errors).map((key) => key.split('.')[0]));
+
         const errored = pages.find(
-            (page) => !page.is_interstitial && (page.fields ?? []).some((field) => errors[field.key]),
+            (page) => !page.is_interstitial && (page.fields ?? []).some((field) => erroredKeys.has(field.key)),
         );
 
         stack = pages.length ? [(errored ?? pages[0]).id] : [];
@@ -296,8 +370,10 @@
 
         focusedError = true;
 
-        // Field keys are /^[a-z][a-z0-9_]*$/ (enforced by UpdateBuilderData), so
-        // there is nothing here a selector needs escaped.
+        // Field keys are /^[a-z][a-z0-9_]*$/ (enforced by UpdateBuilderData) and
+        // a group child's path adds only dots and digits, so there is nothing
+        // here a selector needs escaped. The path is exact, so a message about
+        // the third education row scrolls to the THIRD row.
         const element = formEl.querySelector(`[data-sisf-key="${key}"]`);
 
         element?.scrollIntoView({ behavior: 'smooth', block: 'center' });

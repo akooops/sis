@@ -105,9 +105,31 @@
         builder.errors[selectedPage?.id ?? selected?.field?.id] ?? null,
     );
 
+    /**
+     * The group a new element would land in, or null for the page itself.
+     *
+     * SELECTING A GROUP MAKES IT THE TARGET — including when a CHILD of it is
+     * selected, so adding three fields in a row keeps putting them in the same
+     * group rather than dropping the second one back onto the page. Dragging a
+     * card in is the other way in; this is the click path.
+     *
+     * A group cannot hold a group or a button (FieldTypeRegistry::childCodes()),
+     * so those always go to the page even with a group selected — otherwise the
+     * palette would offer a tile that silently 422s on save.
+     */
+    function groupTarget(type) {
+        const spec = builder.palette.find((p) => p.code === type);
+
+        if (!spec || spec.code === 'group' || spec.group === 'action') return null;
+
+        if (selected?.parent) return selected.parent.id;
+
+        return selected?.field?.type === 'group' ? selected.field.id : null;
+    }
+
     function add(type) {
         const pageId = selectedPage?.id ?? selected?.page?.id ?? builder.pages[0]?.id;
-        builder.addField(type, pageId);
+        builder.addField(type, pageId, groupTarget(type));
         if (!wide) inspectorOpen = true;
     }
 
@@ -268,6 +290,7 @@
                                 locked={builder.locked}
                                 canRemove={builder.pages.length > 1}
                                 onfields={(id, fields) => builder.setFields(id, fields)}
+                                onchildren={(id, children) => builder.setChildren(id, children)}
                                 onselect={select}
                                 onselectpage={selectPage}
                                 onstep={(id, delta) => builder.stepField(id, delta)}
@@ -328,6 +351,7 @@
         page={selectedPage}
         index={selectedPageIndex}
         field={selectedPage ? null : (selected?.field ?? null)}
+        parent={selectedPage ? null : (selected?.parent ?? null)}
         {spec}
         pages={builder.pages}
         locale={builder.locale}

@@ -13,19 +13,23 @@
             <div class="grid gap-6 lg:grid-cols-3">
 
                 <article class="card lg:col-span-2">
-                    <div class="card-body">
-                        @if ($achievement->category)
-                            <span class="badge mb-2" style="--badge-color: {{ $achievement->category->color }}">
-                                {{ $achievement->category->getTranslation('title', $site->locale(), true) ?: $achievement->category->name }}
-                            </span>
-                        @endif
+                    @if ($achievement->thumbnail_url)
+                        <figure class="overlay h-[600px] shrink-0">
+                            <img class="h-full w-full object-cover" src="{{ $achievement->thumbnail_url }}"
+                                alt="{{ $achievement->getTranslation('title', $site->locale(), true) }}">
+                        </figure>
+                    @endif
 
+                    <div class="card-body">
                         <h1 class="text-3xl font-black uppercase leading-[35px] text-brand">
                             {{ $achievement->getTranslation('title', $site->locale(), true) ?: $achievement->name }}
                         </h1>
 
                         <hr class="mb-4 mt-2 border-line">
 
+                        {{-- Admin-authored rich text, same trust level as any other
+                             page content — it is written in the admin editor and a
+                             visitor can never reach it. --}}
                         @include('site::partials.content-styles', ['model' => $achievement])
 
                         {{-- id="page-content" is the scope hook the admin's own
@@ -39,12 +43,18 @@
                         <ul class="post-meta">
                             <li>
                                 <i class="uil uil-calendar-alt" aria-hidden="true"></i>
-                                <span>{{ $achievement->achieved_at?->translatedFormat('j M Y') }}</span>
+                                <span>{{ $achievement->published_at?->translatedFormat('j M Y') }}</span>
                             </li>
                             @if ($doneBy = $achievement->getTranslation('done_by', $site->locale(), true))
                                 <li>
                                     <i class="uil uil-user" aria-hidden="true"></i>
                                     <span>{{ $doneBy }}</span>
+                                </li>
+                            @endif
+                            @if ($achievement->category)
+                                <li>
+                                    <i class="uil uil-folder" aria-hidden="true"></i>
+                                    <span>{{ $achievement->category->getTranslation('title', $site->locale(), true) ?: $achievement->category->name }}</span>
                                 </li>
                             @endif
                         </ul>

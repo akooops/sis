@@ -29,6 +29,12 @@
     let {
         field = null,
         page = null,
+        /**
+         * The repeatable group this element sits in, or null when it sits on the
+         * page. Hides the settings that only mean something at page level rather
+         * than offering a control the save would quietly drop.
+         */
+        parent = null,
         index = 0,
         spec = null,
         pages = [],
@@ -282,9 +288,15 @@
                     <Switch value={!!field.is_required} disabled={locked} onchange={(v) => onpatch?.(field.id, { is_required: v })} />
                 </Field>
 
-                <Field label="Must be unique" hint="Refuses an answer someone has already given on this form.">
-                    <Switch value={!!field.is_unique} disabled={locked} onchange={(v) => onpatch?.(field.id, { is_unique: v })} />
-                </Field>
+                <!-- Not inside a group: the value repeats within one submission,
+                     so "an answer nobody has given before" has nothing to compare
+                     against. FormBuilderController::saveField() drops the flag on
+                     a child regardless of what is posted. -->
+                {#if !parent}
+                    <Field label="Must be unique" hint="Refuses an answer someone has already given on this form.">
+                        <Switch value={!!field.is_unique} disabled={locked} onchange={(v) => onpatch?.(field.id, { is_unique: v })} />
+                    </Field>
+                {/if}
 
                 {#each spec.validations ?? [] as rule (rule.key)}
                     <SchemaField

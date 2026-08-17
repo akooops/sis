@@ -7,8 +7,13 @@
      * when the list reorders — which is precisely what a drag does — so a card
      * that remembered anything itself would remember the wrong thing.
      */
+    import { dndzone } from 'svelte-dnd-action';
+    import { flip } from 'svelte/animate';
     import Badge from '@/components/ui/Badge.svelte';
     import { translate } from '@/lib/forms/i18n';
+    // Self-import, the Svelte 5 replacement for <svelte:self>. Recursion stops
+    // at depth one: only a `group` renders a zone, and a group cannot contain one.
+    import CanvasElement from './CanvasElement.svelte';
 
     let {
         field,
@@ -16,14 +21,36 @@
         fallbackLocale = 'en',
         selected = false,
         error = null,
+        errors = {},
         locked = false,
         canMoveUp = false,
         canMoveDown = false,
+        selectedId = null,
         onselect = null,
         onstep = null,
         onduplicate = null,
         onremove = null,
+        onchildren = null,
     } = $props();
+
+    /**
+     * A repeatable group draws its own zone for its children.
+     *
+     * A SEPARATE ZONE TYPE, not the page's. Sharing `form-fields` would let a
+     * child be dragged out onto a page and a group be dragged into a group —
+     * and a group inside a group is exactly what childCodes() refuses, so the
+     * save would 422 on a move the canvas appeared to allow.
+     */
+    const isGroup = $derived(field.type === 'group');
+
+    /** Injected into every element by FieldTypeRegistry::settingsFor(). */
+    const width = $derived(String(field.settings?.width ?? '100'));
+
+    // The ARRAY INSTANCE, for the same reason PageSection needs one: a fresh
+    // array on every read makes the zone re-measure forever.
+    const children = $derived(field.children ?? []);
+
+    const FLIP = { duration: 160 };
 
     /**
      * A one-line summary of whatever the element says.
@@ -62,10 +89,11 @@
 </script>
 
 <div
-    class="group relative flex items-center gap-3 rounded-lg border bg-background p-3 {selected
+    class="flex flex-col rounded-lg border bg-background {selected
         ? 'border-primary ring-1 ring-primary'
         : 'border-border'} {error ? 'border-destructive' : ''}"
 >
+<div class="group relative flex items-center gap-3 p-3">
     <i
         class="ki-filled ki-dots-square-vertical shrink-0 text-muted-foreground {locked ? 'opacity-30' : 'cursor-grab'}"
         aria-hidden="true"
@@ -88,6 +116,14 @@
         <span class="flex w-full min-w-0 items-center gap-2 text-2sm text-muted-foreground">
             <span class="shrink-0"><Badge variant="secondary" size="sm">{field.type}</Badge></span>
             <code class="min-w-0 shrink truncate">{field.key}</code>
+            <!-- Only when it is NOT full width. A badge on every card saying
+                 "100%" is noise on the overwhelming majority of them, and the
+                 interesting fact is always the exception. -->
+            {#if width !== '100'}
+                <span class="shrink-0" title="Width on large screens">
+                    <Badge variant="secondary" size="sm">{width}%</Badge>
+                </span>
+            {/if}
         </span>
         {#if error}
             <span class="w-full min-w-0 break-words text-2sm text-destructive">{Object.values(error)[0]}</span>
@@ -132,4 +168,56 @@
             ><i class="ki-filled ki-trash"></i></button>
         </div>
     {/if}
+</div>
+
+{#if isGroup}
+    <!-- The elements repeated inside each entry. Its own zone, its own type. -->
+    <div class="flex flex-col gap-2 border-t border-border px-3 pb-3 pt-2">
+        <span class="text-2sm text-muted-foreground">Repeated for each entry</span>
+
+        <!-- Items only — the label above and the empty state below are siblings,
+             because svelte-dnd-action indexes this element's children
+             positionally against `items`. -->
+        <div
+            class="flex min-h-[44px] flex-col gap-2"
+            use:dndzone={{
+                items: children,
+                type: 'form-group-fields',
+                dragDisabled: locked,
+                dropTargetStyle: { outline: '2px dashed var(--color-primary)', borderRadius: '10px' },
+                flipDurationMs: FLIP.duration,
+            }}
+            onconsider={(e) => onchildren?.(field.id, e.detail.items)}
+            onfinalize={(e) => onchildren?.(field.id, e.detail.items)}
+        >
+            {#each children as child (child.id)}
+                <div animate:flip={FLIP}>
+                    <CanvasElement
+                        field={child}
+                        {locale}
+                        {fallbackLocale}
+                        {locked}
+                        {errors}
+                        {selectedId}
+                        selected={selectedId === child.id}
+                        error={errors[child.id] ?? null}
+                        canMoveUp={children.indexOf(child) > 0}
+                        canMoveDown={children.indexOf(child) < children.length - 1}
+                        {onselect}
+                        {onstep}
+                        {onduplicate}
+                        {onremove}
+                        {onchildren}
+                    />
+                </div>
+            {/each}
+        </div>
+
+        {#if children.length === 0}
+            <p class="rounded-lg border border-dashed border-border p-3 text-center text-2sm text-muted-foreground">
+                Empty. Select this group, then click an element in the palette.
+            </p>
+        {/if}
+    </div>
+{/if}
 </div>

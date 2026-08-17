@@ -9,9 +9,12 @@
      */
     let { palette = [], disabled = false, onadd = null } = $props();
 
+    // Filtered, not defaulted: an element whose group is not listed here silently
+    // vanishes from the palette, so a new server-side group needs a line here too.
     const GROUPS = [
         { key: 'input', label: 'Fields' },
         { key: 'choice', label: 'Choices' },
+        { key: 'layout', label: 'Layout' },
         { key: 'display', label: 'Content' },
         { key: 'action', label: 'Actions' },
     ];

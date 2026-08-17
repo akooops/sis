@@ -85,6 +85,7 @@
                         {field}
                         value={values[field.key]}
                         error={errors[field.key] ?? null}
+                        {errors}
                         {locale}
                         {fallbackLocale}
                         {disabled}
@@ -103,6 +104,7 @@
                 {field}
                 value={values[field.key]}
                 error={errors[field.key] ?? null}
+                {errors}
                 {locale}
                 {fallbackLocale}
                 {disabled}
