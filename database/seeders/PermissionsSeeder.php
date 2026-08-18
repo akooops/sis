@@ -208,6 +208,40 @@ class PermissionsSeeder extends Seeder
             ['code' => 'job-offer-clusters.store', 'name' => 'Add a posting to a pool', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'job-offer-clusters.destroy', 'name' => 'Remove a posting from a pool', 'supports_web' => true, 'supports_api' => false],
 
+            ['code' => 'visit-services.index', 'name' => 'View visit services', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-services.store', 'name' => 'Create visit services', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-services.update', 'name' => 'Update visit services', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-services.destroy', 'name' => 'Delete visit services', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'visit-slots.index', 'name' => 'View visit time slots', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-slots.store', 'name' => 'Create visit time slots', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-slots.update', 'name' => 'Update visit time slots', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-slots.destroy', 'name' => 'Delete visit time slots', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'visit-reservations.index', 'name' => 'View visit reservations', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-reservations.show', 'name' => 'View a visit reservation', 'supports_web' => true, 'supports_api' => false],
+            /* The desk's internal note. Every other change to a reservation is a
+               transition below, with its own permission and its own audit row. */
+            ['code' => 'visit-reservations.update', 'name' => 'Write reservation notes', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-reservations.destroy', 'name' => 'Delete visit reservations', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-reservations.export', 'name' => 'Export visit reservations', 'supports_web' => true, 'supports_api' => false],
+            /*
+             * One permission PER TRANSITION, the same reasoning the job-application
+             * block above spells out.
+             *
+             * Confirming a booking and cancelling one are different acts with
+             * different consequences for a family who has arranged their day around
+             * it. A school will want a receptionist who can ring round and confirm
+             * but cannot cancel, and somebody marking the register on the morning
+             * who does neither. A blanket update permission cannot express either.
+             */
+            ['code' => 'visit-reservations.contact', 'name' => 'Mark reservations contacted', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-reservations.confirm', 'name' => 'Confirm reservations', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-reservations.attend', 'name' => 'Mark reservations attended', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-reservations.no-show', 'name' => 'Mark reservations a no-show', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-reservations.cancel', 'name' => 'Cancel reservations', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'visit-reservations.reopen', 'name' => 'Reopen cancelled reservations', 'supports_web' => true, 'supports_api' => false],
+
             ['code' => 'countries.index', 'name' => 'View countries', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'countries.store', 'name' => 'Create countries', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'countries.update', 'name' => 'Update countries', 'supports_web' => true, 'supports_api' => false],

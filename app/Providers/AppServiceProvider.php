@@ -57,6 +57,10 @@ use App\Models\Setting;
 use App\Models\Stream;
 use App\Models\User;
 use App\Models\UserRole;
+use App\Models\VisitReservation;
+use App\Models\VisitService;
+use App\Models\VisitSlot;
+use App\Models\Visitor;
 use App\Observers\AchievementObserver;
 use App\Observers\AlbumObserver;
 use App\Observers\ApiKeyObserver;
@@ -110,6 +114,10 @@ use App\Observers\SettingObserver;
 use App\Observers\StreamObserver;
 use App\Observers\UserObserver;
 use App\Observers\UserRoleObserver;
+use App\Observers\VisitReservationObserver;
+use App\Observers\VisitServiceObserver;
+use App\Observers\VisitSlotObserver;
+use App\Observers\VisitorObserver;
 use App\Services\Forms\FieldTypeRegistry;
 use App\Services\Integrations\Registry;
 use App\Services\Sessions\SessionHandler;
@@ -201,6 +209,19 @@ class AppServiceProvider extends ServiceProvider
          * recording that a machine did exactly what it is supposed to. Same
          * reasoning that keeps Session out of the log. What a PERSON does to a
          * pool is audited on Cluster itself.
+         */
+        VisitService::observe(VisitServiceObserver::class);
+        VisitSlot::observe(VisitSlotObserver::class);
+        Visitor::observe(VisitorObserver::class);
+        VisitReservation::observe(VisitReservationObserver::class);
+        /*
+         * DELIBERATELY UNOBSERVED: VisitAttendee.
+         *
+         * ReservationProjector replaces the attendee rows wholesale on every
+         * projection — that is what makes it idempotent — so an observer would
+         * record a delete and an insert per child every time a booking was
+         * re-read, saying nothing a person could act on. The reservation they hang
+         * off IS audited, and the submission behind it keeps the answers verbatim.
          */
         Country::observe(CountryObserver::class);
         Program::observe(ProgramObserver::class);

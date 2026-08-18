@@ -24,6 +24,10 @@
         onblur = null,
         onnavigate = null,
         onupload = null,
+        // The challenge, when one is due on this page. A SNIPPET rather than a
+        // flag, because the renderer owns the widget's state and its lifecycle —
+        // this component owns only the question of WHERE it belongs.
+        captcha = null,
     } = $props();
 
     const title = $derived(translate(page?.title, locale, fallbackLocale));
@@ -66,6 +70,33 @@
 
         return out;
     });
+
+    /**
+     * The group the captcha must sit IMMEDIATELY BEFORE, or null for "the end".
+     *
+     * A challenge belongs directly above the control that submits. It used to be
+     * rendered by FormRenderer after this whole component, which put it above the
+     * renderer's OWN fallback button but BELOW one the form's author placed —
+     * because an author's button is simply another element on the page.
+     *
+     * The submit row is the anchor, not the first or last row: an author may put
+     * a button between two questions, and a challenge above THAT is just as
+     * stranded as one below the submit. Falling back to the last button row keeps
+     * something sensible on a page whose submit control is the renderer's own,
+     * and null means this page has no buttons at all — the fallback row is
+     * rendered after this section, so the end of the section is still above it.
+     */
+    const captchaBeforeId = $derived.by(() => {
+        const rows = groups.filter((group) => group.buttons);
+
+        if (rows.length === 0) {
+            return null;
+        }
+
+        const submits = rows.find((row) => row.fields.some((f) => f?.settings?.action === 'submit'));
+
+        return (submits ?? rows[rows.length - 1]).id;
+    });
 </script>
 
 <!-- The admin's own handles, same pair every element carries: the form's
@@ -75,6 +106,8 @@
     {#if title}<h2 class="sisf-page-title">{title}</h2>{/if}
 
     {#each groups as group (group.id)}
+        {#if captcha && group.id === captchaBeforeId}{@render captcha()}{/if}
+
         {#if group.buttons}
             <!-- Back and Next on one line. The wrapper is presentational only:
                  each button keeps its own .sisf-el, so the admin's css_id and
@@ -117,4 +150,8 @@
             />
         {/if}
     {/each}
+
+    <!-- No buttons on this page, so there is nothing to sit above within it. The
+         renderer's fallback row follows this section, so here IS above it. -->
+    {#if captcha && captchaBeforeId === null}{@render captcha()}{/if}
 </section>

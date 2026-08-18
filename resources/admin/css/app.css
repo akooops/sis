@@ -42,6 +42,14 @@
 @import '../metronic/src/css/components/index.css';
 @import '../metronic/src/css/demos/demo1.css';
 
+/* FullCalendar, themed to match Metronic — .fc-button sized like kt-btn, the
+   toolbar title on the Metronic type scale.
+
+   NOT part of components/index.css, which is why this is its own line: the theme
+   ships the file but never imports it, so the visit time-slot calendar would
+   otherwise render in FullCalendar's stock blue-and-grey inside a Metronic card. */
+@import '../metronic/src/css/components/fullcalendar.css';
+
 /* Brand overrides (colors, radius). Keep last so it wins. */
 @import './brand.css';
 
@@ -51,6 +59,63 @@
     flex-grow: 1;
     width: 100%;
     min-width: 0;
+}
+
+/* Visit time slots: the four states a slot can be in, on the calendar and in the
+   legend beside it.
+
+   The same scale as the public site (resources/site/css/site/tokens.css) rather
+   than Metronic's status colours, so an admin looking at the calendar and a
+   visitor looking at the booking page see a slot the same colour. Declared here
+   because nothing else in the admin has a use for them, and because the two
+   bundles share no stylesheet.
+
+   `limited` IS BOOKABLE — nearly full, not refused. `is-overbooked` is the race
+   ReservationProjector documents and deliberately allows: a ring rather than a
+   fifth colour, because the state underneath still means what it says. */
+:root {
+    --slot-open: #198754;
+    --slot-limited: #fd7e14;
+    --slot-full: #dc3545;
+    --slot-closed: #adb5bd;
+}
+
+.fc-event.is-available,
+.fc-legend-is-available {
+    background-color: var(--slot-open);
+    border-color: var(--slot-open);
+    color: #fff;
+}
+
+.fc-event.is-limited,
+.fc-legend-is-limited {
+    background-color: var(--slot-limited);
+    border-color: var(--slot-limited);
+    color: #fff;
+}
+
+.fc-event.is-full,
+.fc-legend-is-full {
+    background-color: var(--slot-full);
+    border-color: var(--slot-full);
+    color: #fff;
+}
+
+.fc-event.is-closed,
+.fc-legend-is-closed {
+    background-color: var(--slot-closed);
+    border-color: var(--slot-closed);
+    color: #fff;
+}
+
+.fc-event.is-overbooked {
+    outline: 2px solid var(--slot-full);
+    outline-offset: 1px;
+}
+
+/* Every slot is editable, so the whole grid is a click target. */
+.fc-event {
+    cursor: pointer;
 }
 
 /* Sidebar scrollbar thumb. Metronic's .kt-scrollable-* paints the thumb with

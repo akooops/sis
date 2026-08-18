@@ -83,6 +83,9 @@
     --color-slot-open: #198754;
     --color-slot-limited: #fd7e14;
     --color-slot-full: #dc3545;
+    /* Closed by an admin, or already past. Grey rather than red: it is not a
+       refusal, it is a time that was never on offer. */
+    --color-slot-closed: #adb5bd;
 
     /* Accents kept from the old palette (used by streams, badges, charts) */
     --color-aqua: #54a8c7;

@@ -17,6 +17,7 @@ use App\Http\Controllers\Web\Site\ProgramsController;
 use App\Http\Controllers\Web\Site\ResourcesController;
 use App\Http\Controllers\Web\Site\SitemapController;
 use App\Http\Controllers\Web\Site\SubmitController;
+use App\Http\Controllers\Web\Site\VisitsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -89,6 +90,16 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('job-applications', [AdminPagesController::class, 'jobApplications'])->middleware('verify.permissions:job-applications.index')->name('web.admin.job-applications.index');
     Route::get('candidates', [AdminPagesController::class, 'candidates'])->middleware('verify.permissions:candidates.index')->name('web.admin.candidates.index');
     Route::get('clusters', [AdminPagesController::class, 'clusters'])->middleware('verify.permissions:clusters.index')->name('web.admin.clusters.index');
+    Route::get('visit-services', [AdminPagesController::class, 'visitServices'])->middleware('verify.permissions:visit-services.index')->name('web.admin.visit-services.index');
+    Route::get('visit-slots', [AdminPagesController::class, 'visitSlots'])->middleware('verify.permissions:visit-slots.index')->name('web.admin.visit-slots.index');
+    /*
+     * `web.admin.visit-reservations.index` must keep exactly this name, for the
+     * same reason its job-applications twin above must:
+     * VisitReservationObserver::announce() links every visit notification to it and
+     * swallows its own failures, so a rename does not error — it makes every visit
+     * notification vanish into the integrations log.
+     */
+    Route::get('visit-reservations', [AdminPagesController::class, 'visitReservations'])->middleware('verify.permissions:visit-reservations.index')->name('web.admin.visit-reservations.index');
     Route::get('menus', [AdminPagesController::class, 'menus'])->middleware('verify.permissions:menus.index')->name('web.admin.menus.index');
     Route::get('menu-items', [AdminPagesController::class, 'menuItems'])->middleware('verify.permissions:menu-items.index')->name('web.admin.menu-items.index');
     Route::get('countries', [AdminPagesController::class, 'countries'])->middleware('verify.permissions:countries.index')->name('web.admin.countries.index');
@@ -138,6 +149,19 @@ $site = function () {
 
     Route::get('jobs', [JobsController::class, 'index'])->name('jobs.index');
     Route::get('jobs/{slug}', [JobsController::class, 'show'])->name('jobs.show');
+
+    /*
+     * Visits: ONE page, plus the calendar's month feed.
+     *
+     * The feed is throttled because it is public and unauthenticated. It is
+     * declared here rather than beside the form endpoints below so that it
+     * inherits the same optional locale prefix as the page that calls it — the
+     * browser builds its URL from the same route() that rendered the page.
+     */
+    Route::get('visits', [VisitsController::class, 'index'])->name('visits.index');
+    Route::get('visits/{service}/slots', [VisitsController::class, 'slots'])
+        ->middleware('throttle:60,1')
+        ->name('visits.slots');
 
     Route::get('calendars', [ResourcesController::class, 'calendars'])->name('calendars');
     Route::get('newsletters', [ResourcesController::class, 'newsletters'])->name('newsletters');

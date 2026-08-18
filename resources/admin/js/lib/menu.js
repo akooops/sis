@@ -78,6 +78,18 @@ export const adminMenu = [
         ],
     },
     {
+        label: 'Visits',
+        icon: 'ki-filled ki-calendar-tick',
+        children: [
+            // Same order as Jobs, and for the same reason: the visit is the thing
+            // that exists first, its times hang off it, and a booking is what a
+            // time turns into.
+            { label: 'Visit Services', route: 'web.admin.visit-services.index', permission: 'visit-services.index' },
+            { label: 'Time Slots', route: 'web.admin.visit-slots.index', permission: 'visit-slots.index' },
+            { label: 'Bookings', route: 'web.admin.visit-reservations.index', permission: 'visit-reservations.index' },
+        ],
+    },
+    {
         label: 'Forms',
         icon: 'ki-filled ki-questionnaire-tablet',
         children: [

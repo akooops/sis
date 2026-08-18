@@ -31,7 +31,14 @@ import initSwipers from './site/swiper';
  */
 const ON_DEMAND = [
     ['[data-sisf]', () => import('./site/forms')],
-    ['[data-island]', () => import('./site/islands')],
+    /*
+     * The booking flow, which mounts the SAME FormRenderer behind a
+     * service-and-slot gate. Which is why the visits page passes `marker: false`
+     * to site::partials.forms.embed: the `[data-sisf]` marker above would
+     * otherwise load site/forms.js as well and mount a second renderer into the
+     * one root.
+     */
+    ['[data-visits-root]', () => import('./site/visits')],
     ['[data-lightbox]', () => import('./site/lightbox')],
     ['[data-calendar]', () => import('./site/calendar')],
     ['[data-datepicker]', () => import('./site/datepicker')],

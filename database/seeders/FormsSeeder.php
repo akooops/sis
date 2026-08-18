@@ -422,6 +422,197 @@ class FormsSeeder extends Seeder
     }
 
     /**
+     * The 15 grade options, prek through g12, in 9 locales.
+     *
+     * SHARED BY EVERY FORM THAT ASKS WHAT YEAR A CHILD IS IN — the admissions
+     * inquiry and the visit reservation today. It is a method rather than 165
+     * lines repeated per form because the two lists have to agree: an inquiry
+     * and a booking for the same child should store the same value, and a school
+     * that renames a year should not have to find every form that spells it.
+     *
+     * A FIXED LIST rather than one generated from the grades table. The visitor
+     * is telling us what year their child is in AT THEIR CURRENT SCHOOL, which is
+     * not necessarily a year this school offers, and binding the question to our
+     * own catalogue would make an applicant from outside the system unable to
+     * answer it truthfully.
+     *
+     * Option VALUES are never translated — the same answer has to read identically
+     * whatever language it was given in, which is what makes an export comparable.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function gradeOptions(): array
+    {
+        return [
+            ['value' => 'prek', 'label' => [
+                'en' => 'Pre-K',
+                'ar' => 'ما قبل الروضة',
+                'fr' => 'Petite section',
+                'es' => 'Preescolar',
+                'de' => 'Vorschule',
+                'it' => 'Prescolare',
+                'pt' => 'Pré-escolar',
+                'ru' => 'Дошкольная группа',
+                'hi' => 'प्री-के',
+            ]],
+            ['value' => 'kg1', 'label' => [
+                'en' => 'KG1',
+                'ar' => 'الروضة الأولى',
+                'fr' => 'Maternelle 1',
+                'es' => 'Infantil 1',
+                'de' => 'Kindergarten 1',
+                'it' => 'Materna 1',
+                'pt' => 'Jardim 1',
+                'ru' => 'Подготовка 1',
+                'hi' => 'केजी1',
+            ]],
+            ['value' => 'kg2', 'label' => [
+                'en' => 'KG2',
+                'ar' => 'الروضة الثانية',
+                'fr' => 'Maternelle 2',
+                'es' => 'Infantil 2',
+                'de' => 'Kindergarten 2',
+                'it' => 'Materna 2',
+                'pt' => 'Jardim 2',
+                'ru' => 'Подготовка 2',
+                'hi' => 'केजी2',
+            ]],
+            ['value' => 'g1', 'label' => [
+                'en' => 'Grade 1',
+                'ar' => 'الصف 1',
+                'fr' => 'Année 1',
+                'es' => 'Curso 1',
+                'de' => 'Klasse 1',
+                'it' => 'Classe 1',
+                'pt' => 'Ano 1',
+                'ru' => '1-й класс',
+                'hi' => 'कक्षा 1',
+            ]],
+            ['value' => 'g2', 'label' => [
+                'en' => 'Grade 2',
+                'ar' => 'الصف 2',
+                'fr' => 'Année 2',
+                'es' => 'Curso 2',
+                'de' => 'Klasse 2',
+                'it' => 'Classe 2',
+                'pt' => 'Ano 2',
+                'ru' => '2-й класс',
+                'hi' => 'कक्षा 2',
+            ]],
+            ['value' => 'g3', 'label' => [
+                'en' => 'Grade 3',
+                'ar' => 'الصف 3',
+                'fr' => 'Année 3',
+                'es' => 'Curso 3',
+                'de' => 'Klasse 3',
+                'it' => 'Classe 3',
+                'pt' => 'Ano 3',
+                'ru' => '3-й класс',
+                'hi' => 'कक्षा 3',
+            ]],
+            ['value' => 'g4', 'label' => [
+                'en' => 'Grade 4',
+                'ar' => 'الصف 4',
+                'fr' => 'Année 4',
+                'es' => 'Curso 4',
+                'de' => 'Klasse 4',
+                'it' => 'Classe 4',
+                'pt' => 'Ano 4',
+                'ru' => '4-й класс',
+                'hi' => 'कक्षा 4',
+            ]],
+            ['value' => 'g5', 'label' => [
+                'en' => 'Grade 5',
+                'ar' => 'الصف 5',
+                'fr' => 'Année 5',
+                'es' => 'Curso 5',
+                'de' => 'Klasse 5',
+                'it' => 'Classe 5',
+                'pt' => 'Ano 5',
+                'ru' => '5-й класс',
+                'hi' => 'कक्षा 5',
+            ]],
+            ['value' => 'g6', 'label' => [
+                'en' => 'Grade 6',
+                'ar' => 'الصف 6',
+                'fr' => 'Année 6',
+                'es' => 'Curso 6',
+                'de' => 'Klasse 6',
+                'it' => 'Classe 6',
+                'pt' => 'Ano 6',
+                'ru' => '6-й класс',
+                'hi' => 'कक्षा 6',
+            ]],
+            ['value' => 'g7', 'label' => [
+                'en' => 'Grade 7',
+                'ar' => 'الصف 7',
+                'fr' => 'Année 7',
+                'es' => 'Curso 7',
+                'de' => 'Klasse 7',
+                'it' => 'Classe 7',
+                'pt' => 'Ano 7',
+                'ru' => '7-й класс',
+                'hi' => 'कक्षा 7',
+            ]],
+            ['value' => 'g8', 'label' => [
+                'en' => 'Grade 8',
+                'ar' => 'الصف 8',
+                'fr' => 'Année 8',
+                'es' => 'Curso 8',
+                'de' => 'Klasse 8',
+                'it' => 'Classe 8',
+                'pt' => 'Ano 8',
+                'ru' => '8-й класс',
+                'hi' => 'कक्षा 8',
+            ]],
+            ['value' => 'g9', 'label' => [
+                'en' => 'Grade 9',
+                'ar' => 'الصف 9',
+                'fr' => 'Année 9',
+                'es' => 'Curso 9',
+                'de' => 'Klasse 9',
+                'it' => 'Classe 9',
+                'pt' => 'Ano 9',
+                'ru' => '9-й класс',
+                'hi' => 'कक्षा 9',
+            ]],
+            ['value' => 'g10', 'label' => [
+                'en' => 'Grade 10',
+                'ar' => 'الصف 10',
+                'fr' => 'Année 10',
+                'es' => 'Curso 10',
+                'de' => 'Klasse 10',
+                'it' => 'Classe 10',
+                'pt' => 'Ano 10',
+                'ru' => '10-й класс',
+                'hi' => 'कक्षा 10',
+            ]],
+            ['value' => 'g11', 'label' => [
+                'en' => 'Grade 11',
+                'ar' => 'الصف 11',
+                'fr' => 'Année 11',
+                'es' => 'Curso 11',
+                'de' => 'Klasse 11',
+                'it' => 'Classe 11',
+                'pt' => 'Ano 11',
+                'ru' => '11-й класс',
+                'hi' => 'कक्षा 11',
+            ]],
+            ['value' => 'g12', 'label' => [
+                'en' => 'Grade 12',
+                'ar' => 'الصف 12',
+                'fr' => 'Année 12',
+                'es' => 'Curso 12',
+                'de' => 'Klasse 12',
+                'it' => 'Classe 12',
+                'pt' => 'Ano 12',
+                'ru' => '12-й класс',
+                'hi' => 'कक्षा 12',
+            ]],
+        ];
+    }
+
+    /**
      * Forms that ship with the app. run() creates these as is_system, so their
      * settings stay editable but their structure does not.
      *
@@ -759,176 +950,8 @@ class FormsSeeder extends Seeder
                                 'type' => 'select',
                                 'key' => 'grade',
                                 'is_required' => true,
-                                // Option VALUES are never translated — the same answer has to read
-                                // identically whatever language it was given in, which is what makes
-                                // an export comparable.
-                                'options' => [
-                                    ['value' => 'prek', 'label' => [
-                                        'en' => 'Pre-K',
-                                        'ar' => 'ما قبل الروضة',
-                                        'fr' => 'Petite section',
-                                        'es' => 'Preescolar',
-                                        'de' => 'Vorschule',
-                                        'it' => 'Prescolare',
-                                        'pt' => 'Pré-escolar',
-                                        'ru' => 'Дошкольная группа',
-                                        'hi' => 'प्री-के',
-                                    ]],
-                                    ['value' => 'kg1', 'label' => [
-                                        'en' => 'KG1',
-                                        'ar' => 'الروضة الأولى',
-                                        'fr' => 'Maternelle 1',
-                                        'es' => 'Infantil 1',
-                                        'de' => 'Kindergarten 1',
-                                        'it' => 'Materna 1',
-                                        'pt' => 'Jardim 1',
-                                        'ru' => 'Подготовка 1',
-                                        'hi' => 'केजी1',
-                                    ]],
-                                    ['value' => 'kg2', 'label' => [
-                                        'en' => 'KG2',
-                                        'ar' => 'الروضة الثانية',
-                                        'fr' => 'Maternelle 2',
-                                        'es' => 'Infantil 2',
-                                        'de' => 'Kindergarten 2',
-                                        'it' => 'Materna 2',
-                                        'pt' => 'Jardim 2',
-                                        'ru' => 'Подготовка 2',
-                                        'hi' => 'केजी2',
-                                    ]],
-                                    ['value' => 'g1', 'label' => [
-                                        'en' => 'Grade 1',
-                                        'ar' => 'الصف 1',
-                                        'fr' => 'Année 1',
-                                        'es' => 'Curso 1',
-                                        'de' => 'Klasse 1',
-                                        'it' => 'Classe 1',
-                                        'pt' => 'Ano 1',
-                                        'ru' => '1-й класс',
-                                        'hi' => 'कक्षा 1',
-                                    ]],
-                                    ['value' => 'g2', 'label' => [
-                                        'en' => 'Grade 2',
-                                        'ar' => 'الصف 2',
-                                        'fr' => 'Année 2',
-                                        'es' => 'Curso 2',
-                                        'de' => 'Klasse 2',
-                                        'it' => 'Classe 2',
-                                        'pt' => 'Ano 2',
-                                        'ru' => '2-й класс',
-                                        'hi' => 'कक्षा 2',
-                                    ]],
-                                    ['value' => 'g3', 'label' => [
-                                        'en' => 'Grade 3',
-                                        'ar' => 'الصف 3',
-                                        'fr' => 'Année 3',
-                                        'es' => 'Curso 3',
-                                        'de' => 'Klasse 3',
-                                        'it' => 'Classe 3',
-                                        'pt' => 'Ano 3',
-                                        'ru' => '3-й класс',
-                                        'hi' => 'कक्षा 3',
-                                    ]],
-                                    ['value' => 'g4', 'label' => [
-                                        'en' => 'Grade 4',
-                                        'ar' => 'الصف 4',
-                                        'fr' => 'Année 4',
-                                        'es' => 'Curso 4',
-                                        'de' => 'Klasse 4',
-                                        'it' => 'Classe 4',
-                                        'pt' => 'Ano 4',
-                                        'ru' => '4-й класс',
-                                        'hi' => 'कक्षा 4',
-                                    ]],
-                                    ['value' => 'g5', 'label' => [
-                                        'en' => 'Grade 5',
-                                        'ar' => 'الصف 5',
-                                        'fr' => 'Année 5',
-                                        'es' => 'Curso 5',
-                                        'de' => 'Klasse 5',
-                                        'it' => 'Classe 5',
-                                        'pt' => 'Ano 5',
-                                        'ru' => '5-й класс',
-                                        'hi' => 'कक्षा 5',
-                                    ]],
-                                    ['value' => 'g6', 'label' => [
-                                        'en' => 'Grade 6',
-                                        'ar' => 'الصف 6',
-                                        'fr' => 'Année 6',
-                                        'es' => 'Curso 6',
-                                        'de' => 'Klasse 6',
-                                        'it' => 'Classe 6',
-                                        'pt' => 'Ano 6',
-                                        'ru' => '6-й класс',
-                                        'hi' => 'कक्षा 6',
-                                    ]],
-                                    ['value' => 'g7', 'label' => [
-                                        'en' => 'Grade 7',
-                                        'ar' => 'الصف 7',
-                                        'fr' => 'Année 7',
-                                        'es' => 'Curso 7',
-                                        'de' => 'Klasse 7',
-                                        'it' => 'Classe 7',
-                                        'pt' => 'Ano 7',
-                                        'ru' => '7-й класс',
-                                        'hi' => 'कक्षा 7',
-                                    ]],
-                                    ['value' => 'g8', 'label' => [
-                                        'en' => 'Grade 8',
-                                        'ar' => 'الصف 8',
-                                        'fr' => 'Année 8',
-                                        'es' => 'Curso 8',
-                                        'de' => 'Klasse 8',
-                                        'it' => 'Classe 8',
-                                        'pt' => 'Ano 8',
-                                        'ru' => '8-й класс',
-                                        'hi' => 'कक्षा 8',
-                                    ]],
-                                    ['value' => 'g9', 'label' => [
-                                        'en' => 'Grade 9',
-                                        'ar' => 'الصف 9',
-                                        'fr' => 'Année 9',
-                                        'es' => 'Curso 9',
-                                        'de' => 'Klasse 9',
-                                        'it' => 'Classe 9',
-                                        'pt' => 'Ano 9',
-                                        'ru' => '9-й класс',
-                                        'hi' => 'कक्षा 9',
-                                    ]],
-                                    ['value' => 'g10', 'label' => [
-                                        'en' => 'Grade 10',
-                                        'ar' => 'الصف 10',
-                                        'fr' => 'Année 10',
-                                        'es' => 'Curso 10',
-                                        'de' => 'Klasse 10',
-                                        'it' => 'Classe 10',
-                                        'pt' => 'Ano 10',
-                                        'ru' => '10-й класс',
-                                        'hi' => 'कक्षा 10',
-                                    ]],
-                                    ['value' => 'g11', 'label' => [
-                                        'en' => 'Grade 11',
-                                        'ar' => 'الصف 11',
-                                        'fr' => 'Année 11',
-                                        'es' => 'Curso 11',
-                                        'de' => 'Klasse 11',
-                                        'it' => 'Classe 11',
-                                        'pt' => 'Ano 11',
-                                        'ru' => '11-й класс',
-                                        'hi' => 'कक्षा 11',
-                                    ]],
-                                    ['value' => 'g12', 'label' => [
-                                        'en' => 'Grade 12',
-                                        'ar' => 'الصف 12',
-                                        'fr' => 'Année 12',
-                                        'es' => 'Curso 12',
-                                        'de' => 'Klasse 12',
-                                        'it' => 'Classe 12',
-                                        'pt' => 'Ano 12',
-                                        'ru' => '12-й класс',
-                                        'hi' => 'कक्षा 12',
-                                    ]],
-                                ],
+                                // The shared 15-grade list — see gradeOptions().
+                                'options' => $this->gradeOptions(),
                                 'label' => [
                                     'en' => 'Grade applied for',
                                     'ar' => 'الصف المتقدَّم إليه',
@@ -1468,6 +1491,237 @@ class FormsSeeder extends Seeder
                                     'de' => 'Bewerbung senden', 'it' => 'Invia candidatura',
                                     'pt' => 'Enviar candidatura', 'ru' => 'Отправить заявку',
                                     'hi' => 'आवेदन भेजें',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+
+            /*
+             * The school-visit reservation.
+             *
+             * TWO PAGES: who you are, then who is coming. The wizard on /visits has
+             * already asked WHICH visit, WHICH time and HOW MANY people before this
+             * form mounts, so those are the only two questions left — and they are
+             * genuinely different ones, asked of different people. Splitting them
+             * also keeps the students group off the screen that holds the contact
+             * details, which matters because the group grows: five children is
+             * twenty inputs, and a shared page's length would be set by the party
+             * size rather than by the form.
+             *
+             * THREE HIDDEN FIELDS carry what the wizard chose. Hidden rather than
+             * absent because the submit is a plain POST and those choices have to
+             * travel with the answers — site/visits.js mounts the renderer with them
+             * as initial values, the way the CV chooser hands it parsed ones. All
+             * three are visitor-tamperable, so VisitReservationIsAllowed re-reads the
+             * slot and the service instead of trusting them, and ReservationProjector
+             * takes the service off the SLOT so the two cannot disagree.
+             *
+             * NONE OF THE THREE IS REQUIRED at the schema level, deliberately: an
+             * empty slot id would otherwise be reported as "The visit slot id field is
+             * required", naming an input the visitor cannot see. The rule answers the
+             * same case with a sentence about time slots.
+             *
+             * THE STUDENT KEYS ARE PREFIXED because field keys are unique per FORM,
+             * group children included — the guardian already holds first_name and
+             * last_name. config/visits.php maps them back onto the shared columns;
+             * that is exactly what the map is for.
+             *
+             * max_instances mirrors the default VisitService::max_visitors. It is the
+             * ceiling a hand-rolled post cannot exceed; the real per-booking cap is
+             * the party size the visitor picked on the card, enforced at submit as a
+             * max on this group.
+             */
+            [
+                'slug' => 'visit-reservation',
+                'name' => 'Visit reservation',
+                'title' => [
+                    'en' => 'Book a visit',
+                    'ar' => 'حجز زيارة',
+                    'fr' => 'Réserver une visite',
+                    'es' => 'Reservar una visita',
+                    'de' => 'Besuch buchen',
+                    'it' => 'Prenota una visita',
+                    'pt' => 'Marcar uma visita',
+                    'ru' => 'Записаться на визит',
+                    'hi' => 'भ्रमण बुक करें',
+                ],
+                'confirmation_message' => [
+                    'en' => 'Thank you. Your visit is booked and we will be in touch to confirm.',
+                    'ar' => 'شكرًا لك. تم حجز زيارتك وسنتواصل معك للتأكيد.',
+                    'fr' => 'Merci. Votre visite est réservée et nous vous contacterons pour la confirmer.',
+                    'es' => 'Gracias. Su visita está reservada y nos pondremos en contacto para confirmarla.',
+                    'de' => 'Vielen Dank. Ihr Besuch ist gebucht und wir melden uns zur Bestätigung.',
+                    'it' => 'Grazie. La tua visita è prenotata e ti contatteremo per confermarla.',
+                    'pt' => 'Obrigado. A sua visita está marcada e entraremos em contacto para confirmar.',
+                    'ru' => 'Спасибо. Ваш визит забронирован, мы свяжемся с вами для подтверждения.',
+                    'hi' => 'धन्यवाद। आपका भ्रमण बुक हो गया है और हम पुष्टि के लिए संपर्क करेंगे।',
+                ],
+                'pages' => [
+                    [
+                        'name' => 'Details',
+                        'title' => [
+                            'en' => 'Your details',
+                            'ar' => 'بياناتك',
+                            'fr' => 'Vos coordonnées',
+                            'es' => 'Sus datos',
+                            'de' => 'Ihre Angaben',
+                            'it' => 'I tuoi dati',
+                            'pt' => 'Os seus dados',
+                            'ru' => 'Ваши данные',
+                            'hi' => 'आपका विवरण',
+                        ],
+                        'fields' => [
+                            ['type' => 'hidden', 'key' => 'visit_service_id'],
+                            ['type' => 'hidden', 'key' => 'visit_slot_id'],
+                            ['type' => 'hidden', 'key' => 'visitors_count'],
+                            [
+                                'type' => 'text', 'key' => 'first_name', 'is_required' => true,
+                                'settings' => ['width' => '50'],
+                                'validation' => ['max_length' => 100],
+                                'label' => [
+                                    'en' => 'First name', 'ar' => 'الاسم الأول', 'fr' => 'Prénom',
+                                    'es' => 'Nombre', 'de' => 'Vorname', 'it' => 'Nome',
+                                    'pt' => 'Nome próprio', 'ru' => 'Имя', 'hi' => 'पहला नाम',
+                                ],
+                            ],
+                            [
+                                'type' => 'text', 'key' => 'last_name', 'is_required' => true,
+                                'settings' => ['width' => '50'],
+                                'validation' => ['max_length' => 100],
+                                'label' => [
+                                    'en' => 'Last name', 'ar' => 'اسم العائلة', 'fr' => 'Nom',
+                                    'es' => 'Apellidos', 'de' => 'Nachname', 'it' => 'Cognome',
+                                    'pt' => 'Apelido', 'ru' => 'Фамилия', 'hi' => 'उपनाम',
+                                ],
+                            ],
+                            [
+                                'type' => 'email', 'key' => 'email', 'is_required' => true,
+                                'settings' => ['width' => '50'],
+                                'label' => [
+                                    'en' => 'Email', 'ar' => 'البريد الإلكتروني', 'fr' => 'E-mail',
+                                    'es' => 'Correo electrónico', 'de' => 'E-Mail', 'it' => 'E-mail',
+                                    'pt' => 'E-mail', 'ru' => 'Эл. почта', 'hi' => 'ईमेल',
+                                ],
+                            ],
+                            [
+                                'type' => 'phone', 'key' => 'phone', 'is_required' => true,
+                                'settings' => ['width' => '50'],
+                                'label' => [
+                                    'en' => 'Phone', 'ar' => 'رقم الهاتف', 'fr' => 'Téléphone',
+                                    'es' => 'Teléfono', 'de' => 'Telefon', 'it' => 'Telefono',
+                                    'pt' => 'Telefone', 'ru' => 'Телефон', 'hi' => 'फ़ोन',
+                                ],
+                            ],
+                            [
+                                'type' => 'button', 'key' => 'to_students',
+                                'settings' => ['action' => 'next', 'variant' => 'primary'],
+                                'label' => [
+                                    'en' => 'Continue', 'ar' => 'متابعة', 'fr' => 'Continuer',
+                                    'es' => 'Continuar', 'de' => 'Weiter', 'it' => 'Continua',
+                                    'pt' => 'Continuar', 'ru' => 'Продолжить', 'hi' => 'जारी रखें',
+                                ],
+                            ],
+                        ],
+                    ],
+                    [
+                        'name' => 'Students',
+                        'title' => [
+                            'en' => 'Who is coming',
+                            'ar' => 'من سيحضر',
+                            'fr' => 'Qui vient',
+                            'es' => 'Quién asiste',
+                            'de' => 'Wer kommt',
+                            'it' => 'Chi partecipa',
+                            'pt' => 'Quem vem',
+                            'ru' => 'Кто придёт',
+                            'hi' => 'कौन आ रहा है',
+                        ],
+                        'fields' => [
+                            [
+                                /*
+                                 * REQUIRED, with a minimum of one row — unlike the job
+                                 * form's optional education. A school visit exists to
+                                 * show a child around, so a booking with nobody named
+                                 * is a booking the front desk cannot prepare for.
+                                 */
+                                'type' => 'group', 'key' => 'students', 'is_required' => true,
+                                'settings' => ['min_instances' => 1, 'max_instances' => 5],
+                                'label' => [
+                                    'en' => 'Students', 'ar' => 'الطلاب', 'fr' => 'Élèves',
+                                    'es' => 'Alumnos', 'de' => 'Schülerinnen und Schüler',
+                                    'it' => 'Studenti', 'pt' => 'Alunos', 'ru' => 'Учащиеся',
+                                    'hi' => 'छात्र',
+                                ],
+                                'children' => [
+                                    [
+                                        'type' => 'text', 'key' => 'student_first_name', 'is_required' => true,
+                                        'settings' => ['width' => '50'],
+                                        'validation' => ['max_length' => 100],
+                                        'label' => [
+                                            'en' => 'First name', 'ar' => 'الاسم الأول', 'fr' => 'Prénom',
+                                            'es' => 'Nombre', 'de' => 'Vorname', 'it' => 'Nome',
+                                            'pt' => 'Nome próprio', 'ru' => 'Имя', 'hi' => 'पहला नाम',
+                                        ],
+                                    ],
+                                    [
+                                        'type' => 'text', 'key' => 'student_last_name', 'is_required' => true,
+                                        'settings' => ['width' => '50'],
+                                        'validation' => ['max_length' => 100],
+                                        'label' => [
+                                            'en' => 'Last name', 'ar' => 'اسم العائلة', 'fr' => 'Nom',
+                                            'es' => 'Apellidos', 'de' => 'Nachname', 'it' => 'Cognome',
+                                            'pt' => 'Apelido', 'ru' => 'Фамилия', 'hi' => 'उपनाम',
+                                        ],
+                                    ],
+                                    [
+                                        // The shared 15-grade list — see gradeOptions().
+                                        // The year the child is in NOW, at whatever
+                                        // school they attend today.
+                                        'type' => 'select', 'key' => 'grade', 'is_required' => true,
+                                        'settings' => ['width' => '50'],
+                                        'options' => $this->gradeOptions(),
+                                        'label' => [
+                                            'en' => 'Current grade', 'ar' => 'الصف الحالي',
+                                            'fr' => 'Niveau actuel', 'es' => 'Curso actual',
+                                            'de' => 'Aktuelle Klassenstufe', 'it' => 'Classe attuale',
+                                            'pt' => 'Ano atual', 'ru' => 'Текущий класс',
+                                            'hi' => 'वर्तमान कक्षा',
+                                        ],
+                                    ],
+                                    [
+                                        'type' => 'text', 'key' => 'current_school',
+                                        'settings' => ['width' => '50'],
+                                        'validation' => ['max_length' => 160],
+                                        'label' => [
+                                            'en' => 'Current school', 'ar' => 'المدرسة الحالية',
+                                            'fr' => 'École actuelle', 'es' => 'Centro actual',
+                                            'de' => 'Derzeitige Schule', 'it' => 'Scuola attuale',
+                                            'pt' => 'Escola atual', 'ru' => 'Текущая школа',
+                                            'hi' => 'वर्तमान विद्यालय',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            [
+                                'type' => 'button', 'key' => 'back_to_details',
+                                'settings' => ['action' => 'back', 'variant' => 'secondary'],
+                                'label' => [
+                                    'en' => 'Back', 'ar' => 'رجوع', 'fr' => 'Retour', 'es' => 'Atrás',
+                                    'de' => 'Zurück', 'it' => 'Indietro', 'pt' => 'Voltar',
+                                    'ru' => 'Назад', 'hi' => 'वापस',
+                                ],
+                            ],
+                            [
+                                'type' => 'button', 'key' => 'confirm_booking',
+                                'settings' => ['action' => 'submit', 'variant' => 'primary'],
+                                'label' => [
+                                    'en' => 'Confirm booking', 'ar' => 'تأكيد الحجز',
+                                    'fr' => 'Confirmer la réservation', 'es' => 'Confirmar la reserva',
+                                    'de' => 'Buchung bestätigen', 'it' => 'Conferma la prenotazione',
+                                    'pt' => 'Confirmar a reserva', 'ru' => 'Подтвердить бронирование',
+                                    'hi' => 'बुकिंग की पुष्टि करें',
                                 ],
                             ],
                         ],

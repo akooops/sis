@@ -34,6 +34,16 @@ return [
          */
         'job.application_received' => ['name' => 'Job application received', 'icon' => 'ki-briefcase', 'sort' => 3],
         'job.application_status_changed' => ['name' => 'Job application status changed', 'icon' => 'ki-arrow-right', 'sort' => 4],
+
+        /*
+         * The same arrangement one module over. A visit reservation ALSO fires
+         * form.submission_received, because it is a form; these two carry the VISIT
+         * context — which tour, which family, when they are due and where the
+         * booking has reached — so the admissions desk subscribes to these and
+         * whoever watches forms in general is not drowned in bookings.
+         */
+        'visit.reservation_received' => ['name' => 'Visit booking received', 'icon' => 'ki-calendar-add', 'sort' => 5],
+        'visit.reservation_status_changed' => ['name' => 'Visit booking status changed', 'icon' => 'ki-arrow-right', 'sort' => 6],
     ],
 
     /*

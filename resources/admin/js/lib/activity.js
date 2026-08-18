@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'settings', 'pages', 'articles', 'albums', 'brands', 'brand-asset-groups', 'brand-assets', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'calendars', 'contact-details', 'newsletters', 'newsletter-groups', 'newsletter-group-subscribers', 'programs', 'streams', 'grades', 'job-offers', 'job-applications', 'candidates', 'clusters', 'countries', 'menus', 'menu-items', 'forms', 'form-pages', 'form-fields', 'form-webhooks', 'form-submissions', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'settings', 'pages', 'articles', 'albums', 'brands', 'brand-asset-groups', 'brand-assets', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'calendars', 'contact-details', 'newsletters', 'newsletter-groups', 'newsletter-group-subscribers', 'programs', 'streams', 'grades', 'job-offers', 'job-applications', 'candidates', 'clusters', 'visit-services', 'visit-slots', 'visitors', 'visit-reservations', 'countries', 'menus', 'menu-items', 'forms', 'form-pages', 'form-fields', 'form-webhooks', 'form-submissions', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -67,6 +67,10 @@ export const LOG_NAME_LABELS = {
     'job-applications': 'Job Applications',
     candidates: 'Candidates',
     clusters: 'Talent Pools',
+    'visit-services': 'Visit Services',
+    'visit-slots': 'Visit Time Slots',
+    visitors: 'Visitors',
+    'visit-reservations': 'Visit Reservations',
     countries: 'Countries',
     menus: 'Menus',
     'menu-items': 'Menu Items',
@@ -116,6 +120,11 @@ export const SUBJECT_TYPE_LABELS = {
     job_application: 'Job application',
     candidate: 'Candidate',
     cluster: 'Talent pool',
+    visit_service: 'Visit service',
+    visit_slot: 'Visit time slot',
+    visitor: 'Visitor',
+    visit_reservation: 'Visit reservation',
+    visit_attendee: 'Visit attendee',
     country: 'Country',
     menu: 'Menu',
     menu_item: 'Menu Item',
@@ -350,6 +359,33 @@ const ACTIVITY_MESSAGES = {
         updated: 'Renamed the talent pool :name',
         deleted: 'Deleted the talent pool :name',
         detached: 'Removed :name from the pool',
+    },
+    'visit-services': {
+        created: 'Created the visit :name',
+        updated: 'Updated the visit :name',
+        deleted: 'Deleted the visit :name',
+    },
+    // :name is the slot's own start time — a time slot has no other name, and
+    // reading "Closed 14 Oct 2026, 09:00" is what an audit row is for.
+    'visit-slots': {
+        created: 'Added the time slot :name',
+        updated: 'Updated the time slot :name',
+        deleted: 'Deleted the time slot :name',
+    },
+    visitors: {
+        created: 'Added the visitor :name',
+        updated: 'Updated the visitor :name',
+        deleted: 'Deleted the visitor :name',
+    },
+    // `updated` reads as the status move it almost always is — :status comes
+    // from VisitReservationObserver::meta().
+    'visit-reservations': {
+        created: 'Received a visit booking from :name',
+        updated: ':name is now :status',
+        deleted: 'Deleted the booking from :name',
+        // Hand-rolled by CsvReservationWriter, and it has no subject: an
+        // export spans visits, so there is no single record it was performed on.
+        exported: 'Exported :count reservation(s)',
     },
     countries: {
         created: 'Created the country :name',

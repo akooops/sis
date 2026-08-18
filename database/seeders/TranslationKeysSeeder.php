@@ -1013,6 +1013,80 @@ class TranslationKeysSeeder extends Seeder
                 ],
 
                 /* -----------------------------------------
+                 Visit reservation guards
+
+                 The same shape as the job guards above, and worded the same way: the
+                 visitor has done nothing wrong in any of these cases. A slot fills up
+                 or is called off while the page sits open in a tab, which on a booking
+                 page is the normal case rather than an edge one.
+
+                 visit_slot_mismatched is separate from visit_slot_full on purpose — a
+                 slot attached to another visit is a mismatched booking, not a busy one,
+                 and telling somebody it is "fully booked" would send them hunting for a
+                 different time when the time was never the problem.
+                ------------------------------------------*/
+
+                'visit_slot_missing' => [
+                    'en' => 'That time is no longer available.',
+                    'ar' => 'هذا الموعد لم يعد متاحًا.',
+                    'fr' => 'Ce créneau n’est plus disponible.',
+                    'es' => 'Ese horario ya no está disponible.',
+                    'de' => 'Dieser Termin ist nicht mehr verfügbar.',
+                    'it' => 'Questo orario non è più disponibile.',
+                    'pt' => 'Esse horário já não está disponível.',
+                    'ru' => 'Это время больше недоступно.',
+                    'hi' => 'यह समय अब उपलब्ध नहीं है।',
+                ],
+
+                'visit_slot_mismatched' => [
+                    'en' => 'That time belongs to a different visit. Please pick one from the calendar.',
+                    'ar' => 'هذا الموعد يخص زيارة أخرى. يرجى اختيار موعد من التقويم.',
+                    'fr' => 'Ce créneau correspond à une autre visite. Veuillez en choisir un dans le calendrier.',
+                    'es' => 'Ese horario pertenece a otra visita. Elija uno en el calendario.',
+                    'de' => 'Dieser Termin gehört zu einem anderen Besuch. Bitte wählen Sie einen im Kalender.',
+                    'it' => 'Questo orario appartiene a un’altra visita. Scegline uno dal calendario.',
+                    'pt' => 'Esse horário pertence a outra visita. Escolha um no calendário.',
+                    'ru' => 'Это время относится к другому визиту. Выберите время в календаре.',
+                    'hi' => 'यह समय किसी अन्य भ्रमण का है। कृपया कैलेंडर से समय चुनें।',
+                ],
+
+                'visit_slot_closed' => [
+                    'en' => 'That time is no longer open for booking.',
+                    'ar' => 'أُغلق الحجز على هذا الموعد.',
+                    'fr' => 'Ce créneau n’est plus ouvert à la réservation.',
+                    'es' => 'Ese horario ya no admite reservas.',
+                    'de' => 'Für diesen Termin sind keine Buchungen mehr möglich.',
+                    'it' => 'Questo orario non è più prenotabile.',
+                    'pt' => 'Esse horário já não aceita reservas.',
+                    'ru' => 'Запись на это время закрыта.',
+                    'hi' => 'इस समय के लिए बुकिंग बंद हो चुकी है।',
+                ],
+
+                'visit_slot_full' => [
+                    'en' => 'That time is fully booked. Please choose another.',
+                    'ar' => 'اكتمل العدد في هذا الموعد. يرجى اختيار موعد آخر.',
+                    'fr' => 'Ce créneau est complet. Veuillez en choisir un autre.',
+                    'es' => 'Ese horario está completo. Elija otro.',
+                    'de' => 'Dieser Termin ist ausgebucht. Bitte wählen Sie einen anderen.',
+                    'it' => 'Questo orario è al completo. Scegline un altro.',
+                    'pt' => 'Esse horário está esgotado. Escolha outro.',
+                    'ru' => 'На это время мест нет. Выберите другое.',
+                    'hi' => 'यह समय पूरी तरह बुक हो चुका है। कृपया दूसरा चुनें।',
+                ],
+
+                'visit_already_booked' => [
+                    'en' => 'You have already booked this time.',
+                    'ar' => 'لقد سبق أن حجزت هذا الموعد.',
+                    'fr' => 'Vous avez déjà réservé ce créneau.',
+                    'es' => 'Ya ha reservado este horario.',
+                    'de' => 'Sie haben diesen Termin bereits gebucht.',
+                    'it' => 'Hai già prenotato questo orario.',
+                    'pt' => 'Já reservou este horário.',
+                    'ru' => 'Вы уже забронировали это время.',
+                    'hi' => 'आप यह समय पहले ही बुक कर चुके हैं।',
+                ],
+
+                /* -----------------------------------------
                  Repeatable groups
 
                  ONE SET OF STRINGS FOR EVERY GROUP, interpolated with the group's own
@@ -1678,6 +1752,32 @@ class TranslationKeysSeeder extends Seeder
                     'hi' => 'चुनें',
                 ],
 
+                /* The card, and the panel it opens */
+
+                /*
+                 * The duration pill. A COUNT, not a formatted string built in PHP:
+                 * "60 min" is not how every one of these languages says it, and the
+                 * abbreviation differs even where the number does not.
+                 */
+                'service.duration' => [
+                    'en' => ':minutes min', 'ar' => ':minutes دقيقة', 'fr' => ':minutes min',
+                    'es' => ':minutes min', 'de' => ':minutes Min.', 'it' => ':minutes min',
+                    'pt' => ':minutes min', 'ru' => ':minutes мин', 'hi' => ':minutes मिनट',
+                ],
+
+                /*
+                 * The label on the back button in each wizard card's header.
+                 *
+                 * Paired with an arrow, and with the PREVIOUS step's own name as the
+                 * aria-label — so a screen reader hears "Back to Choose a visit"
+                 * rather than a bare "Back" three times on one page.
+                 */
+                'back' => [
+                    'en' => 'Back', 'ar' => 'رجوع', 'fr' => 'Retour', 'es' => 'Atrás',
+                    'de' => 'Zurück', 'it' => 'Indietro', 'pt' => 'Voltar', 'ru' => 'Назад',
+                    'hi' => 'वापस',
+                ],
+
                 /* Steps */
 
                 'steps.service' => [
@@ -1710,10 +1810,25 @@ class TranslationKeysSeeder extends Seeder
                     'pt' => 'Restam :count lugares', 'ru' => 'Осталось мест: :count',
                     'hi' => ':count स्थान शेष',
                 ],
+                /*
+                 * STILL BOOKABLE, and the wording has to say so — this is the legend
+                 * beside an amber slot a visitor may absolutely take. "Almost full"
+                 * invites them to hurry; "limited" on its own reads like a refusal.
+                 */
+                'slots.limited' => [
+                    'en' => 'Almost full', 'ar' => 'أوشك على الاكتمال', 'fr' => 'Presque complet',
+                    'es' => 'Casi completo', 'de' => 'Fast ausgebucht', 'it' => 'Quasi al completo',
+                    'pt' => 'Quase esgotado', 'ru' => 'Почти заполнено', 'hi' => 'लगभग भर चुका',
+                ],
                 'slots.full' => [
                     'en' => 'Fully booked', 'ar' => 'مكتمل العدد', 'fr' => 'Complet', 'es' => 'Completo',
                     'de' => 'Ausgebucht', 'it' => 'Al completo', 'pt' => 'Esgotado', 'ru' => 'Мест нет',
                     'hi' => 'पूर्ण रूप से बुक',
+                ],
+                'slots.closed' => [
+                    'en' => 'Not available', 'ar' => 'غير متاح', 'fr' => 'Indisponible',
+                    'es' => 'No disponible', 'de' => 'Nicht verfügbar', 'it' => 'Non disponibile',
+                    'pt' => 'Indisponível', 'ru' => 'Недоступно', 'hi' => 'उपलब्ध नहीं',
                 ],
                 'slots.none' => [
                     'en' => 'No times available for this visit yet.',

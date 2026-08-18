@@ -21,11 +21,23 @@
                      already put the same sentence in the error bag.
       $chrome        ?bool — forwarded to site::partials.forms.renderer
       $presets       ?array — answers the page supplies, forwarded to the renderer
+      $marker        ?bool — see below
 --}}
 @php
     $notice = $notice ?? null;
     $presentation = $presentation ?? null;
     $form = $form ?? null;
+
+    /*
+     * Whether to emit `data-sisf`, the selector site.js gates the form module on.
+     *
+     * TRUE everywhere but /visits. That page mounts FormRenderer itself, behind a
+     * service-and-slot gate, from site/visits.js — so leaving the marker on would
+     * have site/forms.js download and mount a SECOND renderer into the same root,
+     * and whichever ran last would win with none of the visitor's chosen slot in
+     * it. A page that turns this off is taking responsibility for the mount.
+     */
+    $marker = $marker ?? true;
 
     /*
      * THE FLASH IS THE GATE, and that is what makes the confirmation honest.
@@ -76,7 +88,7 @@
     {{-- data-sisf ONLY — no `sisf` class. FormRenderer emits its own `.sisf`
          root inside [data-sisf-root], and nesting one inside another applies
          the token block and its padding twice. --}}
-    <div data-sisf data-aos="fade-up" data-aos-duration="1000">
+    <div @if ($marker) data-sisf @endif data-aos="fade-up" data-aos-duration="1000">
         @include('site::partials.forms.renderer', ['presets' => $presets ?? [], 'chooser' => $chooser ?? false])
     </div>
 @endif

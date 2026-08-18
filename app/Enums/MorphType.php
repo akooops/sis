@@ -47,6 +47,11 @@ use App\Models\Setting;
 use App\Models\Stream;
 use App\Models\TranslationKey;
 use App\Models\User;
+use App\Models\VisitAttendee;
+use App\Models\VisitReservation;
+use App\Models\VisitService;
+use App\Models\VisitSlot;
+use App\Models\Visitor;
 
 /**
  * Public aliases for the models in polymorphic columns (activity_log.subject,
@@ -103,6 +108,11 @@ enum MorphType: string
     case FormWebhook = 'form_webhook';
     case FormBlockedIp = 'form_blocked_ip';
     case FormSubmission = 'form_submission';
+    case VisitService = 'visit_service';
+    case VisitSlot = 'visit_slot';
+    case Visitor = 'visitor';
+    case VisitReservation = 'visit_reservation';
+    case VisitAttendee = 'visit_attendee';
 
     /** @return class-string */
     public function class(): string
@@ -153,6 +163,11 @@ enum MorphType: string
             self::FormWebhook => FormWebhook::class,
             self::FormBlockedIp => FormBlockedIp::class,
             self::FormSubmission => FormSubmission::class,
+            self::VisitService => VisitService::class,
+            self::VisitSlot => VisitSlot::class,
+            self::Visitor => Visitor::class,
+            self::VisitReservation => VisitReservation::class,
+            self::VisitAttendee => VisitAttendee::class,
         };
     }
 

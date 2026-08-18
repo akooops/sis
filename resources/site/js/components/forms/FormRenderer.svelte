@@ -750,6 +750,7 @@
         {#if current}
             <FormPage
                 page={current}
+                captcha={captchaOn && submitsHere ? captchaBlock : null}
                 values={answers}
                 {errors}
                 locale={activeLocale}
@@ -764,7 +765,27 @@
             />
         {/if}
 
-        {#if captchaOn && submitsHere}
+        <!--
+            DEFINED HERE, RENDERED BY FormPage — and the split is the whole point.
+
+            This used to sit right here, between <FormPage> and the fallback
+            buttons below. That put it above the renderer's OWN submit button and
+            below an author-placed one, because an author's button is just another
+            element inside the page. A challenge under the submit control is one a
+            visitor scrolls past without completing.
+
+            Only FormPage knows where the button rows are (it is what collapses
+            adjacent buttons into a row); only this component knows whether a
+            challenge is due. Passing a snippet lets each keep its own job — and a
+            snippet carries its DEFINING scope, so `bind:this={captchaEl}` below
+            still binds this component's state from inside the child.
+
+            Everything about it stays true wherever it renders: FormPage's section
+            is inside this <form>, which is what v2 needs (see below), and the
+            captchaOn && submitsHere gate is applied where the snippet is PASSED,
+            so a page that does not submit is given nothing to render.
+        -->
+        {#snippet captchaBlock()}
             <!--
                 Inside the form on purpose. v2 injects its own textarea named
                 `g-recaptcha-response` into the div below, and it only posts if
@@ -784,7 +805,7 @@
 
                 {#if captchaNotice}<p class="sisf-error" role="alert">{captchaNotice}</p>{/if}
             </div>
-        {/if}
+        {/snippet}
 
         <!--
             Fallback controls. A form whose author placed no button still has to

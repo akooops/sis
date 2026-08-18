@@ -100,6 +100,11 @@ class PagesSeeder extends Seeder
                 'es' => 'Solicitud de admisión', 'de' => 'Aufnahmeanfrage', 'it' => 'Richiesta di ammissione',
                 'pt' => 'Pedido de admissão', 'ru' => 'Заявка на приём', 'hi' => 'प्रवेश पूछताछ',
             ]],
+            ['slug' => 'visits', 'name' => 'School visits', 'title' => [
+                'en' => 'School visits', 'ar' => 'زيارات المدرسة', 'fr' => 'Visites de l’école',
+                'es' => 'Visitas a la escuela', 'de' => 'Schulbesuche', 'it' => 'Visite alla scuola',
+                'pt' => 'Visitas à escola', 'ru' => 'Посещение школы', 'hi' => 'विद्यालय भ्रमण',
+            ]],
             // Not routed: the exception handler's 404 view reads this one, and
             // renders a translated fallback when it is missing.
             ['slug' => 'error', 'name' => 'Error', 'title' => [

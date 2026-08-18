@@ -60,6 +60,7 @@ return [
      */
     'submission_rules' => [
         'job-application' => [App\Rules\JobApplicationIsAllowed::class],
+        'visit-reservation' => [App\Rules\VisitReservationIsAllowed::class],
     ],
 
     /*
@@ -81,6 +82,7 @@ return [
      */
     'projectors' => [
         'job-application' => App\Services\Jobs\ApplicationProjector::class,
+        'visit-reservation' => App\Services\Visits\ReservationProjector::class,
     ],
 
     /*

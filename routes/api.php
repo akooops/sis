@@ -61,6 +61,9 @@ use App\Http\Controllers\Api\Admin\TranslationKeysController;
 use App\Http\Controllers\Api\Admin\TranslationsController;
 use App\Http\Controllers\Api\Admin\UserRolesController;
 use App\Http\Controllers\Api\Admin\UsersController;
+use App\Http\Controllers\Api\Admin\VisitReservationsController;
+use App\Http\Controllers\Api\Admin\VisitServicesController;
+use App\Http\Controllers\Api\Admin\VisitSlotsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -445,6 +448,54 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::delete('candidate-clusters/{candidateCluster}', [CandidateClustersController::class, 'destroy'])->middleware('verify.permissions:candidate-clusters.destroy')->name('api.v1.admin.candidate-clusters.destroy');
         Route::get('job-offer-clusters/{cluster}', [JobOfferClustersController::class, 'index'])->middleware('verify.permissions:job-offer-clusters.index')->name('api.v1.admin.job-offer-clusters.index');
         Route::delete('job-offer-clusters/{jobOfferCluster}', [JobOfferClustersController::class, 'destroy'])->middleware('verify.permissions:job-offer-clusters.destroy')->name('api.v1.admin.job-offer-clusters.destroy');
+
+        // Visit services — the bookable visits. Shaped like job-offers: a content
+        // module with translated copy, a thumbnail and an editorial status.
+        Route::get('visit-services', [VisitServicesController::class, 'index'])->middleware('verify.permissions:visit-services.index')->name('api.v1.admin.visit-services.index');
+        Route::get('visit-services/{visitService}', [VisitServicesController::class, 'show'])->middleware('verify.permissions:visit-services.index')->name('api.v1.admin.visit-services.show');
+        Route::post('visit-services', [VisitServicesController::class, 'store'])->middleware('verify.permissions:visit-services.store')->name('api.v1.admin.visit-services.store');
+        Route::put('visit-services/{visitService}', [VisitServicesController::class, 'update'])->middleware('verify.permissions:visit-services.update')->name('api.v1.admin.visit-services.update');
+        Route::delete('visit-services/{visitService}', [VisitServicesController::class, 'destroy'])->middleware('verify.permissions:visit-services.destroy')->name('api.v1.admin.visit-services.destroy');
+
+        /*
+         * Time slots.
+         *
+         * `calendar` and `bulk` MUST stay above `{visitSlot}`, or each binds as a
+         * ULID and 404s — the same discipline job-applications/export keeps.
+         *
+         * calendar is the month feed: a flat, UNPAGINATED array of everything
+         * overlapping a window, because a calendar shows a month and a month is not
+         * a page. It is capped at config('visits.feed_max_days') instead.
+         */
+        Route::get('visit-slots/calendar', [VisitSlotsController::class, 'calendar'])->middleware('verify.permissions:visit-slots.index')->name('api.v1.admin.visit-slots.calendar');
+        Route::post('visit-slots/bulk', [VisitSlotsController::class, 'bulk'])->middleware('verify.permissions:visit-slots.store')->name('api.v1.admin.visit-slots.bulk');
+        Route::get('visit-slots', [VisitSlotsController::class, 'index'])->middleware('verify.permissions:visit-slots.index')->name('api.v1.admin.visit-slots.index');
+        Route::post('visit-slots', [VisitSlotsController::class, 'store'])->middleware('verify.permissions:visit-slots.store')->name('api.v1.admin.visit-slots.store');
+        Route::put('visit-slots/{visitSlot}', [VisitSlotsController::class, 'update'])->middleware('verify.permissions:visit-slots.update')->name('api.v1.admin.visit-slots.update');
+        Route::delete('visit-slots/{visitSlot}', [VisitSlotsController::class, 'destroy'])->middleware('verify.permissions:visit-slots.destroy')->name('api.v1.admin.visit-slots.destroy');
+
+        /*
+         * Reservations — READ-ONLY plus six explicit transitions and a note. No
+         * store: the submit pipeline is the only writer, and `update` takes the
+         * desk's internal note and nothing else.
+         *
+         * One permission per transition, because a school wants a receptionist who
+         * can confirm without being able to cancel, and someone marking the register
+         * on the day who does neither.
+         *
+         * `export` MUST stay above `{visitReservation}`.
+         */
+        Route::get('visit-reservations/export', [VisitReservationsController::class, 'export'])->middleware('verify.permissions:visit-reservations.export')->name('api.v1.admin.visit-reservations.export');
+        Route::get('visit-reservations', [VisitReservationsController::class, 'index'])->middleware('verify.permissions:visit-reservations.index')->name('api.v1.admin.visit-reservations.index');
+        Route::get('visit-reservations/{visitReservation}', [VisitReservationsController::class, 'show'])->middleware('verify.permissions:visit-reservations.show')->name('api.v1.admin.visit-reservations.show');
+        Route::put('visit-reservations/{visitReservation}', [VisitReservationsController::class, 'update'])->middleware('verify.permissions:visit-reservations.update')->name('api.v1.admin.visit-reservations.update');
+        Route::post('visit-reservations/{visitReservation}/contact', [VisitReservationsController::class, 'contact'])->middleware('verify.permissions:visit-reservations.contact')->name('api.v1.admin.visit-reservations.contact');
+        Route::post('visit-reservations/{visitReservation}/confirm', [VisitReservationsController::class, 'confirm'])->middleware('verify.permissions:visit-reservations.confirm')->name('api.v1.admin.visit-reservations.confirm');
+        Route::post('visit-reservations/{visitReservation}/attend', [VisitReservationsController::class, 'attend'])->middleware('verify.permissions:visit-reservations.attend')->name('api.v1.admin.visit-reservations.attend');
+        Route::post('visit-reservations/{visitReservation}/no-show', [VisitReservationsController::class, 'noShow'])->middleware('verify.permissions:visit-reservations.no-show')->name('api.v1.admin.visit-reservations.no-show');
+        Route::post('visit-reservations/{visitReservation}/cancel', [VisitReservationsController::class, 'cancel'])->middleware('verify.permissions:visit-reservations.cancel')->name('api.v1.admin.visit-reservations.cancel');
+        Route::post('visit-reservations/{visitReservation}/reopen', [VisitReservationsController::class, 'reopen'])->middleware('verify.permissions:visit-reservations.reopen')->name('api.v1.admin.visit-reservations.reopen');
+        Route::delete('visit-reservations/{visitReservation}', [VisitReservationsController::class, 'destroy'])->middleware('verify.permissions:visit-reservations.destroy')->name('api.v1.admin.visit-reservations.destroy');
 
         // Countries
         Route::get('countries', [CountriesController::class, 'index'])->middleware('verify.permissions:countries.index')->name('api.v1.admin.countries.index');

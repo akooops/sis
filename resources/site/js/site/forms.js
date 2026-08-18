@@ -253,8 +253,12 @@ export default function initForms() {
  *
  * Enhancement only: with the plugin blocked or failing to load, the field stays
  * a working tel input and the server still normalises what it receives.
+ *
+ * EXPORTED because site/visits.js mounts the same FormRenderer behind a gate of
+ * its own and needs the identical treatment. A second copy would be a second
+ * place to remember the `input.iti` guard.
  */
-function enhancePhoneFields(root) {
+export function enhancePhoneFields(root) {
     root.querySelectorAll('.sisf-el--phone input[type="tel"]').forEach((input) => {
         // Idempotent: attachPhoneWidget hangs the plugin on the element, so an
         // input that already has one is skipped rather than wrapped twice.
@@ -291,7 +295,7 @@ function enhancePhoneFields(root) {
  * would scan it twice for every mutation. Undefined where MutationObserver is
  * not implemented, which is why callers disconnect optionally.
  */
-function watchPhoneFields(root) {
+export function watchPhoneFields(root) {
     if (typeof MutationObserver !== 'function') {
         return;
     }

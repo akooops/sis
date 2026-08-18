@@ -64,10 +64,20 @@ class JobOffersSeeder extends Seeder
             ],
         );
 
-        // Re-asserted on every seed rather than only on create: an install that
-        // predates the column would otherwise keep a deletable general posting.
-        if (! $offer->is_system) {
-            $offer->forceFill(['is_system' => true])->saveQuietly();
+        /*
+         * BOTH HALVES OF THE CONTRACT RE-ASSERTED ON EVERY SEED, not only on
+         * create. `is_system` because an install predating the column would
+         * otherwise keep a deletable general posting — and `deadline_at` because
+         * this row is the one that is ALWAYS open, and firstOrCreate cannot repair
+         * a deadline somebody has since set on it.
+         *
+         * Not hypothetical: this row was found with is_system cleared AND a
+         * deadline two weeks out, which would have closed the posting the apply
+         * flow resolves by slug and left every spontaneous applicant with the
+         * "closed" notice instead of a form.
+         */
+        if ($offer->is_system !== true || $offer->deadline_at !== null) {
+            $offer->forceFill(['is_system' => true, 'deadline_at' => null])->saveQuietly();
         }
     }
 }

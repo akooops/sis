@@ -653,12 +653,21 @@
         border-color: #146c43;
     }
 
+    /* LIMITED IS STILL BOOKABLE — it means "nearly full", not "refused", and
+       VisitSlot::state() hands it out while seats remain. It used to carry
+       `cursor: not-allowed` and a dimmed opacity here, which was harmless only
+       because nothing ever emitted the class; now that something does, styling it
+       like a refusal would tell a visitor they cannot have a time they can. */
     .fc-event.is-limited {
         background-color: var(--color-slot-limited);
         border-color: var(--color-slot-limited);
         color: var(--color-paper);
-        cursor: not-allowed;
-        opacity: 0.7;
+        cursor: pointer;
+    }
+
+    .fc-event.is-limited:hover {
+        background-color: #e8590c;
+        border-color: #d9480f;
     }
 
     .fc-event.is-full {
@@ -667,6 +676,23 @@
         color: var(--color-paper);
         cursor: not-allowed;
         opacity: 0.6;
+    }
+
+    .fc-event.is-closed {
+        background-color: var(--color-slot-closed);
+        border-color: var(--color-slot-closed);
+        color: var(--color-paper);
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    /* The time the visitor has actually picked. A ring rather than another
+       colour: the four state colours already mean something, and a fifth would
+       make the legend a lie. */
+    .fc-event.is-chosen {
+        outline: 2px solid var(--color-brand);
+        outline-offset: 2px;
+        box-shadow: 0 0 0 4px rgb(42 93 145 / 0.15);
     }
 
     /* -------------------------------------------------------------------------
