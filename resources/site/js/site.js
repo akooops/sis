@@ -39,6 +39,12 @@ const ON_DEMAND = [
      * one root.
      */
     ['[data-visits-root]', () => import('./site/visits')],
+    /*
+     * The venue booking wizard. Only the RESERVE page needs it — the contact page
+     * carries an ordinary `data-sisf` form and is mounted by site/forms.js above,
+     * which is the dividend of giving the two forms their own URLs.
+     */
+    ['[data-facility-reserve]', () => import('./site/facilities')],
     ['[data-lightbox]', () => import('./site/lightbox')],
     ['[data-calendar]', () => import('./site/calendar')],
     ['[data-datepicker]', () => import('./site/datepicker')],

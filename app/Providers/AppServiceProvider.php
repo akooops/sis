@@ -20,6 +20,11 @@ use App\Models\ContactDetail;
 use App\Models\Country;
 use App\Models\Document;
 use App\Models\Event;
+use App\Models\Facility;
+use App\Models\FacilityAlbum;
+use App\Models\FacilityArticle;
+use App\Models\FacilityReservation;
+use App\Models\FacilitySlot;
 use App\Models\Form;
 use App\Models\FormBlockedCountry;
 use App\Models\FormBlockedIp;
@@ -78,6 +83,11 @@ use App\Observers\ContactDetailObserver;
 use App\Observers\CountryObserver;
 use App\Observers\DocumentObserver;
 use App\Observers\EventObserver;
+use App\Observers\FacilityAlbumObserver;
+use App\Observers\FacilityArticleObserver;
+use App\Observers\FacilityObserver;
+use App\Observers\FacilityReservationObserver;
+use App\Observers\FacilitySlotObserver;
 use App\Observers\FormBlockedCountryObserver;
 use App\Observers\FormBlockedIpObserver;
 use App\Observers\FormFieldObserver;
@@ -214,6 +224,11 @@ class AppServiceProvider extends ServiceProvider
         VisitSlot::observe(VisitSlotObserver::class);
         Visitor::observe(VisitorObserver::class);
         VisitReservation::observe(VisitReservationObserver::class);
+        Facility::observe(FacilityObserver::class);
+        FacilityArticle::observe(FacilityArticleObserver::class);
+        FacilityAlbum::observe(FacilityAlbumObserver::class);
+        FacilitySlot::observe(FacilitySlotObserver::class);
+        FacilityReservation::observe(FacilityReservationObserver::class);
         /*
          * DELIBERATELY UNOBSERVED: VisitAttendee.
          *

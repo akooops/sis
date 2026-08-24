@@ -44,6 +44,15 @@ return [
          */
         'visit.reservation_received' => ['name' => 'Visit booking received', 'icon' => 'ki-calendar-add', 'sort' => 5],
         'visit.reservation_status_changed' => ['name' => 'Visit booking status changed', 'icon' => 'ki-arrow-right', 'sort' => 6],
+
+        /*
+         * The same arrangement a third time, for the venues. A booking ALSO fires
+         * form.submission_received; these two carry the VENUE context — which
+         * space, who booked it, when they are due — so whoever runs the venues
+         * subscribes to these rather than to forms in general.
+         */
+        'facility.reservation_received' => ['name' => 'Venue booking received', 'icon' => 'ki-home-2', 'sort' => 7],
+        'facility.reservation_status_changed' => ['name' => 'Venue booking status changed', 'icon' => 'ki-arrow-right', 'sort' => 8],
     ],
 
     /*

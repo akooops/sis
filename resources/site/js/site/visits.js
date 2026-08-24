@@ -29,7 +29,7 @@
 import { mount, unmount } from 'svelte';
 import FormRenderer from '@site/components/forms/FormRenderer.svelte';
 import { collectEnvironment, createTelemetry } from '@site/lib/forms/telemetry';
-import VisitSlots from './islands/VisitSlots.svelte';
+import SlotPicker from './islands/SlotPicker.svelte';
 import { enhancePhoneFields, readPayload, watchPhoneFields } from './forms';
 
 export default function initVisits() {
@@ -231,7 +231,7 @@ export default function initVisits() {
             mountedCalendar = null;
         }
 
-        mountedCalendar = mount(VisitSlots, {
+        mountedCalendar = mount(SlotPicker, {
             target: calendarHost,
             props: {
                 // __SERVICE__ is the placeholder route() left in the template, so

@@ -14,7 +14,7 @@ export const CAUSER_RESOURCES = {
     api_key: { route: 'api.v1.admin.api-keys.index', labelKey: 'name' },
 };
 
-export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'settings', 'pages', 'articles', 'albums', 'brands', 'brand-asset-groups', 'brand-assets', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'calendars', 'contact-details', 'newsletters', 'newsletter-groups', 'newsletter-group-subscribers', 'programs', 'streams', 'grades', 'job-offers', 'job-applications', 'candidates', 'clusters', 'visit-services', 'visit-slots', 'visitors', 'visit-reservations', 'countries', 'menus', 'menu-items', 'forms', 'form-pages', 'form-fields', 'form-webhooks', 'form-submissions', 'auth'];
+export const ACTIVITY_LOG_NAMES = ['users', 'roles', 'permissions', 'api-keys', 'media', 'integrations', 'notifications', 'notification-groups', 'languages', 'translations', 'settings', 'pages', 'articles', 'albums', 'brands', 'brand-asset-groups', 'brand-assets', 'events', 'achievements', 'categories', 'partners', 'documents', 'banners', 'calendars', 'contact-details', 'newsletters', 'newsletter-groups', 'newsletter-group-subscribers', 'programs', 'streams', 'grades', 'job-offers', 'job-applications', 'candidates', 'clusters', 'visit-services', 'visit-slots', 'visitors', 'visit-reservations', 'facilities', 'facility-slots', 'facility-reservations', 'countries', 'menus', 'menu-items', 'forms', 'form-pages', 'form-fields', 'form-webhooks', 'form-submissions', 'auth'];
 
 export const ACTIVITY_EVENTS = [
     'created',
@@ -71,6 +71,9 @@ export const LOG_NAME_LABELS = {
     'visit-slots': 'Visit Time Slots',
     visitors: 'Visitors',
     'visit-reservations': 'Visit Reservations',
+    facilities: 'Facilities',
+    'facility-slots': 'Facility Time Slots',
+    'facility-reservations': 'Facility Bookings',
     countries: 'Countries',
     menus: 'Menus',
     'menu-items': 'Menu Items',
@@ -125,6 +128,9 @@ export const SUBJECT_TYPE_LABELS = {
     visitor: 'Visitor',
     visit_reservation: 'Visit reservation',
     visit_attendee: 'Visit attendee',
+    facility: 'Facility',
+    facility_slot: 'Facility time slot',
+    facility_reservation: 'Facility booking',
     country: 'Country',
     menu: 'Menu',
     menu_item: 'Menu Item',
@@ -386,6 +392,28 @@ const ACTIVITY_MESSAGES = {
         // Hand-rolled by CsvReservationWriter, and it has no subject: an
         // export spans visits, so there is no single record it was performed on.
         exported: 'Exported :count reservation(s)',
+    },
+    // A venue's own lifecycle, plus what is attached to it. `attached` and
+    // `detached` come from the two pivots, which log against the FACILITY —
+    // so :name is the article or album, not the venue.
+    facilities: {
+        created: 'Created the facility :name',
+        updated: 'Updated the facility :name',
+        deleted: 'Deleted the facility :name',
+        attached: 'Added :name to the facility',
+        detached: 'Removed :name from the facility',
+    },
+    // :name is the slot's own start time — a time slot has no other name.
+    'facility-slots': {
+        created: 'Added the time slot :name',
+        updated: 'Updated the time slot :name',
+        deleted: 'Deleted the time slot :name',
+    },
+    'facility-reservations': {
+        created: 'Received a venue booking from :name',
+        updated: ':name is now :status',
+        deleted: 'Deleted the booking from :name',
+        exported: 'Exported :count booking(s)',
     },
     countries: {
         created: 'Created the country :name',

@@ -59,6 +59,7 @@ final class SiteContext
         'job_offer' => 'web.site.jobs.show',
         'program' => 'web.site.programs.show',
         'brand' => 'web.site.brands.show',
+        'facility' => 'web.site.facilities.show',
         'form' => 'web.site.forms.show',
     ];
 

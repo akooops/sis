@@ -199,6 +199,21 @@ class PagesController extends Controller
         return inertia('Admin/VisitReservations/Index');
     }
 
+    public function facilities(): Response
+    {
+        return inertia('Admin/Facilities/Index');
+    }
+
+    public function facilitySlots(): Response
+    {
+        return inertia('Admin/FacilitySlots/Index');
+    }
+
+    public function facilityReservations(): Response
+    {
+        return inertia('Admin/FacilityReservations/Index');
+    }
+
     public function menus(): Response
     {
         return inertia('Admin/Menus/Index');

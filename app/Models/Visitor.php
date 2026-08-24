@@ -39,9 +39,26 @@ class Visitor extends Model
      2. Relationships
     ------------------------------------------*/
 
-    public function reservations(): HasMany
+    /*
+     * TWO KINDS OF BOOKING, ONE PERSON.
+     *
+     * A visitor books a school tour and, later, the hall for a birthday. Both
+     * modules match them the same way — email OR phone, see scopeIdentifiedBy —
+     * so the two relations below are the same human seen from two desks. That
+     * shared identity is the whole reason this table is not duplicated per module.
+     *
+     * Named for their modules rather than one of them being `reservations()`: an
+     * unqualified name here would silently mean "visits only" to a reader of the
+     * facilities code.
+     */
+    public function visitReservations(): HasMany
     {
         return $this->hasMany(VisitReservation::class);
+    }
+
+    public function facilityReservations(): HasMany
+    {
+        return $this->hasMany(FacilityReservation::class);
     }
 
     /* -----------------------------------------

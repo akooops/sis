@@ -90,6 +90,17 @@ export const adminMenu = [
         ],
     },
     {
+        label: 'Facilities',
+        icon: 'ki-filled ki-home-2',
+        children: [
+            // Same order as Visits, and for the same reason: the venue exists
+            // first, its times hang off it, and a booking is what a time becomes.
+            { label: 'Facilities', route: 'web.admin.facilities.index', permission: 'facilities.index' },
+            { label: 'Time Slots', route: 'web.admin.facility-slots.index', permission: 'facility-slots.index' },
+            { label: 'Bookings', route: 'web.admin.facility-reservations.index', permission: 'facility-reservations.index' },
+        ],
+    },
+    {
         label: 'Forms',
         icon: 'ki-filled ki-questionnaire-tablet',
         children: [

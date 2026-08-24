@@ -22,6 +22,12 @@ use App\Http\Controllers\Api\Admin\ContactTypesController;
 use App\Http\Controllers\Api\Admin\CountriesController;
 use App\Http\Controllers\Api\Admin\DocumentsController;
 use App\Http\Controllers\Api\Admin\EventsController;
+use App\Http\Controllers\Api\Admin\FacilitiesController;
+use App\Http\Controllers\Api\Admin\FacilityAlbumsController;
+use App\Http\Controllers\Api\Admin\FacilityArticlesController;
+use App\Http\Controllers\Api\Admin\FacilityReservationsController;
+use App\Http\Controllers\Api\Admin\FacilitySlotsController;
+use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\FormAnalyticsController;
 use App\Http\Controllers\Api\Admin\FormBlockedCountriesController;
 use App\Http\Controllers\Api\Admin\FormBlockedIpsController;
@@ -100,6 +106,13 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('users/{user}/reject', [UsersController::class, 'reject'])->middleware('verify.permissions:users.reject')->name('api.v1.admin.users.reject');
         Route::post('users/{user}/verify', [UsersController::class, 'verify'])->middleware('verify.permissions:users.verify')->name('api.v1.admin.users.verify');
         Route::post('users/{user}/logout-devices', [UsersController::class, 'logoutDevices'])->middleware('verify.permissions:users.logout-devices')->name('api.v1.admin.users.logout-devices');
+
+        /*------------------------
+        | Dashboard
+        |------------------------*/
+        // Every tile and chart on the admin landing page, in one call.
+        // analytics.index gates the DATA; dashboards.index gates the page.
+        Route::get('analytics/dashboard', [DashboardController::class, 'show'])->middleware('verify.permissions:analytics.index')->name('api.v1.admin.analytics.dashboard');
 
         // Sessions
         Route::get('sessions/{user}', [SessionsController::class, 'index'])->middleware('verify.permissions:sessions.index')->name('api.v1.admin.sessions.index');
@@ -496,6 +509,59 @@ Route::prefix('v1')->middleware('verify.auth')->group(function () {
         Route::post('visit-reservations/{visitReservation}/cancel', [VisitReservationsController::class, 'cancel'])->middleware('verify.permissions:visit-reservations.cancel')->name('api.v1.admin.visit-reservations.cancel');
         Route::post('visit-reservations/{visitReservation}/reopen', [VisitReservationsController::class, 'reopen'])->middleware('verify.permissions:visit-reservations.reopen')->name('api.v1.admin.visit-reservations.reopen');
         Route::delete('visit-reservations/{visitReservation}', [VisitReservationsController::class, 'destroy'])->middleware('verify.permissions:visit-reservations.destroy')->name('api.v1.admin.visit-reservations.destroy');
+
+        // Facilities — the bookable venues. A content module, shaped like
+        // visit-services, with two pivot resources hanging off it.
+        Route::get('facilities', [FacilitiesController::class, 'index'])->middleware('verify.permissions:facilities.index')->name('api.v1.admin.facilities.index');
+        Route::get('facilities/{facility}', [FacilitiesController::class, 'show'])->middleware('verify.permissions:facilities.index')->name('api.v1.admin.facilities.show');
+        Route::post('facilities', [FacilitiesController::class, 'store'])->middleware('verify.permissions:facilities.store')->name('api.v1.admin.facilities.store');
+        Route::put('facilities/{facility}', [FacilitiesController::class, 'update'])->middleware('verify.permissions:facilities.update')->name('api.v1.admin.facilities.update');
+        Route::delete('facilities/{facility}', [FacilitiesController::class, 'destroy'])->middleware('verify.permissions:facilities.destroy')->name('api.v1.admin.facilities.destroy');
+
+        /*
+         * What appears on a venue's page: ATTACH AND DETACH, no update. The link is
+         * two foreign keys, so there is nothing to edit — the same shape (and the
+         * same three permissions) as notification-group-users.
+         *
+         * Nested under {facility} because a link is always read from the venue's
+         * end; the drawer passes it as PivotDrawer's `parentId`.
+         */
+        Route::get('facility-articles/{facility}', [FacilityArticlesController::class, 'index'])->middleware('verify.permissions:facility-articles.index')->name('api.v1.admin.facility-articles.index');
+        Route::post('facility-articles/{facility}', [FacilityArticlesController::class, 'store'])->middleware('verify.permissions:facility-articles.store')->name('api.v1.admin.facility-articles.store');
+        Route::delete('facility-articles/{facilityArticle}', [FacilityArticlesController::class, 'destroy'])->middleware('verify.permissions:facility-articles.destroy')->name('api.v1.admin.facility-articles.destroy');
+
+        Route::get('facility-albums/{facility}', [FacilityAlbumsController::class, 'index'])->middleware('verify.permissions:facility-albums.index')->name('api.v1.admin.facility-albums.index');
+        Route::post('facility-albums/{facility}', [FacilityAlbumsController::class, 'store'])->middleware('verify.permissions:facility-albums.store')->name('api.v1.admin.facility-albums.store');
+        Route::delete('facility-albums/{facilityAlbum}', [FacilityAlbumsController::class, 'destroy'])->middleware('verify.permissions:facility-albums.destroy')->name('api.v1.admin.facility-albums.destroy');
+
+        /*
+         * Venue time slots. `calendar` and `bulk` MUST stay above `{facilitySlot}`,
+         * or each binds as a ULID and 404s — the same discipline the visit-slots and
+         * job-applications blocks keep.
+         */
+        Route::get('facility-slots/calendar', [FacilitySlotsController::class, 'calendar'])->middleware('verify.permissions:facility-slots.index')->name('api.v1.admin.facility-slots.calendar');
+        Route::post('facility-slots/bulk', [FacilitySlotsController::class, 'bulk'])->middleware('verify.permissions:facility-slots.store')->name('api.v1.admin.facility-slots.bulk');
+        Route::get('facility-slots', [FacilitySlotsController::class, 'index'])->middleware('verify.permissions:facility-slots.index')->name('api.v1.admin.facility-slots.index');
+        Route::post('facility-slots', [FacilitySlotsController::class, 'store'])->middleware('verify.permissions:facility-slots.store')->name('api.v1.admin.facility-slots.store');
+        Route::put('facility-slots/{facilitySlot}', [FacilitySlotsController::class, 'update'])->middleware('verify.permissions:facility-slots.update')->name('api.v1.admin.facility-slots.update');
+        Route::delete('facility-slots/{facilitySlot}', [FacilitySlotsController::class, 'destroy'])->middleware('verify.permissions:facility-slots.destroy')->name('api.v1.admin.facility-slots.destroy');
+
+        /*
+         * Venue bookings — READ-ONLY plus six explicit transitions and a note, the
+         * same contract visit-reservations keeps. `export` MUST stay above
+         * `{facilityReservation}`.
+         */
+        Route::get('facility-reservations/export', [FacilityReservationsController::class, 'export'])->middleware('verify.permissions:facility-reservations.export')->name('api.v1.admin.facility-reservations.export');
+        Route::get('facility-reservations', [FacilityReservationsController::class, 'index'])->middleware('verify.permissions:facility-reservations.index')->name('api.v1.admin.facility-reservations.index');
+        Route::get('facility-reservations/{facilityReservation}', [FacilityReservationsController::class, 'show'])->middleware('verify.permissions:facility-reservations.show')->name('api.v1.admin.facility-reservations.show');
+        Route::put('facility-reservations/{facilityReservation}', [FacilityReservationsController::class, 'update'])->middleware('verify.permissions:facility-reservations.update')->name('api.v1.admin.facility-reservations.update');
+        Route::post('facility-reservations/{facilityReservation}/contact', [FacilityReservationsController::class, 'contact'])->middleware('verify.permissions:facility-reservations.contact')->name('api.v1.admin.facility-reservations.contact');
+        Route::post('facility-reservations/{facilityReservation}/confirm', [FacilityReservationsController::class, 'confirm'])->middleware('verify.permissions:facility-reservations.confirm')->name('api.v1.admin.facility-reservations.confirm');
+        Route::post('facility-reservations/{facilityReservation}/attend', [FacilityReservationsController::class, 'attend'])->middleware('verify.permissions:facility-reservations.attend')->name('api.v1.admin.facility-reservations.attend');
+        Route::post('facility-reservations/{facilityReservation}/no-show', [FacilityReservationsController::class, 'noShow'])->middleware('verify.permissions:facility-reservations.no-show')->name('api.v1.admin.facility-reservations.no-show');
+        Route::post('facility-reservations/{facilityReservation}/cancel', [FacilityReservationsController::class, 'cancel'])->middleware('verify.permissions:facility-reservations.cancel')->name('api.v1.admin.facility-reservations.cancel');
+        Route::post('facility-reservations/{facilityReservation}/reopen', [FacilityReservationsController::class, 'reopen'])->middleware('verify.permissions:facility-reservations.reopen')->name('api.v1.admin.facility-reservations.reopen');
+        Route::delete('facility-reservations/{facilityReservation}', [FacilityReservationsController::class, 'destroy'])->middleware('verify.permissions:facility-reservations.destroy')->name('api.v1.admin.facility-reservations.destroy');
 
         // Countries
         Route::get('countries', [CountriesController::class, 'index'])->middleware('verify.permissions:countries.index')->name('api.v1.admin.countries.index');

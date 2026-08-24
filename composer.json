@@ -14,6 +14,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.8",
+        "maxmind-db/reader": "^1.13",
         "microsoft/microsoft-graph": "^2.46",
         "socialiteproviders/microsoft-azure": "^5.2",
         "spatie/laravel-activitylog": "^4.12",

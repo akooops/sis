@@ -142,4 +142,25 @@ abstract class ApiController extends Controller
             $query->where($column, $operator, $date);
         });
     }
+
+    /**
+     * A date boundary for the AGGREGATE endpoints, which do not go through
+     * spatie/query-builder and so cannot use date() above - there is no builder
+     * to hang an AllowedFilter on, only a range to compute once.
+     *
+     * Same contract either way: an unparsable date is a 422, never a silently
+     * dropped bound that would quietly widen the result.
+     */
+    protected function boundary(mixed $value, string $edge, string $key): ?Carbon
+    {
+        if (! is_string($value) || $value === '') {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($value)->{$edge}();
+        } catch (InvalidFormatException) {
+            throw ValidationException::withMessages([$key => __('validation.date', ['attribute' => 'date'])]);
+        }
+    }
 }

@@ -11,7 +11,7 @@ return [
      * be retired without its lines disappearing from the seeder, and so the seed
      * order is deterministic.
      */
-    'groups' => ['common', 'nav', 'site', 'forms', 'jobs', 'visits'],
+    'groups' => ['common', 'nav', 'site', 'forms', 'jobs', 'visits', 'facilities'],
 
     /*
      * THE CATALOGUE ITSELF IS NOT HERE — it lives in TranslationKeysSeeder.

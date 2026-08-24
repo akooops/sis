@@ -100,6 +100,11 @@ class PagesSeeder extends Seeder
                 'es' => 'Solicitud de admisión', 'de' => 'Aufnahmeanfrage', 'it' => 'Richiesta di ammissione',
                 'pt' => 'Pedido de admissão', 'ru' => 'Заявка на приём', 'hi' => 'प्रवेश पूछताछ',
             ]],
+            ['slug' => 'facilities', 'name' => 'Facilities', 'title' => [
+                'en' => 'Facilities', 'ar' => 'المرافق', 'fr' => 'Nos espaces',
+                'es' => 'Instalaciones', 'de' => 'Räumlichkeiten', 'it' => 'I nostri spazi',
+                'pt' => 'Os nossos espaços', 'ru' => 'Площадки', 'hi' => 'सुविधाएँ',
+            ]],
             ['slug' => 'visits', 'name' => 'School visits', 'title' => [
                 'en' => 'School visits', 'ar' => 'زيارات المدرسة', 'fr' => 'Visites de l’école',
                 'es' => 'Visitas a la escuela', 'de' => 'Schulbesuche', 'it' => 'Visite alla scuola',

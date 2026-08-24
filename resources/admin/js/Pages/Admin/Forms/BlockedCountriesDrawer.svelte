@@ -81,10 +81,11 @@
             <div class="flex flex-col gap-1">
                 <span class="font-medium">Country blocking is not active on this server.</span>
                 <span class="text-sm">
-                    A visitor's country is read from a CDN header, and that header is only trusted when the
-                    request arrives through a known proxy. <code>TRUSTED_PROXIES</code> is unset here, so every
-                    country below is currently allowed through. Set it at deploy time to make these blocks take
-                    effect.
+                    A visitor's country is resolved two ways: from a CDN header, which is only trusted when the
+                    request arrives through a known proxy, or from a local IP database. Neither is available
+                    here, so every country below is currently allowed through. Set <code>TRUSTED_PROXIES</code>
+                    at deploy time, or run <code>php artisan analytics:geoip-update</code> to install the
+                    database — either one makes these blocks take effect.
                 </span>
                 {#if geo.headers?.length}
                     <span class="text-xs text-muted-foreground">Headers read: {geo.headers.join(', ')}</span>

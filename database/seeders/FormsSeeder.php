@@ -1728,6 +1728,220 @@ class FormsSeeder extends Seeder
                     ],
                 ],
             ],
+
+            /*
+             * A message to one venue.
+             *
+             * ONE PAGE, and no projector: a message is a message. It stays a
+             * FormSubmission and is read under Forms → Submissions, because there
+             * are no domain rows for it to become. See the note in
+             * config/forms.php's `projectors` for what that costs.
+             *
+             * `facility_id` is a SERVER-SIDE preset — /facilities/{slug}/contact is
+             * one venue and the controller knows which — so unlike the booking form
+             * this page needs no JavaScript of its own at all.
+             */
+            [
+                'slug' => 'facility-contact',
+                'name' => 'Facility contact',
+                'title' => [
+                    'en' => 'Contact us', 'ar' => 'تواصل معنا', 'fr' => 'Nous contacter',
+                    'es' => 'Contacto', 'de' => 'Kontakt', 'it' => 'Contattaci',
+                    'pt' => 'Contacte-nos', 'ru' => 'Свяжитесь с нами', 'hi' => 'हमसे संपर्क करें',
+                ],
+                'confirmation_message' => [
+                    'en' => 'Thank you. We have your message and will be in touch.',
+                    'ar' => 'شكرًا لك. وصلتنا رسالتك وسنتواصل معك.',
+                    'fr' => 'Merci. Nous avons bien reçu votre message et vous recontacterons.',
+                    'es' => 'Gracias. Hemos recibido su mensaje y nos pondremos en contacto.',
+                    'de' => 'Vielen Dank. Ihre Nachricht ist angekommen, wir melden uns.',
+                    'it' => 'Grazie. Abbiamo ricevuto il tuo messaggio e ti contatteremo.',
+                    'pt' => 'Obrigado. Recebemos a sua mensagem e entraremos em contacto.',
+                    'ru' => 'Спасибо. Мы получили ваше сообщение и свяжемся с вами.',
+                    'hi' => 'धन्यवाद। हमें आपका संदेश मिल गया है और हम संपर्क करेंगे।',
+                ],
+                'pages' => [
+                    [
+                        'name' => 'Message',
+                        'fields' => [
+                            ['type' => 'hidden', 'key' => 'facility_id'],
+                            [
+                                'type' => 'text', 'key' => 'first_name', 'is_required' => true,
+                                'settings' => ['width' => '50'],
+                                'validation' => ['max_length' => 100],
+                                'label' => [
+                                    'en' => 'First name', 'ar' => 'الاسم الأول', 'fr' => 'Prénom',
+                                    'es' => 'Nombre', 'de' => 'Vorname', 'it' => 'Nome',
+                                    'pt' => 'Nome próprio', 'ru' => 'Имя', 'hi' => 'पहला नाम',
+                                ],
+                            ],
+                            [
+                                'type' => 'text', 'key' => 'last_name', 'is_required' => true,
+                                'settings' => ['width' => '50'],
+                                'validation' => ['max_length' => 100],
+                                'label' => [
+                                    'en' => 'Last name', 'ar' => 'اسم العائلة', 'fr' => 'Nom',
+                                    'es' => 'Apellidos', 'de' => 'Nachname', 'it' => 'Cognome',
+                                    'pt' => 'Apelido', 'ru' => 'Фамилия', 'hi' => 'उपनाम',
+                                ],
+                            ],
+                            [
+                                'type' => 'email', 'key' => 'email', 'is_required' => true,
+                                'settings' => ['width' => '50'],
+                                'label' => [
+                                    'en' => 'Email', 'ar' => 'البريد الإلكتروني', 'fr' => 'E-mail',
+                                    'es' => 'Correo electrónico', 'de' => 'E-Mail', 'it' => 'E-mail',
+                                    'pt' => 'E-mail', 'ru' => 'Эл. почта', 'hi' => 'ईमेल',
+                                ],
+                            ],
+                            [
+                                'type' => 'phone', 'key' => 'phone', 'is_required' => true,
+                                'settings' => ['width' => '50'],
+                                'label' => [
+                                    'en' => 'Phone', 'ar' => 'رقم الهاتف', 'fr' => 'Téléphone',
+                                    'es' => 'Teléfono', 'de' => 'Telefon', 'it' => 'Telefono',
+                                    'pt' => 'Telefone', 'ru' => 'Телефон', 'hi' => 'फ़ोन',
+                                ],
+                            ],
+                            [
+                                'type' => 'text', 'key' => 'subject', 'is_required' => true,
+                                'validation' => ['max_length' => 200],
+                                'label' => [
+                                    'en' => 'Subject', 'ar' => 'الموضوع', 'fr' => 'Objet',
+                                    'es' => 'Asunto', 'de' => 'Betreff', 'it' => 'Oggetto',
+                                    'pt' => 'Assunto', 'ru' => 'Тема', 'hi' => 'विषय',
+                                ],
+                            ],
+                            [
+                                'type' => 'textarea', 'key' => 'message', 'is_required' => true,
+                                'settings' => ['rows' => 6],
+                                'validation' => ['max_length' => 4000],
+                                'label' => [
+                                    'en' => 'Message', 'ar' => 'الرسالة', 'fr' => 'Message',
+                                    'es' => 'Mensaje', 'de' => 'Nachricht', 'it' => 'Messaggio',
+                                    'pt' => 'Mensagem', 'ru' => 'Сообщение', 'hi' => 'संदेश',
+                                ],
+                            ],
+                            [
+                                'type' => 'button', 'key' => 'send_message',
+                                'settings' => ['action' => 'submit', 'variant' => 'primary'],
+                                'label' => [
+                                    'en' => 'Send message', 'ar' => 'إرسال الرسالة',
+                                    'fr' => 'Envoyer le message', 'es' => 'Enviar mensaje',
+                                    'de' => 'Nachricht senden', 'it' => 'Invia il messaggio',
+                                    'pt' => 'Enviar mensagem', 'ru' => 'Отправить сообщение',
+                                    'hi' => 'संदेश भेजें',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+
+            /*
+             * Booking one venue for one time.
+             *
+             * ONE PAGE, because the wizard on /facilities/{slug}/reserve has already
+             * asked which time before this form mounts, and the venue is the page.
+             * All that is left is who to call back.
+             *
+             * NO PARTY SIZE and no repeatable group — the difference from the visit
+             * form. A venue slot's limit counts bookings, so there is no second
+             * number, and nobody is asked to name the people coming.
+             *
+             * `facility_id` arrives as a server-side preset; `facility_slot_id`
+             * cannot, because which time was picked happens in the browser, so
+             * site/facilities.js hands it to the renderer as an initial value.
+             * NEITHER is required at the schema level, deliberately: an empty slot
+             * id would otherwise be reported as "The facility slot id field is
+             * required", naming an input the visitor cannot see, where the rule
+             * answers the same case with a sentence about times.
+             */
+            [
+                'slug' => 'facility-reservation',
+                'name' => 'Facility reservation',
+                'title' => [
+                    'en' => 'Book this venue', 'ar' => 'احجز هذا المرفق',
+                    'fr' => 'Réserver cet espace', 'es' => 'Reservar este espacio',
+                    'de' => 'Diesen Bereich buchen', 'it' => 'Prenota questo spazio',
+                    'pt' => 'Reservar este espaço', 'ru' => 'Забронировать площадку',
+                    'hi' => 'यह स्थल बुक करें',
+                ],
+                'confirmation_message' => [
+                    'en' => 'Thank you. Your booking is in and we will be in touch to confirm.',
+                    'ar' => 'شكرًا لك. تم تسجيل حجزك وسنتواصل معك للتأكيد.',
+                    'fr' => 'Merci. Votre réservation est enregistrée et nous vous contacterons pour la confirmer.',
+                    'es' => 'Gracias. Su reserva está registrada y nos pondremos en contacto para confirmarla.',
+                    'de' => 'Vielen Dank. Ihre Buchung liegt vor und wir melden uns zur Bestätigung.',
+                    'it' => 'Grazie. La tua prenotazione è registrata e ti contatteremo per confermarla.',
+                    'pt' => 'Obrigado. A sua reserva está registada e entraremos em contacto para confirmar.',
+                    'ru' => 'Спасибо. Ваша бронь принята, мы свяжемся с вами для подтверждения.',
+                    'hi' => 'धन्यवाद। आपकी बुकिंग दर्ज हो गई है और हम पुष्टि के लिए संपर्क करेंगे।',
+                ],
+                'pages' => [
+                    [
+                        'name' => 'Details',
+                        'title' => [
+                            'en' => 'Your details', 'ar' => 'بياناتك', 'fr' => 'Vos coordonnées',
+                            'es' => 'Sus datos', 'de' => 'Ihre Angaben', 'it' => 'I tuoi dati',
+                            'pt' => 'Os seus dados', 'ru' => 'Ваши данные', 'hi' => 'आपका विवरण',
+                        ],
+                        'fields' => [
+                            ['type' => 'hidden', 'key' => 'facility_id'],
+                            ['type' => 'hidden', 'key' => 'facility_slot_id'],
+                            [
+                                'type' => 'text', 'key' => 'first_name', 'is_required' => true,
+                                'settings' => ['width' => '50'],
+                                'validation' => ['max_length' => 100],
+                                'label' => [
+                                    'en' => 'First name', 'ar' => 'الاسم الأول', 'fr' => 'Prénom',
+                                    'es' => 'Nombre', 'de' => 'Vorname', 'it' => 'Nome',
+                                    'pt' => 'Nome próprio', 'ru' => 'Имя', 'hi' => 'पहला नाम',
+                                ],
+                            ],
+                            [
+                                'type' => 'text', 'key' => 'last_name', 'is_required' => true,
+                                'settings' => ['width' => '50'],
+                                'validation' => ['max_length' => 100],
+                                'label' => [
+                                    'en' => 'Last name', 'ar' => 'اسم العائلة', 'fr' => 'Nom',
+                                    'es' => 'Apellidos', 'de' => 'Nachname', 'it' => 'Cognome',
+                                    'pt' => 'Apelido', 'ru' => 'Фамилия', 'hi' => 'उपनाम',
+                                ],
+                            ],
+                            [
+                                'type' => 'email', 'key' => 'email', 'is_required' => true,
+                                'settings' => ['width' => '50'],
+                                'label' => [
+                                    'en' => 'Email', 'ar' => 'البريد الإلكتروني', 'fr' => 'E-mail',
+                                    'es' => 'Correo electrónico', 'de' => 'E-Mail', 'it' => 'E-mail',
+                                    'pt' => 'E-mail', 'ru' => 'Эл. почта', 'hi' => 'ईमेल',
+                                ],
+                            ],
+                            [
+                                'type' => 'phone', 'key' => 'phone', 'is_required' => true,
+                                'settings' => ['width' => '50'],
+                                'label' => [
+                                    'en' => 'Phone', 'ar' => 'رقم الهاتف', 'fr' => 'Téléphone',
+                                    'es' => 'Teléfono', 'de' => 'Telefon', 'it' => 'Telefono',
+                                    'pt' => 'Telefone', 'ru' => 'Телефон', 'hi' => 'फ़ोन',
+                                ],
+                            ],
+                            [
+                                'type' => 'button', 'key' => 'confirm_reservation',
+                                'settings' => ['action' => 'submit', 'variant' => 'primary'],
+                                'label' => [
+                                    'en' => 'Confirm booking', 'ar' => 'تأكيد الحجز',
+                                    'fr' => 'Confirmer la réservation', 'es' => 'Confirmar la reserva',
+                                    'de' => 'Buchung bestätigen', 'it' => 'Conferma la prenotazione',
+                                    'pt' => 'Confirmar a reserva', 'ru' => 'Подтвердить бронирование',
+                                    'hi' => 'बुकिंग की पुष्टि करें',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 }

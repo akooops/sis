@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\ApiController;
 use App\Models\Form;
 use App\Models\FormSubmission;
 use App\Services\Forms\SubmissionAnalytics;
-use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
@@ -67,24 +66,9 @@ class FormAnalyticsController extends ApiController
         }
 
         return [
-            'from' => $this->boundary($filter['created_from'] ?? null, 'startOfDay'),
-            'to' => $this->boundary($filter['created_to'] ?? null, 'endOfDay'),
+            'from' => $this->boundary($filter['created_from'] ?? null, 'startOfDay', 'filter.created_from'),
+            'to' => $this->boundary($filter['created_to'] ?? null, 'endOfDay', 'filter.created_to'),
             'status' => $status ?: null,
         ];
-    }
-
-    protected function boundary(mixed $value, string $edge): ?Carbon
-    {
-        if (! is_string($value) || $value === '') {
-            return null;
-        }
-
-        try {
-            return Carbon::parse($value)->{$edge}();
-        } catch (InvalidFormatException) {
-            throw ValidationException::withMessages([
-                'filter.'.($edge === 'startOfDay' ? 'created_from' : 'created_to') => __('validation.date', ['attribute' => 'date']),
-            ]);
-        }
     }
 }

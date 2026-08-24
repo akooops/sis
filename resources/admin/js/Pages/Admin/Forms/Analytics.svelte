@@ -22,6 +22,7 @@
     import Alert from '@/components/feedback/Alert.svelte';
     import Badge from '@/components/ui/Badge.svelte';
     import Spinner from '@/components/ui/Spinner.svelte';
+    import StatTile from '@/components/ui/StatTile.svelte';
     import ClampText from '@/components/ui/ClampText.svelte';
     import DatePicker from '@/components/form/DatePicker.svelte';
     import ApexChart from '@/components/charts/ApexChart.svelte';
@@ -849,18 +850,9 @@
 </AdminLayout>
 
 {#snippet tile(label, value, hint, icon, clamp = false)}
-    <div class="kt-card p-4">
-        <div class="flex items-start justify-between gap-2">
-            <span class="text-2sm font-medium text-secondary-foreground">{label}</span>
-            <i class="ki-filled {icon} text-base text-muted-foreground"></i>
-        </div>
-        <div class="mt-2 text-2xl font-semibold text-mono">
-            {#if clamp}
-                <span class="block text-lg leading-tight"><ClampText value={value} maxWidth="100%" title={value} /></span>
-            {:else}
-                {value}
-            {/if}
-        </div>
-        {#if hint}<div class="mt-1 text-2sm text-muted-foreground">{hint}</div>{/if}
-    </div>
+    <!-- The markup moved to components/ui/StatTile.svelte when the dashboard
+         became its second consumer. Kept as a snippet so the call sites below
+         read the same as they always did. -->
+    <StatTile {label} {value} {hint} {icon} {clamp} />
 {/snippet}
+

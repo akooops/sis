@@ -18,6 +18,9 @@ use App\Models\ContactDetail;
 use App\Models\Country;
 use App\Models\Document;
 use App\Models\Event;
+use App\Models\Facility;
+use App\Models\FacilityReservation;
+use App\Models\FacilitySlot;
 use App\Models\Form;
 use App\Models\FormBlockedIp;
 use App\Models\FormField;
@@ -113,6 +116,9 @@ enum MorphType: string
     case Visitor = 'visitor';
     case VisitReservation = 'visit_reservation';
     case VisitAttendee = 'visit_attendee';
+    case Facility = 'facility';
+    case FacilitySlot = 'facility_slot';
+    case FacilityReservation = 'facility_reservation';
 
     /** @return class-string */
     public function class(): string
@@ -168,6 +174,9 @@ enum MorphType: string
             self::Visitor => Visitor::class,
             self::VisitReservation => VisitReservation::class,
             self::VisitAttendee => VisitAttendee::class,
+            self::Facility => Facility::class,
+            self::FacilitySlot => FacilitySlot::class,
+            self::FacilityReservation => FacilityReservation::class,
         };
     }
 

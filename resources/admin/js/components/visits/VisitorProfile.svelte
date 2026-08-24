@@ -8,14 +8,26 @@
      */
     import { gradeLabel } from '@/lib/visitReservation';
 
-    let { visitor = null, attendees = [] } = $props();
+    /*
+     * `personLabel` because the same row means different things to the two
+     * modules that share it: on a school visit this person is a guardian, on a
+     * venue booking they are simply whoever booked. One table, two words for it.
+     */
+    let { visitor = null, attendees = null, personLabel = 'Guardian' } = $props();
 
-    const rows = $derived(Array.isArray(attendees) ? attendees : []);
+    /*
+     * NULL means "this kind of booking has no attendees", which is different from
+     * an empty list. A school visit always names its students, so it passes an
+     * array and an empty one is worth showing; a venue booking names one person,
+     * so it passes nothing and the section is omitted rather than reading
+     * "Students (0)".
+     */
+    const rows = $derived(Array.isArray(attendees) ? attendees : null);
 </script>
 
 <div class="flex flex-col gap-5">
     <div class="flex flex-col gap-2">
-        <span class="text-sm font-medium text-mono">Guardian</span>
+        <span class="text-sm font-medium text-mono">{personLabel}</span>
 
         {#if visitor}
             <dl class="flex flex-col divide-y divide-border rounded-lg border border-border text-sm">
@@ -43,6 +55,7 @@
         {/if}
     </div>
 
+    {#if rows}
     <div class="flex flex-col gap-2">
         <span class="text-sm font-medium text-mono">Students ({rows.length})</span>
 
@@ -63,4 +76,5 @@
             <p class="text-sm text-muted-foreground">Nothing recorded.</p>
         {/if}
     </div>
+    {/if}
 </div>

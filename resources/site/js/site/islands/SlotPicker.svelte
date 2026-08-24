@@ -1,6 +1,11 @@
 <script>
     /**
-     * The slot picker: a month of times for one visit, loaded a window at a time.
+     * The slot picker: a month of times for one bookable thing, a window at a time.
+     *
+     * DOMAIN-AGNOSTIC ON PURPOSE — it takes a URL, some labels and a callback, and
+     * knows nothing about what is being booked. Both /visits and
+     * /facilities/{slug}/reserve mount it, which is why it is named for what it
+     * does rather than for the first module that needed it.
      *
      * REPLACES VisitBooking.svelte, which was the old app's whole three-step
      * wizard ported across and never wired up. Two things are different here and

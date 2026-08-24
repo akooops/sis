@@ -37,6 +37,15 @@ class Kernel extends ConsoleKernel
         $schedule->command('banners:publish-scheduled')->everyMinute()->withoutOverlapping();
         $schedule->command('forms:publish-scheduled')->everyMinute()->withoutOverlapping();
         $schedule->command('forms:close-abandoned')->everyFifteenMinutes()->withoutOverlapping();
+
+        /*
+         * The IP-to-country database, refreshed monthly.
+         *
+         * Day 3, not day 1: DB-IP publishes the month's file on the 1st and it
+         * can 404 for a few hours. Geo fails open, so a missed run costs nothing
+         * but staleness, and the command skips a file younger than 25 days.
+         */
+        $schedule->command('analytics:geoip-update')->monthlyOn(3, '04:00')->withoutOverlapping();
     }
 
     /**

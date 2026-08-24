@@ -8,7 +8,7 @@ use App\Models\Form;
 use App\Models\FormSubmission;
 use App\Data\Media\StoreMediaData;
 use App\Models\Media;
-use App\Services\Forms\GeoResolver;
+use App\Services\Analytics\GeoResolver;
 use App\Services\Forms\SubmissionContext;
 use App\Services\Forms\SubmissionGuard;
 use App\Services\Forms\SubmissionToken;

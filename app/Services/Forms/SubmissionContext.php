@@ -2,6 +2,9 @@
 
 namespace App\Services\Forms;
 
+use App\Services\Analytics\Acquisition;
+use App\Services\Analytics\GeoResolver;
+use App\Services\Analytics\UserAgentParser;
 use App\Models\Country;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -177,34 +180,10 @@ class SubmissionContext
      */
     protected function entryPoint(?string $referrer, ?array $utm): string
     {
-        if ($utm) {
-            return 'campaign';
-        }
-
-        $host = $referrer ? strtolower((string) parse_url($referrer, PHP_URL_HOST)) : '';
-
-        if ($host === '') {
-            return 'direct';
-        }
-
-        if ($host === strtolower((string) parse_url((string) config('app.url'), PHP_URL_HOST))) {
-            return 'internal';
-        }
-
-        foreach (['google.', 'bing.', 'yahoo.', 'duckduckgo.', 'yandex.', 'baidu.', 'ecosia.', 'qwant.'] as $needle) {
-            if (str_contains($host, $needle)) {
-                return 'search';
-            }
-        }
-
-        foreach (['facebook.', 'instagram.', 'twitter.', 'x.com', 't.co', 'linkedin.', 'lnkd.in', 'youtube.',
-            'tiktok.', 'reddit.', 'pinterest.', 'whatsapp.', 'telegram.', 't.me'] as $needle) {
-            if (str_contains($host, $needle)) {
-                return 'social';
-            }
-        }
-
-        return 'referral';
+        // One list of search and social hosts for the whole app — see
+        // App\Services\Analytics\Acquisition. A page view and a form submission
+        // must bucket the same referrer the same way.
+        return Acquisition::entryPoint($referrer, $utm);
     }
 
     /** A screen or viewport dimension, clamped to the unsigned smallint columns. */

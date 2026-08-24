@@ -61,6 +61,7 @@ return [
     'submission_rules' => [
         'job-application' => [App\Rules\JobApplicationIsAllowed::class],
         'visit-reservation' => [App\Rules\VisitReservationIsAllowed::class],
+        'facility-reservation' => [App\Rules\FacilityReservationIsAllowed::class],
     ],
 
     /*
@@ -83,18 +84,29 @@ return [
     'projectors' => [
         'job-application' => App\Services\Jobs\ApplicationProjector::class,
         'visit-reservation' => App\Services\Visits\ReservationProjector::class,
+        'facility-reservation' => App\Services\Facilities\ReservationProjector::class,
+        /*
+         * `facility-contact` is DELIBERATELY ABSENT. A message to a venue is a
+         * message — it has no domain rows to become, so it stays a FormSubmission
+         * and is read under Forms → Submissions. The cost, stated plainly: those
+         * cannot be filtered per venue there, because the facility id lives in the
+         * answer JSON. Adding that later is a class and one line here.
+         */
     ],
 
     /*
      * THE SEEDED FORM DEFINITIONS ARE NOT HERE — they live in FormsSeeder.
      *
      * This file is settings: the field-type registry, the projector and rule
-     * maps, and the spam/upload/webhook/limit/geo/capture knobs — all of which
+     * maps, and the spam/upload/webhook/limit/capture knobs — all of which
      * the running app reads per request. The ~1,000 lines of `system` form
      * definitions that used to sit here are seed content, read once at deploy
      * time by one seeder, and they made `config:cache` serialise nine locales of
      * form copy into every request's bootstrap.
      *
+     * The country headers moved to config/analytics.php with GeoResolver;
+     * the forms module still reads them through that one resolver.
+
      * The seeded slugs are still resolved by the public site (`contact`,
      * `inquiries`) and by config/jobs.php (`job-application`) — that contract is
      * unchanged; only where the definitions are written has moved.
@@ -169,16 +181,6 @@ return [
         // first interaction, every page change, a heartbeat while typing, and
         // one on the way out.
         'telemetry_per_minute' => (int) env('FORMS_TELEMETRY_PER_MINUTE', 60),
-    ],
-
-    'geo' => [
-        /*
-         * Headers a CDN or load balancer uses to report the visitor's country.
-         * Trusted ONLY when the request arrived through a proxy TrustProxies
-         * recognises — otherwise any client could set one and walk straight past
-         * a country block.
-         */
-        'country_headers' => ['CF-IPCountry', 'CloudFront-Viewer-Country', 'X-Vercel-IP-Country', 'X-Country-Code'],
     ],
 
     /*

@@ -7,6 +7,7 @@ use App\Models\Album;
 use App\Models\Article;
 use App\Models\Brand;
 use App\Models\Event;
+use App\Models\Facility;
 use App\Models\Form;
 use App\Models\JobOffer;
 use App\Models\Language;
@@ -54,6 +55,7 @@ class SitemapController extends SiteController
         'achievements' => 'web.site.achievements.index',
         'identity' => 'web.site.brands.index',
         'jobs' => 'web.site.jobs.index',
+        'facilities' => 'web.site.facilities.index',
         'calendars' => 'web.site.calendars',
         'newsletters' => 'web.site.newsletters',
         'guidelines' => 'web.site.guidelines',
@@ -80,6 +82,13 @@ class SitemapController extends SiteController
         'brands' => ['model' => Brand::class, 'route' => 'web.site.brands.show', 'scope' => 'live'],
         // Open, not live: a vacancy past its deadline should stop being offered.
         'jobs' => ['model' => JobOffer::class, 'route' => 'web.site.jobs.show', 'scope' => 'open'],
+        /*
+         * Live, not bookable: a venue with no times left still describes what the
+         * school has, and its contact page is the point of finding it. Only the
+         * detail page is listed — /contact and /reserve are actions on it rather
+         * than destinations of their own.
+         */
+        'facilities' => ['model' => Facility::class, 'route' => 'web.site.facilities.show', 'scope' => 'live'],
     ];
 
     public function index(): Response

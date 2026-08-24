@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Forms;
+namespace App\Services\Analytics;
 
 /**
  * Browser, OS and device from a user-agent string.

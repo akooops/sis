@@ -9,6 +9,7 @@ use App\Http\Controllers\Web\Site\ArticlesController;
 use App\Http\Controllers\Web\Site\BrandsController;
 use App\Http\Controllers\Web\Site\ContactController;
 use App\Http\Controllers\Web\Site\EventsController;
+use App\Http\Controllers\Web\Site\FacilitiesController;
 use App\Http\Controllers\Web\Site\FormsController as SiteFormsController;
 use App\Http\Controllers\Web\Site\HomeController;
 use App\Http\Controllers\Web\Site\JobsController;
@@ -100,6 +101,15 @@ Route::middleware('auth')->prefix('admin')->group(function () {
      * notification vanish into the integrations log.
      */
     Route::get('visit-reservations', [AdminPagesController::class, 'visitReservations'])->middleware('verify.permissions:visit-reservations.index')->name('web.admin.visit-reservations.index');
+    Route::get('facilities', [AdminPagesController::class, 'facilities'])->middleware('verify.permissions:facilities.index')->name('web.admin.facilities.index');
+    Route::get('facility-slots', [AdminPagesController::class, 'facilitySlots'])->middleware('verify.permissions:facility-slots.index')->name('web.admin.facility-slots.index');
+    /*
+     * `web.admin.facility-reservations.index` must keep exactly this name, for the
+     * same reason its two siblings above must: FacilityReservationObserver links
+     * every venue notification to it and swallows its own failures, so a rename
+     * does not error — it makes every one of them vanish into the integrations log.
+     */
+    Route::get('facility-reservations', [AdminPagesController::class, 'facilityReservations'])->middleware('verify.permissions:facility-reservations.index')->name('web.admin.facility-reservations.index');
     Route::get('menus', [AdminPagesController::class, 'menus'])->middleware('verify.permissions:menus.index')->name('web.admin.menus.index');
     Route::get('menu-items', [AdminPagesController::class, 'menuItems'])->middleware('verify.permissions:menu-items.index')->name('web.admin.menu-items.index');
     Route::get('countries', [AdminPagesController::class, 'countries'])->middleware('verify.permissions:countries.index')->name('web.admin.countries.index');
@@ -163,6 +173,27 @@ $site = function () {
         ->middleware('throttle:60,1')
         ->name('visits.slots');
 
+    /*
+     * Facilities: a listing, a page per venue, and the two things you can do from
+     * it — each on its own URL, because the form renderer emits one payload per
+     * page.
+     *
+     * DECLARED LONGEST-FIRST. `facilities/{slug}` would otherwise match
+     * `facilities/the-hive/contact`... it would not, actually — a route parameter
+     * never spans a slash — but the ordering is kept anyway so that reading this
+     * block top to bottom goes from most specific to least, the way the rest of
+     * the file does.
+     *
+     * The slots feed is throttled because it is public and unauthenticated.
+     */
+    Route::get('facilities', [FacilitiesController::class, 'index'])->name('facilities.index');
+    Route::get('facilities/{slug}/contact', [FacilitiesController::class, 'contact'])->name('facilities.contact');
+    Route::get('facilities/{slug}/reserve', [FacilitiesController::class, 'reserve'])->name('facilities.reserve');
+    Route::get('facilities/{slug}/slots', [FacilitiesController::class, 'slots'])
+        ->middleware('throttle:60,1')
+        ->name('facilities.slots');
+    Route::get('facilities/{slug}', [FacilitiesController::class, 'show'])->name('facilities.show');
+
     Route::get('calendars', [ResourcesController::class, 'calendars'])->name('calendars');
     Route::get('newsletters', [ResourcesController::class, 'newsletters'])->name('newsletters');
     Route::get('guidelines', [ResourcesController::class, 'guidelines'])->name('guidelines');
@@ -176,8 +207,8 @@ $site = function () {
     Route::get('{slug}', [PagesController::class, 'show'])->name('pages.show');
 };
 
-Route::middleware('set.locale')->prefix('{locale}')->name('web.site.')->group($site);
-Route::middleware('set.locale')->name('web.site.root.')->group($site);
+Route::middleware(['set.locale', 'record.view'])->prefix('{locale}')->name('web.site.')->group($site);
+Route::middleware(['set.locale', 'record.view'])->name('web.site.root.')->group($site);
 
 /*------------------------
 Forms

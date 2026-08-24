@@ -413,6 +413,11 @@ class TranslationKeysSeeder extends Seeder
                     'de' => 'Karriere', 'it' => 'Lavora con noi', 'pt' => 'Carreiras', 'ru' => 'Вакансии',
                     'hi' => 'करियर',
                 ],
+                'breadcrumbs.facilities' => [
+                    'en' => 'Facilities', 'ar' => 'المرافق', 'fr' => 'Espaces', 'es' => 'Instalaciones',
+                    'de' => 'Räumlichkeiten', 'it' => 'Spazi', 'pt' => 'Espaços', 'ru' => 'Площадки',
+                    'hi' => 'सुविधाएँ',
+                ],
                 'breadcrumbs.identity' => [
                     'en' => 'Identity', 'ar' => 'الهوية', 'fr' => 'Identité', 'es' => 'Identidad',
                     'de' => 'Identität', 'it' => 'Identità', 'pt' => 'Identidade', 'ru' => 'Айдентика',
@@ -1075,6 +1080,75 @@ class TranslationKeysSeeder extends Seeder
                 ],
 
                 'visit_already_booked' => [
+                    'en' => 'You have already booked this time.',
+                    'ar' => 'لقد سبق أن حجزت هذا الموعد.',
+                    'fr' => 'Vous avez déjà réservé ce créneau.',
+                    'es' => 'Ya ha reservado este horario.',
+                    'de' => 'Sie haben diesen Termin bereits gebucht.',
+                    'it' => 'Hai già prenotato questo orario.',
+                    'pt' => 'Já reservou este horário.',
+                    'ru' => 'Вы уже забронировали это время.',
+                    'hi' => 'आप यह समय पहले ही बुक कर चुके हैं।',
+                ],
+
+                /* -----------------------------------------
+                 Venue booking guards
+
+                 The same five cases as the visit guards above, worded for a venue.
+                 NOT shared with them: those sentences say "visit", and a person
+                 booking the hall being told a *visit* is fully booked would read as
+                 the site answering a different question.
+                ------------------------------------------*/
+
+                'facility_slot_missing' => [
+                    'en' => 'That time is no longer available.',
+                    'ar' => 'هذا الموعد لم يعد متاحًا.',
+                    'fr' => 'Ce créneau n’est plus disponible.',
+                    'es' => 'Ese horario ya no está disponible.',
+                    'de' => 'Dieser Termin ist nicht mehr verfügbar.',
+                    'it' => 'Questo orario non è più disponibile.',
+                    'pt' => 'Esse horário já não está disponível.',
+                    'ru' => 'Это время больше недоступно.',
+                    'hi' => 'यह समय अब उपलब्ध नहीं है।',
+                ],
+
+                'facility_slot_mismatched' => [
+                    'en' => 'That time belongs to a different venue. Please pick one from the calendar.',
+                    'ar' => 'هذا الموعد يخص مرفقًا آخر. يرجى اختيار موعد من التقويم.',
+                    'fr' => 'Ce créneau correspond à un autre espace. Veuillez en choisir un dans le calendrier.',
+                    'es' => 'Ese horario pertenece a otro espacio. Elija uno en el calendario.',
+                    'de' => 'Dieser Termin gehört zu einem anderen Bereich. Bitte wählen Sie einen im Kalender.',
+                    'it' => 'Questo orario appartiene a un’altra struttura. Scegline uno dal calendario.',
+                    'pt' => 'Esse horário pertence a outro espaço. Escolha um no calendário.',
+                    'ru' => 'Это время относится к другой площадке. Выберите время в календаре.',
+                    'hi' => 'यह समय किसी अन्य स्थल का है। कृपया कैलेंडर से समय चुनें।',
+                ],
+
+                'facility_slot_closed' => [
+                    'en' => 'That time is no longer open for booking.',
+                    'ar' => 'أُغلق الحجز على هذا الموعد.',
+                    'fr' => 'Ce créneau n’est plus ouvert à la réservation.',
+                    'es' => 'Ese horario ya no admite reservas.',
+                    'de' => 'Für diesen Termin sind keine Buchungen mehr möglich.',
+                    'it' => 'Questo orario non è più prenotabile.',
+                    'pt' => 'Esse horário já não aceita reservas.',
+                    'ru' => 'Запись на это время закрыта.',
+                    'hi' => 'इस समय के लिए बुकिंग बंद हो चुकी है।',
+                ],
+
+                'facility_slot_full' => [
+                    'en' => 'That time is fully booked. Please choose another.',
+                    'ar' => 'اكتمل الحجز في هذا الموعد. يرجى اختيار موعد آخر.',
+                    'fr' => 'Ce créneau est complet. Veuillez en choisir un autre.',
+                    'es' => 'Ese horario está completo. Elija otro.',
+                    'de' => 'Dieser Termin ist ausgebucht. Bitte wählen Sie einen anderen.',
+                    'it' => 'Questo orario è al completo. Scegline un altro.',
+                    'pt' => 'Esse horário está esgotado. Escolha outro.',
+                    'ru' => 'На это время мест нет. Выберите другое.',
+                    'hi' => 'यह समय पूरी तरह बुक हो चुका है। कृपया दूसरा चुनें।',
+                ],
+
+                'facility_already_booked' => [
                     'en' => 'You have already booked this time.',
                     'ar' => 'لقد سبق أن حجزت هذا الموعد.',
                     'fr' => 'Vous avez déjà réservé ce créneau.',
@@ -1945,6 +2019,184 @@ class TranslationKeysSeeder extends Seeder
                     'pt' => 'Esse horário já não tem lugar para tantos visitantes.',
                     'ru' => 'На это время уже не хватает мест для стольких посетителей.',
                     'hi' => 'उस समय इतने आगंतुकों के लिए अब स्थान नहीं है।',
+                ],
+            ],
+
+            /*
+             * Translation catalogue — group `facilities` (lang/{code}/facilities.php).
+             *
+             * The venues the school rents out, and the two things a visitor can do
+             * from one: send a message, or book a time.
+             *
+             * `:venue` is interpolated with the venue's OWN translated title, so a
+             * heading reads "Book The Hive" in English and the equivalent in Arabic
+             * without a per-venue string existing anywhere. That is also why the
+             * page titles are here rather than seeded onto each facility row: the
+             * wording is the same for every venue and only the name changes.
+             *
+             * THIS IS THE TRACKED SOURCE. lang/ is generated output and gitignored.
+             */
+            'facilities' => [
+
+                /* The listing and the venue card */
+
+                'empty' => [
+                    'en' => 'There are no facilities to show yet.',
+                    'ar' => 'لا توجد مرافق لعرضها بعد.',
+                    'fr' => 'Aucun espace à afficher pour le moment.',
+                    'es' => 'Todavía no hay instalaciones que mostrar.',
+                    'de' => 'Es gibt noch keine Räumlichkeiten zu zeigen.',
+                    'it' => 'Non ci sono ancora spazi da mostrare.',
+                    'pt' => 'Ainda não há espaços para mostrar.',
+                    'ru' => 'Площадок пока нет.',
+                    'hi' => 'दिखाने के लिए अभी कोई सुविधा नहीं है।',
+                ],
+                'view' => [
+                    'en' => 'View details', 'ar' => 'عرض التفاصيل', 'fr' => 'Voir les détails',
+                    'es' => 'Ver detalles', 'de' => 'Details ansehen', 'it' => 'Vedi i dettagli',
+                    'pt' => 'Ver detalhes', 'ru' => 'Подробнее', 'hi' => 'विवरण देखें',
+                ],
+
+                /* The two calls to action on a venue's page.
+                   NAMESPACED under cta.* because `contact` is also the parent of
+                   contact.title/contact.crumb below, and a key cannot be both a
+                   string and a branch — TranslationService refuses the write. */
+
+                'cta.book' => [
+                    'en' => 'Book this venue', 'ar' => 'احجز هذا المرفق',
+                    'fr' => 'Réserver cet espace', 'es' => 'Reservar este espacio',
+                    'de' => 'Diesen Bereich buchen', 'it' => 'Prenota questo spazio',
+                    'pt' => 'Reservar este espaço', 'ru' => 'Забронировать площадку',
+                    'hi' => 'यह स्थल बुक करें',
+                ],
+                'cta.contact' => [
+                    'en' => 'Contact us about it', 'ar' => 'تواصل معنا بشأنه',
+                    'fr' => 'Nous contacter à ce sujet', 'es' => 'Contáctenos al respecto',
+                    'de' => 'Fragen Sie uns dazu', 'it' => 'Contattaci a riguardo',
+                    'pt' => 'Fale connosco sobre isto', 'ru' => 'Написать нам о ней',
+                    'hi' => 'इसके बारे में संपर्क करें',
+                ],
+
+                /* Sections on a venue's page. The HEADINGS render unconditionally
+                   only where there is something under them — unlike the home page,
+                   an empty "News" heading on a venue says the venue has no news
+                   rather than that the section is coming. */
+
+                'sections.news' => [
+                    'en' => 'News', 'ar' => 'الأخبار', 'fr' => 'Actualités', 'es' => 'Noticias',
+                    'de' => 'Neuigkeiten', 'it' => 'Notizie', 'pt' => 'Notícias', 'ru' => 'Новости',
+                    'hi' => 'समाचार',
+                ],
+                'sections.albums' => [
+                    'en' => 'Photos', 'ar' => 'الصور', 'fr' => 'Photos', 'es' => 'Fotos',
+                    'de' => 'Fotos', 'it' => 'Foto', 'pt' => 'Fotos', 'ru' => 'Фотографии',
+                    'hi' => 'तस्वीरें',
+                ],
+
+                /* The contact page */
+
+                'contact.title' => [
+                    'en' => 'Contact us about :venue', 'ar' => 'تواصل معنا بشأن :venue',
+                    'fr' => 'Nous contacter au sujet de :venue', 'es' => 'Contáctenos sobre :venue',
+                    'de' => 'Kontakt zu :venue', 'it' => 'Contattaci per :venue',
+                    'pt' => 'Fale connosco sobre :venue', 'ru' => 'Написать нам о :venue',
+                    'hi' => ':venue के बारे में संपर्क करें',
+                ],
+                'contact.crumb' => [
+                    'en' => 'Contact', 'ar' => 'تواصل', 'fr' => 'Contact', 'es' => 'Contacto',
+                    'de' => 'Kontakt', 'it' => 'Contatti', 'pt' => 'Contacto', 'ru' => 'Контакты',
+                    'hi' => 'संपर्क',
+                ],
+
+                /* The booking page */
+
+                'reserve.title' => [
+                    'en' => 'Book :venue', 'ar' => 'احجز :venue', 'fr' => 'Réserver :venue',
+                    'es' => 'Reservar :venue', 'de' => ':venue buchen', 'it' => 'Prenota :venue',
+                    'pt' => 'Reservar :venue', 'ru' => 'Забронировать :venue',
+                    'hi' => ':venue बुक करें',
+                ],
+                'reserve.crumb' => [
+                    'en' => 'Book', 'ar' => 'الحجز', 'fr' => 'Réserver', 'es' => 'Reservar',
+                    'de' => 'Buchen', 'it' => 'Prenota', 'pt' => 'Reservar', 'ru' => 'Бронирование',
+                    'hi' => 'बुकिंग',
+                ],
+
+                /* The two steps of the booking wizard */
+
+                'steps.slot' => [
+                    'en' => 'Pick a time', 'ar' => 'اختر الموعد', 'fr' => 'Choisir un horaire',
+                    'es' => 'Elegir una hora', 'de' => 'Zeit wählen', 'it' => 'Scegli un orario',
+                    'pt' => 'Escolher um horário', 'ru' => 'Выберите время', 'hi' => 'समय चुनें',
+                ],
+                'steps.details' => [
+                    'en' => 'Your details', 'ar' => 'بياناتك', 'fr' => 'Vos coordonnées',
+                    'es' => 'Sus datos', 'de' => 'Ihre Angaben', 'it' => 'I tuoi dati',
+                    'pt' => 'Os seus dados', 'ru' => 'Ваши данные', 'hi' => 'आपका विवरण',
+                ],
+                'back' => [
+                    'en' => 'Back', 'ar' => 'رجوع', 'fr' => 'Retour', 'es' => 'Atrás',
+                    'de' => 'Zurück', 'it' => 'Indietro', 'pt' => 'Voltar', 'ru' => 'Назад',
+                    'hi' => 'वापस',
+                ],
+
+                /* The calendar's legend and its events. The same four states
+                   VisitSlot::state() decides, worded the same way — a slot is a
+                   slot whichever module owns it. */
+
+                'slots.available' => [
+                    'en' => 'Available times', 'ar' => 'المواعيد المتاحة', 'fr' => 'Créneaux disponibles',
+                    'es' => 'Horarios disponibles', 'de' => 'Verfügbare Zeiten', 'it' => 'Orari disponibili',
+                    'pt' => 'Horários disponíveis', 'ru' => 'Свободное время', 'hi' => 'उपलब्ध समय',
+                ],
+                'slots.limited' => [
+                    'en' => 'Almost full', 'ar' => 'أوشك على الاكتمال', 'fr' => 'Presque complet',
+                    'es' => 'Casi completo', 'de' => 'Fast ausgebucht', 'it' => 'Quasi al completo',
+                    'pt' => 'Quase esgotado', 'ru' => 'Почти заполнено', 'hi' => 'लगभग भर चुका',
+                ],
+                'slots.full' => [
+                    'en' => 'Fully booked', 'ar' => 'مكتمل الحجز', 'fr' => 'Complet', 'es' => 'Completo',
+                    'de' => 'Ausgebucht', 'it' => 'Al completo', 'pt' => 'Esgotado', 'ru' => 'Мест нет',
+                    'hi' => 'पूर्ण रूप से बुक',
+                ],
+                'slots.closed' => [
+                    'en' => 'Not available', 'ar' => 'غير متاح', 'fr' => 'Indisponible',
+                    'es' => 'No disponible', 'de' => 'Nicht verfügbar', 'it' => 'Non disponibile',
+                    'pt' => 'Indisponível', 'ru' => 'Недоступно', 'hi' => 'उपलब्ध नहीं',
+                ],
+                'slots.remaining' => [
+                    'en' => ':count places left', 'ar' => 'المتبقي :count مقعدًا',
+                    'fr' => ':count places restantes', 'es' => 'Quedan :count plazas',
+                    'de' => 'Noch :count Plätze', 'it' => ':count posti rimasti',
+                    'pt' => 'Restam :count lugares', 'ru' => 'Осталось мест: :count',
+                    'hi' => ':count स्थान शेष',
+                ],
+                'slots.none' => [
+                    'en' => 'No times are available for this venue yet.',
+                    'ar' => 'لا توجد مواعيد متاحة لهذا المرفق بعد.',
+                    'fr' => 'Aucun créneau n’est encore disponible pour cet espace.',
+                    'es' => 'Todavía no hay horarios para este espacio.',
+                    'de' => 'Für diesen Bereich sind noch keine Zeiten verfügbar.',
+                    'it' => 'Non ci sono ancora orari disponibili per questo spazio.',
+                    'pt' => 'Ainda não há horários para este espaço.',
+                    'ru' => 'Для этой площадки пока нет свободного времени.',
+                    'hi' => 'इस स्थल के लिए अभी कोई समय उपलब्ध नहीं है।',
+                ],
+                'error' => [
+                    'en' => 'We could not load the available times. Please try again.',
+                    'ar' => 'تعذّر تحميل المواعيد المتاحة. يرجى المحاولة مرة أخرى.',
+                    'fr' => 'Impossible de charger les créneaux disponibles. Veuillez réessayer.',
+                    'es' => 'No hemos podido cargar los horarios disponibles. Inténtelo de nuevo.',
+                    'de' => 'Die verfügbaren Zeiten konnten nicht geladen werden. Bitte erneut versuchen.',
+                    'it' => 'Non è stato possibile caricare gli orari disponibili. Riprova.',
+                    'pt' => 'Não foi possível carregar os horários disponíveis. Tente novamente.',
+                    'ru' => 'Не удалось загрузить свободное время. Попробуйте ещё раз.',
+                    'hi' => 'उपलब्ध समय लोड नहीं हो सका। कृपया पुनः प्रयास करें।',
+                ],
+                'confirm.selected' => [
+                    'en' => 'Selected time', 'ar' => 'الموعد المختار', 'fr' => 'Créneau choisi',
+                    'es' => 'Horario elegido', 'de' => 'Gewählte Zeit', 'it' => 'Orario scelto',
+                    'pt' => 'Horário escolhido', 'ru' => 'Выбранное время', 'hi' => 'चयनित समय',
                 ],
             ],
         ];

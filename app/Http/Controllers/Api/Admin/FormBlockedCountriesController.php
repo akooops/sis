@@ -6,7 +6,7 @@ use App\Data\Form\FormBlockedCountryData;
 use App\Data\Form\StoreFormBlockedCountryData;
 use App\Http\Controllers\Api\ApiController;
 use App\Models\FormBlockedCountry;
-use App\Services\Forms\GeoResolver;
+use App\Services\Analytics\GeoResolver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\LaravelData\PaginatedDataCollection;
@@ -89,7 +89,7 @@ class FormBlockedCountriesController extends ApiController
     {
         return $this->respond([
             'configured' => $geo->isConfigured($request),
-            'headers' => array_values((array) config('forms.geo.country_headers', [])),
+            'headers' => array_values((array) config('analytics.geo.country_headers', [])),
         ], 'Geo status retrieved successfully');
     }
 }

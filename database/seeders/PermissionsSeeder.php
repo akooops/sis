@@ -15,6 +15,13 @@ class PermissionsSeeder extends Seeder
         $permissions = [
             // Index permissions that gate the admin page shells (routes/web.php).
             ['code' => 'dashboards.index', 'name' => 'View dashboard', 'supports_web' => true, 'supports_api' => false],
+
+            // The traffic and activity panels ON the dashboard. Separate from
+            // dashboards.index, which gates the page: an editor should reach their
+            // landing page without necessarily reading the school's numbers.
+            // supports_api is false for the same reason as settings.* - an API key
+            // has no business reading the dashboard.
+            ['code' => 'analytics.index', 'name' => 'View site analytics', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'users.index', 'name' => 'View users', 'supports_web' => true, 'supports_api' => true],
             ['code' => 'roles.index', 'name' => 'View roles', 'supports_web' => true, 'supports_api' => true],
             ['code' => 'permissions.index', 'name' => 'View permissions', 'supports_web' => true, 'supports_api' => true],
@@ -241,6 +248,40 @@ class PermissionsSeeder extends Seeder
             ['code' => 'visit-reservations.no-show', 'name' => 'Mark reservations a no-show', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'visit-reservations.cancel', 'name' => 'Cancel reservations', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'visit-reservations.reopen', 'name' => 'Reopen cancelled reservations', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'facilities.index', 'name' => 'View facilities', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facilities.store', 'name' => 'Create facilities', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facilities.update', 'name' => 'Update facilities', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facilities.destroy', 'name' => 'Delete facilities', 'supports_web' => true, 'supports_api' => false],
+
+            /* No `.update` on either pivot: the link is two foreign keys, so
+               attaching and detaching is the whole vocabulary. */
+            ['code' => 'facility-articles.index', 'name' => 'View facility news', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-articles.store', 'name' => 'Attach news to a facility', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-articles.destroy', 'name' => 'Detach news from a facility', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'facility-albums.index', 'name' => 'View facility albums', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-albums.store', 'name' => 'Attach albums to a facility', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-albums.destroy', 'name' => 'Detach albums from a facility', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'facility-slots.index', 'name' => 'View facility time slots', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-slots.store', 'name' => 'Create facility time slots', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-slots.update', 'name' => 'Update facility time slots', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-slots.destroy', 'name' => 'Delete facility time slots', 'supports_web' => true, 'supports_api' => false],
+
+            ['code' => 'facility-reservations.index', 'name' => 'View facility bookings', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-reservations.show', 'name' => 'View a facility booking', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-reservations.update', 'name' => 'Write facility booking notes', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-reservations.destroy', 'name' => 'Delete facility bookings', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-reservations.export', 'name' => 'Export facility bookings', 'supports_web' => true, 'supports_api' => false],
+            /* One permission PER TRANSITION, the same reasoning the job-application
+               and visit-reservation blocks above spell out. */
+            ['code' => 'facility-reservations.contact', 'name' => 'Mark facility bookings contacted', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-reservations.confirm', 'name' => 'Confirm facility bookings', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-reservations.attend', 'name' => 'Mark facility bookings attended', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-reservations.no-show', 'name' => 'Mark facility bookings a no-show', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-reservations.cancel', 'name' => 'Cancel facility bookings', 'supports_web' => true, 'supports_api' => false],
+            ['code' => 'facility-reservations.reopen', 'name' => 'Reopen cancelled facility bookings', 'supports_web' => true, 'supports_api' => false],
 
             ['code' => 'countries.index', 'name' => 'View countries', 'supports_web' => true, 'supports_api' => false],
             ['code' => 'countries.store', 'name' => 'Create countries', 'supports_web' => true, 'supports_api' => false],
