@@ -129,8 +129,33 @@ Route::get('robots.txt', [SitemapController::class, 'robots'])->name('web.site.r
 /*------------------------
 | Public site - Newsletters
 |------------------------*/
-Route::get('newsletter/unsubscribe/{signature}', [NewsletterController::class, 'unsubscribe'])
-    ->name('web.site.newsletter-groups.unsubscribe');
+
+/*
+ * ONE ROUTE, because the signup is not one.
+ *
+ * Subscribing is a seeded `is_system` builder form posted to the ordinary
+ * /forms/{locale}/{slug} endpoint below — so it needs no route of its own, and
+ * it gets the captcha, the honeypot, the minimum submit time, the country and IP
+ * blocks and the per-visitor caps that a bespoke POST here would have had to
+ * reimplement. What makes its confirmation land back on /newsletters is
+ * SiteContext::SYSTEM_FORM_ROUTES, not a route name.
+ *
+ * The unsubscribe stays bespoke because it is not a submission: a GET arriving
+ * from somebody's inbox carrying a signature, with no form behind it.
+ *
+ * `set.locale` is what lets it redirect at all. The URI has NO locale segment —
+ * the link is minted into an email, where there is no page to inherit one from —
+ * so without the middleware filling in Language::defaultCode() and setting
+ * URL::defaults, building the /newsletters URL to return to would throw "Missing
+ * required parameter".
+ *
+ * THE NAME IS FROZEN: NewsletterGroupSubscriber::unsubscribeUrl() builds every
+ * recipient's link from it, and ShipNewsletter has already posted those links.
+ */
+Route::middleware('set.locale')->group(function () {
+    Route::get('newsletter/unsubscribe/{signature}', [NewsletterController::class, 'unsubscribe'])
+        ->name('web.site.newsletter-groups.unsubscribe');
+});
 
 /*------------------------
 | Public site - Pages

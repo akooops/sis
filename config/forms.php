@@ -85,6 +85,15 @@ return [
         'job-application' => App\Services\Jobs\ApplicationProjector::class,
         'visit-reservation' => App\Services\Visits\ReservationProjector::class,
         'facility-reservation' => App\Services\Facilities\ReservationProjector::class,
+
+        /*
+         * The mailing-list signup. No SubmissionRule beside it, deliberately: an
+         * address already on a list is shown the ordinary confirmation, because a
+         * rule answering "already subscribed" would tell anyone who asks whether
+         * a given address is on the list — the same fact the unsubscribe endpoint
+         * refuses to leak.
+         */
+        'newsletter-subscribe' => App\Services\Newsletter\SubscriptionProjector::class,
         /*
          * `facility-contact` is DELIBERATELY ABSENT. A message to a venue is a
          * message — it has no domain rows to become, so it stays a FormSubmission

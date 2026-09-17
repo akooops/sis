@@ -229,6 +229,81 @@ class TranslationService
     }
 
     /**
+     * Drop lines from one locale's group file, and prune any parent left empty.
+     *
+     * THE COUNTERPART THIS APP WAS MISSING. Adding a key is "add it to
+     * TranslationKeysSeeder::catalogue(), reseed"; removing one had no path at
+     * all. Dropping the catalogue entry removes NOTHING from an install that has
+     * already seeded — putMany() only ever writes — so a retired key kept
+     * resolving through __() forever, and the registry row kept pointing at it.
+     *
+     * THE REGISTRY ROW IS THE CALLER'S JOB, and it must go too. With
+     * config('translations.fill_missing_keys') false today nothing notices a
+     * stale row; flip it true and the next admin edit to ANY key in the group
+     * re-inserts the removed one as '' in every locale — and '' is present, so
+     * Laravel's fallback never fires and every locale renders a blank instead of
+     * English.
+     *
+     * PRUNING THE PARENT IS NOT TIDINESS. export() renders an empty array as
+     * `[]`, so a group left holding `'subscribe' => []` makes __('site.x.subscribe')
+     * return an array: @lang prints "Array" with a notice rather than failing
+     * loudly. Anything that still has children is left alone.
+     *
+     * Writes no activity row: a removal is a code change arriving with a deploy,
+     * not an admin edit, and log() would have no registered key to hang it off by
+     * the time this runs.
+     *
+     * @param  array<int, string>  $keys  dotted keys, as registered
+     * @return int  how many were actually present
+     */
+    public function remove(string $code, string $group, array $keys): int
+    {
+        $this->guard($code, config('translations.code_pattern'), 'locale');
+        $this->guard($group, config('translations.group_pattern'), 'group');
+
+        $removed = 0;
+
+        $this->withLock($code, $group, function () use ($code, $group, $keys, &$removed) {
+            $this->ensureLocale($code);
+            $this->forget($code, $group);
+
+            $lines = $this->load($code, $group);
+
+            foreach ($keys as $key) {
+                if (! Arr::has($lines, $key)) {
+                    continue;
+                }
+
+                Arr::forget($lines, $key);
+                $removed++;
+
+                // Walk back up: 'a.b.c' leaves 'a.b' and then 'a' behind, and
+                // either may now be an empty array.
+                $parent = $key;
+
+                while (str_contains($parent, '.')) {
+                    $parent = Str::beforeLast($parent, '.');
+
+                    if (Arr::get($lines, $parent) !== []) {
+                        break;
+                    }
+
+                    Arr::forget($lines, $parent);
+                }
+            }
+
+            if ($removed === 0) {
+                return;
+            }
+
+            $this->write($code, $group, $lines);
+            $this->forget($code, $group);
+        });
+
+        return $removed;
+    }
+
+    /**
      * Many lines in one locked write, for the seeder — put() would take a lock and
      * log an activity row per key.
      *

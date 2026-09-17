@@ -25,7 +25,14 @@ class UserSeeder extends Seeder
             ],
         );
 
-        $owner = Role::where('name', 'owner')->first();
+        /*
+         * By CODE. `name` is 'Owner' and an admin may rewrite it at will, so this
+         * matched only because MySQL's default collation is case-insensitive -
+         * on a case-sensitive one it finds nothing, the super user is seeded with
+         * no roles at all, and the first sign-in 403s on the dashboard with no
+         * way to grant anything back.
+         */
+        $owner = Role::where('code', 'owner')->first();
 
         if ($owner) {
             $user->userRoles()->firstOrCreate(['role_id' => $owner->id]);

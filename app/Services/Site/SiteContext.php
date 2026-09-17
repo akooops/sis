@@ -79,6 +79,7 @@ final class SiteContext
     public const SYSTEM_FORM_ROUTES = [
         'contact' => 'web.site.contact',
         'inquiries' => 'web.site.inquiries',
+        'newsletter-subscribe' => 'web.site.newsletters',
     ];
 
     /** @var Collection<string, Setting>|null keyed "group.key" */

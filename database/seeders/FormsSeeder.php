@@ -7,7 +7,9 @@ use App\Models\Form;
 use App\Models\FormField;
 use App\Models\FormFieldOption;
 use App\Models\FormPage;
+use App\Models\Integration;
 use App\Models\Language;
+use App\Services\Newsletter\FormOptions;
 use App\States\Form\Published;
 use Illuminate\Database\Seeder;
 use RuntimeException;
@@ -73,7 +75,7 @@ class FormsSeeder extends Seeder
                     'status' => Published::class,
                     'published_at' => now(),
                     'is_system' => true,
-                ],
+                ] + $this->guards($definition),
             );
 
             // An existing form adopted into the system set: assert the lock only.
@@ -103,6 +105,61 @@ class FormsSeeder extends Seeder
      * @param  array<string, string>|null  $lines
      * @return array<string, string>
      */
+    /**
+     * The spam and captcha columns a definition may set, if it says anything
+     * about them.
+     *
+     * SEPARATE FROM THE REST because these are the only form-level attributes
+     * that are not copy: everything else in a definition is a name or a
+     * translatable string an admin edits afterwards, while these change how the
+     * form BEHAVES. A definition that stays silent gets the table's defaults —
+     * `is_spam_filtered` is already true there, so the honeypot and the minimum
+     * submit time come for free and every existing form keeps exactly what it
+     * had.
+     *
+     * `min_submit_seconds` is worth setting explicitly on a short form: NULL does
+     * not mean "no minimum", it means Form::minSubmitSeconds() falls back to
+     * config('forms.spam.min_seconds'), and tripping that rule is SILENT — the
+     * visitor is shown a fake confirmation and a `spam` row is written.
+     *
+     * CAPTCHA NEEDS BOTH COLUMNS OR IT DOES NOTHING. Captcha::forForm() returns
+     * no challenge unless `is_captcha_enabled` AND `captcha_integration_id` are
+     * both set, so a form flagged on with no integration is silently
+     * unprotected rather than broken. There is no IntegrationsSeeder — keys live
+     * in an admin-created Integration row — so the id can only be resolved from
+     * whatever this install already has, and on a fresh one it is null until an
+     * admin creates the integration and pins it on the form.
+     *
+     * @param  array<string, mixed>  $definition
+     * @return array<string, mixed>
+     */
+    protected function guards(array $definition): array
+    {
+        $guards = [];
+
+        if (array_key_exists('min_submit_seconds', $definition)) {
+            $guards['min_submit_seconds'] = $definition['min_submit_seconds'];
+        }
+
+        if (! ($definition['is_captcha_enabled'] ?? false)) {
+            return $guards;
+        }
+
+        // The oldest enabled captcha integration, which is the same rule
+        // Integration::activeFor() applies — ordered so two installs with the
+        // same rows resolve the same one.
+        $integration = Integration::query()
+            ->whereHas('type', fn ($query) => $query->where('code', 'captcha'))
+            ->where('is_enabled', true)
+            ->oldest()
+            ->first();
+
+        return $guards + [
+            'is_captcha_enabled' => true,
+            'captcha_integration_id' => $integration?->getKey(),
+        ];
+    }
+
     protected function translate(array|string|null $lines, ?string $fallback = null): array
     {
         // A bare string is one untranslated line. Accepted so a definition can
@@ -294,6 +351,20 @@ class FormsSeeder extends Seeder
      */
     protected function optionsFor(array $definition): array
     {
+        /*
+         * The mailing lists. Generated for the same reason countries are — the
+         * table already holds the codes and their translated titles — but with
+         * one difference that matters: countries are a fixed catalogue and
+         * mailing lists are not, so this is only the STARTING set. FormsSeeder
+         * writes options once (run() skips buildStructure() unless the form was
+         * newly created), and App\Services\Newsletter\FormOptions keeps them in
+         * step from then on. Both go through the same options() so a group and
+         * its option cannot be spelled two different ways.
+         */
+        if (($definition['options_from'] ?? null) === 'newsletter_groups') {
+            return app(FormOptions::class)->options();
+        }
+
         if (($definition['options_from'] ?? null) !== 'countries') {
             return array_values($definition['options'] ?? []);
         }
@@ -651,6 +722,146 @@ class FormsSeeder extends Seeder
     private function forms(): array
     {
         return [
+            /*
+             * THE MAILING-LIST SIGNUP, rendered on /newsletters above the
+             * archive by ResourcesController.
+             *
+             * A BUILDER FORM, NOT A BESPOKE POST, so it inherits the guard chain
+             * whole: honeypot, minimum submit time, captcha, country and IP
+             * blocks, per-visitor caps, and one submission pipeline to export and
+             * notify from. It is `is_system` like its siblings, so the slug and
+             * the two field keys config/newsletter.php maps are frozen — and
+             * FormsController::show() therefore 404s /forms/newsletter-subscribe,
+             * which is correct: the page renders it.
+             *
+             * `min_submit_seconds` is set because the default is five and this
+             * form is two fields; see guards() for why that would fail silently.
+             *
+             * THE PICKER'S OPTIONS ARE GENERATED AND THEN KEPT IN SYNC. This
+             * seeds whatever lists exist at install time (NewsletterGroupsSeeder
+             * runs first, so there is always the default one); every list added
+             * afterwards arrives through
+             * App\Services\Newsletter\FormOptions::sync(), called from
+             * NewsletterGroupObserver. A reseed cannot repair them — run() only
+             * builds structure for a form it just created.
+             */
+            [
+                'slug' => 'newsletter-subscribe',
+                'name' => 'Newsletter signup',
+                'min_submit_seconds' => 2,
+                'is_captcha_enabled' => true,
+                'title' => [
+                    'en' => 'Subscribe to our newsletters',
+                    'ar' => 'اشترك في نشراتنا',
+                    'fr' => 'Abonnez-vous à nos bulletins',
+                    'es' => 'Suscríbase a nuestros boletines',
+                    'de' => 'Newsletter abonnieren',
+                    'it' => 'Iscriviti alle nostre newsletter',
+                    'pt' => 'Subscreva os nossos boletins',
+                    'ru' => 'Подпишитесь на наши рассылки',
+                    'hi' => 'हमारे न्यूज़लेटर की सदस्यता लें',
+                ],
+                /*
+                 * Neutral about whether the address was already on the list. A
+                 * second signup gets this same sentence, because saying
+                 * otherwise would tell anyone who asks who is subscribed — the
+                 * fact NewsletterController::unsubscribe() refuses to leak.
+                 */
+                'confirmation_message' => [
+                    'en' => 'Thank you. Your address is on the list, and every email we send carries a link to unsubscribe.',
+                    'ar' => 'شكرًا لك. بريدك مسجّل في القائمة، وكل رسالة نرسلها تتضمن رابطًا لإلغاء الاشتراك.',
+                    'fr' => 'Merci. Votre adresse est inscrite sur la liste, et chaque e-mail que nous envoyons contient un lien de désabonnement.',
+                    'es' => 'Gracias. Su dirección está en la lista y cada correo que enviamos incluye un enlace para darse de baja.',
+                    'de' => 'Vielen Dank. Ihre Adresse steht auf der Liste, und jede E-Mail von uns enthält einen Abmeldelink.',
+                    'it' => 'Grazie. Il tuo indirizzo è nella lista e ogni e-mail che inviamo contiene un link per annullare l’iscrizione.',
+                    'pt' => 'Obrigado. O seu endereço está na lista e cada e-mail que enviamos inclui uma ligação para cancelar a subscrição.',
+                    'ru' => 'Спасибо. Ваш адрес в списке рассылки, и в каждом письме есть ссылка для отписки.',
+                    'hi' => 'धन्यवाद। आपका पता सूची में है, और हम जो भी ईमेल भेजते हैं उसमें सदस्यता समाप्त करने का लिंक होता है।',
+                ],
+                'pages' => [
+                    [
+                        'name' => 'Signup',
+                        'fields' => [
+                            [
+                                'type' => 'email',
+                                'key' => 'email',
+                                'is_required' => true,
+                                'label' => [
+                                    'en' => 'Email address',
+                                    'ar' => 'البريد الإلكتروني',
+                                    'fr' => 'Adresse e-mail',
+                                    'es' => 'Correo electrónico',
+                                    'de' => 'E-Mail-Adresse',
+                                    'it' => 'Indirizzo e-mail',
+                                    'pt' => 'Endereço de e-mail',
+                                    'ru' => 'Электронная почта',
+                                    'hi' => 'ईमेल पता',
+                                ],
+                                'placeholder' => [
+                                    'en' => 'name@example.com',
+                                    'ar' => 'name@example.com',
+                                    'fr' => 'name@example.com',
+                                    'es' => 'name@example.com',
+                                    'de' => 'name@example.com',
+                                    'it' => 'name@example.com',
+                                    'pt' => 'name@example.com',
+                                    'ru' => 'name@example.com',
+                                    'hi' => 'name@example.com',
+                                ],
+                            ],
+                            /*
+                             * CHECKBOXES, NOT A <select multiple>. Both capture
+                             * several values — a select needs
+                             * settings.is_multiple, spelled exactly that — but a
+                             * native multi-select needs ctrl-click to add a
+                             * second choice, which most visitors never discover,
+                             * and it collapses to a scrolling box on a phone. A
+                             * handful of mailing lists as visible ticks says what
+                             * it is. Checkbox is also the only option type that
+                             * declares min_selected/max_selected, though
+                             * is_required already gives `required|array` here.
+                             *
+                             * Option VALUES are group `code`s and are generated —
+                             * see FormOptions for why not ULIDs.
+                             */
+                            [
+                                'type' => 'checkbox',
+                                'key' => 'newsletter_groups',
+                                'is_required' => true,
+                                'options_from' => 'newsletter_groups',
+                                'label' => [
+                                    'en' => 'Which lists would you like?',
+                                    'ar' => 'ما القوائم التي ترغب في الاشتراك بها؟',
+                                    'fr' => 'Quelles listes souhaitez-vous recevoir ?',
+                                    'es' => '¿Qué listas desea recibir?',
+                                    'de' => 'Welche Verteiler möchten Sie erhalten?',
+                                    'it' => 'Quali elenchi vuoi ricevere?',
+                                    'pt' => 'Que listas pretende receber?',
+                                    'ru' => 'Какие рассылки вы хотите получать?',
+                                    'hi' => 'आप कौन-सी सूचियाँ प्राप्त करना चाहेंगे?',
+                                ],
+                            ],
+                            [
+                                'type' => 'button',
+                                'key' => 'subscribe',
+                                'settings' => ['action' => 'submit', 'variant' => 'primary'],
+                                'label' => [
+                                    'en' => 'Subscribe',
+                                    'ar' => 'اشتراك',
+                                    'fr' => 'S’abonner',
+                                    'es' => 'Suscribirse',
+                                    'de' => 'Abonnieren',
+                                    'it' => 'Iscriviti',
+                                    'pt' => 'Subscrever',
+                                    'ru' => 'Подписаться',
+                                    'hi' => 'सदस्यता लें',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+
             [
                 'slug' => 'contact',
                 'name' => 'Contact',

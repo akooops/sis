@@ -4,15 +4,27 @@ namespace App\Http\Controllers\Web\Site;
 
 use App\Models\Calendar;
 use App\Models\Document;
+use App\Models\Form;
 use App\Models\Grade;
 use App\Models\Newsletter;
 use App\Models\Page;
+use App\Services\Forms\FormPresenter;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Downloadable listings — calendars, newsletters, guidelines, documents.
+ *
+ * One of these pages also embeds a form: /newsletters carries the mailing-list
+ * signup, which is a seeded `is_system` builder form like contact and inquiries
+ * rather than a bespoke POST. See newsletters() for what that buys and what it
+ * costs.
+ */
 class ResourcesController extends SiteController
 {
+    public function __construct(protected FormPresenter $presenter) {}
+
     public function calendars(): View
     {
         $locale = $this->site()->locale();
@@ -47,13 +59,27 @@ class ResourcesController extends SiteController
         ]);
     }
 
-    public function newsletters(): View
+    /**
+     * The archive, and above it the signup.
+     *
+     * SIGNUP FIRST, which reverses the order this page shipped with. The
+     * confirmation renders where the embed sits, and SubmitController returns the
+     * visitor with `back()`, which carries no fragment — so anything below the
+     * archive table is off-screen on landing. Putting the form above it is the
+     * only part of that distance this page controls; the hero above it is
+     * everyone's problem and /contact has it too.
+     */
+    public function newsletters(Request $request): View
     {
         $locale = $this->site()->locale();
 
         $page = Page::query()->live()->where('slug', 'newsletters')->firstOrFail();
 
         $newsletters = Newsletter::query()->live()->with('media')->latest('published_at')->get();
+
+        // The signup. Optional in exactly the way /contact's is: an unpublished
+        // or unseeded form must not 404 the newsletter archive.
+        $form = Form::query()->live()->where('slug', (string) config('newsletter.form'))->first();
 
         $title = $page->getTranslation('title', $locale, true) ?: $page->name;
 
@@ -73,9 +99,14 @@ class ResourcesController extends SiteController
 
         $breadcrumbs = [['label' => $title, 'url' => null]];
 
+        $embed = $this->embed($request, $form, $locale);
+
         return view('site::pages.resources.newsletters', [
             'page' => $page,
             'newsletters' => $newsletters,
+            'form' => $embed['form'],
+            'presentation' => $embed['presentation'],
+            'notice' => $embed['notice'],
             'seo' => $seo,
             'breadcrumbs' => $breadcrumbs,
         ]);
@@ -113,6 +144,41 @@ class ResourcesController extends SiteController
             'seo' => $seo,
             'breadcrumbs' => $breadcrumbs,
         ]);
+    }
+
+    /**
+     * What the page needs to draw a seeded form: the row, its presentation, or
+     * the reason there is neither.
+     *
+     * THE ORDER IS LOAD-BEARING and is ContactController's, copied rather than
+     * shared because SiteController is deliberately almost empty. Read the
+     * confirmation flash FIRST: the submission that just succeeded may be the one
+     * that hit the form's cap, and the person who sent it must read their
+     * confirmation rather than "no longer accepting responses". And skip the
+     * notice when submit() already put the same sentence in the error bag, or the
+     * page says it twice.
+     *
+     * @return array{form: ?Form, presentation: ?\App\Services\Forms\FormPresentation, notice: ?string}
+     */
+    protected function embed(Request $request, ?Form $form, string $locale): array
+    {
+        if ($form === null) {
+            return ['form' => null, 'presentation' => null, 'notice' => null];
+        }
+
+        $submitted = session('sisf_submitted') === $form->id;
+
+        $state = $submitted ? 'ok' : $this->presenter->state($request, $form);
+
+        $hasFormError = session('errors')?->getBag('default')->has('form') ?? false;
+
+        return [
+            'form' => $form,
+            'presentation' => ($state === 'ok' && ! $submitted)
+                ? $this->presenter->present($form, $locale)
+                : null,
+            'notice' => ($state === 'ok' || $hasFormError) ? null : $state,
+        ];
     }
 
     public function guidelines(Request $request): View

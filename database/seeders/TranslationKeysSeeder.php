@@ -727,6 +727,44 @@ class TranslationKeysSeeder extends Seeder
                     'de' => 'Newsletter', 'it' => 'Newsletter', 'pt' => 'Boletins', 'ru' => 'Рассылки',
                     'hi' => 'न्यूज़लेटर',
                 ],
+
+                /*
+                 * The page's own copy above the signup form.
+                 *
+                 * EVERYTHING ELSE THE FORM SAYS IS THE FORM'S. Its title, its
+                 * field labels, its placeholder and its confirmation are
+                 * locale => string maps on the seeded row (FormsSeeder), because
+                 * that is where a builder form's wording lives and an admin
+                 * edits it there. A second copy here would be the one nobody
+                 * updates.
+                 */
+                'newsletters.subscribe.intro' => [
+                    'en' => 'Choose a list and enter your email address. Every message we send carries a link to unsubscribe.',
+                    'ar' => 'اختر القائمة وأدخل بريدك الإلكتروني. كل رسالة نرسلها تتضمن رابطًا لإلغاء الاشتراك.',
+                    'fr' => 'Choisissez une liste et saisissez votre adresse e-mail. Chaque message que nous envoyons contient un lien de désabonnement.',
+                    'es' => 'Elija una lista e introduzca su correo electrónico. Cada mensaje que enviamos incluye un enlace para darse de baja.',
+                    'de' => 'Wählen Sie einen Verteiler und geben Sie Ihre E-Mail-Adresse ein. Jede Nachricht, die wir senden, enthält einen Abmeldelink.',
+                    'it' => 'Scegli un elenco e inserisci il tuo indirizzo e-mail. Ogni messaggio che inviamo contiene un link per annullare l’iscrizione.',
+                    'pt' => 'Escolha uma lista e introduza o seu endereço de e-mail. Cada mensagem que enviamos inclui uma ligação para cancelar a subscrição.',
+                    'ru' => 'Выберите рассылку и введите адрес электронной почты. В каждом письме есть ссылка для отписки.',
+                    'hi' => 'एक सूची चुनें और अपना ईमेल पता दर्ज करें। हम जो भी संदेश भेजते हैं उसमें सदस्यता समाप्त करने का लिंक होता है।',
+                ],
+                /*
+                 * The answer to every unsubscribe click, including a signature
+                 * that matched nothing — a stranger must not be able to tell the
+                 * two apart.
+                 */
+                'newsletters.unsubscribed' => [
+                    'en' => 'You have been unsubscribed and will no longer receive these emails.',
+                    'ar' => 'تم إلغاء اشتراكك ولن تصلك هذه الرسائل بعد الآن.',
+                    'fr' => 'Vous êtes désabonné et ne recevrez plus ces e-mails.',
+                    'es' => 'Se ha dado de baja y ya no recibirá estos correos.',
+                    'de' => 'Sie wurden abgemeldet und erhalten diese E-Mails nicht mehr.',
+                    'it' => 'La tua iscrizione è stata annullata e non riceverai più queste e-mail.',
+                    'pt' => 'A sua subscrição foi cancelada e deixará de receber estes e-mails.',
+                    'ru' => 'Вы отписались и больше не будете получать эти письма.',
+                    'hi' => 'आपकी सदस्यता समाप्त कर दी गई है और अब आपको ये ईमेल नहीं मिलेंगे।',
+                ],
                 'documents.panel' => [
                     'en' => 'Documents and forms', 'ar' => 'المستندات والنماذج',
                     'fr' => 'Documents et formulaires', 'es' => 'Documentos y formularios',

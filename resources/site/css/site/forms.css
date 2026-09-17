@@ -343,6 +343,22 @@
     border-radius: 50%;
 }
 
+/* A rejected choice group had NO visual state at all: section 5's invalid rules
+   name only .sisf-input/.sisf-select/.sisf-textarea, so a required checkbox
+   group that was left empty rendered its ticks completely untouched and the red
+   .sisf-error text below was the only signal. Latent until the newsletter signup
+   became the first seeded form with a checkbox field — and "no list ticked" is
+   the likeliest rejection on a two-field form.
+
+   Both ways in, matching section 5: Element.svelte sets the class on the
+   container and CheckboxControl/RadioControl set the attribute on the group. */
+.sisf-el.is-invalid .sisf-checkbox,
+.sisf-el.is-invalid .sisf-radio,
+.sisf-choices[aria-invalid="true"] .sisf-checkbox,
+.sisf-choices[aria-invalid="true"] .sisf-radio {
+    border-color: var(--sisf-danger);
+}
+
 .sisf-checkbox:checked,
 .sisf-radio:checked {
     background-color: var(--sisf-primary);

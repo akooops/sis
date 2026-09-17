@@ -31,9 +31,17 @@
     }
 </script>
 
+<!--
+    role="group" is what makes the two ARIA attributes below mean anything. On a
+    bare <div> they are inert: a screen-reader user tabbing onto the ticks was
+    never told why the field had been rejected, because aria-describedby only
+    resolves against something with a role. The individual inputs stay plain
+    checkboxes; the group carries the label and the error.
+-->
 <div
     class="sisf-choices"
     class:sisf-choices--inline={inline}
+    role="group"
     aria-invalid={invalid || undefined}
     aria-describedby={describedBy}
 >
