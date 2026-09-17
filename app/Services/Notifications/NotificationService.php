@@ -33,6 +33,35 @@ use Throwable;
  */
 class NotificationService
 {
+    /** @see withoutNotifications() */
+    protected static bool $muted = false;
+
+    /**
+     * Run something with notifications suppressed.
+     *
+     * FOR BULK WRITES THAT REPLAY THE PAST, and nothing else. Notifications are
+     * emitted from observers, so any process that writes thousands of rows —
+     * today, the legacy import — announces thousands of events that did not just
+     * happen: "a new application arrived" about an application from last year.
+     *
+     * Deliberately a mute rather than a way to not call send(): the observers are
+     * the single place a notification is emitted, and threading a flag down to
+     * each of them would put migration awareness into domain code. Restored in a
+     * finally, and nested calls restore to whatever they found rather than to
+     * false, so an inner block cannot un-mute an outer one.
+     */
+    public static function withoutNotifications(callable $callback): mixed
+    {
+        $was = static::$muted;
+        static::$muted = true;
+
+        try {
+            return $callback();
+        } finally {
+            static::$muted = $was;
+        }
+    }
+
     /**
      * Emit a type to its subscribers, plus the given groups.
      *
@@ -41,6 +70,10 @@ class NotificationService
      */
     public static function send(string $typeCode, array $attributes = [], ?array $groupIds = null): ?Notification
     {
+        if (static::$muted) {
+            return null;
+        }
+
         $type = static::type($typeCode);
 
         if (! $type) {
