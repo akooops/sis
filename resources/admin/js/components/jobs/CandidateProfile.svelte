@@ -65,7 +65,7 @@
                     class="flex items-center gap-3 rounded-lg border border-border p-3 hover:border-primary"
                     href={candidate.cv.url}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener"
                 >
                     <i class="ki-filled ki-file text-xl text-primary"></i>
                     <span class="flex min-w-0 flex-col">

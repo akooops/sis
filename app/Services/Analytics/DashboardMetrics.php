@@ -239,7 +239,17 @@ class DashboardMetrics
 
         return $this->base($f)
             ->selectRaw($expression.' as label, count(*) as page_views, count(distinct v.visit_key) as visits')
-            ->groupByRaw($expression)
+            /*
+             * GROUPED BY THE ALIAS, NOT BY REPEATING THE EXPRESSION. Under
+             * ONLY_FULL_GROUP_BY, production MySQL refused the repeated
+             * expression with 1055 "v.entry_point isn't in GROUP BY" — it did not
+             * treat the two copies as the same thing — while the dev server
+             * accepted it, so this only failed after deploying. An alias is
+             * unambiguous. It is safe here because `label` is not a column on
+             * site_page_views; grouping on an alias that IS a column would make
+             * MySQL resolve the name to the column and split NULL from ''.
+             */
+            ->groupBy('label')
             ->orderByRaw('visits desc')
             ->when($limit, fn ($query) => $query->limit($limit))
             ->get()
@@ -543,10 +553,12 @@ class DashboardMetrics
         }
 
         $rows = $query
-            // The same expression-not-alias rule as the traffic splits: `status`
-            // is a real column and MySQL would resolve the GROUP BY name to it.
+            // Grouped by the `label` alias, as the traffic splits are: repeating
+            // the expression fails ONLY_FULL_GROUP_BY on production MySQL. Never
+            // alias it `status` — that IS a column, and MySQL would resolve the
+            // GROUP BY name to it.
             ->selectRaw("coalesce(nullif(`status`, ''), 'unknown') as label, count(*) as total")
-            ->groupByRaw("coalesce(nullif(`status`, ''), 'unknown')")
+            ->groupBy('label')
             ->orderByRaw('total desc')
             ->get();
 

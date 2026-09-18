@@ -453,15 +453,16 @@ class SubmissionAnalytics
      */
     protected function devices(Form $form, array $f): array
     {
-        // Grouped by the EXPRESSION, not by the alias: `device_type` is also a
-        // real column, and MySQL resolves a GROUP BY name to the column first —
-        // which would file NULL and '' as two separate rows both reading
-        // "unknown".
+        // Grouped by an alias that is NOT a column. Repeating the expression
+        // fails ONLY_FULL_GROUP_BY on production MySQL (1055), and aliasing it
+        // `device_type` would let MySQL resolve the GROUP BY name to the real
+        // column — filing NULL and '' as two rows both reading "unknown". So it
+        // is selected as `device` and renamed back when mapped.
         return $this->base($form, $f)
-            ->groupByRaw("coalesce(nullif(s.device_type, ''), 'unknown')")
+            ->groupBy('device')
             ->orderByRaw('starts desc')
             ->selectRaw(<<<'SQL'
-                coalesce(nullif(s.device_type, ''), 'unknown') as device_type,
+                coalesce(nullif(s.device_type, ''), 'unknown') as device,
                 count(*) as starts,
                 sum(s.status = 'completed') as completed,
                 avg(case when s.status = 'completed' then s.duration_seconds end) as avg_duration_seconds,
@@ -470,7 +471,7 @@ class SubmissionAnalytics
             SQL)
             ->get()
             ->map(fn ($row) => [
-                'device_type' => (string) $row->device_type,
+                'device_type' => (string) $row->device,
                 'starts' => (int) $row->starts,
                 'completed' => (int) $row->completed,
                 'completion_rate' => $this->rate((int) $row->completed, (int) $row->starts),

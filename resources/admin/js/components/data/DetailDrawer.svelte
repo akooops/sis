@@ -130,7 +130,7 @@
                                 class="flex flex-col gap-1 rounded-lg border border-border p-1.5 hover:border-primary"
                                 href={item.url ?? null}
                                 target="_blank"
-                                rel="noreferrer"
+                                rel="noopener"
                                 title={item.name}
                             >
                                 <div class="flex aspect-square items-center justify-center overflow-hidden rounded bg-muted">
