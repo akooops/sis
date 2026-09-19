@@ -39,13 +39,16 @@
         margin-top: 0;
     }
 
+    /* 56px below lg: at 72px the crest-plus-wordmark filled nearly half a
+       phone's width and crowded the menu button. Same size scrolled or not —
+       there is no room to shrink it further and still read the wordmark. */
     .site-header__logo {
-        height: 72px;
+        height: 56px;
         transition: height 0.5s var(--ease-brand);
     }
 
     .site-header.is-scrolled .site-header__logo {
-        height: 64px;
+        height: 56px;
     }
 
     /* The bar only floats away from the top on large screens, and only while
@@ -347,9 +350,18 @@
     /* -------------------------------------------------------------------------
        Hero slider
        ---------------------------------------------------------------------- */
+    /* Rule and gutter halved on phones: 40px + 10px of the ~345px a phone has
+       left for the heading pushed its longest word off-screen. */
     .hero-heading {
-        padding-inline-start: 40px;
-        border-inline-start: 10px solid var(--color-brand);
+        padding-inline-start: 20px;
+        border-inline-start: 6px solid var(--color-brand);
+    }
+
+    @media (width >= 768px) {
+        .hero-heading {
+            padding-inline-start: 40px;
+            border-inline-start-width: 10px;
+        }
     }
 
     /* Page titles drop in once the hero image has had a beat to load. */

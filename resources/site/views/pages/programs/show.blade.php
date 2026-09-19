@@ -18,37 +18,39 @@
     @if ($program->streams->isNotEmpty())
         <section class="bg-surface">
             <div class="container py-14">
-                <h2 class="mb-6 text-3xl font-black uppercase leading-[35px] text-brand">
-                    @lang('site.programs.streams')
-                </h2>
-
-                <div class="tabs mb-6 flex flex-wrap gap-2">
+                {{-- Every stream is rendered, the inactive ones `hidden`, and the
+                     tabs stay real links: site/tabs.js swaps panels in place,
+                     and without it a click is still a normal page load on the
+                     right tab. --}}
+                <div class="tabs mb-6 flex flex-wrap gap-2" role="tablist" data-tabs>
                     @foreach ($program->streams as $stream)
                         @php($isActive = $activeStream && $activeStream->id === $stream->id)
 
                         <a class="tab-link {{ $isActive ? 'is-active' : '' }}"
                             href="{{ route('web.site.programs.show', ['slug' => $program->slug, 'stream' => $stream->slug]) }}"
-                            @if ($isActive) aria-current="page" @endif>
+                            id="stream-tab-{{ $stream->slug }}"
+                            role="tab"
+                            aria-controls="stream-panel-{{ $stream->slug }}"
+                            aria-selected="{{ $isActive ? 'true' : 'false' }}"
+                            data-tab="{{ $stream->slug }}">
                             {{ $stream->getTranslation('title', $site->locale(), true) ?: $stream->name }}
                         </a>
                     @endforeach
                 </div>
 
-                @if ($activeStream)
-                    <div class="stream">
-                        <h3 class="stream-name">
-                            {{ $activeStream->getTranslation('title', $site->locale(), true) ?: $activeStream->name }}
-                        </h3>
-
-                        @if ($subtitle = $activeStream->getTranslation('description', $site->locale(), true))
-                            <p class="stream-label">{{ $subtitle }}</p>
-                        @endif
+                @foreach ($program->streams as $stream)
+                    <div class="stream"
+                        id="stream-panel-{{ $stream->slug }}"
+                        role="tabpanel"
+                        aria-labelledby="stream-tab-{{ $stream->slug }}"
+                        data-tab-panel="{{ $stream->slug }}"
+                        @unless ($activeStream && $activeStream->id === $stream->id) hidden @endunless>
 
                         <div class="prose">
-                            {!! $activeStream->getTranslation('content', $site->locale(), true) !!}
+                            {!! $stream->getTranslation('content', $site->locale(), true) !!}
                         </div>
                     </div>
-                @endif
+                @endforeach
             </div>
         </section>
     @endif

@@ -29,17 +29,17 @@
                             @endif
 
                             <div class="container relative z-[3] h-full">
-                                <div class="flex h-full items-end px-8 pb-24 lg:px-0">
-                                    <div class="grid w-full gap-4 lg:grid-cols-12 lg:gap-0 lg:px-14">
-                                        <div class="lg:col-span-8">
-                                            <h2 class="hero-heading mb-0 text-6xl font-semibold uppercase leading-none text-paper lg:text-[55px] lg:leading-[52px]">
+                                <div class="flex h-full items-end px-2 pb-24 md:px-8 lg:px-0">
+                                    <div class="grid w-full grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-0 lg:px-14">
+                                        <div class="min-w-0 lg:col-span-8">
+                                            <h2 class="hero-heading mb-0 break-words text-4xl font-semibold uppercase leading-tight text-paper sm:text-5xl md:text-6xl md:leading-none lg:text-[55px] lg:leading-[52px]">
                                                 {{ $bannerTitle }}
                                             </h2>
                                         </div>
 
                                         @if ($bannerUrl && $bannerCta)
                                             <div class="flex items-start lg:col-span-4 lg:px-24">
-                                                <a href="{{ $bannerUrl }}" class="btn btn-on-dark px-24 py-1">
+                                                <a href="{{ $bannerUrl }}" class="btn btn-on-dark w-full px-8 py-1 md:w-auto md:px-24">
                                                     <i class="uil uil-angle-right-b" aria-hidden="true"></i>
                                                     {{ $bannerCta }}
                                                 </a>
@@ -96,8 +96,8 @@
                                 </p>
 
                                 <a href="{{ route('web.site.programs.show', ['slug' => $pathway->slug, 'stream' => $stream->slug]) }}"
-                                    class="btn btn-outline mt-auto w-full py-1 text-base">
-                                    <span class="mx-4">{{ $stream->getTranslation('cta', $site->locale(), true) ?: __('common.read_more') }}</span>
+                                    class="btn btn-outline mt-auto w-full whitespace-normal px-3 py-1 text-[12px] sm:px-[24px] sm:text-sm">
+                                    <span class="sm:mx-4">{{ $stream->getTranslation('cta', $site->locale(), true) ?: __('common.read_more') }}</span>
                                     <i class="uil uil-arrow-right" aria-hidden="true"></i>
                                 </a>
                             </div>

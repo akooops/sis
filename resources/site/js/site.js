@@ -46,6 +46,7 @@ const ON_DEMAND = [
      */
     ['[data-facility-reserve]', () => import('./site/facilities')],
     ['[data-lightbox]', () => import('./site/lightbox')],
+    ['[data-tabs]', () => import('./site/tabs')],
     ['[data-calendar]', () => import('./site/calendar')],
     ['[data-datepicker]', () => import('./site/datepicker')],
     ['[data-phone-input]', () => import('./site/phone')],
