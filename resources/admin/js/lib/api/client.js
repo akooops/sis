@@ -83,6 +83,24 @@ export function buildQuery(params = {}) {
     return sp.toString();
 }
 
+/**
+ * PUT, PATCH and DELETE travel as POST plus `X-HTTP-Method-Override`.
+ *
+ * THE PRODUCTION HOST IS IIS, and its PHP handler mapping accepts only
+ * GET/HEAD/POST. Any other verb falls through to IIS's static-file handler,
+ * which answers an empty 405 (`Allow: GET, HEAD, OPTIONS, TRACE`) before PHP
+ * ever runs — so every save and every delete in the admin failed, while every
+ * list loaded fine. The routes themselves were never wrong.
+ *
+ * Fixing the handler's allowed verbs on the server works too, but Plesk
+ * regenerates that mapping, so a server-side fix is one panel click from being
+ * undone. Tunnelling doesn't depend on the host at all: Symfony's
+ * Request::getMethod() reads this header on any POST, so Laravel routes the
+ * request exactly as the real verb, and the route list, `Route::put()` and
+ * CSRF behave unchanged. Verified against the live server.
+ */
+const TUNNELLED = new Set(['PUT', 'PATCH', 'DELETE']);
+
 async function request(url, { method = 'GET', body, params, signal, headers = {} } = {}) {
     let target = url;
     if (params) {
@@ -90,19 +108,23 @@ async function request(url, { method = 'GET', body, params, signal, headers = {}
         if (qs) target += (target.includes('?') ? '&' : '?') + qs;
     }
 
+    const verb = method.toUpperCase();
+    const tunnelled = TUNNELLED.has(verb);
+
     const isFormData = body instanceof FormData;
     const finalHeaders = {
         Accept: 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
         ...csrfHeader(),
         ...(body && !isFormData ? { 'Content-Type': 'application/json' } : {}),
+        ...(tunnelled ? { 'X-HTTP-Method-Override': verb } : {}),
         ...headers,
     };
 
     let response;
     try {
         response = await fetch(target, {
-            method,
+            method: tunnelled ? 'POST' : verb,
             signal,
             credentials: 'same-origin',
             headers: finalHeaders,
