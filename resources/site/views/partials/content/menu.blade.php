@@ -2,8 +2,13 @@
 
 @if ($menu && $menu->rootItems->isNotEmpty())
     <section class="bg-surface">
-        <div class="container flex justify-center overflow-x-auto py-8">
-            <ul class="flex justify-center gap-6">
+        {{-- Wraps rather than scrolls: a long menu ran off the side of a phone
+             and the items past the edge were only reachable by dragging, with
+             nothing on screen to say so. Each item still keeps its own label on
+             one line. Desktop is unchanged — the items fit a single row there,
+             so the wrap never engages and the row gap never applies. --}}
+        <div class="container flex justify-center py-8">
+            <ul class="flex flex-wrap justify-center gap-x-6 gap-y-2">
                 @foreach ($menu->rootItems as $item)
                     @if ($url = $site->url($item->linkable) ?: $item->url)
                         <li class="whitespace-nowrap">
