@@ -59,10 +59,9 @@ class PagesSeeder extends Seeder
                 'de' => 'Erfolge', 'it' => 'Risultati', 'pt' => 'Conquistas', 'ru' => 'Достижения',
                 'hi' => 'उपलब्धियाँ',
             ]],
-            ['slug' => 'identity', 'name' => 'Identity', 'title' => [
-                'en' => 'Our identity', 'ar' => 'هويتنا', 'fr' => 'Notre identité', 'es' => 'Nuestra identidad',
-                'de' => 'Unsere Identität', 'it' => 'La nostra identità', 'pt' => 'A nossa identidade',
-                'ru' => 'Наша айдентика', 'hi' => 'हमारी पहचान',
+            ['slug' => 'brands', 'name' => 'Brands', 'title' => [
+                'en' => 'Brands', 'ar' => 'العلامات التجارية', 'fr' => 'Marques', 'es' => 'Marcas',
+                'de' => 'Marken', 'it' => 'Marche', 'pt' => 'Marcas', 'ru' => 'Бренды', 'hi' => 'ब्रांड',
             ]],
             ['slug' => 'jobs', 'name' => 'Careers', 'title' => [
                 'en' => 'Careers', 'ar' => 'الوظائف', 'fr' => 'Carrières', 'es' => 'Empleo',

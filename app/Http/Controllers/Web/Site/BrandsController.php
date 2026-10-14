@@ -13,7 +13,7 @@ class BrandsController extends SiteController
     {
         $locale = $this->site()->locale();
 
-        $page = Page::query()->live()->where('slug', 'identity')->firstOrFail();
+        $page = Page::query()->live()->where('slug', 'brands')->firstOrFail();
 
         $brands = Brand::query()->live()->with('media')->orderBy('name')->get();
 
